@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>LeetCode 算法题解</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- 引入 Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="container mt-3">
+    <!-- 搜索表单 -->
+    <form action="{{ url_for('main.problems') }}" method="get" class="form-inline mb-3">
+        <input type="text" name="search" placeholder="" value="{{ search_query }}" class="form-control mr-2">
+        <button type="submit" class="btn btn-primary">搜索</button>
+    </form>
+
+    <!-- 标签筛选 -->
+    <div class="form-group mb-3">
+        <form action="{{ url_for('main.problems') }}" method="get">
+            <select name="tag" onchange="this.form.submit()" class="form-control">
+                <option value="">所有</option>
+                    {% for tag_slug, tag_name in tags.items() %}
+                        <option value="{{ tag_slug }}" {% if selected_tag == tag_slug %}selected{% endif %}>{{ tag_name }}</option>
+                    {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- 问题列表 -->
+    <ul class="list-group mb-3">
+        {% for problem in problems %}
+            <li class="list-group-item">
+                <a href="{{ url_for('main.problem_detail', title_slug=problem.title_slug) }}">{{ problem.title_cn }}</a>
+                <span class="badge badge-secondary">{{ problem.difficulty|difficulty }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- 分页 -->
+    <nav>
+        <ul class="pagination">
+            {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.problems', page=page-1, search=search_query, tag=selected_tag) }}">上一页</a>
+                </li>
+            {% endif %}
+
+            {% set max_pages_to_show = 10 %}
+            {% set half_way = max_pages_to_show // 2 %}
+            {% set start_page = page - half_way if page - half_way > 0 else 1 %}
+            {% set end_page = start_page + max_pages_to_show - 1 if start_page + max_pages_to_show - 1 < total_pages else total_pages %}
+            {% if end_page - start_page < max_pages_to_show - 1 %}
+                {% set start_page = end_page - max_pages_to_show + 1 if end_page - max_pages_to_show + 1 > 0 else 1 %}
+            {% endif %}
+
+            {% for p in range(start_page, end_page + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.problems', page=p, search=search_query, tag=selected_tag) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.problems', page=page+1, search=search_query, tag=selected_tag) }}">下一页</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</body>
+</html>
