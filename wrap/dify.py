@@ -9,6 +9,8 @@ API_KEY = os.getenv("DIFY_API_KEY")
 
 
 def fuzzy_search(query):
+    if API_KEY == '' or API_KEY is None:
+        return
     url = BASE_URL + '/chat-messages'
     headers = {
         'Authorization': f'Bearer {API_KEY}',
