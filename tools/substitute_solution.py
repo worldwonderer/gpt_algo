@@ -20,7 +20,13 @@ def read_prompt(name):
 
 
 def parse_response(res):
-    clean_json = res.content.split('```json\n')[-1].replace('\n```', '')
+    if len(res.content) == 0:
+        return
+    # res.content may be wrapped by ""
+    if res.content[0] == '"':
+        clean_json = json.loads(res.content).replace('```json\n', '').replace('\n```', '')
+    else:
+        clean_json = res.content.replace('```json\n', '').replace('\n```', '')
     try:
         data = json.loads(clean_json)
     except json.JSONDecodeError as e:
@@ -33,17 +39,14 @@ def update_solution(title_slug, code):
     chat = ChatOpenAI(model_name='gpt-4', temperature=0.7)
     doc = collection.find_one({'_id': title_slug})
     # acquire solution explanation first
-    desc_text = '\n'.join([html2text.html2text(x) for x in [doc['title_cn'] or '', doc['content_cn'] or '']])[:500]
+    desc_text = '\n'.join([html2text.html2text(x) for x in [doc['title_cn'] or '', doc['content_cn'] or '']])[:300]
     explain_template = read_prompt('explain')
     explain_prompt = explain_template.replace('${desc}', desc_text).replace('${code}', code)
     res = chat.invoke(explain_prompt)
     explain = parse_response(res)['solution']
     print('explain', explain)
-    collection.update_one({'_id': doc['_id']}, {'$set': {'explain': explain}})
     # acquire solution follow-up
-    explain_text = '\n'.join([explain['approach'].strip(), '时间复杂度: ' +
-                              explain['timeComplexity']['result'], '空间复杂度: ' +
-                              explain['spaceComplexity']['result'], explain['code']])
+    explain_text = '\n'.join([explain['approach'].strip(), explain['code']])
     question_template = read_prompt('follow_up')
     question_prompt = question_template.replace('${desc}', desc_text).replace('${explain}', explain_text)
     res = chat.invoke(question_prompt)
@@ -52,11 +55,12 @@ def update_solution(title_slug, code):
     # acquire follow-up answers
     answer_template = read_prompt('follow_up_answer')
     answer_prompt = answer_template.replace('${desc}', desc_text).replace('${explain}', explain_text).replace(
-        '${question_list}', json.dumps(questions))
+        '${question_list}', json.dumps(questions[:3]))
     res = chat.invoke(answer_prompt)
     explore = parse_response(res)['questions']
     print('explore', explore)
     collection.update_one({'_id': doc['_id']}, {'$set': {'explore': explore}})
+    collection.update_one({'_id': doc['_id']}, {'$set': {'explain': explain}})
     collection.update_one({'_id': doc['_id']}, {'$set': {'submission.code': code}})
 
 
