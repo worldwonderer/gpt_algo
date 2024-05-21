@@ -1,5 +1,5 @@
 def difficulty_filter(difficulty):
-    mapping = {1: '简单', 2: '中等', 3: '困难'}
+    mapping = {1: 'Easy', 2: 'Medium', 3: 'Hard'}
     return mapping.get(difficulty, '未知')
 
 

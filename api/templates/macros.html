@@ -1,0 +1,35 @@
+{% macro render_pagination(page, total_pages, search_query, selected_tag) %}
+    <nav class="problems-pagination">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.problems', page=page-1, search=search_query, tag=selected_tag) }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% set max_pages_to_show = 10 %}
+            {% set half_way = max_pages_to_show // 2 %}
+            {% set start_page = page - half_way if page - half_way > 0 else 1 %}
+            {% set end_page = start_page + max_pages_to_show - 1 if start_page + max_pages_to_show - 1 < total_pages else total_pages %}
+            {% if end_page - start_page < max_pages_to_show - 1 %}
+                {% set start_page = end_page - max_pages_to_show + 1 if end_page - max_pages_to_show + 1 > 0 else 1 %}
+            {% endif %}
+
+            {% for p in range(start_page, end_page + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.problems', page=p, search=search_query, tag=selected_tag) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.problems', page=page+1, search=search_query, tag=selected_tag) }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endmacro %}

@@ -3,67 +3,53 @@
 <head>
     <title>LeetCode 算法题解</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <!-- 引入 Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='list.css') }}">
 </head>
-<body class="container mt-3">
-    <!-- 搜索表单 -->
-    <form action="{{ url_for('main.problems') }}" method="get" class="form-inline mb-3">
-        <input type="text" name="search" placeholder="" value="{{ search_query }}" class="form-control mr-2">
-        <button type="submit" class="btn btn-primary">搜索</button>
-    </form>
+<body>
+    <div class="container mt-3">
+        <header class="problems-header">
+            <h1>LeetCode 算法题解</h1>
+        </header>
 
-    <!-- 标签筛选 -->
-    <div class="form-group mb-3">
-        <form action="{{ url_for('main.problems') }}" method="get">
-            <select name="tag" onchange="this.form.submit()" class="form-control">
-                <option value="">所有</option>
-                    {% for tag_slug, tag_name in tags.items() %}
-                        <option value="{{ tag_slug }}" {% if selected_tag == tag_slug %}selected{% endif %}>{{ tag_name }}</option>
-                    {% endfor %}
-            </select>
-        </form>
+        <div class="filter-section">
+            <form action="{{ url_for('main.problems') }}" method="get" class="search-form">
+                <div class="input-group">
+                    <input type="text" name="search" placeholder="搜索题目" value="{{ search_query }}" class="form-control">
+                    <select name="tag" id="tag-select" class="form-select">
+                        <option value="">所有标签</option>
+                        {% for tag_slug, tag_name in tags.items() %}
+                            <option value="{{ tag_slug }}" {% if selected_tag == tag_slug %}selected{% endif %}>{{ tag_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <main>
+            <div class="card problems-card">
+                <div class="card-header">
+                    <h2>Problems</h2>
+                </div>
+                <div class="card-body">
+                    <div class="list-group problem-list">
+                        {% for problem in problems %}
+                            <a href="{{ url_for('main.problem_detail', title_slug=problem.title_slug) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ problem.frontend_id + ". " }}{{ problem.title_cn }}</span>
+                                    <span class="badge rounded-pill difficulty-badge {{ problem.difficulty|difficulty }}">{{ problem.difficulty|difficulty }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% from 'macros.html' import render_pagination %}
+            {{ render_pagination(page, total_pages, search_query, selected_tag) }}
+        </main>
     </div>
-
-    <!-- 问题列表 -->
-    <ul class="list-group mb-3">
-        {% for problem in problems %}
-            <li class="list-group-item">
-                <a href="{{ url_for('main.problem_detail', title_slug=problem.title_slug) }}">{{ problem.title_cn }}</a>
-                <span class="badge badge-secondary">{{ problem.difficulty|difficulty }}</span>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <!-- 分页 -->
-    <nav>
-        <ul class="pagination">
-            {% if page > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('main.problems', page=page-1, search=search_query, tag=selected_tag) }}">上一页</a>
-                </li>
-            {% endif %}
-
-            {% set max_pages_to_show = 10 %}
-            {% set half_way = max_pages_to_show // 2 %}
-            {% set start_page = page - half_way if page - half_way > 0 else 1 %}
-            {% set end_page = start_page + max_pages_to_show - 1 if start_page + max_pages_to_show - 1 < total_pages else total_pages %}
-            {% if end_page - start_page < max_pages_to_show - 1 %}
-                {% set start_page = end_page - max_pages_to_show + 1 if end_page - max_pages_to_show + 1 > 0 else 1 %}
-            {% endif %}
-
-            {% for p in range(start_page, end_page + 1) %}
-                <li class="page-item {% if p == page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('main.problems', page=p, search=search_query, tag=selected_tag) }}">{{ p }}</a>
-                </li>
-            {% endfor %}
-
-            {% if page < total_pages %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('main.problems', page=page+1, search=search_query, tag=selected_tag) }}">下一页</a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
