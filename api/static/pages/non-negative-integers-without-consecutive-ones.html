@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>不含连续1的非负整数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>不含连续1的非负整数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个正整数 <code>n</code> ，请你统计在&nbsp;<code>[0, n]</code> 范围的非负整数中，有多少个整数的二进制表示中不存在 <strong>连续的 1 </strong>。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> n = 5
+<strong>输出:</strong> 5
+<strong>解释:</strong> 
+下面列出范围在 [0, 5] 的非负整数与其对应的二进制表示：
+0 : 0
+1 : 1
+2 : 10
+3 : 11
+4 : 100
+5 : 101
+其中，只有整数 3 违反规则（有两个连续的 1 ），其他 5 个满足规则。</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> n = 1
+<strong>输出:</strong> 2
+</pre>
+
+<p><strong>示例 3:</strong></p>
+
+<pre>
+<strong>输入:</strong> n = 2
+<strong>输出:</strong> 3
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findIntegers(self, n: int) -&gt; int:
+        s = str(bin(n))[2:]
+        @cache
+        def dfs(i, isOne, isLimit):
+            if i == len(s):
+                return 1
+            res = 0
+            up = s[i] if isLimit else &#39;1&#39;
+
+            res += dfs(i+1, False, isLimit and up == &#39;0&#39;)
+            if not isOne and up == &#39;1&#39;:
+                res += dfs(i+1, True, isLimit)
+
+            return res
+        return dfs(0, False, True)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了深度优先搜索（DFS）和动态规划的方法，结合位操作和记忆化来解决问题。核心思路是递归地构建符合条件的整数，同时确保不会超过给定的上限 n。递归函数 dfs(i, isOne, isLimit) 考虑当前正在处理的比特位索引 i，isOne 表示前一个比特位是否是1，isLimit 表示当前位是否受到 n 的限制。如果当前位 i 等于二进制表示的长度，说明已构建完成一个有效的整数，返回1。函数中，up 变量根据 isLimit 决定当前位能取的最大值。当上一位不是1且当前位可取1时，会继续递归探索。使用 @cache 装饰器对递归结果进行缓存，以避免重复计算。</p>
+                                <p>时间复杂度: O(log n)</p>
+                                <p>空间复杂度: O(log n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findIntegers(self, n: int) -&gt; int:
+        s = str(bin(n))[2:] # 将 n 转换为二进制字符串，去掉前缀&#39;0b&#39;
+        @cache
+        def dfs(i, isOne, isLimit):
+            if i == len(s): # 如果已处理完所有位，返回1
+                return 1
+            res = 0
+            up = s[i] if isLimit else &#39;1&#39; # 根据是否受限决定当前位能取的最大值
+
+            res += dfs(i+1, False, isLimit and up == &#39;0&#39;) # 探索放置0的情况
+            if not isOne and up == &#39;1&#39;: # 如果前一位不是1且当前位可以放1，则探索放置1的情况
+                res += dfs(i+1, True, isLimit)
+
+            return res
+        return dfs(0, False, True) # 从第0位开始，没有前一位，且受限于 n</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在递归调用dfs时，参数isLimit和isOne的具体作用是什么？如何影响递归过程中的决策？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数dfs中，参数isOne用于记录前一个比特位是否是1，这是为了确保不生成含连续1的整数。如果前一个比特位是1，则当前位不能再放1，只能放0。参数isLimit表示当前正在处理的比特位是否受到输入n的限制。如果isLimit为true，意味着当前比特位要确保不超过n的相应位，否则可以随意设为0或1（不超过上限1）。这两个参数共同影响递归过程，确保生成的整数不仅符合不含连续1的条件，而且不会超过n。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理每个比特位时，只有当上一个比特位不是1时，我们才考虑将当前比特位设置为1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这是因为题目的要求是产生不含连续1的非负整数。如果上一个比特位已经是1，再将当前比特位设为1就会产生连续的1，违反题目要求。因此，只有当上一个比特位是0时，我们才能将当前比特位考虑设置为1，以避免生成连续的1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在确定变量up的值时，为什么当isLimit为true时，up取值为s[i]，而当isLimit为false时，up恒定为&#39;1&#39;？这种设计的逻辑依据是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>变量up用于确定在给定的比特位上可能放置的最大值。当isLimit为true时，表示当前正在生成的数必须小于或等于n，因此当前位的最大值直接受到n的当前位（s[i]）的限制。当isLimit为false时，表示当前位不受n的限制，可以自由放置0或1，因此最大值设为&#39;1&#39;。这种设计确保在不超过n的约束下尽可能自由地生成符合条件的数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在递归函数dfs中，返回值是如何累计的，特别是在处理不同比特位时，如何确保不重复计数符合条件的整数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数dfs中，每次递归调用都对应了将当前比特位设为0或1的两种可能情况（如果条件允许）。每次递归返回的是从当前比特位到最后一位所能生成的所有符合条件的整数数量。通过递归的方式，我们将每个比特位的可能结果累加，最终在递归的顶层得到所有可能的符合条件的整数总数。由于利用了缓存（@cache），确保了相同状态的递归结果不会被重复计算，从而有效避免了重复计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/house-robber" class="list-group-item list-group-item-action">
+                                打家劫舍
+                            </a>
+                        
+                            <a href="/problem/house-robber-ii" class="list-group-item list-group-item-action">
+                                打家劫舍 II
+                            </a>
+                        
+                            <a href="/problem/ones-and-zeroes" class="list-group-item list-group-item-action">
+                                一和零
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/non-negative-integers-without-consecutive-ones')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/non-negative-integers-without-consecutive-ones/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

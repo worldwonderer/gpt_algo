@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>删除元素后和的最小差值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>删除元素后和的最小差值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;，它包含&nbsp;<code>3 * n</code>&nbsp;个元素。</p>
+
+<p>你可以从 <code>nums</code>&nbsp;中删除 <strong>恰好</strong>&nbsp;<code>n</code>&nbsp;个元素，剩下的 <code>2 * n</code>&nbsp;个元素将会被分成两个 <strong>相同大小</strong>&nbsp;的部分。</p>
+
+<ul>
+	<li>前面&nbsp;<code>n</code>&nbsp;个元素属于第一部分，它们的和记为&nbsp;<code>sum<sub>first</sub></code>&nbsp;。</li>
+	<li>后面&nbsp;<code>n</code>&nbsp;个元素属于第二部分，它们的和记为&nbsp;<code>sum<sub>second</sub></code>&nbsp;。</li>
+</ul>
+
+<p>两部分和的 <strong>差值</strong>&nbsp;记为&nbsp;<code>sum<sub>first</sub> - sum<sub>second</sub></code>&nbsp;。</p>
+
+<ul>
+	<li>比方说，<code>sum<sub>first</sub> = 3</code> 且&nbsp;<code>sum<sub>second</sub> = 2</code>&nbsp;，它们的差值为&nbsp;<code>1</code>&nbsp;。</li>
+	<li>再比方，<code>sum<sub>first</sub> = 2</code> 且&nbsp;<code>sum<sub>second</sub> = 3</code>&nbsp;，它们的差值为&nbsp;<code>-1</code>&nbsp;。</li>
+</ul>
+
+<p>请你返回删除 <code>n</code>&nbsp;个元素之后，剩下两部分和的 <strong>差值的最小值</strong>&nbsp;是多少。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums = [3,1,2]
+<b>输出：</b>-1
+<b>解释：</b>nums 有 3 个元素，所以 n = 1 。
+所以我们需要从 nums 中删除 1 个元素，并将剩下的元素分成两部分。
+- 如果我们删除 nums[0] = 3 ，数组变为 [1,2] 。两部分和的差值为 1 - 2 = -1 。
+- 如果我们删除 nums[1] = 1 ，数组变为 [3,2] 。两部分和的差值为 3 - 2 = 1 。
+- 如果我们删除 nums[2] = 2 ，数组变为 [3,1] 。两部分和的差值为 3 - 1 = 2 。
+两部分和的最小差值为 min(-1,1,2) = -1 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [7,9,5,8,1,3]
+<b>输出：</b>1
+<b>解释：</b>n = 2 。所以我们需要删除 2 个元素，并将剩下元素分为 2 部分。
+如果我们删除元素 nums[2] = 5 和 nums[3] = 8 ，剩下元素为 [7,9,1,3] 。和的差值为 (7+9) - (1+3) = 12 。
+为了得到最小差值，我们应该删除 nums[1] = 9 和 nums[4] = 1 ，剩下的元素为 [7,5,8,3] 。和的差值为 (7+5) - (8+3) = 1 。
+观察可知，最优答案为 1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>nums.length == 3 * n</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 276 ms</p>
+                    <p>内存: 48.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumDifference(self, nums: List[int]) -&gt; int:
+        N=len(nums)
+        n =N//3
+        left = [0]*n
+        right = [0]*n
+        neg = [-x for x in nums]
+        def f(a,b):
+            q = a[:n]
+            heapq.heapify(q)
+            s = sum(a[:n])
+            b[-1] = s
+            for x in a[n:2*n]:
+                if q[0] &lt; x:
+                    s += x - heapq.heappushpop(q, x)
+                b.append(s)
+        f(neg, left)
+        f(nums[::-1],right)
+        return min( -right[i]-left[3*n - 2- i] for i in range(n-1, 2*n))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>为了求差值最小的两部分和，我们可以利用两个最小堆来维护每一种可能的前n和后n元素的和。这个解决方案首先定义一个辅助函数f，该函数使用最小堆来计算前n个元素的最大可能和。对于数组的前半部分，我们使用一个负数数组来将最小堆转换成最大堆，从而可以获得前n个元素的最大和。对于数组的后半部分，我们直接使用一个最小堆来维护后n个元素的最小和。这样，对于每个元素，我们可以快速更新堆和当前的和，如果新元素比堆顶要大。最后，通过比较所有可能的前后n元素和的组合，找到最小的差值。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumDifference(self, nums: List[int]) -&gt; int:
+        N = len(nums)
+        n = N // 3
+        left = [0] * n
+        right = [0] * n
+        neg = [-x for x in nums]
+        def f(a, b):
+            q = a[:n]
+            heapq.heapify(q)
+            s = sum(a[:n])
+            b[-1] = s
+            for x in a[n:2*n]:
+                if q[0] &lt; x:
+                    s += x - heapq.heappushpop(q, x)
+                b.append(s)
+        f(neg, left)  # Process the first n elements for maximum sums
+        f(nums[::-1], right)  # Process the last n elements for minimum sums
+        return min(-right[i] - left[3 * n - 2 - i] for i in range(n - 1, 2 * n))  # Compute minimal difference</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在计算前n个元素的最大和时，需要将元素值取负再使用最小堆？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算前n个元素的最大和时，我们需要找到前n个元素中最大的元素和。由于最小堆默认是提取出最小的元素，因此通过将所有元素取负数后，原本较大的元素会变成较小的负数，这样就可以利用最小堆的性质来维护这些原始元素的最大值。在堆中，最小的负数对应着原数组中的最大数。这样操作可以有效地使用标准库中的最小堆来实现最大堆的功能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在函数f中，如果新元素比堆顶元素大时进行替换，这种操作的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在函数f中，如果新元素比堆顶元素大，进行替换的主要目的是更新当前的和以维持堆中的n个元素为当前遍历到的元素中的最大或最小n个。这样的替换确保了我们总是保持当前遍历的元素中的最大或最小累积和。替换操作后，堆重新调整，保持堆的性质，这使得我们能够快速计算出当前最优的和，并随着更多元素的遍历进行实时更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算后n个元素的最小和时，为什么选择对nums数组进行反转？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算后n个元素的最小和时，选择对nums数组进行反转是为了方便使用相同的处理逻辑来计算最小和。通过反转数组，原本数组的末尾n个元素变成了反转后数组的前n个元素，这样就可以复用前面定义的函数f，来计算这些元素的最小和。反转后，数组的遍历方式与处理前n个元素的方法相同，从而简化了代码的复杂性并保持了一致的处理逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如何保证f函数中的b数组能够正确记录每一步的和？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在f函数中，b数组用于记录每一步中的累积和。这是通过初始化一个堆和累积和变量，然后遍历元素来维护这个累积和实现的。在遍历过程中，每次堆的内容更新（如有新元素替换堆顶元素），累积和也相应地更新。这个累积和随后被记录在b数组中。具体地，b数组的每个位置记录了从数组开始到当前元素的最优和状态。通过这种方式，b数组能够准确地反映出在每个阶段堆中元素可能达到的最大或最小和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-difference-in-sums-after-removal-of-elements')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-difference-in-sums-after-removal-of-elements/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

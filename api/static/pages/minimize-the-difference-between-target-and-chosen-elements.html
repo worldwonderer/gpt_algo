@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小化目标值与所选元素的差</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小化目标值与所选元素的差</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为 <code>m x n</code> 的整数矩阵 <code>mat</code> 和一个整数 <code>target</code> 。</p>
+
+<p>从矩阵的 <strong>每一行</strong> 中选择一个整数，你的目标是&nbsp;<strong>最小化</strong>&nbsp;所有选中元素之&nbsp;<strong>和</strong>&nbsp;与目标值 <code>target</code> 的 <strong>绝对差</strong> 。</p>
+
+<p>返回 <strong>最小的绝对差</strong> 。</p>
+
+<p><code>a</code> 和 <code>b</code> 两数字的 <strong>绝对差</strong> 是 <code>a - b</code> 的绝对值。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/08/03/matrix1.png" style="width: 181px; height: 181px;" /></p>
+
+<pre>
+<strong>输入：</strong>mat = [[1,2,3],[4,5,6],[7,8,9]], target = 13
+<strong>输出：</strong>0
+<strong>解释：</strong>一种可能的最优选择方案是：
+- 第一行选出 1
+- 第二行选出 5
+- 第三行选出 7
+所选元素的和是 13 ，等于目标值，所以绝对差是 0 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/08/03/matrix1-1.png" style="width: 61px; height: 181px;" /></p>
+
+<pre>
+<strong>输入：</strong>mat = [[1],[2],[3]], target = 100
+<strong>输出：</strong>94
+<strong>解释：</strong>唯一一种选择方案是：
+- 第一行选出 1
+- 第二行选出 2
+- 第三行选出 3
+所选元素的和是 6 ，绝对差是 94 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/08/03/matrix1-3.png" style="width: 301px; height: 61px;" /></p>
+
+<pre>
+<strong>输入：</strong>mat = [[1,2,9,8,7]], target = 6
+<strong>输出：</strong>1
+<strong>解释：</strong>最优的选择方案是选出第一行的 7 。
+绝对差是 1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == mat.length</code></li>
+	<li><code>n == mat[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 70</code></li>
+	<li><code>1 &lt;= mat[i][j] &lt;= 70</code></li>
+	<li><code>1 &lt;= target &lt;= 800</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 53 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre"># class Solution:
+#     def minimizeTheDifference(self, mat: List[List[int]], target: int) -&gt; int:
+#         m, n = len(mat), len(mat[0])
+#         # 什么都不选时和为 0
+#         f = {0}
+#         # 最小的大于等于 target 的和
+#         large = float(&#34;inf&#34;)
+#         for i in range(m):
+#             g = set()
+#             next_large = float(&#34;inf&#34;)
+#             for x in mat[i]:
+#                 for j in f:
+#                     if j + x &gt;= target:
+#                         next_large = min(next_large, j + x)
+#                     else:
+#                         g.add(j + x)
+#                 next_large = min(next_large, large + x)
+#             f = g
+#             large = next_large
+        
+#         ans = abs(large - target)
+#         for x in f:
+#             ans = min(ans, abs(x - target))
+#         return ans
+class Solution:
+    def minimizeTheDifference(self, mat: List[List[int]], target: int) -&gt; int:
+        bits=1
+        for row in mat:
+            tmp=0
+            for r in row:
+                tmp |= (bits&lt;&lt;r)
+            bits=tmp
+        # print(bits)
+        ans=inf
+        for i in range(target,4901,1):
+            if bits &amp;(1&lt;&lt;i):
+                ans=min(ans,i-target)
+                break
+        for i in range(target,-1,-1):
+            if bits &amp;(1&lt;&lt;i):
+                ans=min(ans,target-i)
+                break
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了动态规划的思想，结合状态压缩的技术来解决问题。核心思路是使用位运算的技巧，通过整数的每一位来表示某个和是否可达。具体步骤如下：
+1. 初始状态`bits`设为1，表示只有和为0是可达的。
+2. 遍历矩阵的每一行，对于每个元素，更新可达和的状态。这是通过将`bits`左移元素值位，然后与原`bits`做或运算实现的。
+3. 最后，在所有可能的和中，找到最接近target的值，计算其与target的差值。</p>
+                                <p>时间复杂度: O(m * n + 4900)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def minimizeTheDifference(self, mat: List[List[int]], target: int) -&gt; int:
+        # 初始化bits，只有和为0是可达的
+        bits = 1
+        # 遍历矩阵的每一行
+        for row in mat:
+            tmp = 0
+            # 遍历行中的每一个元素
+            for r in row:
+                # 更新可达和的状态
+                tmp |= (bits &lt;&lt; r)
+            bits = tmp
+        # 初始化答案为无穷大
+        ans = float(&#39;inf&#39;)
+        # 寻找大于等于target的最小可达和
+        for i in range(target, 4901):
+            if bits &amp; (1 &lt;&lt; i):
+                ans = min(ans, i - target)
+                break
+        # 寻找小于target的最大可达和
+        for i in range(target, -1, -1):
+            if bits &amp; (1 &lt;&lt; i):
+                ans = min(ans, target - i)
+                break
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划中，为什么使用位运算来表示和的可达状态而不是使用常规的数组或哈希表？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位运算可以更加高效地存储和处理状态信息。使用位运算（特别是位向量），每个比特(bit)可以代表一个状态（例如和是否可达），这样可以极大地节省空间，同时位运算（如与、或、左移）都是非常快速的操作，特别适合用于需要频繁更新状态的动态规划问题。相比之下，使用数组或哈希表虽然在逻辑上更直观，但在空间和操作效率上可能不如位运算优越。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何保证在将`bits`左移元素值位后与原`bits`做或运算确实可以正确地更新和的可达状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，每一步的`bits`表示当前所有可达的和。当将`bits`左移一个元素的值r位时，原本可达的和x变成了x+r，这代表和x+r现在也是可达的。通过对所有可能的x执行这样的操作，我们可以得到所有通过加上该元素后可能达到的和。将这个结果与原本的`bits`做或运算，意味着合并新的可达和与原有的可达和，确保所有之前和新增的可达和都被记录。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到最大可能和为4900，这个数字是如何得出的？它是否适用于所有输入矩阵的规模？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>最大可能和4900是基于矩阵的最大行数和每个元素的最大可能值估算得出的。假设矩阵的每一行都选择了最大值，而没有给出具体的矩阵规模与元素大小限制，常见的假设是每个元素的大小不会超过100，如果矩阵有最多70行（这是一个假设的常见行数上限），则最大可能和为70*100=7000。4900可能是一个估计或特定问题设定下的值。如果矩阵行数或元素大小有不同，这个数字可能需要调整。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在寻找最小绝对差时要分别从target向上和向下寻找可达的和？直接寻找最接近target的可达和不可以吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接寻找最接近target的可达和在理论上是可行的，但在实现时可能需要更复杂的逻辑来同时处理大于和小于target的情况。通过分别向上和向下寻找，可以简化逻辑：先找到第一个大于等于target的可达和，然后找到最大的小于等于target的可达和，这两个值保证了覆盖所有接近target的情况。这种方法可以更系统地确保找到真正的最小绝对差，尤其是在状态空间大而稀疏时更有效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimize-the-difference-between-target-and-chosen-elements')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimize-the-difference-between-target-and-chosen-elements/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

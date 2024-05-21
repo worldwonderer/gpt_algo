@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>婴儿名字</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>婴儿名字</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>每年，政府都会公布一万个最常见的婴儿名字和它们出现的频率，也就是同名婴儿的数量。有些名字有多种拼法，例如，John 和 Jon 本质上是相同的名字，但被当成了两个名字公布出来。给定两个列表，一个是名字及对应的频率，另一个是本质相同的名字对。设计一个算法打印出每个真实名字的实际频率。注意，如果 John 和 Jon 是相同的，并且 Jon 和 Johnny 相同，则 John 与 Johnny 也相同，即它们有传递和对称性。</p>
+
+<p>在结果列表中，选择<strong> 字典序最小 </strong>的名字作为真实名字。</p>
+
+<p> </p>
+
+<p><strong>示例：</strong></p>
+
+<pre>
+<strong>输入：</strong>names = ["John(15)","Jon(12)","Chris(13)","Kris(4)","Christopher(19)"], synonyms = ["(Jon,John)","(John,Johnny)","(Chris,Kris)","(Chris,Christopher)"]
+<strong>输出：</strong>["John(27)","Chris(36)"]</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>names.length <= 100000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 132 ms</p>
+                    <p>内存: 19.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def trulyMostPopular(self, names: List[str], synonyms: List[str]) -&gt; List[str]:
+        if len(names) &lt;= 0:
+            return []
+        
+        # union find set
+        syn_map = dict()
+        for x in synonyms:
+            child, parent = x.split(&#39;,&#39;)
+            child = child.lstrip(&#39;(&#39;)
+            parent = parent.rstrip(&#39;)&#39;)
+            root1 = child
+            while root1 in syn_map:
+                root1 = syn_map[root1]
+            root2 = parent
+            while root2 in syn_map:
+                root2 = syn_map[root2]
+            if root1 == root2:
+                continue    
+                
+            if root1 &lt; root2:
+                syn_map[root2] = root1
+            else:
+                syn_map[root1] = root2
+                
+        #print(synonyms)
+        #print(syn_map)
+        #exit(0)
+            
+        freq_map = dict()
+        for x in names:
+            name, freq = x.split(&#39;(&#39;)
+            freq = int(freq.split(&#39;)&#39;)[0])
+            root = name
+            while root in syn_map:
+                root = syn_map[root]
+            freq_map[root] = freq_map.get(root, 0) + freq
+            
+        return [&#34;{}({})&#34;.format(k, v) for k, v in freq_map.items()]    
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了并查集的数据结构来处理名字的等价关系。首先，通过处理synonyms列表来构建一个等价关系图，将具有相同含义的名字进行合并。合并规则是，总是让字典序较小的名字作为代表。接着，通过遍历names列表，将每个名字的频率累加到其根节点（即代表名字）上。最后，输出所有有频率记录的根节点及其对应的频率。这种方法有效地将所有同义名字归并到一个名字上，并且处理了名字间的传递性等价关系。</p>
+                                <p>时间复杂度: O((A + B) * α(N))</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def trulyMostPopular(self, names: List[str], synonyms: List[str]) -&gt; List[str]:
+        if len(names) &lt;= 0:
+            return []
+        
+        # 使用并查集来处理名字的等价关系
+        syn_map = dict()
+        for x in synonyms:
+            child, parent = x.split(&#39;,&#39;)
+            child = child.lstrip(&#39;(&#39;)
+            parent = parent.rstrip(&#39;)&#39;)
+            # 查找每个名字当前的根节点
+            root1 = child
+            while root1 in syn_map:
+                root1 = syn_map[root1]
+            root2 = parent
+            while root2 in syn_map:
+                root2 = syn_map[root2]
+            # 如果根节点相同，说明已在同一集合中
+            if root1 == root2:
+                continue
+            
+            # 将根节点字典序较大的名字合并到字典序较小的名字下
+            if root1 &lt; root2:
+                syn_map[root2] = root1
+            else:
+                syn_map[root1] = root2
+                
+        # 统计每个根节点的频率
+        freq_map = dict()
+        for x in names:
+            name, freq = x.split(&#39;(&#39;)
+            freq = int(freq.split(&#39;)&#39;)[0])
+            root = name
+            while root in syn_map:
+                root = syn_map[root]
+            freq_map[root] = freq_map.get(root, 0) + freq
+            
+        # 输出格式化的结果
+        return [&#34;{}({})&#34;.format(k, v) for k, v in freq_map.items()]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在并查集中，如何确保总是将字典序较小的名字作为代表名字？具体的合并逻辑是怎样实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在并查集的实现中，每次合并两个集合时，会先找到两个名字的根节点。接着，比较这两个根节点的字典序，将字典序较大的名字的根节点指向字典序较小的名字的根节点。这样，每个集合的代表（根节点）总是字典序最小的名字。具体逻辑是：1) 通过递归或迭代找到每个名字的根节点；2) 比较两个根节点的字典序；3) 更新较大字典序名字的根节点指针，指向较小字典序名字的根节点。这种做法确保了合并后的根节点总是最小字典序的名字，保持了集合的有序性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            并查集在合并过程中，如果遇到名字的链条很长，如何优化以提高查找根节点的效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在并查集中，为了优化长链条问题，可以使用两种主要的技术：路径压缩和按秩合并。路径压缩是在查找根节点的过程中，将查找路径上的每个节点直接连接到根节点，从而减少后续查找时间。按秩合并是根据每个节点的秩（通常是树的高度或大小）来决定合并方向，一般将秩较小的根节点指向秩较大的根节点，这样可以避免树过度增长。通过这两种技术，可以显著减少查找根节点的平均时间复杂度，使得并查集操作更加高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理名字的频率时，频率映射表是如何确保合并后只有根节点存储最终频率的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理名字频率时，首先将每个名字的频率加到其对应的根节点上。具体操作是：1) 对于每个名字，通过并查集找到其根节点；2) 将名字的频率累加到根节点的频率上。这样，即使多个名字因为同义关系合并到一起，它们的频率也会被正确地加到同一个根节点上。最终，频率映射表中只记录每个根节点的总频率，而非合并前的各个名字的频率。这样可以确保输出的是合并后的名字及其总频率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/baby-names-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/baby-names-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

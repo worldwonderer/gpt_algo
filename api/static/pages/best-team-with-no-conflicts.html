@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>无矛盾的最佳球队</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>无矛盾的最佳球队</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>假设你是球队的经理。对于即将到来的锦标赛，你想组合一支总体得分最高的球队。球队的得分是球队中所有球员的分数 <strong>总和</strong> 。</p>
+
+<p>然而，球队中的矛盾会限制球员的发挥，所以必须选出一支 <strong>没有矛盾</strong> 的球队。如果一名年龄较小球员的分数 <strong>严格大于</strong> 一名年龄较大的球员，则存在矛盾。同龄球员之间不会发生矛盾。</p>
+
+<p>给你两个列表 <code>scores</code> 和 <code>ages</code>，其中每组 <code>scores[i]</code> 和 <code>ages[i]</code> 表示第 <code>i</code> 名球员的分数和年龄。请你返回 <strong>所有可能的无矛盾球队中得分最高那支的分数</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>scores = [1,3,5,10,15], ages = [1,2,3,4,5]
+<strong>输出：</strong>34
+<strong>解释：</strong>你可以选中所有球员。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>scores = [4,5,6,5], ages = [2,1,2,1]
+<strong>输出：</strong>16
+<strong>解释：</strong>最佳的选择是后 3 名球员。注意，你可以选中多个同龄球员。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>scores = [1,2,3,5], ages = [8,9,10,1]
+<strong>输出：</strong>6
+<strong>解释：</strong>最佳的选择是前 3 名球员。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= scores.length, ages.length &lt;= 1000</code></li>
+	<li><code>scores.length == ages.length</code></li>
+	<li><code>1 &lt;= scores[i] &lt;= 10<sup>6</sup></code></li>
+	<li><code>1 &lt;= ages[i] &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 100 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def bestTeamScore(self, scores: List[int], ages: List[int]) -&gt; int:
+        u = max(ages)
+        t = [0] * (u + 1)
+
+        # 返回 max(max_sum[:i+1])
+        def query(i: int) -&gt; int:
+            mx = 0
+            while i:
+                mx = max(mx, t[i])
+                i &amp;= i - 1
+            return mx
+
+        # 更新 max_sum[i] 为 mx
+        def update(i: int, mx: int) -&gt; None:
+            while i &lt; len(t):
+                t[i] = max(t[i], mx)
+                i += i &amp; -i
+
+        for score, age in sorted(zip(scores, ages)):
+            update(age, query(age) + score)
+        return query(u)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了结合排序和树状数组（Binary Indexed Tree, BIT）的动态规划方法。首先，通过将球员按照年龄排序（如果年龄相同则按分数排序），确保能够以非降序处理球员。这样，在处理每个球员时，可以保证其之前的球员要么年龄小于等于当前球员，要么年龄相同但分数不大于当前球员。然后，使用树状数组来维护不同年龄下可达到的最高分数总和。对于每个球员，通过树状数组查询当前年龄可达到的最大分数，并更新该年龄的分数总和。最后，通过查询最大年龄的信息，得到最大分数总和。</p>
+                                <p>时间复杂度: O(n log n + n log(maxAge))</p>
+                                <p>空间复杂度: O(maxAge + n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def bestTeamScore(self, scores: List[int], ages: List[int]) -&gt; int:
+        u = max(ages)
+        t = [0] * (u + 1)
+
+        def query(i: int) -&gt; int:
+            # 查询树状数组中从1到i的最大值
+            mx = 0
+            while i:
+                mx = max(mx, t[i])
+                i &amp;= i - 1
+            return mx
+
+        def update(i: int, mx: int) -&gt; None:
+            # 更新树状数组，将位置i的值更新为当前路径的最大值
+            while i &lt; len(t):
+                t[i] = max(t[i], mx)
+                i += i &amp; -i
+
+        # 对球员按年龄和分数排序，确保处理顺序符合题目要求
+        for score, age in sorted(zip(scores, ages)):
+            # 对于每个球员，更新其年龄对应的最大分数
+            update(age, query(age) + score)
+        # 查询最大年龄对应的最大分数总和
+        return query(u)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么首先需要将球员按照年龄和分数进行排序？排序的具体规则是什么，即当年龄相同时分数如何排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>球员的排序是为了保证处理球员时，可以通过动态规划的方式逐步构建最佳球队。排序规则是首先按年龄升序排序，如果年龄相同，则按分数升序排序。这样做的目的是在处理每个球员时，可以保证之前处理的球员要么年龄小于等于当前球员，要么年龄相同但分数不大于当前球员。这种排序方式确保了在使用动态规划时，可以正确地依赖之前的状态来更新当前状态，从而找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用树状数组（Binary Indexed Tree, BIT）来维护最高分数总和，树状数组中每个位置代表的具体含义是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，树状数组中的每个位置代表了对应年龄的最高分数总和。具体来说，如果树状数组的索引为i，则该位置存储的是年龄为i的球员组成的球队可以达到的最高分数总和。这种结构允许我们通过高效的更新和查询操作，快速地计算和更新不同年龄下的球队的最高分数总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用树状数组的查询和更新操作中，查询函数`query()`的实现逻辑是什么，它如何确保能获取到当前年龄最大的分数总和？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>查询函数`query()`的实现逻辑是从指定的年龄开始，向下迭代到年龄1，通过树状数组中的链接结构逐个查询更小的年龄范围，累计这些范围内的最大分数总和。在每次迭代中，它使用`i &amp;= i - 1`来移动到下一个需要查询的索引。这种方法确保了能够获取到从年龄1到当前年龄i的球员组成的球队可能达到的最大分数总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            更新函数`update()`在树状数组中的作用是什么，它是如何确保树状数组中存储的是某个年龄下的最高分数总和的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>更新函数`update()`的作用是将树状数组中的某个特定年龄的最高分数总和更新为新的更高值。它通过从指定的年龄索引开始，逐步向数组的较高索引移动，并在每个步骤中更新存储的分数总和。这是通过`i += i &amp; -i`实现的，该操作确保了能逐步覆盖所有包含该年龄的范围。这种更新保证了在任何给定的年龄点，树状数组都能反映出到目前为止可能组成的最佳球队的最高分数总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/best-team-with-no-conflicts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/best-team-with-no-conflicts/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

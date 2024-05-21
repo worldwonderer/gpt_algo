@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>火星词典</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>火星词典</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>现有一种使用英语字母的外星文语言，这门语言的字母顺序与英语顺序不同。</p>
+
+<p>给定一个字符串列表 <code>words</code> ，作为这门语言的词典，<code>words</code> 中的字符串已经 <strong>按这门新语言的字母顺序进行了排序</strong> 。</p>
+
+<p>请你根据该词典还原出此语言中已知的字母顺序，并 <strong>按字母递增顺序</strong> 排列。若不存在合法字母顺序，返回 <code>&quot;&quot;</code> 。若存在多种可能的合法字母顺序，返回其中 <strong>任意一种</strong> 顺序即可。</p>
+
+<p>字符串 <code>s</code> <strong>字典顺序小于</strong> 字符串 <code>t</code> 有两种情况：</p>
+
+<ul>
+	<li>在第一个不同字母处，如果 <code>s</code> 中的字母在这门外星语言的字母顺序中位于 <code>t</code> 中字母之前，那么&nbsp;<code>s</code> 的字典顺序小于 <code>t</code> 。</li>
+	<li>如果前面 <code>min(s.length, t.length)</code> 字母都相同，那么 <code>s.length &lt; t.length</code> 时，<code>s</code> 的字典顺序也小于 <code>t</code> 。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = [&quot;wrt&quot;,&quot;wrf&quot;,&quot;er&quot;,&quot;ett&quot;,&quot;rftt&quot;]
+<strong>输出：</strong>&quot;wertf&quot;
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = [&quot;z&quot;,&quot;x&quot;]
+<strong>输出：</strong>&quot;zx&quot;
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = [&quot;z&quot;,&quot;x&quot;,&quot;z&quot;]
+<strong>输出：</strong>&quot;&quot;
+<strong>解释：</strong>不存在合法字母顺序，因此返回 <code>&quot;&quot; 。</code>
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= words.length &lt;= 100</code></li>
+	<li><code>1 &lt;= words[i].length &lt;= 100</code></li>
+	<li><code>words[i]</code> 仅由小写英文字母组成</li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 269&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/alien-dictionary/">https://leetcode-cn.com/problems/alien-dictionary/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def alienOrder(self, words: List[str]) -&gt; str:
+        edge, s = defaultdict(list), set()
+        for word in words:
+            s.update(set(word)) # 统计全部字符
+        indegree = [0] * 26 # 使用的都是英文字母！
+        pre = words[0]
+        for i in range(1, len(words)):
+            now = words[i] 
+            for sa, sb in zip(pre, now):
+                if sa != sb:
+                    edge[sa].append(sb) # 统计出度的边
+                    indegree[ord(sb) - ord(&#39;a&#39;)] += 1 # 统计入度
+                    break
+            else: # for循环没有发生break或者continue时，迭代完成后要执行的操作可在else下声明
+                if len(pre) &gt; len(now):
+                    return &#34;&#34;
+            pre = now
+        order = [e for e in s if indegree[ord(e) - ord(&#39;a&#39;)] == 0] # 从入度为0开始
+        for sa in order:
+            for sb in edge[sa]:
+                indegree[sc := ord(sb) - ord(&#39;a&#39;)] -= 1 # 海象运算符可以在运算过程中赋值！
+                if not indegree[sc]: # 入度至多有一次为0！
+                    order.append(sb) # 随着循环的进行order自动延长，直至遍历完！
+        return &#34;&#34;.join(order) if len(order) == len(s) else &#34;&#34;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题解的思路基于图论中的拓扑排序。首先，题解尝试通过给定的单词列表构建一个有向图，其中节点代表字母，有向边代表字母间的顺序关系。使用边和入度数组来建立这个图的结构。接下来，题解遍历单词列表，比较相邻的单词，找到第一个不同的字母对，以此来确定字母间的顺序关系，即在图中添加边。特别的，如果发现短单词排在长单词后面，那么立即返回空字符串，因为这是不合法的。最后，题解使用拓扑排序算法来得到一个有效的字母顺序。如果排序过程中某个时刻没有入度为0的字母而图中仍有字母未处理，则说明存在环，也返回空字符串。</p>
+                                <p>时间复杂度: O(n + V + E)</p>
+                                <p>空间复杂度: O(26) 或 O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def alienOrder(self, words: List[str]) -&gt; str:
+        edge, s = defaultdict(list), set()
+        for word in words:
+            s.update(set(word)) # 统计全部字符
+        indegree = [0] * 26 # 初始化入度数组
+        pre = words[0]
+        for i in range(1, len(words)):
+            now = words[i]
+            for sa, sb in zip(pre, now):
+                if sa != sb:
+                    edge[sa].append(sb) # 建立从sa到sb的边
+                    indegree[ord(sb) - ord(&#39;a&#39;)] += 1 # 增加sb的入度
+                    break
+            else: # 处理长度不一致的特殊情况
+                if len(pre) &gt; len(now):
+                    return &#34;&#34;
+            pre = now
+        order = [e for e in s if indegree[ord(e) - ord(&#39;a&#39;)] == 0] # 入度为0的节点作为起始点
+        for sa in order:
+            for sb in edge[sa]:
+                indegree[sc := ord(sb) - ord(&#39;a&#39;)] -= 1 # 处理sa的每一个邻接点sb
+                if not indegree[sc]: # 如果sb的入度为0，加入队列
+                    order.append(sb)
+        return &#34;&#34;.join(order) if len(order) == len(s) else &#34;&#34; # 如果排序完成的长度与节点数相同，返回结果，否则返回空字符串</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建有向图时，如果两个单词相同，比如`aa`和`aa`，这种情况在代码中是如何处理的？是否会影响图的构建或是最终的结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建有向图时，如果遇到两个单词完全相同，例如`aa`和`aa`，代码中通过`zip(pre, now)`比较相邻单词中的每个字母。由于两个单词相同，`zip`函数会比较每个位置的字母，但都是相同的，因此不会进入`if sa != sb`的逻辑块内，也就不会在图中添加任何新的边。这种情况不会影响图的构建，因为没有新的顺序关系被发现，也不会影响最终的结果，因为字母的相对顺序并没有改变。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果较短的单词排在较长的单词之后，则返回空字符串。能否详细解释为什么这种情况下必然不存在合法的字母顺序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果较短的单词排在较长的单词之后，例如`abc`之后是`ab`，这在字母顺序的逻辑上是不合法的。因为按照字典顺序的规则，如果一个单词的前缀与另一个单词相同，那么较短的单词应该排在前面。在这种情况下，`ab`不能排在`abc`之后，因为这意味着`c`需要在`b`之前出现，同时又在`b`之后出现，这自然形成了一个逻辑上的矛盾。因此，这种情况下一定不存在合法的字母顺序，所以返回空字符串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理字母入度数组时，为什么只增加不同字母对中后一个字母的入度而不是两个字母都增加？这样的处理对拓扑排序的结果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建图和处理入度数组时，我们只增加不同字母对中后一个字母的入度，因为这反映了前一个字母应该在后一个字母之前出现的顺序关系。如果我们增加两个字母的入度，这将意味着两个字母都依赖于对方，形成了一个循环依赖，这在拓扑排序中是没有意义的。正确的做法是只表达一种单向依赖关系。这样的处理确保了拓扑排序能够正确地表示字母之间的顺序，如果存在一种合法的顺序。如果处理错误，可能会导致无法解析出一个有效的顺序，或者错误地认为存在依赖环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/Jf1JuT')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/Jf1JuT/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

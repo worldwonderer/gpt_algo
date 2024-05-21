@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>猫和老鼠 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>猫和老鼠 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=game-theory" class="badge bg-secondary tag-link">博弈</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>一只猫和一只老鼠在玩一个叫做猫和老鼠的游戏。</p>
+
+<p>它们所处的环境设定是一个 <code>rows x cols</code> 的方格 <code>grid</code> ，其中每个格子可能是一堵墙、一块地板、一位玩家（猫或者老鼠）或者食物。</p>
+
+<ul>
+	<li>玩家由字符 <code>'C'</code> （代表猫）和 <code>'M'</code> （代表老鼠）表示。</li>
+	<li>地板由字符 <code>'.'</code> 表示，玩家可以通过这个格子。</li>
+	<li>墙用字符 <code>'#'</code> 表示，玩家不能通过这个格子。</li>
+	<li>食物用字符 <code>'F'</code> 表示，玩家可以通过这个格子。</li>
+	<li>字符 <code>'C'</code> ， <code>'M'</code> 和 <code>'F'</code> 在 <code>grid</code> 中都只会出现一次。</li>
+</ul>
+
+<p>猫和老鼠按照如下规则移动：</p>
+
+<ul>
+	<li>老鼠 <strong>先移动</strong> ，然后两名玩家轮流移动。</li>
+	<li>每一次操作时，猫和老鼠可以跳到上下左右四个方向之一的格子，他们不能跳过墙也不能跳出 <code>grid</code> 。</li>
+	<li><code>catJump</code> 和 <code>mouseJump</code> 是猫和老鼠分别跳一次能到达的最远距离，它们也可以跳小于最大距离的长度。</li>
+	<li>它们可以停留在原地。</li>
+	<li>老鼠可以跳跃过猫的位置。</li>
+</ul>
+
+<p>游戏有 4 种方式会结束：</p>
+
+<ul>
+	<li>如果猫跟老鼠处在相同的位置，那么猫获胜。</li>
+	<li>如果猫先到达食物，那么猫获胜。</li>
+	<li>如果老鼠先到达食物，那么老鼠获胜。</li>
+	<li>如果老鼠不能在 1000 次操作以内到达食物，那么猫获胜。</li>
+</ul>
+
+<p>给你 <code>rows x cols</code> 的矩阵 <code>grid</code> 和两个整数 <code>catJump</code> 和 <code>mouseJump</code> ，双方都采取最优策略，如果老鼠获胜，那么请你返回 <code>true</code> ，否则返回 <code>false</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/01/17/sample_111_1955.png" style="width: 580px; height: 239px;" /></strong></p>
+
+<pre>
+<b>输入：</b>grid = ["####F","#C...","M...."], catJump = 1, mouseJump = 2
+<b>输出：</b>true
+<b>解释：</b>猫无法抓到老鼠，也没法比老鼠先到达食物。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/01/17/sample_2_1955.png" style="width: 580px; height: 175px;" /></p>
+
+<pre>
+<b>输入：</b>grid = ["M.C...F"], catJump = 1, mouseJump = 4
+<b>输出：</b>true
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>grid = ["M.C...F"], catJump = 1, mouseJump = 3
+<b>输出：</b>false
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre>
+<b>输入：</b>grid = ["C...#","...#F","....#","M...."], catJump = 2, mouseJump = 5
+<b>输出：</b>false
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre>
+<b>输入：</b>grid = [".M...","..#..","#..#.","C#.#.","...#F"], catJump = 3, mouseJump = 1
+<b>输出：</b>true
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>rows == grid.length</code></li>
+	<li><code>cols = grid[i].length</code></li>
+	<li><code>1 <= rows, cols <= 8</code></li>
+	<li><code>grid[i][j]</code> 只包含字符 <code>'C'</code> ，<code>'M'</code> ，<code>'F'</code> ，<code>'.'</code> 和 <code>'#'</code> 。</li>
+	<li><code>grid</code> 中只包含一个 <code>'C'</code> ，<code>'M'</code> 和 <code>'F'</code> 。</li>
+	<li><code>1 <= catJump, mouseJump <= 8</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 630 ms</p>
+                    <p>内存: 17.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">MOUSE_TURN = 0
+CAT_TURN = 1
+UNKNOWN = 0
+MOUSE_WIN = 1
+CAT_WIN = 2
+MAX_MOVES = 1000
+DIRS = ((-1, 0), (1, 0), (0, -1), (0, 1))
+
+class Solution:
+    def canMouseWin(self, grid: List[str], catJump: int, mouseJump: int) -&gt; bool:
+        rows, cols = len(grid), len(grid[0])
+
+        def getPos(row: int, col: int) -&gt; int:
+            return row * cols + col
+
+        startMouse = startCat = food = 0
+        for i, row in enumerate(grid):
+            for j, ch in enumerate(row):
+                if ch == &#39;M&#39;:
+                    startMouse = getPos(i, j)
+                elif ch == &#39;C&#39;:
+                    startCat = getPos(i, j)
+                elif ch == &#39;F&#39;:
+                    food = getPos(i, j)
+
+        # 计算每个状态的度
+        total = rows * cols
+        degrees = [[[0, 0] for _ in range(total)] for _ in range(total)]
+        for mouse in range(total):
+            mouseRow, mouseCol = divmod(mouse, cols)
+            if grid[mouseRow][mouseCol] == &#39;#&#39;:
+                continue
+            for cat in range(total):
+                catRow, catCol = divmod(cat, cols)
+                if grid[catRow][catCol] == &#39;#&#39;:
+                    continue
+                degrees[mouse][cat][MOUSE_TURN] += 1
+                degrees[mouse][cat][CAT_TURN] += 1
+                for dx, dy in DIRS:
+                    row, col, jump = mouseRow + dx, mouseCol + dy, 1
+                    while 0 &lt;= row &lt; rows and 0 &lt;= col &lt; cols and grid[row][col] != &#39;#&#39; and jump &lt;= mouseJump:
+                        nextMouse = getPos(row, col)
+                        nextCat = getPos(catRow, catCol)
+                        degrees[nextMouse][nextCat][MOUSE_TURN] += 1
+                        row += dx
+                        col += dy
+                        jump += 1
+                    row, col, jump = catRow + dx, catCol + dy, 1
+                    while 0 &lt;= row &lt; rows and 0 &lt;= col &lt; cols and grid[row][col] != &#39;#&#39; and jump &lt;= catJump:
+                        nextMouse = getPos(mouseRow, mouseCol)
+                        nextCat = getPos(row, col)
+                        degrees[nextMouse][nextCat][CAT_TURN] += 1
+                        row += dx
+                        col += dy
+                        jump += 1
+
+        results = [[[[0, 0], [0, 0]] for _ in range(total)] for _ in range(total)]
+        q = deque()
+
+        # 猫和老鼠在同一个单元格，猫获胜
+        for pos in range(total):
+            row, col = divmod(pos, cols)
+            if grid[row][col] == &#39;#&#39;:
+                continue
+            results[pos][pos][MOUSE_TURN][0] = CAT_WIN
+            results[pos][pos][MOUSE_TURN][1] = 0
+            results[pos][pos][CAT_TURN][0] = CAT_WIN
+            results[pos][pos][CAT_TURN][1] = 0
+            q.append((pos, pos, MOUSE_TURN))
+            q.append((pos, pos, CAT_TURN))
+
+        # 猫和食物在同一个单元格，猫获胜
+        for mouse in range(total):
+            mouseRow, mouseCol = divmod(mouse, cols)
+            if grid[mouseRow][mouseCol] == &#39;#&#39; or mouse == food:
+                continue
+            results[mouse][food][MOUSE_TURN][0] = CAT_WIN
+            results[mouse][food][MOUSE_TURN][1] = 0
+            results[mouse][food][CAT_TURN][0] = CAT_WIN
+            results[mouse][food][CAT_TURN][1] = 0
+            q.append((mouse, food, MOUSE_TURN))
+            q.append((mouse, food, CAT_TURN))
+
+        # 老鼠和食物在同一个单元格且猫和食物不在同一个单元格，老鼠获胜
+        for cat in range(total):
+            catRow, catCol = divmod(cat, cols)
+            if grid[catRow][catCol] == &#39;#&#39; or cat == food:
+                continue
+            results[food][cat][MOUSE_TURN][0] = MOUSE_WIN
+            results[food][cat][MOUSE_TURN][1] = 0
+            results[food][cat][CAT_TURN][0] = MOUSE_WIN
+            results[food][cat][CAT_TURN][1] = 0
+            q.append((food, cat, MOUSE_TURN))
+            q.append((food, cat, CAT_TURN))
+
+        def getPrevStates(mouse: int, cat: int, turn: int) -&gt; List[Tuple[int, int, int]]:
+            mouseRow, mouseCol = divmod(mouse, cols)
+            catRow, catCol = divmod(cat, cols)
+            prevTurn = CAT_TURN if turn == MOUSE_TURN else MOUSE_TURN
+            maxJump = mouseJump if prevTurn == MOUSE_TURN else catJump
+            startRow = mouseRow if prevTurn == MOUSE_TURN else catRow
+            startCol = mouseCol if prevTurn == MOUSE_TURN else catCol
+            prevStates = [(mouse, cat, prevTurn)]
+            for dx, dy in DIRS:
+                i, j, jump = startRow + dx, startCol + dy, 1
+                while 0 &lt;= i &lt; rows and 0 &lt;= j &lt; cols and grid[i][j] != &#39;#&#39; and jump &lt;= maxJump:
+                    prevMouseRow = i if prevTurn == MOUSE_TURN else mouseRow
+                    prevMouseCol = j if prevTurn == MOUSE_TURN else mouseCol
+                    prevCatRow = catRow if prevTurn == MOUSE_TURN else i
+                    prevCatCol = catCol if prevTurn == MOUSE_TURN else j
+                    prevMouse = getPos(prevMouseRow, prevMouseCol)
+                    prevCat = getPos(prevCatRow, prevCatCol)
+                    prevStates.append((prevMouse, prevCat, prevTurn))
+                    i += dx
+                    j += dy
+                    jump += 1
+            return prevStates
+
+        # 拓扑排序
+        while q:
+            mouse, cat, turn = q.popleft()
+            result = results[mouse][cat][turn][0]
+            moves = results[mouse][cat][turn][1]
+            for prevMouse, prevCat, prevTurn in getPrevStates(mouse, cat, turn):
+                if results[prevMouse][prevCat][prevTurn][0] == UNKNOWN:
+                    if result == MOUSE_WIN and prevTurn == MOUSE_TURN or result == CAT_WIN and prevTurn == CAT_TURN:
+                        results[prevMouse][prevCat][prevTurn][0] = result
+                        results[prevMouse][prevCat][prevTurn][1] = moves + 1
+                        q.append((prevMouse, prevCat, prevTurn))
+                    else:
+                        degrees[prevMouse][prevCat][prevTurn] -= 1
+                        if degrees[prevMouse][prevCat][prevTurn] == 0:
+                            loseResult = CAT_WIN if prevTurn == MOUSE_TURN else MOUSE_WIN
+                            results[prevMouse][prevCat][prevTurn][0] = loseResult
+                            results[prevMouse][prevCat][prevTurn][1] = moves + 1
+                            q.append((prevMouse, prevCat, prevTurn))
+        return results[startMouse][startCat][MOUSE_TURN][0] == MOUSE_WIN and results[startMouse][startCat][MOUSE_TURN][1] &lt;= MAX_MOVES
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了多源最短路径算法的思路，将问题建模成一个图，节点表示猫和老鼠的位置，状态为当前轮到谁移动。题解首先初始化每个位置的状态，如猫和老鼠处于同一位置或者猫和食物处于同一位置。然后，通过拓扑排序和状态传播，计算出从初始位置出发，在给定步数限制内老鼠是否能赢。主要逻辑是基于反向传播：从已知的输赢状态（如猫和老鼠同格，或者到达食物），向可能到达这些状态的前序位置传播输赢结果，直至包含初始位置的状态得到解决。</p>
+                                <p>时间复杂度: O((rows * cols) ^ 2)</p>
+                                <p>空间复杂度: O((rows * cols) ^ 2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def canMouseWin(self, grid: List[str], catJump: int, mouseJump: int) -&gt; bool:
+        rows, cols = len(grid), len(grid[0])
+
+        # 计算位置序号的函数
+        def getPos(row: int, col: int) -&gt; int:
+            return row * cols + col
+
+        # 初始化起始位置
+        startMouse = startCat = food = 0
+        for i, row in enumerate(grid):
+            for j, ch in enumerate(row):
+                if ch == &#39;M&#39;:
+                    startMouse = getPos(i, j)
+                elif ch == &#39;C&#39;:
+                    startCat = getPos(i, j)
+                elif ch == &#39;F&#39;:
+                    food = getPos(i, j)
+
+        # 初始化状态的度数，考虑移动限制
+        total = rows * cols
+        degrees = [[[0, 0] for _ in range(total)] for _ in range(total)]
+        for mouse in range(total):
+            mouseRow, mouseCol = divmod(mouse, cols)
+            if grid[mouseRow][mouseCol] == &#39;#&#39;:
+                continue
+            for cat in range(total):
+                catRow, catCol = divmod(cat, cols)
+                if grid[catRow][catCol] == &#39;#&#39;:
+                    continue
+                degrees[mouse][cat][MOUSE_TURN] += 1
+                degrees[mouse][cat][CAT_TURN] += 1
+                for dx, dy in DIRS:
+                    # 老鼠的移动
+                    row, col, jump = mouseRow + dx, mouseCol + dy, 1
+                    while 0 &lt;= row &lt; rows and 0 &lt;= col &lt; cols and grid[row][col] != &#39;#&#39; and jump &lt;= mouseJump:
+                        nextMouse = getPos(row, col)
+                        nextCat = getPos(catRow, catCol)
+                        degrees[nextMouse][nextCat][MOUSE_TURN] += 1
+                        row += dx
+                        col += dy
+                        jump += 1
+                    # 猫的移动
+                    row, col, jump = catRow + dx, catCol + dy, 1
+                    while 0 &lt;= row &lt; rows and 0 &lt;= col &lt; cols and grid[row][col] != &#39;#&#39; and jump &lt;= catJump:
+                        nextMouse = getPos(mouseRow, mouseCol)
+                        nextCat = getPos(row, col)
+                        degrees[nextMouse][nextCat][CAT_TURN] += 1
+                        row += dx
+                        col += dy
+                        jump += 1
+
+        # 初始化结果状态和队列
+        results = [[[[0, 0], [0, 0]] for _ in range(total)] for _ in range(total)]
+        q = deque()
+
+        # 处理特殊情况：猫和老鼠同格、猫和食物同格
+        for pos in range(total):
+            row, col = divmod(pos, cols)
+            if grid[row][col] == &#39;#&#39;:
+                continue
+            results[pos][pos][MOUSE_TURN][0] = CAT_WIN
+            results[pos][pos][MOUSE_TURN][1] = 0
+            results[pos][pos][CAT_TURN][0] = CAT_WIN
+            results[pos][pos][CAT_TURN][1] = 0
+            q.append((pos, pos, MOUSE_TURN))
+            q.append((pos, pos, CAT_TURN))
+
+        # 处理老鼠和食物同格、猫和食物不同格的情况
+        for cat in range(total):
+            catRow, catCol = divmod(cat, cols)
+            if grid[catRow][catCol] == &#39;#&#39; or cat == food:
+                continue
+            results[food][cat][MOUSE_TURN][0] = MOUSE_WIN
+            results[food][cat][MOUSE_TURN][1] = 0
+            results[food][cat][CAT_TURN][0] = MOUSE_WIN
+            results[food][cat][CAT_TURN][1] = 0
+            q.append((food, cat, MOUSE_TURN))
+            q.append((food, cat, CAT_TURN))
+
+        # 使用拓扑排序处理所有状态，进行状态更新
+        while q:
+            mouse, cat, turn = q.popleft()
+            result = results[mouse][cat][turn][0]
+            moves = results[mouse][cat][turn][1]
+            for prevMouse, prevCat, prevTurn in getPrevStates(mouse, cat, turn):
+                if results[prevMouse][prevCat][prevTurn][0] == UNKNOWN:
+                    if result == MOUSE_WIN and prevTurn == MOUSE_TURN or result == CAT_WIN and prevTurn == CAT_TURN:
+                        results[prevMouse][prevCat][prevTurn][0] = result
+                        results[prevMouse][prevCat][prevTurn][1] = moves + 1
+                        q.append((prevMouse, prevCat, prevTurn))
+                    else:
+                        degrees[prevMouse][prevCat][prevTurn] -= 1
+                        if degrees[prevMouse][prevCat][prevTurn] == 0:
+                            loseResult = CAT_WIN if prevTurn == MOUSE_TURN else MOUSE_WIN
+                            results[prevMouse][prevCat][prevTurn][0] = loseResult
+                            results[prevMouse][prevCat][prevTurn][1] = moves + 1
+                            q.append((prevMouse, prevCat, prevTurn))
+        return results[startMouse][startCat][MOUSE_TURN][0] == MOUSE_WIN and results[startMouse][startCat][MOUSE_TURN][1] &lt;= MAX_MOVES</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            message <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>您提供的问题列表中只有一个条目“message”，这似乎是一个占位符或未完整表述的问题。请提供更具体的问题或询问关于算法、边界条件、数据结构等方面的详细信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/cat-and-mouse-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/cat-and-mouse-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

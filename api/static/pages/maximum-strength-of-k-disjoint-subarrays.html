@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>K 个不相交子数组的最大能量值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>K 个不相交子数组的最大能量值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code>&nbsp;下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;和一个 <strong>正奇数</strong>&nbsp;整数&nbsp;<code>k</code>&nbsp;。</p>
+
+<p><code>x</code> 个子数组的能量值定义为&nbsp;<code>strength = sum[1] * x - sum[2] * (x - 1) + sum[3] * (x - 2) - sum[4] * (x - 3) + ... + sum[x] * 1</code> ，其中&nbsp;<code>sum[i]</code>&nbsp;是第 <code>i</code>&nbsp;个子数组的和。更正式的，能量值是满足&nbsp;<code>1 &lt;= i &lt;= x</code>&nbsp;的所有&nbsp;<code>i</code>&nbsp;对应的&nbsp;<code>(-1)<sup>i+1</sup> * sum[i] * (x - i + 1)</code>&nbsp;之和。</p>
+
+<p>你需要在 <code>nums</code>&nbsp;中选择 <code>k</code>&nbsp;个 <strong>不相交</strong><strong>子数组</strong>&nbsp;，使得&nbsp;<strong>能量值最大</strong>&nbsp;。</p>
+
+<p>请你返回可以得到的 <strong>最大</strong><strong>能量值</strong>&nbsp;。</p>
+
+<p><strong>注意</strong>，选出来的所有子数组&nbsp;<strong>不</strong>&nbsp;需要覆盖整个数组。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,2,3,-1,2], k = 3
+<b>输出：</b>22
+<b>解释：</b>选择 3 个子数组的最好方式是选择：nums[0..2] ，nums[3..3] 和 nums[4..4] 。能量值为 (1 + 2 + 3) * 3 - (-1) * 2 + 2 * 1 = 22 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [12,-2,-2,-2,-2], k = 5
+<b>输出：</b>64
+<b>解释：</b>唯一一种选 5 个不相交子数组的方案是：nums[0..0] ，nums[1..1] ，nums[2..2] ，nums[3..3] 和 nums[4..4] 。能量值为 12 * 5 - (-2) * 4 + (-2) * 3 - (-2) * 2 + (-2) * 1 = 64 。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [-1,-2,-3], k = 1
+<b>输出：</b>-1
+<b>解释：</b>选择 1 个子数组的最优方案是：nums[0..0] 。能量值为 -1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>4</sup></code></li>
+	<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= k &lt;= n</code></li>
+	<li><code>1 &lt;= n * k &lt;= 10<sup>6</sup></code></li>
+	<li><code>k</code> 是奇数。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 876 ms</p>
+                    <p>内存: 17.8 MB</p>
+                    <pre class="bg-light p-2 code-pre"># https://leetcode.cn/u/l00/
+
+class Solution:
+    def maximumStrength(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        acc = [0]
+        for num in nums:
+            acc.append(acc[-1] + num)
+        dps = [0] * (n + 1)
+        for ck in range(k):
+            cw = k - ck
+            if ck &amp; 1: cw = -cw
+            # cw = (-1 if ck &amp; 1 else 1) * (k - ck)
+            lastDps = dps[ck]
+            dps[ck] = curs = -inf
+            # bestDps = -inf
+            for i in range(ck, n - k + ck + 1):
+                t = lastDps - acc[i] * cw
+                if curs &lt; t: curs = t
+                lastDps = dps[i + 1]
+                # if bestDps &lt; curs + acc[i + 1] * cw: bestDps = curs + acc[i + 1] * cw
+                # dps[i + 1] = bestDps
+                t = curs + acc[i + 1] * cw
+                dps[i + 1] = t if dps[i] &lt; t else dps[i]
+        return dps[-1]
+
+# class Solution:
+#     def maximumStrength(self, nums: List[int], k: int) -&gt; int:
+#         n = len(nums)
+#         acc = 0 
+#         dps = [-inf] * k
+#         res = [-inf] * k
+#         cws = [(k - ck) * (((ck &amp; 1 ^ 1) &lt;&lt; 1) -1)  for ck in range(k)]
+#         for i in range(n):
+#             preAcc = acc
+#             acc += nums[i]
+#             preRes = 0
+#             bestDps = dps[0]
+#             bestRes = res[0]
+#             for ck in range(min(i+1, k)): # for ck in range(k):
+#                 cw = cws[ck]
+#                 # if preRes - preAcc * cw &gt; bestDps: bestDps = preRes - preAcc * cw
+#                 # dps[ck] = bestDps
+#                 dps[ck] = max(dps[ck], preRes - preAcc * cw)
+#                 preRes = res[ck]
+#                 if dps[ck] + acc * cw &gt; bestRes: bestRes = dps[ck] + acc * cw
+#                 res[ck] = bestRes
+#                 # dps[ck] = max(dps[ck], preRes - preAcc * cw)
+#                 # preRes = res[ck]
+#                 # res[ck] = max(res[ck], dps[ck] + acc * cw)
+#         return res[-1]
+
+# class Solution:
+#     def maximumStrength(self, nums: List[int], k: int) -&gt; int:
+#         n = len(nums)
+#         # 整理前缀和
+#         acc = [0]
+#         for num in nums:
+#             acc.append(acc[-1] + num)
+#         # 动态规划每一层选出下标 i 范围内划分 ck 块的最优结果
+#         preDps = [0] * (n + 1)
+#         dps = [0] * (n + 1)
+#         for ck in range(k):
+#             cw = k - ck
+#             if ck &amp; 1: cw = -cw
+#             dps[ck] = -inf
+#             curs = -inf
+#             for i in range(ck, n):
+#                 curs = max(curs, preDps[i] - acc[i] * cw)
+#                 dps[i + 1] = max(dps[i], curs + acc[i + 1] * cw)
+#             dps, preDps = preDps, dps
+#         return preDps[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用动态规划的方式来求解。首先，计算数组 `nums` 的累加和 `acc`，这是为了快速计算任意子数组的和。然后，定义动态规划数组 `dps`，其中 `dps[i]` 表示在数组前 `i` 个元素中选取 `ck` 个子数组能够获得的最大能量值。对于每一个可能的 `k`，计算对应的权重 `cw`，这个权重根据 `k` 的值和当前子数组的索引 `ck` 而有所不同，具体为 `(-1)^ck * (k - ck)`。接着，遍历数组使用滚动数组方式更新 `dps`，每次考虑加入新的子数组时，更新 `dps[i]` 为包括新子数组的最大能量值。这个过程中，我们需要维护当前的最大值 `curs` 以便快速更新 `dps`。最终 `dps[-1]` 将包含在整个数组中选取 `k` 个子数组的最大能量值。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Class definition for the solution to the problem
+
+class Solution:
+    def maximumStrength(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        # Create prefix sum array
+        acc = [0]
+        for num in nums:
+            acc.append(acc[-1] + num)
+        # Initialize the DP array
+        dps = [0] * (n + 1)
+        # Iterate through possible number of subarrays
+        for ck in range(k):
+            # Calculate the weight for current number of subarrays
+            cw = k - ck
+            if ck &amp; 1: cw = -cw
+            lastDps = dps[ck]
+            dps[ck] = curs = -inf
+            # Update DP values for the current subarray count
+            for i in range(ck, n - k + ck + 1):
+                t = lastDps - acc[i] * cw
+                if curs &lt; t: curs = t
+                lastDps = dps[i + 1]
+                t = curs + acc[i + 1] * cw
+                dps[i + 1] = t if dps[i] &lt; t else dps[i]
+        # Return the maximum strength from the last DP value
+        return dps[-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在你的解决方案中，为什么选择使用动态规划方法来处理这个问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划是解决此类问题的有效方法，因为它能够将问题分解成较小的子问题，并通过解决这些子问题来构建最终解决方案。特别是在涉及到多个选择和决策步骤的问题中，如在数组中选择不相交子数组以最大化某种指标（本题中的能量值）时，动态规划可以有效地避免重复计算并储存中间结果，从而降低问题的复杂度。此外，动态规划通过迭代更新解决方案，能够确保每一步都是基于前一步的最优解，这使得最终得到的是全局最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划数组 `dps[i]` 是如何确保不同子数组之间不重叠的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法的实现中，`dps[i]` 记录的是从数组的开始到第 `i` 个元素，最多取 `ck` 个子数组时的最大能量值。通过逐步增长子数组的数量并更新 `dps[i]`，在每一步中，算法都会检查前一个最优结果和当前可能加入的子数组的组合。这里的关键在于，每次更新 `dps[i]` 时，都是基于在第 `i` 个元素之前的数组段的最优解进行更新。因此，新增的子数组始终是从前一个子数组结束之后的位置开始，这自然地保证了子数组之间不会有重叠。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你在计算权重 `cw` 时使用了 `(-1)^ck * (k - ck)`，这样的计算方式是如何来的？它与题目描述中的能量值计算有什么联系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>权重 `cw` 的计算方式是为了根据子数组的数量调整每个子数组对总能量值的贡献。这里的计算公式 `(-1)^ck * (k - ck)` 是基于子数组数量来调整权重的正负和大小。当 `ck` （当前子数组的数量）是奇数时，权重为负，这可能代表在某些情境下需要减少由于选择更多子数组带来的额外成本或惩罚。这种权重调整方式确保算法在增加子数组数量时能够平衡每个子数组的贡献，从而在满足题目要求的同时最大化总能量值。在整个解决方案的上下文中，这样的权重调整帮助算法在不同的选择中找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-strength-of-k-disjoint-subarrays')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-strength-of-k-disjoint-subarrays/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

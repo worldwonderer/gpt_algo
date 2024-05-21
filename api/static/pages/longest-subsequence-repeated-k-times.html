@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>重复 K 次的最长子序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>重复 K 次的最长子序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code> 的字符串 <code>s</code> ，和一个整数 <code>k</code> 。请你找出字符串 <code>s</code> 中 <strong>重复</strong> <code>k</code> 次的 <strong>最长子序列</strong> 。</p>
+
+<p><strong>子序列</strong> 是由其他字符串删除某些（或不删除）字符派生而来的一个字符串。</p>
+
+<p>如果&nbsp;<code>seq * k</code> 是 <code>s</code> 的一个子序列，其中 <code>seq * k</code> 表示一个由 <code>seq</code> 串联 <code>k</code>&nbsp;次构造的字符串，那么就称 <code>seq</code><strong> </strong>是字符串 <code>s</code> 中一个 <strong>重复 <code>k</code> 次</strong> 的子序列。</p>
+
+<ul>
+	<li>举个例子，<code>"bba"</code> 是字符串 <code>"bababcba"</code> 中的一个重复 <code>2</code> 次的子序列，因为字符串 <code>"bbabba"</code> 是由 <code>"bba"</code> 串联 <code>2</code> 次构造的，而&nbsp;<code>"bbabba"</code> 是字符串 <code>"<em><strong>b</strong></em>a<em><strong>bab</strong></em>c<em><strong>ba</strong></em>"</code> 的一个子序列。</li>
+</ul>
+
+<p>返回字符串 <code>s</code> 中 <strong>重复 k 次的最长子序列</strong>&nbsp; 。如果存在多个满足的子序列，则返回 <strong>字典序最大</strong> 的那个。如果不存在这样的子序列，返回一个 <strong>空</strong> 字符串。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="example 1" src="https://assets.leetcode.com/uploads/2021/08/30/longest-subsequence-repeat-k-times.png" style="width: 457px; height: 99px;" /></p>
+
+<pre>
+<strong>输入：</strong>s = "letsleetcode", k = 2
+<strong>输出：</strong>"let"
+<strong>解释：</strong>存在两个最长子序列重复 2 次：let" 和 "ete" 。
+"let" 是其中字典序最大的一个。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "bb", k = 2
+<strong>输出：</strong>"b"
+<strong>解释：</strong>重复 2 次的最长子序列是 "b" 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "ab", k = 2
+<strong>输出：</strong>""
+<strong>解释：</strong>不存在重复 2 次的最长子序列。返回空字符串。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == s.length</code></li>
+	<li><code>2 &lt;= k &lt;= 2000</code></li>
+	<li><code>2 &lt;= n &lt; k * 8</code></li>
+	<li><code>s</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1392 ms</p>
+                    <p>内存: 18.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def longestSubsequenceRepeatedK(self, s: str, k: int) -&gt; str:
+        lst = [ord(w) - ord(&#34;a&#34;) for w in s]
+        n = len(s)
+        nxt = [-1] * 26 * n
+        post = dict()
+        for i in range(n - 1, -1, -1):
+            post[lst[i]] = i
+            for j in post:
+                nxt[i * 26 + j] = post[j]
+
+        cnt = Counter(lst)
+        hot = []
+        for w in sorted(cnt, reverse=True):
+            hot.extend([w] * (cnt[w] // k))
+
+        pre = set()
+        for m in range(min(len(hot), 7), 0, -1):
+            for item in permutations(hot, m):
+                if item in pre:
+                    continue
+                pre.add(item)
+                i = j = 0
+                while j &lt; k * m and i &lt; n:
+                    i = nxt[i * 26 + item[j % m]]
+                    if i == -1:
+                        break
+                    i += 1
+                    j += 1
+                if j == k * m:
+                    word = &#34;&#34;.join([chr(x + ord(&#34;a&#34;)) for x in item])
+                    return word
+        return &#34;&#34;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的思路首先是将字符串s转换为字符的整数表示，便于后续操作。然后构建一个next数组，用于快速定位字符在字符串中的下一个出现位置，这是通过逆序遍历字符串s并记录每个字符最后出现位置来实现的。接着，利用字符频数统计，确定哪些字符的出现次数至少是k的倍数，这些字符可能构成最终答案的一部分。题解尝试所有可能的组合（长度从1到7），使用排列尝试构建子序列，检查是否能在字符串s中重复出现k次。这一步使用next数组进行快速验证。最后，返回字典序最大的有效子序列。</p>
+                                <p>时间复杂度: O(n + 7^7 * km)</p>
+                                <p>空间复杂度: O(n + 7^7)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def longestSubsequenceRepeatedK(self, s: str, k: int) -&gt; str:
+        lst = [ord(w) - ord(&#39;a&#39;) for w in s]  # 将字符转换为0-25的整数表示
+        n = len(s)
+        nxt = [-1] * 26 * n  # 初始化next数组
+        post = dict()  # 用于记录字符的最后出现位置
+        for i in range(n - 1, -1, -1):
+            post[lst[i]] = i
+            for j in post:
+                nxt[i * 26 + j] = post[j]  # 更新next数组
+
+        cnt = Counter(lst)
+        hot = []
+        for w in sorted(cnt, reverse=True):
+            hot.extend([w] * (cnt[w] // k))  # 选取可能构成答案的字符集合
+
+        pre = set()
+        for m in range(min(len(hot), 7), 0, -1):
+            for item in permutations(hot, m):
+                if item in pre:
+                    continue
+                pre.add(item)
+                i = j = 0
+                while j &lt; k * m and i &lt; n:
+                    i = nxt[i * 26 + item[j % m]]
+                    if i == -1:
+                        break
+                    i += 1
+                    j += 1
+                if j == k * m:
+                    word = &#39;&#39;.join([chr(x + ord(&#39;a&#39;)) for x in item])
+                    return word
+        return &#39;&#39;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建next数组时选择逆序遍历字符串s？这种做法与正序遍历有何不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建next数组时选择逆序遍历字符串s是为了方便地记录每个字符最近一次出现的位置。逆序遍历可以确保在遍历到某个字符时，直接使用已记录的信息更新next数组。如果使用正序遍历，则需要额外记录每个字符接下来的出现位置，这会使得逻辑更为复杂并可能增加错误发生的概率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中，字符的整数表示从0至25是如何帮助优化算法的？是否有其他方法可以达到相同的效果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>字符的整数表示（从0至25）通过简化字符处理帮助优化算法，使得字符可以直接作为数组索引使用，从而提高访问效率和减少内存使用。其他方法，如直接使用字符作为字典的键，虽然可行，但通常会比直接使用整数索引慢，并且在内存使用上也不如数组索引高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到使用next数组进行快速验证子序列是否可重复出现k次，具体是如何实现的？能否详细解释其逻辑和步骤？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用next数组进行快速验证的逻辑是通过next数组快速定位字符串中字符的下一个出现位置。具体步骤是：通过next数组，从当前位置开始查找子序列中的下一个字符。如果找到，继续向后查找；如果找不到，表示子序列不能在字符串中重复出现k次。这种方法大大减少了查找每个可能的子序列出现位置的时间复杂度，从而提高了整体算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么题解尝试的子序列长度限制在7以内？这是否意味着超过7个字符的子序列是不可能存在的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>子序列长度限制在7以内主要是出于性能考虑。考虑到排列的数量随着长度增加而急剧增加，长度大于7的排列会导致计算量过大，从而影响算法效率。这并不意味着超过7个字符的子序列不可能存在，但在实际应用中，限制长度可以在接受的时间内得到结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-subsequence-repeated-k-times')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-subsequence-repeated-k-times/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

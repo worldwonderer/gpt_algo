@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>网格图中机器人回家的最小代价</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>网格图中机器人回家的最小代价</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>m x n</code>&nbsp;的网格图，其中&nbsp;<code>(0, 0)</code>&nbsp;是最左上角的格子，<code>(m - 1, n - 1)</code>&nbsp;是最右下角的格子。给你一个整数数组&nbsp;<code>startPos</code>&nbsp;，<code>startPos = [start<sub>row</sub>, start<sub>col</sub>]</code>&nbsp;表示 <strong>初始</strong>&nbsp;有一个 <strong>机器人</strong>&nbsp;在格子&nbsp;<code>(start<sub>row</sub>, start<sub>col</sub>)</code>&nbsp;处。同时给你一个整数数组&nbsp;<code>homePos</code>&nbsp;，<code>homePos = [home<sub>row</sub>, home<sub>col</sub>]</code>&nbsp;表示机器人的 <strong>家</strong>&nbsp;在格子&nbsp;<code>(home<sub>row</sub>, home<sub>col</sub>)</code>&nbsp;处。</p>
+
+<p>机器人需要回家。每一步它可以往四个方向移动：<strong>上</strong>，<strong>下</strong>，<strong>左</strong>，<strong>右</strong>，同时机器人不能移出边界。每一步移动都有一定代价。再给你两个下标从&nbsp;<strong>0</strong>&nbsp;开始的额整数数组：长度为&nbsp;<code>m</code>&nbsp;的数组&nbsp;<code>rowCosts</code> &nbsp;和长度为 <code>n</code>&nbsp;的数组&nbsp;<code>colCosts</code>&nbsp;。</p>
+
+<ul>
+	<li>如果机器人往 <strong>上</strong>&nbsp;或者往 <strong>下</strong>&nbsp;移动到第 <code>r</code>&nbsp;<strong>行</strong>&nbsp;的格子，那么代价为&nbsp;<code>rowCosts[r]</code>&nbsp;。</li>
+	<li>如果机器人往 <strong>左</strong>&nbsp;或者往 <strong>右</strong>&nbsp;移动到第 <code>c</code>&nbsp;<strong>列</strong> 的格子，那么代价为&nbsp;<code>colCosts[c]</code>&nbsp;。</li>
+</ul>
+
+<p>请你返回机器人回家需要的 <strong>最小总代价</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/10/11/eg-1.png" style="width: 282px; height: 217px;"></p>
+
+<pre><strong>输入：</strong>startPos = [1, 0], homePos = [2, 3], rowCosts = [5, 4, 3], colCosts = [8, 2, 6, 7]
+<b>输出：</b>18
+<b>解释：</b>一个最优路径为：
+从 (1, 0) 开始
+-&gt; 往下走到 (<em><strong>2</strong></em>, 0) 。代价为 rowCosts[2] = 3 。
+-&gt; 往右走到 (2, <em><strong>1</strong></em>) 。代价为 colCosts[1] = 2 。
+-&gt; 往右走到 (2, <em><strong>2</strong></em>) 。代价为 colCosts[2] = 6 。
+-&gt; 往右走到 (2, <em><strong>3</strong></em>) 。代价为 colCosts[3] = 7 。
+总代价为 3 + 2 + 6 + 7 = 18</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>startPos = [0, 0], homePos = [0, 0], rowCosts = [5], colCosts = [26]
+<b>输出：</b>0
+<b>解释：</b>机器人已经在家了，所以不需要移动。总代价为 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == rowCosts.length</code></li>
+	<li><code>n == colCosts.length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= rowCosts[r], colCosts[c] &lt;= 10<sup>4</sup></code></li>
+	<li><code>startPos.length == 2</code></li>
+	<li><code>homePos.length == 2</code></li>
+	<li><code>0 &lt;= start<sub>row</sub>, home<sub>row</sub> &lt; m</code></li>
+	<li><code>0 &lt;= start<sub>col</sub>, home<sub>col</sub> &lt; n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 49 ms</p>
+                    <p>内存: 28.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minCost(
+        self,
+        startPos: List[int],
+        homePos: List[int],
+        rowCosts: List[int],
+        colCosts: List[int],
+    ) -&gt; int:
+        i, j = startPos
+        x, y = homePos
+        ans = 0
+        if i &lt; x:
+            ans += sum(rowCosts[i + 1 : x + 1])
+        else:
+            ans += sum(rowCosts[x:i])
+        if j &lt; y:
+            ans += sum(colCosts[j + 1 : y + 1])
+        else:
+            ans += sum(colCosts[y:j])
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解通过直接计算从起始位置到目标位置的行和列移动代价来解决问题。首先，将起始位置 (startPos) 和目标位置 (homePos) 分别分解为行和列的坐标。接着，根据行和列坐标的相对位置（是否需要向上或向下、向左或向右移动），计算行和列的代价。如果目标行在起始行的下方，累加从起始行到目标行之间的所有行代价；如果在上方，则累加从目标行到起始行的行代价。列的处理方法相同。最后，将行和列的代价相加得到总代价。</p>
+                                <p>时间复杂度: O(m + n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minCost(
+        self,
+        startPos: List[int],
+        homePos: List[int],
+        rowCosts: List[int],
+        colCosts: List[int],
+    ) -&gt; int:
+        i, j = startPos  # 起始位置的行和列
+        x, y = homePos   # 目标位置的行和列
+        ans = 0           # 初始化总代价为0
+        if i &lt; x:
+            ans += sum(rowCosts[i + 1 : x + 1])  # 如果目标行在下方，累加行代价
+        else:
+            ans += sum(rowCosts[x:i])          # 如果目标行在上方，累加行代价
+        if j &lt; y:
+            ans += sum(colCosts[j + 1 : y + 1])  # 如果目标列在右方，累加列代价
+        else:
+            ans += sum(colCosts[y:j])          # 如果目标列在左方，累加列代价
+        return ans  # 返回计算得到的总代价</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么题解在计算从起始位置到目标位置的行代价时，使用了`rowCosts[i + 1 : x + 1]`而不是`rowCosts[i:x]`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中使用`rowCosts[i + 1 : x + 1]`而不是`rowCosts[i:x]`是因为行代价`rowCosts[i]`代表的是从第`i`行移动到第`i+1`行的代价。因此，如果机器人从行`i`移动到行`x`，则需要从`i+1`行开始计算移动代价，直到`x`行，故取`i+1`到`x+1`的切片来确保包括从`i`到`x`的所有移动代价。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算列代价时，为何选择累加`colCosts[j + 1 : y + 1]`的方式？这是否意味着初始单元格的列代价不被考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>列代价的计算类似于行代价。`colCosts[j]`代表从第`j`列移动到第`j+1`列的代价。当使用`colCosts[j + 1 : y + 1]`累加时，意味着从第`j`列出发的移动代价不包括在内，因为这代表的是从`j+1`列开始到`y`列的移动。如果机器人从列`j`向列`y`移动，其实是从`j`列的下一列开始计算代价，所以初始单元格的列代价并不需要被考虑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果起始位置和目标位置在同一行或同一列，此方法是否仍然有效？比如`startPos`和`homePos`完全相同的情况。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果起始位置和目标位置在同一行或同一列，比如完全相同的情况，此方法仍然有效。在这种情况下，行或列的切片操作将返回一个空列表，例如`rowCosts[x:x]`或`colCosts[y:y]`，其结果是`sum`函数将返回0。因此，总代价将为0，这符合预期，因为机器人无需移动。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解假设了直接向目标方向移动，是否有必要检查中间路径上是否存在更低代价的替代路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题解中，假设的是机器人移动的行和列代价是固定的，并且只与移动的行列位置有关，不依赖于其他路径选择。因此，题解采取了直接计算从起始位置到目标位置的最短路径代价的简单方法。如果行和列的代价变化不仅取决于移动的行列，而且与具体的路径选择有关，则需要考虑更复杂的路径规划算法，如动态规划或Dijkstra算法来找到最低代价的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-homecoming-of-a-robot-in-a-grid')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-homecoming-of-a-robot-in-a-grid/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

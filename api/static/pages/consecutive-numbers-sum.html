@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>连续整数求和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>连续整数求和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个正整数 <code>n</code>，返回 <em>连续正整数满足所有数字之和为 <code>n</code>&nbsp;的组数</em> 。&nbsp;</p>
+
+
+
+<p><strong>示</strong><strong>例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>n = 5
+<strong>输出: </strong>2
+<strong>解释: </strong>5 = 2 + 3，共有两组连续整数([5],[2,3])求和后为 5。</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>n = 9
+<strong>输出: </strong>3
+<strong>解释: </strong>9 = 4 + 5 = 2 + 3 + 4</pre>
+
+<p><strong>示例 3:</strong></p>
+
+<pre>
+<strong>输入: </strong>n = 15
+<strong>输出: </strong>4
+<strong>解释: </strong>15 = 8 + 7 = 4 + 5 + 6 = 1 + 2 + 3 + 4 + 5</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>9</sup></code>​​​​​​​</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 51 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">import copy
+import collections
+
+class Solution:
+    def consecutiveNumbersSum(self, n: int) -&gt; int:
+        prime_factors=collections.defaultdict(int)## 字典用来存储所有质因数，key是质因数，value是质因数的次数
+        K=2*n
+        b=2
+        while b**2&lt;=K:
+            if not K % b:
+                prime_factors[b]+=1
+                K//=b# 若是，则把质数b从K中拿出，保证了后面的b只可能是质数
+            else:
+                b+=1
+        prime_factors[K]+=1 #最后剩下的K是2N的最大质因数
+        factors = []  ## 列表用来存储所有因数
+        def traceback(component,prime_factors):
+            if not prime_factors:
+                factors.append(component)## 把所有的因数记录下来
+            else:
+                dic=copy.deepcopy(prime_factors)
+                item=dic.popitem()## 从字典里取出一个质因数（一个tuple键值对）
+                for i in range(item[1]+1):
+                    traceback(component*item[0]**i,dic) ## 对于这个质因数，考虑其在因数中可以出现的次数，最少0次，最多item[1]次
+        traceback(1,prime_factors)
+        res=0
+        for factor in factors:
+            if factor ** 2&lt;2*n and ((2*n)//factor-factor)%2:
+                res+=1
+        return res
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解利用了数学和因数分解的方法来解决问题。首先，题解考虑了将输入的 n 扩大两倍至 2*n，并试图分解这个数字的所有因数。解题核心在于分解出所有可能的因数组合，并从中判定那些因数可以通过一个特定的公式来表示连续整数之和等于原始的 n。通过一种深度优先搜索的方式，生成 2*n 的所有因数，然后对这些因数进行检查，看它们是否能形成连续整数序列的和。具体来说，如果某个因数 x 使得 (2*n // x - x) 是奇数，那么这个 x 可以构成一个解。这是因为可以通过解方程组得出连续整数的起点和终点来检查 x 是否为有效因数。</p>
+                                <p>时间复杂度: O(sqrt(K))，其中 K = 2*n</p>
+                                <p>空间复杂度: O(sqrt(K) + log(K))</p>
+                                <pre class="bg-light p-2">import copy
+import collections
+
+class Solution:
+    def consecutiveNumbersSum(self, n: int) -&gt; int:
+        prime_factors = collections.defaultdict(int)  # 存储所有质因数
+        K = 2 * n
+        b = 2
+        while b ** 2 &lt;= K:
+            if not K % b:
+                prime_factors[b] += 1
+                K //= b
+            else:
+                b += 1
+        prime_factors[K] += 1  # 最后剩下的K是2N的最大质因数
+        factors = []  # 存储所有因数
+        def traceback(component, prime_factors):
+            if not prime_factors:
+                factors.append(component)  # 记录因数
+            else:
+                dic = copy.deepcopy(prime_factors)
+                item = dic.popitem()  # 取出一个质因数
+                for i in range(item[1] + 1):
+                    traceback(component * item[0] ** i, dic)
+        traceback(1, prime_factors)
+        res = 0
+        for factor in factors:
+            if factor ** 2 &lt; 2 * n and ((2 * n) // factor - factor) % 2:
+                res += 1
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到需要将输入的n扩大两倍至2*n，并分解这个数字的所有因数。请问为什么需要将n扩大两倍才进行因数分解？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个方法基于公式推导的需要。考虑连续整数求和的问题，如果存在k个连续整数之和等于n，则这k个整数可以表示为x, x+1, ..., x+k-1。这个序列的和可以表示为kx + (k*(k-1))/2 = n。为了简化这个方程，并使其易于通过因数分解解决，乘以2以消除分数，得到2kx + k(k-1) = 2n。这样，可以通过将2n因数分解，然后检查这些因数是否能够通过此方程满足条件，来找到所有可能的k和x。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到如果(2*n // x - x)是奇数，则x可以构成一个解。这里的条件为何是奇数？它是如何与连续整数序列的起点和终点关联的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于连续整数序列和为n的方程kx + k(k-1)/2 = n，我们乘以2并重写为2kx + k(k-1) = 2n。如果我们将x表示为y - (k-1)/2，即x是从y开始向前和向后扩展的中间点，那么这个方程可以简化为k(2y-k+1) = 2n。设x = (2n // k - k + 1) / 2，为了使x为整数，(2n // k - k + 1)必须是偶数，这意味着对于k来说，(2n // k - k)必须是奇数。这种表示方式直接关联了连续序列的起点和整体长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了深度优先搜索（DFS）来生成所有的因数。这种方法与直接计算因数有什么区别或优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用深度优先搜索（DFS）来生成因数，利用质因数分解的结果来递归地探索所有可能的因数组合，这可以确保生成2*n的所有因数而不遗漏。与直接计算因数（通常需要检查到sqrt(n)）相比，DFS可以在发现质因数后更系统地探索所有因数组合，尤其是在因数分布不均匀时。这种方法更灵活地处理质因数的幂次组合，对于大数的因数分解尤其有效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中最终判断有效因数时，使用了条件&#39;factor ** 2 &lt; 2 * n&#39;。这个条件是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>条件&#39;factor ** 2 &lt; 2 * n&#39;是为了确保在方程k(2y-k+1) = 2n中，k是一个有效的因数。如果factor ** 2 &gt;= 2 * n，那么当我们将k设置为factor时，2y-k+1将不可能是正整数，因此无法形成有效的连续整数序列。这个条件保证了k和相应的y可以构成一个实际的连续整数序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/consecutive-numbers-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/consecutive-numbers-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

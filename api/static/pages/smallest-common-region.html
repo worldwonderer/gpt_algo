@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小公共区域</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小公共区域</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 41 ms</p>
+                    <p>内存: 19.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findSmallestRegion(self, regions: List[List[str]], r1: str, r2: str) -&gt; str:
+        q, p = set(), {i: j for j, *r in regions for i in r}    #其中i为区域，j为对应的直接父节点，通过(j, *r)分离出数组的第一个元素和后续元素。
+        while r1 in p:
+            q.add(r1)
+            r1 = p[r1]
+        while r2 in p:
+            if r2 in q:
+                return r2
+            r2 = p[r2]
+        return r2</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题目的是找到两个区域r1和r2的最小公共区域。首先，根据regions列表建立一个字典p，键为区域名，值为该区域的直接父区域。然后，从r1开始，逐级向上追溯其父区域，并将遇到的每个区域存储在集合q中。之后，从r2开始向上追溯其父区域，直到找到第一个同时存在于集合q中的区域，即为最小公共区域。如果r2的所有父区域都不在集合q中，则返回最顶层的父区域r2。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findSmallestRegion(self, regions: List[List[str]], r1: str, r2: str) -&gt; str:
+        q, p = set(), {i: j for j, *r in regions for i in r}    # 创建存储每个区域的父区域的字典
+        while r1 in p:  # 从r1向上追溯其父区域
+            q.add(r1)  # 将r1及其父区域加入集合q
+            r1 = p[r1]  # 更新r1为其父区域
+        while r2 in p:  # 从r2向上追溯其父区域
+            if r2 in q:  # 如果r2已存在于集合q中，说明找到了最小公共区域
+                return r2
+            r2 = p[r2]  # 更新r2为其父区域
+        return r2  # 如果没有找到公共区域，返回最顶层的父区域r2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建父区域字典`p`时，对于包含多个子区域的列表项，如何确保字典正确反映了所有子区域到父区域的映射？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，使用了一个字典推导式`{i: j for j, *r in regions for i in r}`来构建父区域字典。这种写法利用了Python的解包特性，其中`j`是每个列表的第一个元素，代表父区域，而`*r`是剩余的元素，代表所有子区域。字典推导式中的`for i in r`确保了每个子区域`i`都会被映射到其对应的父区域`j`。因此，这种方法能够确保即使父区域有多个子区域，字典也能正确地映射每个子区域到其父区域。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            代码中没有显式地处理r1或r2为顶级区域的情况，这是否意味着算法假设输入的r1和r2总是非顶级区域？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>代码确实没有显式处理r1或r2为顶级区域的情况。在这个算法中，如果r1或r2是顶级区域，它们将不会在字典`p`中作为键出现，因此`while r1 in p`或`while r2 in p`的循环将不会执行。这意味着，如果r1或r2是顶级区域，它们将直接被视为潜在的最小公共区域。因此，可以认为是有一个隐含的假设，即r1和r2通常不是顶级区域，否则算法会直接返回顶级区域本身作为结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在while循环中追踪r1和r2的父区域，如果r1或r2的某个父区域在字典`p`中没有映射，这种情况如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果在追踪过程中，r1或r2的某个父区域在字典`p`中没有映射，意味着已经到达了顶级区域，因为顶级区域没有更高的父区域。在代码中，一旦`r1`或`r2`不在字典`p`中，相应的循环就会结束。对于r2，如果在它的追踪过程中未找到与r1共同的区域，最终它会返回当前的r2值，可能是顶级区域。这种处理方式暗示了到达顶级区域后，没有更高的父区域可以追踪，因此返回当前的区域作为最小公共区域。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/lowest-common-ancestor-of-a-binary-search-tree" class="list-group-item list-group-item-action">
+                                二叉搜索树的最近公共祖先
+                            </a>
+                        
+                            <a href="/problem/lowest-common-ancestor-of-a-binary-tree" class="list-group-item list-group-item-action">
+                                二叉树的最近公共祖先
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/smallest-common-region')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/smallest-common-region/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

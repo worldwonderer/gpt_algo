@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>在 D 天内送达包裹的能力</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>在 D 天内送达包裹的能力</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>传送带上的包裹必须在 <code>days</code> 天内从一个港口运送到另一个港口。</p>
+
+<p>传送带上的第 <code>i</code>&nbsp;个包裹的重量为&nbsp;<code>weights[i]</code>。每一天，我们都会按给出重量（<code>weights</code>）的顺序往传送带上装载包裹。我们装载的重量不会超过船的最大运载重量。</p>
+
+<p>返回能在 <code>days</code> 天内将传送带上的所有包裹送达的船的最低运载能力。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>weights = [1,2,3,4,5,6,7,8,9,10], days = 5
+<strong>输出：</strong>15
+<strong>解释：</strong>
+船舶最低载重 15 就能够在 5 天内送达所有包裹，如下所示：
+第 1 天：1, 2, 3, 4, 5
+第 2 天：6, 7
+第 3 天：8
+第 4 天：9
+第 5 天：10
+
+请注意，货物必须按照给定的顺序装运，因此使用载重能力为 14 的船舶并将包装分成 (2, 3, 4, 5), (1, 6, 7), (8), (9), (10) 是不允许的。 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>weights = [3,2,2,4,1,4], days = 3
+<strong>输出：</strong>6
+<strong>解释：</strong>
+船舶最低载重 6 就能够在 3 天内送达所有包裹，如下所示：
+第 1 天：3, 2
+第 2 天：2, 4
+第 3 天：1, 4
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>weights = [1,2,3,1,1], days = 4
+<strong>输出：</strong>3
+<strong>解释：</strong>
+第 1 天：1
+第 2 天：2
+第 3 天：3
+第 4 天：1, 1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= days &lt;= weights.length &lt;= 5 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= weights[i] &lt;= 500</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 111 ms</p>
+                    <p>内存: 20.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def shipWithinDays(self, weights: List[int], days: int) -&gt; int:
+        l, r = max(weights), max(weights) * ceil(len(weights) / days)
+        def check(cap):
+            ship = 0
+            day = 1
+            for w in weights:
+                ship += w
+                if ship &gt; cap:
+                    day += 1
+                    ship = w
+                    if day &gt; days:
+                        return False
+            return True
+
+        while l &lt; r:
+            m = (l + r) // 2
+            if check(m):
+                r = m
+            else:
+                l = m +1
+        return l</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用二分查找法确定最小的运载能力。首先设置二分查找的范围：下界 l 是 weights 中的最大值（因为载重至少要能承载单个包裹中的最大重量），上界 r 是按最大包裹权重均匀分布时的总重量。然后定义一个辅助函数 check(cap)，用于判断给定的载重 cap 是否能在指定的 days 天内运送完所有包裹。具体方法是顺序累加包裹重量，当累加的重量超过 cap 时，需要使用新的一天继续装载，如果使用的天数超过 days，则返回 False。通过二分查找逐渐缩小可能的载重范围，直到找到最小的符合条件的载重。</p>
+                                <p>时间复杂度: O(n log(R-L))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">
+python
+class Solution:
+    def shipWithinDays(self, weights: List[int], days: int) -&gt; int:
+        l, r = max(weights), sum(weights)  # 设置搜索范围
+        def check(cap):
+            ship = 0  # 当前船的载重
+            day = 1  # 当前使用的天数
+            for w in weights:
+                ship += w
+                if ship &gt; cap:  # 如果当前包裹加载后超过最大载重，需要使用新的一天
+                    day += 1
+                    ship = w  # 从新的一天开始，当前包裹是第一个装载的
+                    if day &gt; days:  # 如果使用的天数超过了限制，返回 False
+                        return False
+            return True  # 如果所有包裹都可以在限定天数内装载完，返回 True
+
+        while l &lt; r:  # 二分查找最小可能载重
+            m = (l + r) // 2
+            if check(m):  # 如果当前载重可以满足条件，尝试更小的载重
+                r = m
+            else:
+                l = m + 1
+        return l  # 返回最小载重
+
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在二分查找中下界设置为weights数组中的最大值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此问题中，下界设置为weights数组中的最大值是因为任何有效的运载能力至少应该能够承载单个包裹的最大重量。如果运载能力小于weights中的最大值，那么至少有一个包裹无法被运载，因此这样的载重能力不符合问题的基本需求。设置下界为weights中的最大值是为了确保所有包裹都可以被单独运载，从而满足基本的逻辑要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在二分查找中，当check函数返回False时，为什么选择增加mid值（即设置l = m + 1）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当check函数返回False时，说明当前的运载能力cap（即mid值）不足以在指定的天数内完成所有包裹的运送。因此，需要尝试一个更大的运载能力来满足条件。通过设置l = m + 1，我们排除了当前和更小的运载能力值，将搜索范围向可能成功的更大值方向调整。这是二分搜索策略的一部分，旨在逐步缩小搜索范围，直至找到最小的满足条件的运载能力。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            check函数在处理完所有weights后直接返回True是否考虑了所有边界情况，例如当最后一天刚好达到或略低于最大载重时的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>check函数在处理完所有weights后直接返回True实际上已经考虑了所有边界情况。函数逻辑确保在不超过指定天数的情况下，每一天的累积载重都不会超过cap。只要最后一天的累积载重没有超过cap，无论是刚好达到还是略低于最大载重，都表明这个cap值是足够的。此函数保证了在给定的天数内，所有包裹都可以被运送完毕，因此可以直接返回True。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际应用中，如何确定weights数组中单个包裹的最大重量不会超过船的最大承载能力？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实际应用中，通常会通过事先的设备选择和规划来确保船只的最大承载能力至少等于或大于预计中单个包裹的最大重量。这通常涉及到对船只的承载标准的了解和包裹重量的预估。在运输前的准备阶段，会有明确的规定或者检查，以确保每个包裹的重量都在船只的承载能力范围内。如果存在任何包裹超过船只最大承载能力的风险，那么需要重新评估包裹的分配或者选择更大承载能力的船只。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/capacity-to-ship-packages-within-d-days')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/capacity-to-ship-packages-within-d-days/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

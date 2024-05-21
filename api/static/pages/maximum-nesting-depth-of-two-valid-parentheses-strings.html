@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>有效括号的嵌套深度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>有效括号的嵌套深度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><strong>有效括号字符串 </strong>定义：对于每个左括号，都能找到与之对应的右括号，反之亦然。详情参见题末「<strong>有效括号字符串</strong>」部分。</p>
+
+<p><strong>嵌套深度</strong> <code>depth</code> 定义：即有效括号字符串嵌套的层数，<code>depth(A)</code> 表示有效括号字符串 <code>A</code> 的嵌套深度。详情参见题末「<strong>嵌套深度</strong>」部分。</p>
+
+<p>有效括号字符串类型与对应的嵌套深度计算方法如下图所示：</p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/04/01/1111.png" style="height: 152px; width: 600px;"></p>
+
+
+
+<p>给你一个「有效括号字符串」 <code>seq</code>，请你将其分成两个不相交的有效括号字符串，<code>A</code> 和&nbsp;<code>B</code>，并使这两个字符串的深度最小。</p>
+
+<ul>
+	<li>不相交：每个 <code>seq[i]</code> 只能分给 <code>A</code> 和 <code>B</code> 二者中的一个，不能既属于 <code>A</code> 也属于 <code>B</code> 。</li>
+	<li><code>A</code> 或 <code>B</code> 中的元素在原字符串中可以不连续。</li>
+	<li><code>A.length + B.length = seq.length</code></li>
+	<li>深度最小：<code>max(depth(A), depth(B))</code>&nbsp;的可能取值最小。&nbsp;</li>
+</ul>
+
+<p>划分方案用一个长度为 <code>seq.length</code> 的答案数组 <code>answer</code> 表示，编码规则如下：</p>
+
+<ul>
+	<li><code>answer[i] = 0</code>，<code>seq[i]</code> 分给 <code>A</code> 。</li>
+	<li><code>answer[i] = 1</code>，<code>seq[i]</code> 分给 <code>B</code> 。</li>
+</ul>
+
+<p>如果存在多个满足要求的答案，只需返回其中任意 <strong>一个 </strong>即可。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>seq = &quot;(()())&quot;
+<strong>输出：</strong>[0,1,1,1,1,0]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>seq = &quot;()(())()&quot;
+<strong>输出：</strong>[0,0,0,1,1,0,1,1]
+<strong>解释：</strong>本示例答案不唯一。
+按此输出 A = &quot;()()&quot;, B = &quot;()()&quot;, max(depth(A), depth(B)) = 1，它们的深度最小。
+像 [1,1,1,0,0,1,1,1]，也是正确结果，其中 A = &quot;()()()&quot;, B = &quot;()&quot;, max(depth(A), depth(B)) = 1 。 
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;&nbsp;seq.size &lt;= 10000</code></li>
+</ul>
+
+
+
+<p><strong>有效括号字符串：</strong></p>
+
+<pre>仅由&nbsp;<code>&quot;(&quot;</code> 和&nbsp;<code>&quot;)&quot;</code>&nbsp;构成的字符串，对于每个左括号，都能找到与之对应的右括号，反之亦然。
+下述几种情况同样属于有效括号字符串：
+
+  1. 空字符串
+  2. 连接，可以记作&nbsp;<code>AB</code>（<code>A</code> 与 <code>B</code> 连接），其中&nbsp;<code>A</code>&nbsp;和&nbsp;<code>B</code>&nbsp;都是有效括号字符串
+  3. 嵌套，可以记作&nbsp;<code>(A)</code>，其中&nbsp;<code>A</code>&nbsp;是有效括号字符串
+</pre>
+
+<p><strong>嵌套深度：</strong></p>
+
+<pre>类似地，我们可以定义任意有效括号字符串 <code>s</code> 的 <strong>嵌套深度</strong>&nbsp;<code>depth(S)</code>：
+
+  1.<code> s</code> 为空时，<code>depth(&quot;&quot;) = 0</code>
+<code>  2. s</code> 为 <code>A</code> 与 <code>B</code> 连接时，<code>depth(A + B) = max(depth(A), depth(B))</code>，其中&nbsp;<code>A</code> 和&nbsp;<code>B</code>&nbsp;都是有效括号字符串
+<code>  3. s</code> 为嵌套情况，<code>depth(&quot;(&quot; + A + &quot;)&quot;) = 1 + depth(A)</code>，其中 <code>A</code> 是有效括号字符串
+
+例如：<code>&quot;&quot;</code>，<code>&quot;()()&quot;</code>，和&nbsp;<code>&quot;()(()())&quot;</code>&nbsp;都是有效括号字符串，嵌套深度分别为 0，1，2，而&nbsp;<code>&quot;)(&quot;</code> 和&nbsp;<code>&quot;(()&quot;</code>&nbsp;都不是有效括号字符串。
+</pre>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxDepthAfterSplit(self, seq: str) -&gt; List[int]:
+        ans = [0] * len(seq)
+        x = 0
+        for i, c in enumerate(seq):
+            if c == &#34;(&#34;:
+                ans[i] = x &amp; 1
+                x += 1
+            else:
+                x -= 1
+                ans[i] = x &amp; 1
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了贪心策略来尽可能平均地分配左括号和右括号到两个字符串A和B中，以确保它们的最大嵌套深度最小。每遇到一个左括号，根据当前的深度（通过变量x表示，每遇到一个左括号增加1，右括号减少1）的奇偶性，决定将其分配给A（0）还是B（1）。这样做的好处是可以均匀地分配括号，减少任一子字符串的连续深度增加。右括号的处理方式与左括号相同，只是在深度变化前进行分配。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxDepthAfterSplit(self, seq: str) -&gt; List[int]:
+        ans = [0] * len(seq)  # 创建一个与seq等长的数组，用于保存答案
+        x = 0  # 使用x来跟踪当前的深度（未匹配的左括号的数量）
+        for i, c in enumerate(seq):  # 遍历输入的有效括号字符串
+            if c == &#39;(&#39;:
+                ans[i] = x &amp; 1  # 根据当前深度的奇偶性分配给A或B
+                x += 1  # 遇到左括号，深度增加
+            else:
+                x -= 1  # 遇到右括号，深度减少
+                ans[i] = x &amp; 1  # 与处理左括号相同的逻辑，但先减少深度
+        return ans  # 返回分配方案</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在这种贪心策略中，为什么根据左括号和右括号的当前深度奇偶性分配给不同的字符串可以确保最小化最大嵌套深度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过使每个括号的深度根据其奇偶性分配到不同的字符串，可以保证在任一给定字符串中，不会连续地增加嵌套深度。这样做的结果是，当一个字符串接收到一个深度为奇数的左括号时，另一个字符串则接收到一个深度为偶数的左括号，从而在两个字符串中交替增加深度。这种分配方式有效地将可能的最大深度平均分配给两个子字符串，避免了一个字符串独自承受过高的嵌套深度，从而实现了最大嵌套深度的最小化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的变量x是如何准确跟踪未匹配的左括号数量的？存在错误处理非有效括号字符串的风险吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>变量x通过在遇到左括号时增加1，遇到右括号时减少1，来跟踪未匹配的左括号数量。这种方法准确地反映了在任何给定点的嵌套深度。这种方法假设输入字符串是有效的括号字符串，即每个左括号都有一个对应的右括号。如果输入字符串不是有效的括号字符串，那么变量x可能无法准确反映实际的嵌套深度，因为它可能会出现负值（即右括号比左括号多）或最终不归零（即左括号比右括号多）。因此，如果输入包含非有效括号字符串，该方法的行为是未定义的，可能导致错误的输出。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于输入字符串的长度为奇数时，这种分配策略是否仍然有效？会不会导致分配不均等的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>有效括号字符串的长度总是偶数，因为每个左括号必须匹配一个右括号。因此，对于长度为奇数的输入字符串，它不是一个有效的括号字符串，所以此分配策略并不适用。如果不小心输入了一个长度为奇数的字符串，这将是一个错误的输入，因为它违反了有效括号字符串的定义。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在执行题解代码时，如果输入字符串seq为空，返回的结果是什么？这种情况下代码是否需要特殊处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果输入字符串seq为空，代码将返回一个空列表。这是因为代码开始时初始化了一个长度与输入字符串相同的列表ans，如果输入为空，ans也将为空。这种情况下代码不需要特殊处理，因为它已经能够正确地处理空输入，返回一个空的结果列表。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-nesting-depth-of-two-valid-parentheses-strings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-nesting-depth-of-two-valid-parentheses-strings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

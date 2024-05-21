@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>对角线上不同值的数量差</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>对角线上不同值的数量差</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <code>0</code> 开始、大小为 <code>m x n</code> 的二维矩阵 <code>grid</code> ，请你求解大小同样为 <code>m x n</code> 的答案矩阵 <code>answer</code> 。</p>
+
+<p>矩阵 <code>answer</code> 中每个单元格 <code>(r, c)</code> 的值可以按下述方式进行计算：</p>
+
+<ul>
+	<li>令 <code>topLeft[r][c]</code> 为矩阵 <code>grid</code> 中单元格 <code>(r, c)</code> 左上角对角线上 <strong>不同值</strong> 的数量。</li>
+	<li>令 <code>bottomRight[r][c]</code> 为矩阵 <code>grid</code> 中单元格 <code>(r, c)</code> 右下角对角线上 <strong>不同值</strong> 的数量。</li>
+</ul>
+
+<p>然后 <code>answer[r][c] = |topLeft[r][c] - bottomRight[r][c]|</code> 。</p>
+
+<p>返回矩阵 <code>answer</code> 。</p>
+
+<p><strong>矩阵对角线</strong> 是从最顶行或最左列的某个单元格开始，向右下方向走到矩阵末尾的对角线。</p>
+
+<p>如果单元格 <code>(r1, c1)</code> 和单元格 <code>(r, c) </code>属于同一条对角线且 <code>r1 &lt; r</code> ，则单元格 <code>(r1, c1)</code> 属于单元格 <code>(r, c)</code> 的左上对角线。类似地，可以定义右下对角线。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2023/04/19/ex2.png" style="width: 786px; height: 121px;" />
+<pre>
+<strong>输入：</strong>grid = [[1,2,3],[3,1,5],[3,2,1]]
+<strong>输出：</strong>[[1,1,0],[1,0,1],[0,1,1]]
+<strong>解释：</strong>第 1 个图表示最初的矩阵 grid 。&nbsp;
+第 2 个图表示对单元格 (0,0) 计算，其中蓝色单元格是位于右下对角线的单元格。
+第 3 个图表示对单元格 (1,2) 计算，其中红色单元格是位于左上对角线的单元格。
+第 4 个图表示对单元格 (1,1) 计算，其中蓝色单元格是位于右下对角线的单元格，红色单元格是位于左上对角线的单元格。
+- 单元格 (0,0) 的右下对角线包含 [1,1] ，而左上对角线包含 [] 。对应答案是 |1 - 0| = 1 。
+- 单元格 (1,2) 的右下对角线包含 [] ，而左上对角线包含 [2] 。对应答案是 |0 - 1| = 1 。
+- 单元格 (1,1) 的右下对角线包含 [1] ，而左上对角线包含 [1] 。对应答案是 |1 - 1| = 0 。
+其他单元格的对应答案也可以按照这样的流程进行计算。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1]]
+<strong>输出：</strong>[[0]]
+<strong>解释：</strong>- 单元格 (0,0) 的右下对角线包含 [] ，左上对角线包含 [] 。对应答案是 |0 - 0| = 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m, n, grid[i][j] &lt;= 50</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 51 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def differenceOfDistinctValues(self, grid: List[List[int]]) -&gt; List[List[int]]:
+        m,n=len(grid),len(grid[0])
+        ans=[[0]*n for _ in range(m)]
+        for i in range(m):
+            x,y=i,0
+            mp=set()
+            while x&lt;m and y&lt;n:
+                ans[x][y]=len(mp)
+                mp.add(grid[x][y])
+                x+=1
+                y+=1
+        for j in range(1,n):
+            x,y=0,j
+            mp=set()
+            while x&lt;m and y&lt;n:
+                ans[x][y]=len(mp)
+                mp.add(grid[x][y])
+                x+=1
+                y+=1
+        for i in range(m-1,-1,-1):
+            x,y=i,n-1
+            mp=set()
+            while x&gt;=0 and y&gt;=0:
+                ans[x][y]=abs(ans[x][y]-len(mp))
+                mp.add(grid[x][y])
+                x-=1
+                y-=1
+        for j in range(n-2,-1,-1):
+            x,y=m-1,j
+            mp=set()
+            while x&gt;=0 and y&gt;=0:
+                ans[x][y]=abs(ans[x][y]-len(mp))
+                mp.add(grid[x][y])
+                x-=1
+                y-=1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解方法通过遍历矩阵中的所有对角线来计算左上角和右下角的对角线上的不同值数量。首先，使用四个独立的循环来分别处理矩阵的四个边界开始的对角线：首先是从上边界开始的左上到右下的对角线（两个循环），接着是从右边界和底边界开始的右下到左上的对角线（两个循环）。每个循环中使用一个集合来存储遍历过程中遇到的不同的值，并在每个单元格更新answer矩阵中的对应值。最后，根据左上和右下的值计算其差的绝对值。</p>
+                                <p>时间复杂度: O((m + n) * min(m, n))</p>
+                                <p>空间复杂度: O(min(m, n))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def differenceOfDistinctValues(self, grid: List[List[int]]) -&gt; List[List[int]]:
+        m, n = len(grid), len(grid[0])  # 获取矩阵的行数和列数
+        ans = [[0] * n for _ in range(m)]  # 初始化答案矩阵
+        # 计算左上到右下的对角线的不同值数量
+        for i in range(m):
+            x, y = i, 0
+            mp = set()  # 使用集合来存储遇到的不同值
+            while x &lt; m and y &lt; n:
+                ans[x][y] = len(mp)
+                mp.add(grid[x][y])
+                x += 1
+                y += 1
+        for j in range(1, n):
+            x, y = 0, j
+            mp = set()
+            while x &lt; m and y &lt; n:
+                ans[x][y] = len(mp)
+                mp.add(grid[x][y])
+                x += 1
+                y += 1
+        # 计算右下到左上的对角线的不同值数量并计算最终结果
+        for i in range(m - 1, -1, -1):
+            x, y = i, n - 1
+            mp = set()
+            while x &gt;= 0 and y &gt;= 0:
+                ans[x][y] = abs(ans[x][y] - len(mp))  # 更新结果矩阵的值
+                mp.add(grid[x][y])
+                x -= 1
+                y -= 1
+        for j in range(n - 2, -1, -1):
+            x, y = m - 1, j
+            mp = set()
+            while x &gt;= 0 and y &gt;= 0:
+                ans[x][y] = abs(ans[x][y] - len(mp))
+                mp.add(grid[x][y])
+                x -= 1
+                y -= 1
+        return ans  # 返回答案矩阵</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在遍历并计算每个对角线的不同值时，为什么选择使用集合而不是其他数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理对角线不同值的计算时，集合（Set）提供了一种快速有效的方式来确保值的唯一性，即自动处理重复值。集合的主要操作包括添加元素和检查元素是否存在，这两种操作通常都能在平均常数时间内完成，这使得它非常适合于此类问题，其中需要频繁地检查和添加不同的元素。相比之下，如果使用列表（List）或数组（Array），则每次添加新元素时都需先遍历已有元素以避免重复，这会导致时间复杂度显著增加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于每个单元格，您如何确保在计算`topLeft[r][c]`和`bottomRight[r][c]`时不会出现重复计数的问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中通过分别维护两个独立的集合来处理从左上到右下和从右下到左上的对角线。这两个集合在遍历时各自独立，确保了在计算每个方向上的对角线时，都是从新的集合开始，避免了重复计数的问题。同时，在计算结果矩阵`ans[r][c]`时使用绝对值来处理两个方向上不同值的数量之差，这进一步确保了不会由于遍历顺序或重复元素影响最终结果的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在对角线遍历的过程中，如果矩阵的行数和列数差异较大，这种方法的效率如何，是否会造成某些行或列的重复遍历？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在矩阵行数和列数差异较大的情况下，方法依然保持效率，因为每次遍历都是沿着单独的对角线从某一边界到另一边界。虽然某些对角线可能较短（特别是当接近矩阵的角落时），但每个元素仍然只被访问一次，不会造成重复遍历。此外，对于每个方向的对角线，遍历是从边界开始，直到另一边界结束，有效地利用了每个元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新答案矩阵`ans`时，为什么选择在遍历每个对角线的过程中更新`ans`的值，而不是单独计算完所有对角线后再统一计算`ans`的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法允许在遍历对角线时即时更新答案矩阵，这样可以边计算边更新，避免了在所有数据收集完毕后再进行一次整体的复杂计算，这样可以降低时间复杂度和空间复杂度。实时更新结果也使得代码结构更简洁，逻辑更清晰，易于理解和维护。此外，这种方法避免了可能的错误和复杂性，因为所有必要的信息在访问某个单元格时都是最新的，并立即应用到答案矩阵中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/difference-of-number-of-distinct-values-on-diagonals')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/difference-of-number-of-distinct-values-on-diagonals/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

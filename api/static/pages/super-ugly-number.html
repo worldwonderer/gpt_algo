@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>超级丑数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>超级丑数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><strong>超级丑数</strong> 是一个正整数，并满足其所有质因数都出现在质数数组 <code>primes</code> 中。</p>
+
+<p>给你一个整数 <code>n</code> 和一个整数数组 <code>primes</code> ，返回第 <code>n</code> 个 <strong>超级丑数</strong> 。</p>
+
+<p>题目数据保证第 <code>n</code> 个 <strong>超级丑数</strong> 在 <strong>32-bit</strong> 带符号整数范围内。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 12, <code>primes</code> = <code>[2,7,13,19]</code>
+<strong>输出：</strong>32 
+<strong>解释：</strong>给定长度为 4 的质数数组 primes = [2,7,13,19]，前 12 个超级丑数序列为：[1,2,4,7,8,13,14,16,19,26,28,32] 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 1, primes = [2,3,5]
+<strong>输出：</strong>1
+<strong>解释：</strong>1 不含质因数，因此它的所有质因数都在质数数组 primes = [2,3,5] 中。
+</pre>
+&nbsp;
+
+<div class="top-view__1vxA">
+<div class="original__bRMd">
+<div>
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= primes.length &lt;= 100</code></li>
+	<li><code>2 &lt;= primes[i] &lt;= 1000</code></li>
+	<li>题目数据<strong> 保证</strong> <code>primes[i]</code> 是一个质数</li>
+	<li><code>primes</code> 中的所有值都 <strong>互不相同</strong> ，且按 <strong>递增顺序</strong> 排列</li>
+</ul>
+</div>
+</div>
+</div>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 140 ms</p>
+                    <p>内存: 21.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def nthSuperUglyNumber(self, n: int, primes: List[int]) -&gt; int:
+        ans = [1]
+        ans_idx = [0]
+        primes_idx = [0 for _ in range(len(primes))]
+        pq = [(prime, idx) for idx, prime in enumerate(primes)]
+        heapq.heapify(pq)
+        for _ in range(n-1):
+            cur, idx = heapq.heappop(pq)
+            ans.append(cur)
+            ans_idx.append(idx)
+            primes_idx[idx] += 1
+            while ans_idx[primes_idx[idx]] &gt; idx:
+                primes_idx[idx] += 1
+            heapq.heappush(pq, (primes[idx] * ans[primes_idx[idx]], idx))
+        return ans[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了最小堆来解决超级丑数问题。具体思路如下：
+1. 初始化一个结果数组 ans，并将 1 作为第一个超级丑数加入 ans。
+2. 使用一个最小堆 pq 存储 (prime, idx) 元组，其中 prime 表示质数，idx 表示该质数在 primes 数组中的下标。最小堆按照 prime 值进行排序。
+3. 初始化一个数组 primes_idx，用于记录每个质数在 ans 数组中的下标。
+4. 循环 n-1 次，每次从最小堆中取出最小的 (prime, idx) 元组，将 prime 加入 ans 数组。
+5. 更新 primes_idx[idx]，找到下一个未被使用的 ans[primes_idx[idx]]，将其与当前质数相乘，得到新的超级丑数，并将其加入最小堆中。
+6. 最终返回 ans 数组的最后一个元素，即第 n 个超级丑数。</p>
+                                <p>时间复杂度: O(n * log k)，其中 n 是要求的超级丑数的编号，k 是质数数组的长度。</p>
+                                <p>空间复杂度: O(n + k)，其中 n 是要求的超级丑数的编号，k 是质数数组的长度。</p>
+                                <pre class="bg-light p-2">class Solution:
+    def nthSuperUglyNumber(self, n: int, primes: List[int]) -&gt; int:
+        ans = [1]  # 结果数组，初始化为 [1]
+        ans_idx = [0]  # 记录每个质数在 ans 数组中的下标
+        primes_idx = [0 for _ in range(len(primes))]  # 记录每个质数在 ans 数组中的下标
+        pq = [(prime, idx) for idx, prime in enumerate(primes)]  # 初始化最小堆
+        heapq.heapify(pq)  # 建立最小堆
+        
+        for _ in range(n-1):
+            cur, idx = heapq.heappop(pq)  # 取出最小的超级丑数及其对应的质数下标
+            ans.append(cur)  # 将当前超级丑数加入结果数组
+            ans_idx.append(idx)  # 记录当前超级丑数对应的质数下标
+            
+            primes_idx[idx] += 1  # 更新对应质数的下标
+            while ans_idx[primes_idx[idx]] &gt; idx:  # 找到下一个未被使用的 ans[primes_idx[idx]]
+                primes_idx[idx] += 1
+            
+            heapq.heappush(pq, (primes[idx] * ans[primes_idx[idx]], idx))  # 将新的超级丑数加入最小堆
+        
+        return ans[-1]  # 返回第 n 个超级丑数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用最小堆来解这道超级丑数的问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>最小堆结构能够有效地从多个质数的乘积结果中持续选出最小的数，保证生成的超级丑数是按顺序排列的。在每次从堆中取出最小元素后，都会生成新的可能的超级丑数并加入堆中，确保下一次仍然可以获取到最小值。使用最小堆可以避免对所有生成的丑数进行排序，从而提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在算法中，如果在最小堆中存在重复的超级丑数，是否会影响最终结果或效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果最小堆中存在重复的超级丑数，它可能会稍微影响效率，因为同一个丑数会被多次处理和添加到结果数组中，尽管最终结果数组中不会包含重复的丑数。在实际实现中，可以通过设置或检查条件来避免将重复的丑数加入到最小堆中，从而优化算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中提到的`更新 primes_idx[idx]`步骤中，为什么要寻找下一个未被使用的ans[primes_idx[idx]]，这样做的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这一步骤的目的是为了确保每个质数都能乘以所有可能的先前生成的超级丑数，从而生成所有可能的新超级丑数。通过更新`primes_idx[idx]`，我们确保每个质数都与它之前的所有超级丑数相乘，这样可以保持超级丑数数组的完整性和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码实现中提到将每个质数与ans数组中的对应元素相乘，这里的对应元素是如何选择的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对应元素是通过质数的索引`idx`在`primes_idx`数组中的值来确定的。每次从堆中取出一个元素时，都会使用对应质数与ans数组中`primes_idx[idx]`位置的元素相乘，生成新的超级丑数。这确保了每个质数都依次与所有生成的超级丑数相乘，从而按正确的顺序生成每一个新的超级丑数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/ugly-number-ii" class="list-group-item list-group-item-action">
+                                丑数 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/super-ugly-number')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/super-ugly-number/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

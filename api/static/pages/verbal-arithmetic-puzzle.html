@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>口算难题</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>口算难题</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个方程，左边用&nbsp;<code>words</code>&nbsp;表示，右边用&nbsp;<code>result</code> 表示。</p>
+
+<p>你需要根据以下规则检查方程是否可解：</p>
+
+<ul>
+	<li>每个字符都会被解码成一位数字（0 - 9）。</li>
+	<li>每对不同的字符必须映射到不同的数字。</li>
+	<li>每个 <code>words[i]</code> 和 <code>result</code>&nbsp;都会被解码成一个没有前导零的数字。</li>
+	<li>左侧数字之和（<code>words</code>）等于右侧数字（<code>result</code>）。&nbsp;</li>
+</ul>
+
+<p>如果方程可解，返回&nbsp;<code>True</code>，否则返回&nbsp;<code>False</code>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>words = [&quot;SEND&quot;,&quot;MORE&quot;], result = &quot;MONEY&quot;
+<strong>输出：</strong>true
+<strong>解释：</strong>映射 &#39;S&#39;-&gt; 9, &#39;E&#39;-&gt;5, &#39;N&#39;-&gt;6, &#39;D&#39;-&gt;7, &#39;M&#39;-&gt;1, &#39;O&#39;-&gt;0, &#39;R&#39;-&gt;8, &#39;Y&#39;-&gt;&#39;2&#39;
+所以 &quot;SEND&quot; + &quot;MORE&quot; = &quot;MONEY&quot; ,  9567 + 1085 = 10652</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>words = [&quot;SIX&quot;,&quot;SEVEN&quot;,&quot;SEVEN&quot;], result = &quot;TWENTY&quot;
+<strong>输出：</strong>true
+<strong>解释：</strong>映射 &#39;S&#39;-&gt; 6, &#39;I&#39;-&gt;5, &#39;X&#39;-&gt;0, &#39;E&#39;-&gt;8, &#39;V&#39;-&gt;7, &#39;N&#39;-&gt;2, &#39;T&#39;-&gt;1, &#39;W&#39;-&gt;&#39;3&#39;, &#39;Y&#39;-&gt;4
+所以 &quot;SIX&quot; + &quot;SEVEN&quot; + &quot;SEVEN&quot; = &quot;TWENTY&quot; ,  650 + 68782 + 68782 = 138214</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>words = [&quot;THIS&quot;,&quot;IS&quot;,&quot;TOO&quot;], result = &quot;FUNNY&quot;
+<strong>输出：</strong>true
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>words = [&quot;LEET&quot;,&quot;CODE&quot;], result = &quot;POINT&quot;
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= words.length &lt;= 5</code></li>
+	<li><code>1 &lt;= words[i].length,&nbsp;results.length&nbsp;&lt;= 7</code></li>
+	<li><code>words[i], result</code>&nbsp;只含有大写英文字母</li>
+	<li>表达式中使用的不同字符数最大为&nbsp;10</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">import math
+class Solution:
+    def isSolvable(self, words: List[str], result: str) -&gt; bool:
+        L=len(result)
+        weights=defaultdict(int)
+        no_zero_chars=set()
+        for word in words:
+            if len(word)&gt;L:
+                return False
+            if len(word)!=1:
+                no_zero_chars.add(word[0])
+            base=1
+            for c in reversed(word):
+                weights[c]+=base
+                base*=10
+        base=1
+        for c in reversed(result):
+            weights[c]-=base
+            base*=10
+        if L&gt;1:
+            no_zero_chars.add(result[0])
+        
+        weights=sorted([[k,v] for k,v in weights.items() if v!=0],key=lambda x:-abs(x[1]))
+        used=[False]*10
+        # chars={k:-1 for k,_ in weights}
+        N=len(weights)
+        def dfs(idx,total):
+            if idx==N:
+                return total==0
+            mi=ma=total
+            mi_start=ma_start=0
+            mi_end=ma_end=9
+            for i in range(idx+1,N):
+                char,weight=weights[i]
+                if weight&lt;0:
+                    mi+=weight*mi_end
+                    mi_end-=1
+                    ma+=weight*ma_start
+                    ma_start+=1
+                else:
+                    mi+=weight*mi_start
+                    mi_start+=1
+                    ma+=weight*ma_end
+                    ma_end-=1
+            c,w=weights[idx]
+            right=-mi/w
+            left=-ma/w
+            if w&lt;0:
+                left,right=right,left
+            left=max(0,math.ceil(left))
+            right=min(9,math.floor(right))
+            for i in range(left,right+1):
+                if used[i]:
+                    continue
+                if i==0 and c in no_zero_chars:
+                    continue
+                used[i]=True
+                if dfs(idx+1,total+i*w):
+                    return True
+                used[i]=False
+            return False
+        return dfs(0,0)
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用回溯算法和剪枝优化来解决口算难题。首先，统计每个字符在words和result中出现的权重，权重表示该字符在数字中的位置。然后对权重进行排序，按照绝对值从大到小的顺序。接着使用深度优先搜索进行回溯，尝试为每个字符分配一个数字。在回溯过程中，通过计算当前分配方案的最小值和最大值，并与当前权重和进行比较，来进行剪枝优化。如果找到一个可行的分配方案，就返回True，否则返回False。</p>
+                                <p>时间复杂度: O(10^C), C为字符数</p>
+                                <p>空间复杂度: O(C), C为字符数</p>
+                                <pre class="bg-light p-2">import math
+class Solution:
+    def isSolvable(self, words: List[str], result: str) -&gt; bool:
+        L=len(result)
+        weights=defaultdict(int)  # 存储每个字符的权重
+        no_zero_chars=set()  # 存储不能为0的字符
+        for word in words:
+            if len(word)&gt;L:  # 如果word长度超过result，无解
+                return False
+            if len(word)!=1:
+                no_zero_chars.add(word[0])  # 长度不为1的word，首字符不能为0
+            base=1
+            for c in reversed(word):  # 从低位到高位计算字符权重
+                weights[c]+=base
+                base*=10
+        base=1
+        for c in reversed(result):  # 从低位到高位计算result字符权重
+            weights[c]-=base
+            base*=10
+        if L&gt;1:
+            no_zero_chars.add(result[0])  # result首字符不能为0
+        
+        weights=sorted([[k,v] for k,v in weights.items() if v!=0],key=lambda x:-abs(x[1]))  # 按绝对值从大到小排序
+        used=[False]*10  # 标记数字是否已使用
+        N=len(weights)
+        def dfs(idx,total):
+            if idx==N:  # 所有字符都分配完，检查total是否为0
+                return total==0
+            mi=ma=total
+            mi_start=ma_start=0
+            mi_end=ma_end=9
+            for i in range(idx+1,N):  # 计算剩余字符的最小值和最大值
+                char,weight=weights[i]
+                if weight&lt;0:
+                    mi+=weight*mi_end
+                    mi_end-=1
+                    ma+=weight*ma_start
+                    ma_start+=1
+                else:
+                    mi+=weight*mi_start
+                    mi_start+=1
+                    ma+=weight*ma_end
+                    ma_end-=1
+            c,w=weights[idx]  # 当前要分配的字符和权重
+            right=-mi/w
+            left=-ma/w
+            if w&lt;0:  # 权重为负，交换left和right
+                left,right=right,left
+            left=max(0,math.ceil(left))
+            right=min(9,math.floor(right))
+            for i in range(left,right+1):  # 尝试分配数字
+                if used[i]:
+                    continue
+                if i==0 and c in no_zero_chars:  # 不能分配0
+                    continue
+                used[i]=True
+                if dfs(idx+1,total+i*w):  # 递归分配下一个字符
+                    return True
+                used[i]=False
+            return False
+        return dfs(0,0)
+            
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，你提到使用回溯算法和剪枝优化，请问如何确定在哪些情况下进行剪枝？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，剪枝操作是基于当前的字符分配对后续分配可能造成的影响。在回溯过程中，我们首先计算剩余字符如果按照最小可能值或最大可能值分配后可能形成的总和区间，即计算最小可能总和（mi）和最大可能总和（ma）。如果当前字符分配后的新总和不在这个区间内，那么就没有必要继续这个分支的探索，因为它不可能导致总和为零的有效解。这种基于当前选择对未来可能性限制的思考是剪枝的关键。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在存储每个字符的权重时，需要将结果result中的字符权重取相反数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在口算难题中，我们的目标是使得words数组中的字符串所代表的数值之和等于result字符串所代表的数值。在权重计算时，words中的字符应该是正向累加的，因为它们是被加的数。而result中的字符则需要取相反数，因为在等式中result是被减的数（即words的和应该等于result）。这样，我们最终的目标是使所有字符的总权重乘以对应的数字后的和为零。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，如果word的长度超过result，就直接返回False。这种判断是否考虑了所有字符都映射到0的特殊情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个判断实际上没有考虑到所有字符都映射到0的情况。理论上，如果每个字符都映射到0，那么无论words的长度或result的长度如何，都会满足等式。然而，这种情况在实际问题中通常不会被考虑为有效解，特别是当题目或上下文规定不允许所有数字均为0时。因此，如果word的长度超过result，通常意味着无法通过非零的数字映射来达成等式，因此直接返回False是一种合理的简化处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中使用了排序策略，按字符权重的绝对值从大到小排序。这种排序方式是如何帮助优化回溯过程的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>按权重的绝对值从大到小排序的目的是优先处理对总和影响最大的字符。这种策略是基于一个观点：权重大的字符对最终的数值有较大影响，因此先为这些字符分配数字可以更快地观察到分配的效果，增加早期剪枝的可能性，从而减少不必要的回溯。例如，一个权重为1000的字符错误分配的影响，远大于一个权重为10的字符。通过这种方式，可以更有效地缩小搜索空间，加快找到解的速度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/verbal-arithmetic-puzzle')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/verbal-arithmetic-puzzle/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

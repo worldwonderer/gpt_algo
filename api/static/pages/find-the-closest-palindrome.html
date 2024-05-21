@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>寻找最近的回文数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>寻找最近的回文数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个表示整数的字符串&nbsp;<code>n</code> ，返回与它最近的回文整数（不包括自身）。如果不止一个，返回较小的那个。</p>
+
+<p>“最近的”定义为两个整数<strong>差的绝对值</strong>最小。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> n = "123"
+<strong>输出:</strong> "121"
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> n = "1"
+<strong>输出:</strong> "0"
+<strong>解释:</strong> 0 和 2是最近的回文，但我们返回最小的，也就是 0。
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n.length &lt;= 18</code></li>
+	<li><code>n</code>&nbsp;只由数字组成</li>
+	<li><code>n</code>&nbsp;不含前导 0</li>
+	<li><code>n</code>&nbsp;代表在&nbsp;<code>[1, 10<sup>18</sup>&nbsp;- 1]</code> 范围内的整数</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 25 ms</p>
+                    <p>内存: 15.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def nearestPalindromic(self, n: str) -&gt; str:
+        length, int_n = len(n), int(n)
+        if int_n &lt; 10 or int_n == 10 ** (length-1): return str(int_n-1)
+        if int_n - 1 == 10 ** (length-1): return str(int_n-2)
+        if int_n + 1 == 10 ** length: return str(int_n + 2)
+
+        pre = int(n[:(length+1)//2])
+        tmp = [s[:length//2] + s[::-1] for s in [str(pre + dx) for dx in (-1, 0, 1)]]
+        return min(tmp, key=lambda x: (x==n, abs(int(x)-int_n)))
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解思路主要分为几个步骤：1. 特殊情况处理：如果n小于10或者n等于10的幂次方，则直接返回n-1；如果n减1等于10的幂次方，则返回n-2；如果n加1等于10的下一个幂次方，则返回n+2。这些特殊情况处理主要是为了应对边界情况。2. 对于一般情况，先找到n的前半部分（对于奇数长度的n，中间的数字也包括在前半部分），然后构造三个候选的回文数，分别是将前半部分减1、不变、加1后，再将其翻转拼接到后半部分。3. 在这三个候选回文数中，找出与n差的绝对值最小的那个，如果有多个差值相同的，则返回较小的那个。</p>
+                                <p>时间复杂度: O(length)</p>
+                                <p>空间复杂度: O(length)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def nearestPalindromic(self, n: str) -&gt; str:
+        length, int_n = len(n), int(n)
+        # 特殊情况处理
+        if int_n &lt; 10 or int_n == 10 ** (length-1): return str(int_n-1)
+        if int_n - 1 == 10 ** (length-1): return str(int_n-2)
+        if int_n + 1 == 10 ** length: return str(int_n + 2)
+
+        pre = int(n[:(length+1)//2])  # 获取n的前半部分
+        # 构造三个候选回文数
+        tmp = [s[:length//2] + s[::-1] for s in [str(pre + dx) for dx in (-1, 0, 1)]]
+        # 在候选回文数中找出与n差的绝对值最小的那个
+        return min(tmp, key=lambda x: (x==n, abs(int(x)-int_n)))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            请问在处理特殊情况时，为什么对于小于10或等于10的幂次方的n，返回n-1就是最近的回文数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于小于10的数（1到9），每个数本身就是回文数，所以其最近的回文数是其自身或者相邻的整数。由于题目可能要求找到与原数不同的回文数，返回n-1提供了一个最接近且不同于原数的回文数。对于10的幂次方（如10, 100, 1000等），它们的最近回文数一定会在它们的前一个整数，因为下一个可能的回文数相对较远（例如对于10来说，下一个回文数是11）。因此，对于这类数字，返回n-1是找到最接近的回文数的有效方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构造回文数时，为何选择将前半部分的数字分别减1、不变、加1？这样的操作对找到最近回文数有何作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造回文数的过程中，通过对前半部分的数字进行减1、不变、加1操作，可以生成三个候选回文数，从而覆盖所有可能接近原数的回文数的情况。例如，如果原数已经是回文数，那么不变的操作可能会生成原始数本身；而加1和减1的操作则分别提供了略大于和略小于原数的回文数，从而可以确保在不同情况下找到最接近的回文数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何处理奇数长度和偶数长度的n在构造回文数时的差异？具体是如何确定中间的数字是否应该包含在前半部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造回文数时，奇数长度和偶数长度的数字处理稍有不同。对于奇数长度的数字，其中间的数字应包含在前半部分，这是因为回文数的中心点对称。例如，对于数字12321，前半部分是123。而对于偶数长度的数字，前半部分直接截取到中间即可，例如对于数字1221，前半部分是12。这样的处理确保了构造出的回文数保持对称性，无论原数字的长度是奇数还是偶数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到使用min函数进行排序和选择最小值，能否详细解释min函数中的lambda表达式如何确保既考虑了差值最小又考虑了数值大小？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，min函数使用了一个lambda表达式来确定最优的回文数。这个lambda表达式设定了两个排序准则：首先比较生成的回文数是否与原数相等（x==n），然后比较它们与原数的绝对差值（abs(int(x)-int_n)）。这种方式首先排除了与原数相同的数，然后在剩下的候选中选择差值最小的。如果有多个候选的差值相等，min函数默认返回第一个遇到的最小数值，这样就同时考虑了差值最小和数值大小，确保找到最接近且有效的回文数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-closest-palindrome')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-closest-palindrome/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

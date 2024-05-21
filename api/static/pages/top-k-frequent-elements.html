@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>前 K 个高频元素</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>前 K 个高频元素</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=bucket-sort" class="badge bg-secondary tag-link">桶排序</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=quickselect" class="badge bg-secondary tag-link">快速选择</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> 和一个整数 <code>k</code> ，请你返回其中出现频率前 <code>k</code> 高的元素。你可以按 <strong>任意顺序</strong> 返回答案。</p>
+
+<p> </p>
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>nums = [1,1,1,2,2,3], k = 2
+<strong>输出: </strong>[1,2]
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>nums = [1], k = 1
+<strong>输出: </strong>[1]</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= nums.length <= 10<sup>5</sup></code></li>
+	<li><code>k</code> 的取值范围是 <code>[1, 数组中不相同的元素的个数]</code></li>
+	<li>题目数据保证答案唯一，换句话说，数组中前 <code>k</code> 个高频元素的集合是唯一的</li>
+</ul>
+
+<p> </p>
+
+<p><strong>进阶：</strong>你所设计算法的时间复杂度 <strong>必须</strong> 优于 <code>O(n log n)</code> ，其中 <code>n</code><em> </em>是数组大小。</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 20 ms</p>
+                    <p>内存: 19.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">import heapq
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
+        map_fre = defaultdict(int)
+        for i in range(len(nums)):
+            map_fre[nums[i]] += 1
+        pri_que = []
+        for key,freq in map_fre.items():
+            heapq.heappush(pri_que,(freq,key))
+            if len(pri_que) &gt; k:
+                heapq.heappop(pri_que)
+        result = [0]*k
+        for i in range(k-1,-1,-1):
+            result[i] = heapq.heappop(pri_que)[1]
+        return result</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是先用哈希表统计每个元素出现的频率，然后用小顶堆维护前 k 个高频元素。具体步骤如下：
+1. 使用哈希表 map_fre 统计数组 nums 中每个元素出现的频率。
+2. 创建一个小顶堆 pri_que，遍历哈希表中的键值对，将 (频率, 元素) 二元组插入堆中。
+3. 在插入过程中，如果堆的大小超过 k，则弹出堆顶元素，保证堆中始终维护前 k 个高频元素。
+4. 遍历完哈希表后，堆中剩下的就是前 k 个高频元素，将它们按照频率从高到低的顺序弹出并存入结果数组中。
+5. 返回结果数组。</p>
+                                <p>时间复杂度: O(n log k)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">```python
+import heapq
+from collections import defaultdict
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
+        # 使用哈希表统计每个元素出现的频率
+        map_fre = defaultdict(int)
+        for num in nums:
+            map_fre[num] += 1
+        
+        # 创建小顶堆，维护前 k 个高频元素
+        pri_que = []
+        for key, freq in map_fre.items():
+            heapq.heappush(pri_que, (freq, key))
+            if len(pri_que) &gt; k:
+                heapq.heappop(pri_que)
+        
+        # 从堆中弹出前 k 个高频元素，按照频率从高到低的顺序存入结果数组
+        result = [0] * k
+        for i in range(k - 1, -1, -1):
+            result[i] = heapq.heappop(pri_que)[1]
+        
+        return result
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，哈希表`map_fre`用于统计每个元素的频率，如果数组`nums`中的所有元素都相同，哈希表的大小是否仍然为`n`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组`nums`中的所有元素都相同，那么哈希表`map_fre`中将只有一个键值对，即这个重复元素及其总出现次数。因此，哈希表的大小为1，而不是`n`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在堆`pri_que`中，元素是以`(频率, 元素)`的形式存储，这种存储方式是否支持在有相同频率的情况下，正确地保持元素的比较和弹出顺序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Python中的小顶堆（使用`heapq`），当元素的第一关键字（在本例中是频率）相同时，它会使用元素的第二关键字进行比较（在本例中是元素本身）。因此，若频率相同，小顶堆会根据元素值大小进行排序。这种方式确实支持在频率相同的情况下，根据元素值的顺序来决定谁先被弹出。不过，这并不会影响题目的解决方法，因为题目只关心频率高低，对于频率相同的元素，并未要求特定的排序顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法最终返回的结果数组`result`是如何保证元素顺序与题目要求的前`k`高频的顺序一致的？是否存在因堆的性质导致的顺序问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>由于小顶堆`pri_que`维护的是前`k`高频元素，并且堆顶是这些元素中频率最低的，故在将元素从堆中移除并存入结果数组`result`时，需要逆序填充。这是因为堆弹出的顺序是从频率最低到最高，而题目要求是频率从高到低。因此，通过从结果数组的最后一个位置向前填充，可以确保最终数组的顺序与题目要求的前`k`高频的顺序一致。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/word-frequency" class="list-group-item list-group-item-action">
+                                统计词频
+                            </a>
+                        
+                            <a href="/problem/kth-largest-element-in-an-array" class="list-group-item list-group-item-action">
+                                数组中的第K个最大元素
+                            </a>
+                        
+                            <a href="/problem/sort-characters-by-frequency" class="list-group-item list-group-item-action">
+                                根据字符出现频率排序
+                            </a>
+                        
+                            <a href="/problem/split-array-into-consecutive-subsequences" class="list-group-item list-group-item-action">
+                                分割数组为连续子序列
+                            </a>
+                        
+                            <a href="/problem/top-k-frequent-words" class="list-group-item list-group-item-action">
+                                前K个高频单词
+                            </a>
+                        
+                            <a href="/problem/k-closest-points-to-origin" class="list-group-item list-group-item-action">
+                                最接近原点的 K 个点
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/top-k-frequent-elements')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/top-k-frequent-elements/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

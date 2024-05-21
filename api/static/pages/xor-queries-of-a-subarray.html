@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子数组异或查询</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子数组异或查询</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个正整数数组 <code>arr</code>，现给你一个对应的查询数组 <code>queries</code>，其中 <code>queries[i] = [L<sub>i, </sub>R<sub>i</sub>]</code>。</p>
+
+<p>对于每个查询 <code>i</code>，请你计算从 <code>L<sub>i</sub></code> 到 <code>R<sub>i</sub></code> 的 <strong>XOR</strong> 值（即 <code>arr[L<sub>i</sub>] <strong>xor</strong> arr[L<sub>i</sub>+1] <strong>xor</strong> ... <strong>xor</strong> arr[R<sub>i</sub>]</code>）作为本次查询的结果。</p>
+
+<p>并返回一个包含给定查询 <code>queries</code> 所有结果的数组。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [1,3,4,8], queries = [[0,1],[1,2],[0,3],[3,3]]
+<strong>输出：</strong>[2,7,14,8] 
+<strong>解释：</strong>
+数组中元素的二进制表示形式是：
+1 = 0001 
+3 = 0011 
+4 = 0100 
+8 = 1000 
+查询的 XOR 值为：
+[0,1] = 1 xor 3 = 2 
+[1,2] = 3 xor 4 = 7 
+[0,3] = 1 xor 3 xor 4 xor 8 = 14 
+[3,3] = 8
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [4,8,2,10], queries = [[2,3],[1,3],[0,0],[0,3]]
+<strong>输出：</strong>[8,0,4,4]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= arr.length <= 3 * 10^4</code></li>
+	<li><code>1 <= arr[i] <= 10^9</code></li>
+	<li><code>1 <= queries.length <= 3 * 10^4</code></li>
+	<li><code>queries[i].length == 2</code></li>
+	<li><code>0 <= queries[i][0] <= queries[i][1] < arr.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 27.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def xorQueries(self, arr: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(arr)
+        prefix = [0] * (n + 1)
+        for i in range(1, n + 1):
+            prefix[i] = prefix[i - 1] ^ arr[i - 1]
+        ans = [0] * len(queries)
+        for i, (start, end) in enumerate(queries):
+            ans[i] = prefix[end + 1] ^ prefix[start]
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>为了高效地回答多个查询，本题解采用了前缀异或数组的技术。首先构建一个前缀数组 prefix，其中 prefix[i] 表示从 arr[0] 到 arr[i-1] 的元素的异或和。使用这个前缀数组可以在 O(1) 的时间内计算任何子数组的异或和。具体来说，子数组 arr[L] 到 arr[R] 的异或和可以表示为 prefix[R+1] ^ prefix[L]，这是因为 prefix[R+1] 包含了 arr[0] 到 arr[R] 的异或结果，而 prefix[L] 包含了 arr[0] 到 arr[L-1] 的异或结果，两者异或后刚好可以得到 arr[L] 到 arr[R] 的异或结果。</p>
+                                <p>时间复杂度: O(n + q)</p>
+                                <p>空间复杂度: O(n + q)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def xorQueries(self, arr: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(arr)
+        # 初始化前缀异或数组，多一个元素便于处理边界条件
+        prefix = [0] * (n + 1)
+        # 构建前缀异或数组
+        for i in range(1, n + 1):
+            prefix[i] = prefix[i - 1] ^ arr[i - 1]
+        # 初始化结果数组
+        ans = [0] * len(queries)
+        # 计算每个查询的异或结果
+        for i, (start, end) in enumerate(queries):
+            ans[i] = prefix[end + 1] ^ prefix[start]
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建前缀异或数组时，为什么需要初始化prefix数组的长度为n+1而不是n？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化prefix数组的长度为n+1而不是n是为了方便处理边界情况，特别是当子数组的起始索引L为0时。prefix数组中的每个元素prefix[i]代表从数组arr的开始到arr[i-1]的元素的异或和。因此，prefix[0]需要被设为0，这样可以直接使用prefix[R+1]来获取从arr[0]到arr[R]的异或和。如果只初始化为n，那么计算从arr[0]到arr[R]的异或和时，需要做额外的条件判断，增加了复杂度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何理解前缀异或数组中prefix[i]的计算方法，尤其是为什么使用prefix[i-1] ^ arr[i-1]？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>前缀异或数组中prefix[i]的计算方法是将前一个元素的前缀异或结果prefix[i-1]与当前数组元素arr[i-1]进行异或。这种方法的理解基于异或运算的性质：任何数与自身异或的结果为0且异或运算具有交换律和结合律。通过使用prefix[i-1] ^ arr[i-1]，我们实际上是将arr[0]到arr[i-2]的异或结果与arr[i-1]进行异或，从而得到从arr[0]到arr[i-1]的所有元素的异或和，这样可以递归地构建整个prefix数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            前缀异或数组的边界条件是如何处理的，特别是为何prefix[0]被初始化为0有助于计算子数组的异或结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建前缀异或数组时，prefix[0]被初始化为0是关键的边界条件处理方式。这是因为prefix[0]代表了空子数组的异或结果，也即没有任何元素的异或结果应为0。这样的初始化使得当我们需要计算从arr[0]到某个元素arr[R]的异或和时，可以直接使用prefix[R+1]，因为prefix[R+1]实际上包含了arr[0]到arr[R]的异或结果。如果没有将prefix[0]初始化为0，那么在计算整个数组的异或结果时就需要特别处理这种情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在查询处理中，为什么得出子数组arr[L]到arr[R]的异或和可以通过prefix[R+1] ^ prefix[L]计算得到？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个计算方式基于异或运算的性质，特别是异或运算的撤销性质（任何数与自身异或结果为0）和结合律。prefix数组中，prefix[R+1]代表从arr[0]到arr[R]的元素的异或结果，而prefix[L]代表从arr[0]到arr[L-1]的元素的异或结果。当使用prefix[R+1] ^ prefix[L]时，arr[0]到arr[L-1]的部分被“撤销”，只留下arr[L]到arr[R]的异或和。这样我们可以在常数时间O(1)内得到任意子数组的异或结果，极大地提高了查询效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/xor-queries-of-a-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/xor-queries-of-a-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

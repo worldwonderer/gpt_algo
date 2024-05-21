@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>快照数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>快照数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>实现支持下列接口的「快照数组」-&nbsp;SnapshotArray：</p>
+
+<ul>
+	<li><code>SnapshotArray(int length)</code>&nbsp;- 初始化一个与指定长度相等的 类数组 的数据结构。<strong>初始时，每个元素都等于</strong><strong>&nbsp;0</strong>。</li>
+	<li><code>void set(index, val)</code>&nbsp;- 会将指定索引&nbsp;<code>index</code>&nbsp;处的元素设置为&nbsp;<code>val</code>。</li>
+	<li><code>int snap()</code>&nbsp;- 获取该数组的快照，并返回快照的编号&nbsp;<code>snap_id</code>（快照号是调用&nbsp;<code>snap()</code>&nbsp;的总次数减去&nbsp;<code>1</code>）。</li>
+	<li><code>int get(index, snap_id)</code>&nbsp;- 根据指定的&nbsp;<code>snap_id</code>&nbsp;选择快照，并返回该快照指定索引 <code>index</code>&nbsp;的值。</li>
+</ul>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>[&quot;SnapshotArray&quot;,&quot;set&quot;,&quot;snap&quot;,&quot;set&quot;,&quot;get&quot;]
+     [[3],[0,5],[],[0,6],[0,0]]
+<strong>输出：</strong>[null,null,0,null,5]
+<strong>解释：
+</strong>SnapshotArray snapshotArr = new SnapshotArray(3); // 初始化一个长度为 3 的快照数组
+snapshotArr.set(0,5);  // 令 array[0] = 5
+snapshotArr.snap();  // 获取快照，返回 snap_id = 0
+snapshotArr.set(0,6);
+snapshotArr.get(0,0);  // 获取 snap_id = 0 的快照中 array[0] 的值，返回 5</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= length&nbsp;&lt;= 50000</code></li>
+	<li>题目最多进行<code>50000</code> 次<code>set</code>，<code>snap</code>，和&nbsp;<code>get</code>的调用 。</li>
+	<li><code>0 &lt;= index&nbsp;&lt;&nbsp;length</code></li>
+	<li><code>0 &lt;=&nbsp;snap_id &lt;&nbsp;</code>我们调用&nbsp;<code>snap()</code>&nbsp;的总次数</li>
+	<li><code>0 &lt;=&nbsp;val &lt;= 10^9</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 378 ms</p>
+                    <p>内存: 47.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">from bisect import bisect_left
+
+class SnapshotArray:
+
+    def __init__(self, length: int):
+        # 初始化字典数组和 id
+        self.arr = [{0: 0} for _ in range(length)]
+        self.sid = 0
+
+    def set(self, index: int, val: int) -&gt; None:
+        # 设置当前快照的元素值
+        self.arr[index][self.sid] = val
+
+    def snap(self) -&gt; int:
+        # 每次快照 id 加 1
+        self.sid += 1
+        # 返回上一个快照 id
+        return self.sid - 1
+
+    def get(self, index: int, snap_id: int) -&gt; int:
+        # 选择要查找的元素的字典
+        d = self.arr[index]
+        # 如果快照恰好存在, 直接返回
+        if snap_id in d:
+            return d[snap_id]
+        # 不存在则进行二分搜索, 查找快照前最后一次修改
+        k = list(d.keys())
+        i = bisect.bisect_left(k, snap_id)
+        return d[k[i - 1]]
+
+
+
+# Your SnapshotArray object will be instantiated and called as such:
+# obj = SnapshotArray(length)
+# obj.set(index,val)
+# param_2 = obj.snap()
+# param_3 = obj.get(index,snap_id)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了一个字典数组来实现快照数组。每个字典存储了一个索引在不同快照版本中的值。每次调用snap()时，快照id自增，而set()方法则在当前快照id下更新值。get()方法使用二分搜索在当前索引的字典中找到不大于给定快照id的最大快照id，然后返回那个快照id下的值。</p>
+                                <p>时间复杂度: set(): O(1), snap(): O(1), get(): O(logN)</p>
+                                <p>空间复杂度: O(L*N)</p>
+                                <pre class="bg-light p-2">from bisect import bisect_left
+
+class SnapshotArray:
+
+    def __init__(self, length: int):
+        # 初始化字典数组和快照id
+        self.arr = [{0: 0} for _ in range(length)]
+        self.sid = 0
+
+    def set(self, index: int, val: int) -&gt; None:
+        # 设置当前快照的元素值
+        self.arr[index][self.sid] = val
+
+    def snap(self) -&gt; int:
+        # 每次快照id加1
+        self.sid += 1
+        # 返回上一个快照id
+        return self.sid - 1
+
+    def get(self, index: int, snap_id: int) -&gt; int:
+        # 选择要查找的元素的字典
+        d = self.arr[index]
+        # 如果快照恰好存在, 直接返回
+        if snap_id in d:
+            return d[snap_id]
+        # 不存在则进行二分搜索, 查找快照前最后一次修改
+        k = list(d.keys())
+        i = bisect_left(k, snap_id)
+        return d[k[i - 1]]
+
+# Your SnapshotArray object will be instantiated and called as such:
+# obj = SnapshotArray(length)
+# obj.set(index,val)
+# param_2 = obj.snap()
+# param_3 = obj.get(index,snap_id)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在`get`方法中，如果直接找到了`snap_id`就可以直接返回，而如果没有找到则需要使用二分搜索来查找最接近的快照版本？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`get`方法中，如果直接找到`snap_id`，说明在此快照版本时索引对应的值发生了更改并被记录，因此可以直接返回该值。若`snap_id`未直接找到，意味着在`snap_id`时刻之前的某个版本中最后一次修改了该索引的值，但此后至`snap_id`未再改动过，所以需要通过二分搜索在已有的快照键中找到不超过`snap_id`的最大快照键，以得到正确的数据状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`set`方法中，为什么要将值设置在当前的快照id下，而不是直接修改数组中的值？这样设计的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`set`方法中，将值设置在当前快照id下而不是直接修改数组中的值，是为了保留历史数据版本的完整性。这种设计使得系统可以存储和访问某个索引在不同时间点的历史值，支持随时回退到任何之前的快照状态。直接修改数组值将只能保留最新状态，无法实现快照功能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在进行二分搜索时，如果二分搜索的结果是`0`，这种情况下如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果二分搜索的结果是`0`，这表明所有记录的快照键都大于当前查询的`snap_id`。在这种情况下，应返回索引初始状态的值。在快照数组的实现中，每个索引的初始快照（键为0）被设置为0，因此如果`i`为0，则返回索引的初始值，即字典中键为0的值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            请解释一下在最坏情况下，为什么每个索引的字典中会有O(N)个条目，其中N是snap()操作的总次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在最坏情况下，假设每次`snap()`操作后，每个索引的值都被修改并记录到字典中，这将导致每个索引对应的字典中会记录每次快照时的状态。因此，如果进行了N次`snap()`操作，每个索引的字典最终将包含N个条目，每个条目对应一个快照版本的值。这样，字典中的条目数量与快照次数直接相关，即O(N)。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/snapshot-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/snapshot-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

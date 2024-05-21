@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>卖木头块</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>卖木头块</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数&nbsp;<code>m</code> 和&nbsp;<code>n</code>&nbsp;，分别表示一块矩形木块的高和宽。同时给你一个二维整数数组&nbsp;<code>prices</code>&nbsp;，其中&nbsp;<code>prices[i] = [h<sub>i</sub>, w<sub>i</sub>, price<sub>i</sub>]</code>&nbsp;表示你可以以&nbsp;<code>price<sub>i</sub></code>&nbsp;元的价格卖一块高为&nbsp;<code>h<sub>i</sub></code>&nbsp;宽为&nbsp;<code>w<sub>i</sub></code>&nbsp;的矩形木块。</p>
+
+<p>每一次操作中，你必须按下述方式之一执行切割操作，以得到两块更小的矩形木块：</p>
+
+<ul>
+	<li>沿垂直方向按高度 <strong>完全</strong> 切割木块，或</li>
+	<li>沿水平方向按宽度 <strong>完全</strong> 切割木块</li>
+</ul>
+
+<p>在将一块木块切成若干小木块后，你可以根据 <code>prices</code>&nbsp;卖木块。你可以卖多块同样尺寸的木块。你不需要将所有小木块都卖出去。你 <strong>不能</strong>&nbsp;旋转切好后木块来交换它的高度值和宽度值。</p>
+
+<p>请你返回切割一块大小为<em>&nbsp;</em><code>m x n</code><em> </em>的木块后，能得到的&nbsp;<strong>最多</strong>&nbsp;钱数。</p>
+
+<p>注意你可以切割木块任意次。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/04/27/ex1.png" style="width: 239px; height: 150px;" /></p>
+
+<pre>
+<b>输入：</b>m = 3, n = 5, prices = [[1,4,2],[2,2,7],[2,1,3]]
+<b>输出：</b>19
+<b>解释：</b>上图展示了一个可行的方案。包括：
+- 2 块 2 x 2 的小木块，售出 2 * 7 = 14 元。
+- 1 块 2 x 1 的小木块，售出 1 * 3 = 3 元。
+- 1 块 1 x 4 的小木块，售出 1 * 2 = 2 元。
+总共售出 14 + 3 + 2 = 19 元。
+19 元是最多能得到的钱数。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/04/27/ex2new.png" style="width: 250px; height: 175px;" /></p>
+
+<pre>
+<b>输入：</b>m = 4, n = 6, prices = [[3,2,10],[1,4,2],[4,1,3]]
+<b>输出：</b>32
+<b>解释：</b>上图展示了一个可行的方案。包括：
+- 3 块 3 x 2 的小木块，售出 3 * 10 = 30 元。
+- 1 块 1 x 4 的小木块，售出 1 * 2 = 2 元。
+总共售出 30 + 2 = 32 元。
+32 元是最多能得到的钱数。
+注意我们不能旋转 1 x 4 的木块来得到 4 x 1 的木块。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= m, n &lt;= 200</code></li>
+	<li><code>1 &lt;= prices.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>prices[i].length == 3</code></li>
+	<li><code>1 &lt;= h<sub>i</sub> &lt;= m</code></li>
+	<li><code>1 &lt;= w<sub>i</sub> &lt;= n</code></li>
+	<li><code>1 &lt;= price<sub>i</sub> &lt;= 10<sup>6</sup></code></li>
+	<li>所有&nbsp;<code>(h<sub>i</sub>, w<sub>i</sub>)</code> <strong>互不相同</strong>&nbsp;。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 145 ms</p>
+                    <p>内存: 21.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def sellingWood(self, m: int, n: int, prices: List[List[int]]) -&gt; int:
+        &#34;&#34;&#34;
+        动态规划
+        dp[x,y]表示 高、宽为x,y时可以得到的最多钱数
+        
+        情况1: 当x,y存在于prices中的木块大小
+            dp[xi,yi] = prices[i]
+
+        情况2: 当高x&gt;1时，可以水平切割
+            dp[x,y] = max(dp[i,y]+dp[x-i, y], x in [1, x-1])
+        情况3: 当宽y&gt;1时，可以垂直切割
+            dp[x,y] = max(dp[x,j]+dp[x, y-j]), y in [1, y-1])
+        &#34;&#34;&#34;
+
+        # vals = {}
+        # @cache
+        # def dfs(x, y):
+        #     ret = vals.get((x,y), 0)
+
+        #     if x &gt; 1:
+        #         for i in range(1, x//2+1):
+        #             ret = max(ret, dfs(i, y)+dfs(x-i, y))
+
+        #     if y &gt; 1:
+        #         for j in range(1, y//2+1):
+        #             ret = max(ret, dfs(x, j) + dfs(x, y-j))
+        #     return ret
+        dp = [ [0]*(n+1) for _ in range(m+1)]
+
+        for (h, w, price) in prices:
+            dp[h][w] = price
+        
+        ret = 0
+        optimized_split_height_per_width = [[] for _ in range(n+1)]
+        for i in range(1, m+1):
+            optimized_split_width_per_height = []
+            for j in range(1, n+1):
+                tmp = dp[i][j]
+                height_optimized = True
+                width_optimized = True
+                # 水平切割，剪枝，并不是所有位置都需要枚举
+                # 只需要枚举之前的最后分割点即可，之前没有进行分割的点，后面用不到
+                for split_h in optimized_split_height_per_width[j]:
+                    val = dp[split_h][j]+dp[i-split_h][j]
+                    if val &gt; tmp:
+                        # 当前宽高是[i, j]，可以进行水平分割
+                        # 分割高度是split_h
+                        # 记录下来，当高为i时，可以枚举这个宽度
+                        tmp = val
+                        height_optimized = False
+                        width_optimized = True
+                    elif val == tmp:
+                        height_optimized = False
+
+                # 垂直切割，剪枝，并不是所有位置都需要枚举
+                for split_w in optimized_split_width_per_height:
+                    val = dp[i][split_w]+dp[i][j-split_w]
+                    if val &gt; tmp:
+                        # 当前宽高是[i, j]，可以进行垂直分割
+                        # 分割宽度是split_w
+                        # 记录下来，当宽为j时，可以枚举这个高度
+                        tmp = val
+                        width_optimized = False
+                        height_optimized = True
+                    elif val == tmp:
+                        width_optimized = False
+                if tmp == 0:
+                    width_optimized = height_optimized = False
+                dp[i][j] = tmp
+                if width_optimized:
+                    optimized_split_width_per_height.append(j)
+                if height_optimized:
+                    optimized_split_height_per_width[j].append(i)
+
+        ret = dp[-1][-1]
+        return ret
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题采用动态规划的方法来解决。定义 dp[x][y] 为当木块尺寸为 x 高和 y 宽时可以获得的最大收益。初始化 dp 数组时，先将所有给定的价格设置到对应的尺寸上。接下来，对于每个尺寸的木块，尝试进行水平和垂直的切割，更新 dp[x][y] 为所有可能的切割方式中的最大值。通过维护 optimized_split_height_per_width 和 optimized_split_width_per_height 两个列表来记录对于每个尺寸的木块，之前有效的切割位置，从而减少不必要的重复计算，优化动态规划过程。最终 dp[m][n] 存储的就是切割大小为 m x n 的木块能得到的最多钱数。</p>
+                                <p>时间复杂度: O(m^2 * n + m * n^2)</p>
+                                <p>空间复杂度: O(m * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def sellingWood(self, m: int, n: int, prices: List[List[int]]) -&gt; int:
+        # Initialize dp table with all zeros
+        dp = [[0]*(n+1) for _ in range(m+1)]
+
+        # Set prices in dp table
+        for (h, w, price) in prices:
+            dp[h][w] = price
+        
+        # Initialize lists to store optimized split positions
+        optimized_split_height_per_width = [[] for _ in range(n+1)]
+        for i in range(1, m+1):
+            optimized_split_width_per_height = []
+            for j in range(1, n+1):
+                tmp = dp[i][j]
+                height_optimized = width_optimized = True
+                # Horizontal cuts
+                for split_h in optimized_split_height_per_width[j]:
+                    val = dp[split_h][j]+dp[i-split_h][j]
+                    if val &gt; tmp:
+                        tmp = val
+                        height_optimized = False
+                    elif val == tmp:
+                        height_optimized = False
+
+                # Vertical cuts
+                for split_w in optimized_split_width_per_height:
+                    val = dp[i][split_w]+dp[i][j-split_w]
+                    if val &gt; tmp:
+                        tmp = val
+                        width_optimized = False
+                    elif val == tmp:
+                        width_optimized = False
+                
+                # Update dp table and optimized lists
+                dp[i][j] = tmp
+                if width_optimized:
+                    optimized_split_width_per_height.append(j)
+                if height_optimized:
+                    optimized_split_height_per_width[j].append(i)
+
+        # Return the maximum possible money from cutting m x n wood block
+        return dp[m][n]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划解决方案中，为什么需要维护optimized_split_height_per_width和optimized_split_width_per_height两个列表，它们具体的作用是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这两个列表的目的是为了存储之前有效的切割位置，从而减少不必要的重复计算。在动态规划中，每次尝试切割一个木块时，不需要遍历所有可能的切割位置，而是只考虑之前已经证明能提供最大收益的切割位置。这样做可以优化动态规划的过程，提高算法的效率。例如，如果在某个尺寸的木块中，某一切割位置未曾提供超越已知最大收益的新收益，则在后续相同的切割尝试中可以忽略这个切割位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划表dp[x][y]的初始化过程中，如果存在多个价格条目针对同一尺寸（hi, wi），例如两个不同的价格，该如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化dp表时，如果存在多个价格条目针对同一尺寸，应该选择最高的价格设置到dp表中。这是因为我们的目标是最大化收益，因此对于同一尺寸的木块，应当采用能够获得最大收益的价格。在代码中，可以通过比较当前价格与dp表中已存储的价格，选择较大者进行更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您在更新dp表时，考虑了水平和垂直切割，但是如何确保这些切割总是导致最优解？是否存在某些情况下无法通过当前的切割方式达到最大收益？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中通过考虑所有可能的水平和垂直切割，我们尝试找到任何可能的方式来最大化收益。理论上，通过穷尽这些切割方式，我们能够确保找到最优解。然而，动态规划的前提是基于&#39;最优子结构&#39;的假设——即问题的最优解包含了其子问题的最优解。如果这个假设成立，我们的方法总是能找到最优解。不过，如果存在某些特殊情况或约束（例如价格不规则或者受限的切割规则），那么可能需要对算法进行调整或增加额外的逻辑来处理这些特殊情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/selling-pieces-of-wood')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/selling-pieces-of-wood/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

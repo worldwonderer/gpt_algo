@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两个行程编码数组的积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两个行程编码数组的积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 211 ms</p>
+                    <p>内存: 67.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findRLEArray(self, encoded1: List[List[int]], encoded2: List[List[int]]) -&gt; List[List[int]]:
+
+        m, n = len(encoded1), len(encoded2)
+        curr, c = None, 0
+        i, j = 0, 0
+        res = []
+        while i &lt; m and j &lt; n:
+            count1, count2 = encoded1[i][1], encoded2[j][1]
+            num1, num2 = encoded1[i][0], encoded2[j][0]
+            if count1 &lt; count2:
+                i += 1
+                count = count1
+                encoded2[j][1] -= count
+            elif count1 &gt; count2:
+                j += 1
+                count = count2
+                encoded1[i][1] -= count
+            else:
+                i += 1
+                j += 1
+                count = count1
+
+            prod = num1 * num2
+            if not curr:
+                curr, c = prod, count
+            else:
+                if prod != curr:
+                    res.append([curr, c])
+                    curr, c = prod, count
+                else:
+                    c += count
+        
+        res.append([curr, c])
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的核心思路是将两个行程编码数组（每个数组中的元素由[value, count]组成，表示value出现count次）进行逐对元素的乘积，并且保持行程编码的形式。算法逐一比较两个数组中的当前元素，计算乘积，并更新计数。如果两数组当前元素的计数不一致，则减少计数较小的数组的当前元素的计数，并将其指针前移，否则同时前移两数组的指针。当两数组相应计数的乘积与之前的乘积相同，合并计数；否则，将当前乘积和计数作为新的元素添加到结果数组中。</p>
+                                <p>时间复杂度: O(m+n)</p>
+                                <p>空间复杂度: O(m+n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findRLEArray(self, encoded1: List[List[int]], encoded2: List[List[int]]) -&gt; List[List[int]]:
+        m, n = len(encoded1), len(encoded2)  # 获取两个数组的长度
+        curr, c = None, 0  # 初始化当前乘积和计数
+        i, j = 0, 0  # 初始化两个数组的索引
+        res = []  # 初始化结果数组
+        while i &lt; m and j &lt; n:  # 当两个索引都未越界时
+            count1, count2 = encoded1[i][1], encoded2[j][1]  # 获取当前元素的计数
+            num1, num2 = encoded1[i][0], encoded2[j][0]  # 获取当前元素的值
+            if count1 &lt; count2:  # 当第一个数组的计数较小
+                i += 1
+                count = count1
+                encoded2[j][1] -= count  # 更新第二个数组的当前元素计数
+            elif count1 &gt; count2:  # 当第二个数组的计数较小
+                j += 1
+                count = count2
+                encoded1[i][1] -= count  # 更新第一个数组的当前元素计数
+            else:  # 当两个数组的计数相等
+                i += 1
+                j += 1
+                count = count1  # 设置计数为当前计数
+
+            prod = num1 * num2  # 计算当前元素的乘积
+            if not curr:  # 如果没有当前乘积
+                curr, c = prod, count  # 设置当前乘积和计数
+            else:
+                if prod != curr:  # 如果新的乘积与当前乘积不同
+                    res.append([curr, c])  # 将当前乘积和计数添加到结果数组
+                    curr, c = prod, count  # 更新当前乘积和计数
+                else:  # 如果新的乘积与当前乘积相同
+                    c += count  # 累加计数
+        
+        res.append([curr, c])  # 添加最后一个乘积和计数到结果数组
+        return res  # 返回结果数组</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            算法在处理两个数组的计数不一致时，仅减少计数较小的数组的当前计数，并前移指针，这种处理对结果的正确性有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式确保了算法的正确性，因为它允许两个数组中对应的元素按照实际出现的次数进行乘积运算。当一个数组的当前元素的计数小于另一个数组时，通过减少等量的计数并前移指针，可以确保每个元素都被完全且正确地处理，而不会有遗漏或重复。此操作保证了两个数组的元素在运算中的对应性，使得最终的行程编码数组能准确反映出所有可能的乘积及其出现次数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当两个数组的元素乘积相同时，算法选择累加计数而非立即产生新的结果元素，这种做法的优势在哪里？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择累加计数而非立即产生新的结果元素可以有效减少结果数组的大小，从而优化存储空间的使用。在行程编码中，相同值的连续出现可以合并为一个元素，减少了数组的元素数量，提高了空间效率。此外，这种做法还减少了数组操作的次数，可能对算法的运行时间也有一定的优化效果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在算法的最后，直接将当前乘积和计数添加到结果数组中，这里是否考虑到了所有可能的边界情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法的这一处理确实考虑到了所有边界情况。由于在每次循环中，只有在当前乘积发生变化时才会将之前的乘积与计数存入结果数组，而最后一组乘积和计数在循环结束时可能尚未被添加。因此，在循环结束后直接添加最后一组乘积和计数确保了包括最后一次计算在内的所有乘积都被正确记录。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理两个数组的元素时，如果遇到一个数组先遍历完毕的情况，题解中没有明确说明如何处理剩下的元素。这种情况下应如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题目的上下文中，一旦一个数组遍历完成，另一个数组中剩下的元素实际上不需要再处理，因为行程编码表示的是有限的元素和其出现次数。如果其中一个数组已经处理完毕，意味着没有更多的元素来与另一个数组中的剩余元素相乘。因此，这种情况下，算法不需要对剩余的元素进行额外的处理，直接结束即可。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/product-of-two-run-length-encoded-arrays')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/product-of-two-run-length-encoded-arrays/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

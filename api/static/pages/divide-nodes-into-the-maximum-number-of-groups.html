@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>将节点分成尽可能多的组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>将节点分成尽可能多的组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个正整数&nbsp;<code>n</code>&nbsp;，表示一个 <strong>无向</strong>&nbsp;图中的节点数目，节点编号从&nbsp;<code>1</code>&nbsp;到&nbsp;<code>n</code>&nbsp;。</p>
+
+<p>同时给你一个二维整数数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i, </sub>b<sub>i</sub>]</code>&nbsp;表示节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code><sub>&nbsp;</sub>之间有一条&nbsp;<strong>双向</strong>&nbsp;边。注意给定的图可能是不连通的。</p>
+
+<p>请你将图划分为&nbsp;<code>m</code>&nbsp;个组（编号从 <strong>1</strong>&nbsp;开始），满足以下要求：</p>
+
+<ul>
+	<li>图中每个节点都只属于一个组。</li>
+	<li>图中每条边连接的两个点&nbsp;<code>[a<sub>i, </sub>b<sub>i</sub>]</code>&nbsp;，如果&nbsp;<code>a<sub>i</sub></code>&nbsp;属于编号为&nbsp;<code>x</code>&nbsp;的组，<code>b<sub>i</sub></code>&nbsp;属于编号为&nbsp;<code>y</code>&nbsp;的组，那么&nbsp;<code>|y - x| = 1</code>&nbsp;。</li>
+</ul>
+
+<p>请你返回最多可以将节点分为多少个组（也就是最大的<em>&nbsp;</em><code>m</code>&nbsp;）。如果没办法在给定条件下分组，请你返回&nbsp;<code>-1</code>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/13/example1.png" style="width: 352px; height: 201px;"></p>
+
+<pre><b>输入：</b>n = 6, edges = [[1,2],[1,4],[1,5],[2,6],[2,3],[4,6]]
+<b>输出：</b>4
+<b>解释：</b>如上图所示，
+- 节点 5 在第一个组。
+- 节点 1 在第二个组。
+- 节点 2 和节点 4 在第三个组。
+- 节点 3 和节点 6 在第四个组。
+所有边都满足题目要求。
+如果我们创建第五个组，将第三个组或者第四个组中任何一个节点放到第五个组，至少有一条边连接的两个节点所属的组编号不符合题目要求。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>n = 3, edges = [[1,2],[2,3],[3,1]]
+<b>输出：</b>-1
+<b>解释：</b>如果我们将节点 1 放入第一个组，节点 2 放入第二个组，节点 3 放入第三个组，前两条边满足题目要求，但第三条边不满足题目要求。
+没有任何符合题目要求的分组方式。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>1 &lt;= edges.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>1 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt;= n</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li>两个点之间至多只有一条边。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 552 ms</p>
+                    <p>内存: 18.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def magnificentSets(self, n: int, edges: List[List[int]]) -&gt; int:
+        g = [[] for _ in range(n)]
+        for x, y in edges:
+            g[x - 1].append(y - 1)
+            g[y - 1].append(x - 1)
+        
+        def bfs(start: int) -&gt; int:  # 返回从 start 出发的最大深度
+            time = [False] * n
+            depth = 0
+            time[start] = True
+            q = [start]
+            while q:
+                tmp = q
+                q = []
+                for x in tmp:
+                    for y in g[x]:
+                        if not time[y]:
+                            time[y] = True
+                            q.append(y)
+                depth += 1
+            return depth
+
+        color = [0] * n
+        def is_bipartite(x: int, c: int) -&gt; bool:  # 二分图判定，原理见视频讲解            
+            color[x] = c
+            for y in g[x]:
+                if color[y] == -c:
+                    continue
+                if color[y] != 0:
+                    return False
+                if not is_bipartite(y, -c):
+                    return False
+            return True
+
+        clock = 0
+        for i, c in enumerate(color):
+            if c: continue
+            clock += 1
+            if not is_bipartite(i, clock): return -1  # 如果不是二分图（有奇环），则无法分组
+            # 否则一定可以分组
+        value = [0] * clock
+        for i, c in enumerate(color):
+            if c == 0: continue
+            value[abs(c)-1] = max(value[abs(c)-1], bfs(i))  # 枚举连通块的每个点，作为起点 BFS，求最大深度
+        return sum(value)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解通过将问题转化为二分图检测来解决。步骤如下：
+1. 构建图的邻接列表。
+2. 使用颜色数组 `color` 来检测图是否为二分图。二分图可以被分成两组，其中任何一条边的两个顶点都属于不同的组。
+3. 为每个未染色的节点尝试进行二分图染色，使用深度优先搜索（DFS）。如果发现某个节点及其相邻节点颜色相同，说明存在奇数环，返回-1。
+4. 对每个连通分量使用广度优先搜索（BFS）来确定其深度，深度决定了可以分的组数。
+5. 计算所有连通分量的深度和作为最终结果。</p>
+                                <p>时间复杂度: O(V+E)</p>
+                                <p>空间复杂度: O(V+E)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def magnificentSets(self, n: int, edges: List[List[int]]) -&gt; int:
+        g = [[] for _ in range(n)]
+        for x, y in edges:
+            g[x - 1].append(y - 1)
+            g[y - 1].append(x - 1)
+        
+        def bfs(start: int) -&gt; int:
+            time = [False] * n
+            depth = 0
+            time[start] = True
+            q = [start]
+            while q:
+                tmp = q
+                q = []
+                for x in tmp:
+                    for y in g[x]:
+                        if not time[y]:
+                            time[y] = True
+                            q.append(y)
+                depth += 1
+            return depth
+
+        color = [0] * n
+        def is_bipartite(x: int, c: int) -&gt; bool:
+            color[x] = c
+            for y in g[x]:
+                if color[y] == -c:
+                    continue
+                if color[y] != 0:
+                    return False
+                if not is_bipartite(y, -c):
+                    return False
+            return True
+
+        clock = 0
+        for i, c in enumerate(color):
+            if c: continue
+            clock += 1
+            if not is_bipartite(i, clock): return -1
+        value = [0] * clock
+        for i, c in enumerate(color):
+            if c == 0: continue
+            value[abs(c)-1] = max(value[abs(c)-1], bfs(i))
+        return sum(value)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在确定是否为二分图时，需要使用颜色数组标记节点，并选择颜色值为正负号？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分图中，图的顶点可以分成两组，使得每组内的任何两个顶点之间都不存在边。使用颜色数组和正负号是为了方便地检测和标记这两组。具体来说，我们可以将一组顶点标记为+1，另一组标记为-1。当我们在图中遍历时，如果遇到一个已经标记的顶点，我们会检查它是否与当前节点颜色相反。如果相同，则表示图中存在同组的相邻节点，从而不满足二分图的条件。使用正负号的方法简化了这一检测过程，使得我们只需要一次比较即可确定是否违反了二分图的性质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在二分图检测的代码中，当发现一个节点及其相邻节点颜色相同时，直接返回-1，这样的处理是否意味着整个图中存在奇数环？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，当我们在进行二分图染色过程中发现一个节点与其相邻节点颜色相同时，这意味着我们无法将这两个相邻节点放在两个不同的组中，因此图中至少存在一个奇数长度的环。在二分图中，任何环的长度都应该是偶数，因为顶点应该交替出现在两个不同的组中。发现奇数环是判断一个图不是二分图的充分条件。因此，一旦检测到这种情况，就可以直接返回-1，表示图不是二分图。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在进行BFS以计算连通分量的深度时，为什么需要一个额外的数组`time`来标记节点是否已经被访问？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用广度优先搜索（BFS）遍历图的过程中，需要确保每个节点仅被访问一次，这样可以避免重复计算和无限循环。`time`数组用来跟踪每个节点的访问状态。当开始访问一个节点时，我们将其在`time`数组中的对应值标记为`True`，表示该节点已被访问。这样，当我们遇到一个已标记的节点时，就知道不需要再次将其加入到队列中。使用这种方法，我们可以正确地计算出从每个起始节点开始的BFS的深度，从而确定每个连通分量的最大深度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/divide-nodes-into-the-maximum-number-of-groups')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/divide-nodes-into-the-maximum-number-of-groups/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

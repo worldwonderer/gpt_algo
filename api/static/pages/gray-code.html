@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>格雷编码</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>格雷编码</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <strong>n 位格雷码序列</strong> 是一个由 <code>2<sup>n</sup></code> 个整数组成的序列，其中：
+<ul>
+	<li>每个整数都在范围 <code>[0, 2<sup>n</sup> - 1]</code> 内（含 <code>0</code> 和 <code>2<sup>n</sup> - 1</code>）</li>
+	<li>第一个整数是 <code>0</code></li>
+	<li>一个整数在序列中出现 <strong>不超过一次</strong></li>
+	<li>每对 <strong>相邻</strong> 整数的二进制表示 <strong>恰好一位不同</strong> ，且</li>
+	<li><strong>第一个</strong> 和 <strong>最后一个</strong> 整数的二进制表示 <strong>恰好一位不同</strong></li>
+</ul>
+
+<p>给你一个整数 <code>n</code> ，返回任一有效的 <strong>n 位格雷码序列</strong> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 2
+<strong>输出：</strong>[0,1,3,2]
+<strong>解释：</strong>
+[0,1,3,2] 的二进制表示是 [00,01,11,10] 。
+- 0<strong><em>0</em></strong> 和 0<em><strong>1</strong></em> 有一位不同
+- <em><strong>0</strong></em>1 和 <em><strong>1</strong></em>1 有一位不同
+- 1<em><strong>1</strong></em> 和 1<em><strong>0</strong></em> 有一位不同
+- <em><strong>1</strong></em>0 和 <em><strong>0</strong></em>0 有一位不同
+[0,2,3,1] 也是一个有效的格雷码序列，其二进制表示是 [00,10,11,01] 。
+- <em><strong>0</strong></em>0 和 <em><strong>1</strong></em>0 有一位不同
+- 1<em><strong>0</strong></em> 和 1<em><strong>1</strong></em> 有一位不同
+- <em><strong>1</strong></em>1 和 <em><strong>0</strong></em>1 有一位不同
+- 0<em><strong>1</strong></em> 和 0<em><strong>0</strong></em> 有一位不同
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 1
+<strong>输出：</strong>[0,1]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 16</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 168 ms</p>
+                    <p>内存: 18.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def grayCode(self, n: int) -&gt; List[int]:
+        ans = []
+
+        def backtrack(path, choices=(&#39;0&#39;, &#39;1&#39;)):
+            if len(path) == n:
+                num = int(&#39;&#39;.join(path), 2)
+                ans.append(num)
+                return
+
+            path.append(choices[0])
+            backtrack(path, (&#39;0&#39;, &#39;1&#39;))
+            path.pop()
+
+            path.append(choices[1])
+            backtrack(path, (&#39;1&#39;, &#39;0&#39;))
+            path.pop()
+
+        backtrack([])
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用回溯法生成格雷码序列。它从空字符串开始，每次在当前字符串后面添加一个字符 &#39;0&#39; 或 &#39;1&#39;，然后递归地生成下一个字符。添加字符的顺序通过 choices 参数控制，第一次添加 &#39;0&#39; 后继续使用 (&#39;0&#39;, &#39;1&#39;)，添加 &#39;1&#39; 后改用 (&#39;1&#39;, &#39;0&#39;)，这样可以保证相邻的格雷码二进制表示只有一位不同。当字符串长度达到 n 时，将其转换为整数添加到结果列表中。</p>
+                                <p>时间复杂度: O(n * 2^n)</p>
+                                <p>空间复杂度: O(n * 2^n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def grayCode(self, n: int) -&gt; List[int]:
+        ans = []
+
+        def backtrack(path, choices=(&#39;0&#39;, &#39;1&#39;)):
+            if len(path) == n:
+                # 当前字符串长度达到 n，将其转换为整数添加到结果列表中
+                num = int(&#39;&#39;.join(path), 2)
+                ans.append(num)
+                return
+
+            # 添加字符 &#39;0&#39;，继续使用选择列表 (&#39;0&#39;, &#39;1&#39;)
+            path.append(choices[0])
+            backtrack(path, (&#39;0&#39;, &#39;1&#39;))
+            path.pop()
+
+            # 添加字符 &#39;1&#39;，改用选择列表 (&#39;1&#39;, &#39;0&#39;)
+            path.append(choices[1])
+            backtrack(path, (&#39;1&#39;, &#39;0&#39;))
+            path.pop()
+
+        backtrack([])
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在回溯算法中，你是如何确保每对相邻整数的二进制表示恰好一位不同的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回溯算法中，确保每对相邻整数的二进制表示恰好一位不同是通过选择字符添加的策略实现的。具体来说，当添加一个字符后（例如 &#39;0&#39; 或 &#39;1&#39;），下一次的选择会反转（从 &#39;0&#39;, &#39;1&#39; 变为 &#39;1&#39;, &#39;0&#39; 或反之）。这种策略的核心在于它强制了每一步的变化都只影响二进制表示中的一个位，从而保证生成的序列满足格雷码的定义，即相邻的二进制数恰好一位不同。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在添加&#39;1&#39;后要改用选择列表(&#39;1&#39;, &#39;0&#39;)而不是继续使用(&#39;0&#39;, &#39;1&#39;)？这种改变的顺序有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在添加 &#39;1&#39; 后改用选择列表 (&#39;1&#39;, &#39;0&#39;) 而不是继续使用 (&#39;0&#39;, &#39;1&#39;) 的做法是为了确保生成的格雷码序列满足相邻码之间只有一位的差异。这种改变的顺序可以帮助算法在探索新的二进制位时，不会立即回到先前的状态，从而保证了序列的连续性和唯一性。通过这种方式，算法每次在二进制码的生成过程中都进入一个新的“分支”，避免了生成重复的码，并确保了格雷码的正确构造。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            回溯法在生成格雷码时，如何保障第一个和最后一个整数的二进制表示恰好一位不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用回溯法生成格雷码序列时，虽然此算法实现本身不直接保证第一个和最后一个整数的二进制表示恰好一位不同，但这是格雷码的一个标准特性。通常，格雷码是设计为环形码，意味着列表的首尾两个码也应该只有一位之差。在实际应用中，可以在生成所有码之后，额外检查并确保首尾两个码满足这一条件，或者通过特定的构造方法（如反射格雷码方法）来保证。此回溯算法生成的是基本的格雷码序列，可能需要额外步骤来确保首尾闭环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在使用回溯法生成格雷码的过程中，有没有可能生成重复的码？如果有，是如何避免的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用回溯法生成格雷码的过程中，理论上有可能生成重复的码，特别是如果错误地管理了路径或者选择列表。然而，在此题解中通过递归回溯，每次添加字符后都会逆转选择列表的顺序，这样的设计有效地避免了重复路径的产生。每次递归返回时，都会撤销（pop）最近添加的字符，确保每个可能的码都是从未探索的状态开始生成的。这种策略确保了所有生成的码都是唯一的，没有重复。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/1-bit-and-2-bit-characters" class="list-group-item list-group-item-action">
+                                1 比特与 2 比特字符
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/gray-code')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/gray-code/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

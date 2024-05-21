@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>路径交叉</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>路径交叉</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>distance</code><em> </em>。</p>
+
+<p>从 <strong>X-Y</strong> 平面上的点&nbsp;<code>(0,0)</code>&nbsp;开始，先向北移动 <code>distance[0]</code> 米，然后向西移动 <code>distance[1]</code> 米，向南移动 <code>distance[2]</code> 米，向东移动 <code>distance[3]</code> 米，持续移动。也就是说，每次移动后你的方位会发生逆时针变化。</p>
+
+<p>判断你所经过的路径是否相交。如果相交，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/14/selfcross1-plane.jpg" style="width: 400px; height: 435px;" />
+<pre>
+<strong>输入：</strong>distance = [2,1,1,2]
+<strong>输出：</strong>true
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/14/selfcross2-plane.jpg" style="width: 400px; height: 435px;" />
+<pre>
+<strong>输入：</strong>distance = [1,2,3,4]
+<strong>输出：</strong>false
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/14/selfcross3-plane.jpg" style="width: 400px; height: 435px;" />
+<pre>
+<strong>输入：</strong>distance = [1,1,1,1]
+<strong>输出：</strong>true</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;=&nbsp;distance.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;=&nbsp;distance[i] &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 22.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isSelfCrossing(self, distance: List[int]) -&gt; bool:
+        n = len(distance)
+
+        # 处理第 1 种情况
+        i = 0
+        while i &lt; n and (i &lt; 2 or distance[i] &gt; distance[i - 2]):
+            i += 1
+
+        if i == n:
+            return False
+
+        # 处理第 j 次移动的情况
+        if i == 3 and distance[i] == distance[i - 2] or i &gt;= 4 and distance[i] &gt;= distance[i - 2] - distance[i - 4]:
+            distance[i - 1] -= distance[i - 3]
+        i += 1
+
+        # 处理第 2 种情况
+        while i &lt; n and distance[i] &lt; distance[i - 2]:
+            i += 1
+
+        return i != n</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是模拟路径，判断是否会出现路径相交的情况。具体分为以下几步：
+1. 先处理第一种情况，即一直向外扩张的螺旋路径，直到第i次移动小于等于第i-2次移动，说明开始向内收缩，有可能出现相交。
+2. 再处理第i次移动和第i-3次移动组成的矩形区域。如果第i次移动距离等于第i-2次移动距离，或者大于等于第i-2次移动距离减去第i-4次移动距离，说明会与第i-3次移动路径相交。需要将第i-1次移动减去第i-3次移动。
+3. 最后处理第二种情况，即处理后续的移动，看是否会出现第i次移动小于第i-2次移动的情况，如果出现则说明路径相交。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isSelfCrossing(self, distance: List[int]) -&gt; bool:
+        n = len(distance)
+
+        # 处理第 1 种情况：一直向外扩张的螺旋路径
+        i = 0
+        while i &lt; n and (i &lt; 2 or distance[i] &gt; distance[i - 2]):
+            i += 1
+        
+        if i == n:
+            return False
+        
+        # 处理第 i 次移动的情况：判断是否与第i-3次移动相交
+        if i == 3 and distance[i] == distance[i - 2] or i &gt;= 4 and distance[i] &gt;= distance[i - 2] - distance[i - 4]:
+            distance[i - 1] -= distance[i - 3]
+        i += 1
+        
+        # 处理第 2 种情况：判断后续移动是否会出现相交
+        while i &lt; n and distance[i] &lt; distance[i - 2]:
+            i += 1
+        
+        return i != n</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，您是如何确定只考虑到第 i-4 次移动即可判断所有可能的交叉情况？是否存在需要考虑更早移动的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解析路径交叉问题时，只考虑到第i-4次移动的原因是基于路径的走向。一个螺旋形状的路径只需要考虑最近的几次移动来判断是否会交叉。具体来说，第i次移动只可能与第i-3次移动、第i-4次移动和第i-5次移动形成的路径相交。在大多数情况下，只需要考虑到第i-4次移动，因为这能覆盖所有可能的交叉情况。更早的移动，如第i-6次或之前的移动，由于路径的螺旋特性，通常不会与第i次移动产生交叉。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到第 i 次移动与第 i-3 次移动可能相交的情况，具体是如何判断这种相交情况的？能否详细解释判断条件的逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>判断第i次移动与第i-3次移动可能相交的情况是基于两者形成的路径的几何位置。如果第i次移动的距离至少与第i-2次移动的距离相等，且第i-2次移动的距离大于或等于第i-4次移动的距离，则第i次移动可能与第i-3次移动的路径相交。这是因为这种情况下第i次移动足够长，可以延伸到或穿过第i-3次移动形成的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您在实现中提到`distance[i] &gt;= distance[i - 2] - distance[i - 4]`这个条件，这个表达式具体是基于什么样的几何关系或逻辑得出的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件是基于对路径的几何分析得出的。在螺旋型移动中，第i次移动如果要与第i-3次移动相交，它的长度必须至少达到第i-2次移动的长度减去第i-4次移动的长度。这是因为第i-2次移动和第i-4次移动定义了一个外部边界，第i次移动需要足够长才能穿越这个边界并与第i-3次移动的路径相交。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理距离数组 `distance` 时，你是如何处理数组长度小于4的情况的？在代码中似乎没有看到相关的边界处理。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>代码中确实没有明确地处理数组长度小于4的情况。然而，在主循环中，如果数组长度小于4，由于足够的条件分支不会被满足（例如i &gt;= 4），逻辑将自然流向返回`false`，表明不会有交叉。这种处理方式依赖于循环和条件语句的结构，确保在数组长度不足以形成复杂路径时，程序能够正确地判断出不存在交叉。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/self-crossing')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/self-crossing/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

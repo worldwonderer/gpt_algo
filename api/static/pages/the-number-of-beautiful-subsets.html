@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>美丽子集的数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>美丽子集的数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由正整数组成的数组 <code>nums</code> 和一个 <strong>正</strong> 整数 <code>k</code> 。</p>
+
+<p>如果 <code>nums</code> 的子集中，任意两个整数的绝对差均不等于 <code>k</code> ，则认为该子数组是一个 <strong>美丽</strong> 子集。</p>
+
+<p>返回数组 <code>nums</code> 中 <strong>非空</strong> 且 <strong>美丽</strong> 的子集数目。</p>
+
+<p><code>nums</code> 的子集定义为：可以经由 <code>nums</code> 删除某些元素（也可能不删除）得到的一个数组。只有在删除元素时选择的索引不同的情况下，两个子集才会被视作是不同的子集。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums = [2,4,6], k = 2
+<strong>输出：</strong>4
+<strong>解释：</strong>数组 nums 中的美丽子集有：[2], [4], [6], [2, 6] 。
+可以证明数组 [2,4,6] 中只存在 4 个美丽子集。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1], k = 1
+<strong>输出：</strong>1
+<strong>解释：</strong>数组 nums 中的美丽数组有：[1] 。
+可以证明数组 [1] 中只存在 1 个美丽子集。 
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 20</code></li>
+	<li><code>1 &lt;= nums[i], k &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 45 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import Counter, defaultdict
+class Solution:
+    def beautifulSubsets(self, nums: List[int], k: int) -&gt; int:
+        # 分组
+        groups = defaultdict(Counter)
+        for x in nums:
+            groups[x % k][x] += 1
+
+        ans = 1
+        for cnt in groups.values():
+
+            g = sorted(cnt.items())
+            m = len(g)
+            f = [0] * (m+1)
+            f[0] = 1
+            f[1] = 2**g[0][1]
+            for i in range(1, m):
+                if g[i-1][0] == g[i][0]-k:
+                    f[i+1] = f[i] + f[i-1] * (2**g[i][1]-1)
+                else:
+                    f[i+1] = f[i] * 2**g[i][1]
+            ans *= f[m]
+        return ans - 1 #
+            
+        
+                </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的核心思想是通过模 k 的分组来识别可能的冲突，即当两个数的差为 k 时，它们在同一个模 k 的组内的位置之间相差 1。算法首先通过模 k 对 nums 中的数字进行分组，并使用 Counter 来统计同一组内每个数出现的次数。对每个组内的数字进行排序，然后使用动态规划计算每组内可以形成的美丽子集数目。对于每组，如果两个数之间的差为 k，则在计算子集时需要考虑不选取前一个数的情况。最后，所有组的子集数目相乘（去除空集的情况）即为结果。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">from collections import Counter, defaultdict
+class Solution:
+    def beautifulSubsets(self, nums: List[int], k: int) -&gt; int:
+        # 使用 defaultdict 和 Counter 对 nums 数组按照 mod k 的值进行分组和计数
+        groups = defaultdict(Counter)
+        for x in nums:
+            groups[x % k][x] += 1
+
+        ans = 1 # 初始化答案
+        # 遍历每个组，计算每个组的美丽子集数
+        for cnt in groups.values():
+            # 对当前组内的元素进行排序
+            g = sorted(cnt.items())
+            m = len(g) # 组内元素数量
+            f = [0] * (m+1) # 动态规划数组，用于计算子集数
+            f[0] = 1 # 空集的子集数为1
+            f[1] = 2**g[0][1] # 只包含第一个元素的子集数
+            for i in range(1, m):
+                # 判断当前元素与前一个元素的差是否为 k
+                if g[i-1][0] == g[i][0]-k:
+                    f[i+1] = f[i] + f[i-1] * (2**g[i][1]-1)
+                else:
+                    f[i+1] = f[i] * 2**g[i][1] # 如果差不为 k，则可以自由组合
+            ans *= f[m] # 将当前组的结果乘入总答案
+        return ans - 1 # 减去空集
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            算法中提到的`模 k 的分组`是如何帮助识别可能冲突的？具体是如何通过模 k 的值来分组的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中，将数组 `nums` 中的每个数 `x` 按照 `x % k` 的结果进行分组，这是因为任何两个数 `a` 和 `b`，如果它们满足 `a % k == b % k`，则 `a` 和 `b` 的差是 `k` 的倍数。通过这种分组，我们将所有可能相互冲突的数字（即差值为 `k` 的倍数的数字）放入同一个组中。这样，每个组内部的数字都是在模 `k` 意义下相同的，这有助于我们在后续的处理中更容易地识别并处理这些冲突，特别是当需要考虑组合子集时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用动态规划来计算每个组的美丽子集数目，能否详细解释这个动态规划过程中状态转移的逻辑？特别是`f[i+1] = f[i] + f[i-1] * (2**g[i][1]-1)`这一步。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划数组 `f` 用于存储计算到当前元素为止的美丽子集数目。`f[i+1]` 表示考虑到第 `i` 个元素时所有可能的子集数目。如果当前元素与前一个元素的差值为 `k`，那么为了形成美丽子集，我们不能同时选择这两个元素。因此，状态转移方程分为两部分：
+1. `f[i]` 直接继承，表示不选择当前元素。
+2. `f[i-1] * (2**g[i][1]-1)` 表示选择当前元素，但不选择前一个元素，并且当前元素可以以多种方式（由于可能的重复）组成子集。`2**g[i][1]` 表示当前元素所有可能的选择（包括不选），减去1是排除全部不选择的情况。最终，`f[i+1]` 是这两种情况的和，即包括了选择和不选择当前元素的所有有效子集组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算子集时，为什么要特别处理当两个数之间的差为 k 的情况？这种处理方式是如何避免选择导致非美丽子集的数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个数之间的差为 `k`，这意味着这两个数不能同时出现在一个美丽子集中。因为根据题目定义，美丽子集中任意两个数 `a` 和 `b` 的差值不应该是 `k` 的倍数。因此，在计算可能的子集组合时，如果发现当前元素和前一个元素的差是 `k`，我们必须特别处理以避免这两个元素同时被选取。这种处理方式通过动态规划中的状态转移实现，确保我们在计算子集数时考虑到了不选择具有冲突差值的前一个元素的情况，从而避免产生非美丽子集。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-number-of-beautiful-subsets')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-number-of-beautiful-subsets/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

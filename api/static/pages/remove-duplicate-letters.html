@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>去除重复字母</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>去除重复字母</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串 <code>s</code> ，请你去除字符串中重复的字母，使得每个字母只出现一次。需保证 <strong>返回结果的<span data-keyword="lexicographically-smaller-string-alien">字典序</span>最小</strong>（要求不能打乱其他字符的相对位置）。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong><code>s = "bcabc"</code>
+<strong>输出<code>：</code></strong><code>"abc"</code>
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong><code>s = "cbacdcbc"</code>
+<strong>输出：</strong><code>"acdb"</code></pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>s</code> 由小写英文字母组成</li>
+</ul>
+
+
+
+<p><strong>注意：</strong>该题与 1081 <a href="https://leetcode-cn.com/problems/smallest-subsequence-of-distinct-characters">https://leetcode-cn.com/problems/smallest-subsequence-of-distinct-characters</a> 相同</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 24 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def removeDuplicateLetters(self, s: str) -&gt; str:
+        stack = []
+        instack = defaultdict(int)
+        cnt = defaultdict(int)
+        for c in s:
+            cnt[c] += 1
+        for c in s:
+            cnt[c] -= 1
+            if instack[c]:
+                continue
+            while stack and stack[-1] &gt; c and cnt[stack[-1]]:
+                p = stack.pop()
+                instack[p] -= 1
+            stack.append(c)
+            instack[c] += 1
+        return &#39;&#39;.join(stack)
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了单调栈的思路。具体来说，遍历字符串 s 中的每个字符，如果当前字符已经在栈中，则直接跳过；否则，将栈顶元素与当前字符比较，如果栈顶元素大于当前字符且栈顶元素在后面还会出现，则弹出栈顶元素，直到栈为空或栈顶元素小于等于当前字符。然后将当前字符压入栈中。最后将栈中元素拼接成字符串作为结果返回。这样可以保证结果字符串的字典序最小。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def removeDuplicateLetters(self, s: str) -&gt; str:
+        stack = []
+        instack = defaultdict(int)  # 记录字符是否在栈中
+        cnt = defaultdict(int)  # 记录字符的剩余出现次数
+        
+        # 统计每个字符的出现次数
+        for c in s:
+            cnt[c] += 1
+        
+        for c in s:
+            cnt[c] -= 1  # 更新字符的剩余出现次数
+            
+            if instack[c]:  # 如果字符已经在栈中，跳过
+                continue
+            
+            # 如果栈顶元素大于当前字符且在后面还会出现，弹出栈顶元素
+            while stack and stack[-1] &gt; c and cnt[stack[-1]]:
+                p = stack.pop()
+                instack[p] -= 1
+            
+            stack.append(c)  # 将当前字符压入栈中
+            instack[c] += 1
+        
+        return &#39;&#39;.join(stack)  # 将栈中元素拼接成字符串作为结果返回
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到的`单调栈`是如何确保生成的字符串字典序最小的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈通过维持栈中元素的单调递增顺序来确保生成的字符串具有最小的字典序。在处理每个字符时，如果发现栈顶元素大于当前字符且栈顶元素在后面的字符串中还会再次出现，就将栈顶元素弹出。这样做可以保证在不破坏结果字符串中字符的唯一性的前提下，每次都尽可能用较小的字符替代较大的字符，从而使得最终形成的字符串字典序最小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果输入字符串`s`中包含所有26个英文字母，单调栈的最大可能高度是多少？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果输入字符串`s`包含所有26个英文字母，则单调栈的最大可能高度是26。这种情况发生在字符串`s`已经按照某种字典序排列，且每个字符至少出现一次时，单调栈将可能包含所有这些字符，因为没有任何字符需要被弹出栈以保持字典序最小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，跳过栈中已有的字符是基于什么逻辑？为什么不需要再次考虑这些字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>跳过栈中已有的字符是基于逻辑：一旦一个字符被加入到栈中，它就会出现在最终的结果字符串中，因为每个字符在结果中只能出现一次。通过使用`instack`哈希表来记录哪些字符已在栈中，可以确保不会重复处理这些字符。这样做是为了维持每个字符在结果字符串中的唯一性，避免重复添加导致的错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在弹出栈顶元素的条件中，需要检查栈顶元素在后面是否还会出现，这是如何通过`cnt`哈希表实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过`cnt`哈希表来跟踪每个字符在遍历过程中的剩余出现次数，可以决定是否可以安全地弹出栈顶元素。在每次遍历到一个字符时，会将其在`cnt`表中的计数减一。如果栈顶元素的计数大于0，表示该字符在字符串的后续部分还会再次出现，因此可以将其从栈中弹出以保持最小字典序。若计数为0，则表示栈顶元素不会再出现，不能弹出，以确保字符的出现至少一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/remove-duplicate-letters')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/remove-duplicate-letters/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

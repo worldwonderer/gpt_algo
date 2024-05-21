@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>到达目的地的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>到达目的地的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你在一个城市里，城市由 <code>n</code>&nbsp;个路口组成，路口编号为&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;，某些路口之间有 <strong>双向</strong>&nbsp;道路。输入保证你可以从任意路口出发到达其他任意路口，且任意两个路口之间最多有一条路。</p>
+
+<p>给你一个整数&nbsp;<code>n</code>&nbsp;和二维整数数组&nbsp;<code>roads</code>&nbsp;，其中&nbsp;<code>roads[i] = [u<sub>i</sub>, v<sub>i</sub>, time<sub>i</sub>]</code>&nbsp;表示在路口&nbsp;<code>u<sub>i</sub></code>&nbsp;和&nbsp;<code>v<sub>i</sub></code>&nbsp;之间有一条需要花费&nbsp;<code>time<sub>i</sub></code>&nbsp;时间才能通过的道路。你想知道花费 <strong>最少时间</strong>&nbsp;从路口&nbsp;<code>0</code>&nbsp;出发到达路口&nbsp;<code>n - 1</code>&nbsp;的方案数。</p>
+
+<p>请返回花费 <strong>最少时间</strong>&nbsp;到达目的地的 <strong>路径数目</strong>&nbsp;。由于答案可能很大，将结果对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong>&nbsp;后返回。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/07/17/graph2.png" style="width: 235px; height: 381px;">
+<pre><b>输入：</b>n = 7, roads = [[0,6,7],[0,1,2],[1,2,3],[1,3,3],[6,3,3],[3,5,1],[6,5,1],[2,5,1],[0,4,5],[4,6,2]]
+<b>输出：</b>4
+<b>解释：</b>从路口 0 出发到路口 6 花费的最少时间是 7 分钟。
+四条花费 7 分钟的路径分别为：
+- 0 ➝ 6
+- 0 ➝ 4 ➝ 6
+- 0 ➝ 1 ➝ 2 ➝ 5 ➝ 6
+- 0 ➝ 1 ➝ 3 ➝ 5 ➝ 6
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>n = 2, roads = [[1,0,10]]
+<b>输出：</b>1
+<b>解释：</b>只有一条从路口 0 到路口 1 的路，花费 10 分钟。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 200</code></li>
+	<li><code>n - 1 &lt;= roads.length &lt;= n * (n - 1) / 2</code></li>
+	<li><code>roads[i].length == 3</code></li>
+	<li><code>0 &lt;= u<sub>i</sub>, v<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>1 &lt;= time<sub>i</sub> &lt;= 10<sup>9</sup></code></li>
+	<li><code>u<sub>i </sub>!= v<sub>i</sub></code></li>
+	<li>任意两个路口之间至多有一条路。</li>
+	<li>从任意路口出发，你能够到达其他任意路口。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 23.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">from heapq import heappush, heappop
+from math import inf
+
+
+class Node:
+
+    def __init__(self, w, v):
+        self.w = w
+        self.v = v
+    
+    def __lt__(self, other):
+        return self.w &lt; other.w
+    
+    def unpack(self):
+        return [self.w, self.v]
+
+
+
+class Solution:
+    def countPaths(self, n: int, roads: List[List[int]]) -&gt; int:
+        mod = 10 ** 9 + 7
+        e = [[] for _ in range(n)]
+        for x, y, w in roads:
+            e[x].append([y, w])
+            e[y].append([x, w])
+        dis = [0] + [inf] * (n - 1)
+        ways = [1] + [0] * (n - 1)
+        q = [Node(0, 0)]
+        while q:
+            cw, cv = heappop(q).unpack()
+            if cw &lt;= dis[cv]:
+                for v, w in e[cv]:
+                    if cw + w &lt; dis[v]:
+                        dis[v] = cw + w
+                        ways[v] = ways[cv]
+                        heappush(q, Node(cw + w, v))
+                    elif cw + w == dis[v]:
+                        ways[v] = (ways[cv] + ways[v]) % mod
+
+        return ways[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了类似Dijkstra算法的变种，目的是找出从起点到终点的最短路径及其数量。首先，建立邻接表e存储图，dis数组记录从起点到每个点的最短距离，ways数组记录达到每个点的最短路径的数量。使用优先队列（最小堆）来持续处理当前未处理的最近的节点。每次从队列中取出当前距离最小的节点，更新其相邻节点的最短距离和路径数量。更新逻辑是：如果找到更短的路径，则更新最短路径和重置路径计数；如果距离相等，则累加路径数量。最终，ways数组的最后一个元素即为从起点到终点的最短路径的数量。</p>
+                                <p>时间复杂度: O((V+E) log V)</p>
+                                <p>空间复杂度: O(V+E)</p>
+                                <pre class="bg-light p-2">from heapq import heappush, heappop
+from math import inf
+
+
+class Node:
+
+    def __init__(self, w, v):
+        self.w = w  # weight of the node
+        self.v = v  # vertex number
+    
+    def __lt__(self, other):
+        # Determines the order in the priority queue
+        return self.w &lt; other.w
+    
+    def unpack(self):
+        # Helper to unpack node attributes
+        return [self.w, self.v]
+
+
+class Solution:
+    def countPaths(self, n: int, roads: List[List[int]]) -&gt; int:
+        mod = 10 ** 9 + 7  # Modulo value for the result
+        e = [[] for _ in range(n)]  # Adjacency list
+        for x, y, w in roads:
+            e[x].append([y, w])  # Add edge x to y
+            e[y].append([x, w])  # Add edge y to x (since it&#39;s undirected)
+        dis = [0] + [inf] * (n - 1)  # Distance from source
+        ways = [1] + [0] * (n - 1)  # Ways to reach each node
+        q = [Node(0, 0)]  # Priority queue starting with the source node
+        while q:
+            cw, cv = heappop(q).unpack()  # Current weight and vertex
+            if cw &lt;= dis[cv]:
+                for v, w in e[cv]:
+                    if cw + w &lt; dis[v]:
+                        dis[v] = cw + w  # Update distance
+                        ways[v] = ways[cv]  # Update paths count
+                        heappush(q, Node(cw + w, v))  # Push new distance and vertex
+                    elif cw + w == dis[v]:
+                        ways[v] = (ways[cv] + ways[v]) % mod  # Accumulate paths count
+        return ways[-1]  # Return the number of ways to the last node</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中`dis`数组和`ways`数组的初始化方式有何区别，以及这种初始化对算法的影响是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dis`数组用于记录从起点到每个节点的最短距离，初始化为无穷大（除了起点为0），这确保了任何比当前记录更短的路径都会被考虑。`ways`数组用于记录到达每个节点的最短路径的数量，其初始化方式是起点为1，其他所有节点为0，表示从起点到起点的路径只有一条，而到达其他节点的路径数未知，初始为0。这种初始化对算法的影响是确保了只有当找到到某节点的有效路径时，该节点的路径数才会更新，避免了无效路径的计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择使用优先队列（最小堆）来实现这个算法，而不是使用其他数据结构如普通队列或栈？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>优先队列（最小堆）被选择是因为它能够每次从队列中快速地获取当前未处理的最小距离节点，这是Dijkstra算法的核心要求，以此保证路径的最短性。使用普通队列或栈可能导致处理顺序不严格按照节点当前距离排序，从而无法保证每次都处理当前最短的路径，这会影响算法的正确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在代码中，每次从优先队列中取出节点后，为什么要检查`cw &lt;= dis[cv]`？这个条件的作用是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件用于确认从优先队列中取出的节点（其代表一条到达该节点的路径）是否仍然是有效的最短路径。在算法运行过程中，同一个节点可能因为找到更短的路径而被多次加入队列。检查`cw &lt;= dis[cv]`确保只有对应于当前已知最短路径的节点处理逻辑会执行，从而防止对过时的路径进行错误的路径数更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当发现一条到达某个节点的等长路径（即`cw + w == dis[v]`）时，你是如何更新路径数量的，这种方法可能会引入哪些计算上的错误？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当出现等长路径时，算法通过累加路径数量`ways[v] = (ways[cv] + ways[v]) % mod`来更新。这种方法使用了模运算来避免整数溢出，保证结果在一个安全的数值范围内。可能的计算错误主要是如果忘记应用模运算，结果可能会超出整数的表示范围，导致溢出错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-ways-to-arrive-at-destination')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-ways-to-arrive-at-destination/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

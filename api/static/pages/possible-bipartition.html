@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>可能的二分法</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>可能的二分法</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一组&nbsp;<code>n</code>&nbsp;人（编号为&nbsp;<code>1, 2, ..., n</code>），&nbsp;我们想把每个人分进<strong>任意</strong>大小的两组。每个人都可能不喜欢其他人，那么他们不应该属于同一组。</p>
+
+<p>给定整数 <code>n</code>&nbsp;和数组 <code>dislikes</code>&nbsp;，其中&nbsp;<code>dislikes[i] = [a<sub>i</sub>, b<sub>i</sub>]</code>&nbsp;，表示不允许将编号为 <code>a<sub>i</sub></code>&nbsp;和&nbsp;&nbsp;<code>b<sub>i</sub></code>的人归入同一组。当可以用这种方法将所有人分进两组时，返回 <code>true</code>；否则返回 <code>false</code>。</p>
+
+
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 4, dislikes = [[1,2],[1,3],[2,4]]
+<strong>输出：</strong>true
+<strong>解释：</strong>group1 [1,4], group2 [2,3]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 3, dislikes = [[1,2],[1,3],[2,3]]
+<strong>输出：</strong>false
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, dislikes = [[1,2],[2,3],[3,4],[4,5],[1,5]]
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 2000</code></li>
+	<li><code>0 &lt;= dislikes.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>dislikes[i].length == 2</code></li>
+	<li><code>1 &lt;= dislikes[i][j] &lt;= n</code></li>
+	<li><code>a<sub>i</sub>&nbsp;&lt; b<sub>i</sub></code></li>
+	<li><code>dislikes</code>&nbsp;中每一组都 <strong>不同</strong></li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 72 ms</p>
+                    <p>内存: 21.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def possibleBipartition(self, n: int, dislikes: List[List[int]]) -&gt; bool:
+        graph = [[] for _ in range(n+1)]
+        for i, j in dislikes:
+            graph[i].append(j)
+            graph[j].append(i)
+
+        left = [False]*(n+1)
+        right = [False]*(n+1)
+        visited = [False]*(n+1)
+
+        def dfs(v, is_left):
+            if visited[v]:
+                return (is_left and left[v]) or (not is_left and right[v])
+            if is_left:
+                left[v]=True
+            else:
+                right[v]=True
+            visited[v]=True
+            for i in graph[v]:
+                if not dfs(i, not is_left):
+                    return False
+            return True
+        
+        for i in range(1, n+1):
+            if not visited[i] and not dfs(i, True):
+                return False
+        return True
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了图的深度优先搜索（DFS）算法来解决问题。首先，将给定的不喜欢关系转化为一个图的邻接表表示，其中每个节点代表一个人，每条边代表两个人之间的不喜欢关系。然后，尝试将图分为两个不相交的子集（即两个组），使得每个组内的人都不互相不喜欢。为此，我们使用DFS遍历图，同时用两个数组 &#39;left&#39; 和 &#39;right&#39; 分别记录每个人是否属于左组或右组。在遍历过程中，如果遇到一个已经访问过的节点，我们检查它是否已经被分配到了正确的组中；如果遇到一个未访问过的节点，我们将其分配到当前组的对立组中，并继续DFS遍历其邻居。如果在任何时候，我们发现无法将一个节点分配到一个组中而不违反不喜欢关系，我们返回 false。如果整个图都被成功地遍历并分组，我们返回 true。</p>
+                                <p>时间复杂度: O(V + E) 或 O(n + dislikes.length)</p>
+                                <p>空间复杂度: O(V + E) 或 O(n + dislikes.length)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def possibleBipartition(self, n: int, dislikes: List[List[int]]) -&gt; bool:
+        graph = [[] for _ in range(n+1)]  # 创建图的邻接表
+        for i, j in dislikes:
+            graph[i].append(j)  # 添加边
+            graph[j].append(i)
+
+        left = [False]*(n+1)  # 记录节点是否属于左组
+        right = [False]*(n+1)  # 记录节点是否属于右组
+        visited = [False]*(n+1)  # 记录节点是否被访问过
+
+        def dfs(v, is_left):
+            if visited[v]:
+                return (is_left and left[v]) or (not is_left and right[v])
+            if is_left:
+                left[v]=True
+            else:
+                right[v]=True
+            visited[v]=True
+            for i in graph[v]:
+                if not dfs(i, not is_left):
+                    return False
+            return True
+        
+        for i in range(1, n+1):
+            if not visited[i] and not dfs(i, True):
+                return False
+        return True</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS中，你是如何决定将节点分配到左组还是右组的？这种决定有没有特定的规则或条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中，节点的分组基于其父节点的分组情况来决定。具体的规则是：如果当前节点（我们尝试分配的节点）是从另一个已分组的节点访问到的，那么它应当被分配到与父节点相反的组中。这是因为题目要求每个组内的成员不互相不喜欢，所以如果父节点在左组，当前节点就应该分到右组，反之亦然。这种分组策略是为了确保所有不喜欢的关系都横跨两个组，而不是在同一个组内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果在遍历过程中遇到已经访问过的节点，需要检查它是否已经被分配到了正确的组中。这里的‘正确的组’是指什么？如何定义这个正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此上下文中，‘正确的组’指的是一个节点根据其与其他节点的不喜欢关系应该所在的组。具体来说，如果我们通过DFS访问到一个已经标记为访问过的节点，我们需要检查这个节点之前的分组是否与当前尝试分配的组相反。例如，如果我们当前在左组中的节点遍历到一个右组的节点，这是符合预期的；但如果发现这个节点已经在左组，那么就存在矛盾，因为它同时与左组中的一个节点有不喜欢关系，这违反了分组条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果在DFS过程中发现一个节点无法被分配到任何一个组中而不违反不喜欢关系，算法会返回false。能否具体解释这种情况是如何检测出来的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种情况的检测通过DFS递归过程实现。在DFS中，每当我们尝试将一个节点分配到一个组时，我们会递归地尝试将与之有不喜欢关系的节点分配到相反的组。如果在此过程中，我们尝试将一个节点分配到一个组，而这个节点已经在相反的组中（由之前的DFS过程确定），则意味着无法满足分组要求（即存在同一组内的节点互相不喜欢）。这时，DFS将返回false，传递到上层递归调用中，最终结果为无法进行有效分组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/possible-bipartition')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/possible-bipartition/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

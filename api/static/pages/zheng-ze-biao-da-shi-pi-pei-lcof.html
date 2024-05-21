@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>模糊搜索验证</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>模糊搜索验证</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=recursion" class="badge bg-secondary tag-link">递归</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>请设计一个程序来支持用户在文本编辑器中的模糊搜索功能。用户输入内容中可能使用到如下两种通配符：</p>
+
+<ul>
+	<li><code>'.'</code> 匹配任意单个字符。</li>
+	<li><code>'*'</code> 匹配零个或多个前面的那一个元素。</li>
+</ul>
+
+
+
+<p>请返回用户输入内容 <code>input</code> 所有字符是否可以匹配原文字符串 <code>article</code>。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>article = "aa", input = "a"
+<strong>输出:</strong> false
+<strong>解释:</strong> "a" 无法匹配 "aa" 整个字符串。
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>article = "aa", input = "a*"
+<strong>输出:</strong> true
+<strong>解释:</strong>&nbsp;因为 '*' 代表可以匹配零个或多个前面的那一个元素, 在这里前面的元素就是 'a'。因此，字符串 "aa" 可被视为 'a' 重复了一次。
+</pre>
+
+<p><strong>示例&nbsp;3:</strong></p>
+
+<pre>
+<strong>输入: </strong>article = "ab", input = ".*"
+<strong>输出:</strong> true
+<strong>解释:</strong>&nbsp;".*" 表示可匹配零个或多个（'*'）任意字符（'.'）。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= article.length &lt;= 20</code></li>
+	<li><code>1 &lt;= input.length &lt;= 20</code></li>
+	<li><code>article</code> 只包含从 <code>a-z</code> 的小写字母。</li>
+	<li><code>input</code> 只包含从 <code>a-z</code> 的小写字母，以及字符 <code>.</code> 和 <code>*</code> 。</li>
+	<li>保证每次出现字符 <code>*</code> 时，前面都匹配到有效的字符</li>
+</ul>
+
+
+
+<p>注意：本题与主站 10&nbsp;题相同：<a href="https://leetcode-cn.com/problems/regular-expression-matching/">https://leetcode-cn.com/problems/regular-expression-matching/</a></p>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 15 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isMatch(self, s: str, p: str) -&gt; bool:
+        m, n = len(s), len(p)
+        memo = dict()
+
+        def dp(i, j):
+            if j == n:
+                return i == m
+            if i == m:
+                if (n - j) % 2 == 1:
+                    return False
+                while j + 1 &lt; n:
+                    if p[j+1] != &#34;*&#34;:
+                        return False
+                    j += 2
+                return True
+
+            if (i, j) in memo:
+                return memo[(i, j)]
+
+            res = False
+
+            if s[i] == p[j] or p[j] == &#39;.&#39;:
+                if j + 1 &lt; n and p[j+1] == &#39;*&#39;:
+                    res = dp(i, j+2) or dp(i+1, j)
+                else:
+                    res = dp(i+1, j+1)
+            else:
+                if j + 1 &lt; n and p[j+1] == &#39;*&#39;:
+                    res = dp(i, j+2)
+                else:
+                    res = False
+
+            memo[(i, j)] = res
+            return res
+
+        return dp(0, 0)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了动态规划（DP）的方法来解决正则表达式匹配问题。解决方案通过递归函数 dp(i, j) 检查原始字符串 s 从位置 i 开始的子串是否可以被模式 p 从位置 j 开始的子串匹配。使用 memoization 技术（memo 字典）来避免重复计算相同参数的函数调用，从而提高效率。对于基本情况，当模式 p 已经全部匹配完毕 (j == n)，检查 s 是否也完全匹配 (i == m)。若 p 未结束但 s 已结束，则检查剩余的 p 是否可以匹配空字符串。递归地处理模式中的特殊字符 &#39;*&#39; 和 &#39;.&#39;，其中 &#39;.&#39; 可以匹配任意单个字符，&#39;*&#39; 表示前一个字符可以出现零次或多次。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isMatch(self, s: str, p: str) -&gt; bool:
+        m, n = len(s), len(p)
+        memo = dict()
+
+        def dp(i, j):
+            # 如果 p 已全部匹配完毕，检查 s 是否也匹配完毕
+            if j == n:
+                return i == m
+            # 如果 s 已结束但 p 未结束，检查 p 是否可匹配空字符串
+            if i == m:
+                if (n - j) % 2 == 1:
+                    return False
+                while j + 1 &lt; n and p[j+1] == &#39;*&#39;:
+                    j += 2
+                return True
+
+            if (i, j) in memo:
+                return memo[(i, j)]
+
+            res = False
+
+            # 处理匹配操作，考虑 &#39;.&#39; 和 &#39;*&#39; 的情况
+            if s[i] == p[j] or p[j] == &#39;.&#39;:
+                if j + 1 &lt; n and p[j+1] == &#39;*&#39;:
+                    res = dp(i, j+2) or dp(i+1, j)  # 跳过模式或匹配多次
+                else:
+                    res = dp(i+1, j+1)  # 正常匹配下一字符
+            else:
+                if j + 1 &lt; n and p[j+1] == &#39;*&#39;:
+                    res = dp(i, j+2)  # 跳过带 &#39;*&#39; 的模式部分
+                else:
+                    res = False
+
+            memo[(i, j)] = res
+            return res
+
+        return dp(0, 0)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            动态规划算法中，你是如何确定初始条件以及状态转移方程的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此动态规划解法中，初始条件基于字符串 `s` 和 `p` 的结束情况来定义。如果模式 `p` 已经检查完毕（即 `j == n`），则必须检查字符串 `s` 是否也已经结束 (`i == m`)，这是基础匹配条件。状态转移方程基于当前字符和模式的匹配情况而定，特别是考虑到模式字符 &#39;.&#39; 和 &#39;*&#39; 的处理。&#39;.&#39; 匹配任意单个字符，而 &#39;*&#39; 表示其前一个字符可以出现零次或多次，这导致多个分支的递归调用，形成了状态转移的逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理字符&#39;*&#39;时，`dp(i, j+2)` 和 `dp(i+1, j)` 分别代表什么含义，为什么需要两种处理方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dp(i, j+2)` 代表在模式 `p` 中跳过当前的字符和其后的 &#39;*&#39;，这反映了 &#39;*&#39; 的零次出现场景。`dp(i+1, j)` 表示当前字符在 `s` 中匹配后，继续在 `p` 中使用相同的模式进行匹配，这反映了 &#39;*&#39; 的多次出现场景。这两种处理方式是必需的，因为 &#39;*&#39; 的语义允许前一个字符出现任意次，从零次到多次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            递归函数中，当原文字符串 `s` 已经结束但模式字符串 `p` 未结束时，为什么要检查 `(n - j) % 2 == 1` 这个条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 `s` 结束但 `p` 未结束时，我们需要检查 `p` 剩余部分是否能匹配空串。`&#39;(n - j) % 2 == 1&#39;` 检查是因为，如果 `p` 中剩余字符数为奇数，那么这些字符不能完全由 &#39;字符+*&#39; 的组合构成（因为每个这样的组合都占两个位置），从而无法匹配空串。该检查帮助确定是否有非法的单独字符存在，这些字符无法通过 &#39;*&#39; 来抵消其影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在模式字符串 `p` 中连续的&#39;*&#39;字符后面要紧接着检查 `while j + 1 &lt; n and p[j+1] == &#39;*&#39;`，这个循环的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个循环的目的是处理模式中的冗余 &#39;*&#39; 字符。在模式匹配中，如果一个字符后面直接跟着多个 &#39;*&#39;，这是语法上的冗余，因为一个 &#39;*&#39; 已经足够表示其前字符的零次或多次出现。这个循环通过跳过多余的 &#39;*&#39;，简化模式字符串，确保每个字符后面最多只跟一个 &#39;*&#39;，从而避免解析上的混乱和潜在的错误处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/zheng-ze-biao-da-shi-pi-pei-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/zheng-ze-biao-da-shi-pi-pei-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

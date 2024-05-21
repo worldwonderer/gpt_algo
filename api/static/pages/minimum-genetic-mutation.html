@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小基因变化</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小基因变化</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>基因序列可以表示为一条由 8 个字符组成的字符串，其中每个字符都是 <code>'A'</code>、<code>'C'</code>、<code>'G'</code> 和 <code>'T'</code> 之一。</p>
+
+<p>假设我们需要调查从基因序列&nbsp;<code>start</code> 变为 <code>end</code> 所发生的基因变化。一次基因变化就意味着这个基因序列中的一个字符发生了变化。</p>
+
+<ul>
+	<li>例如，<code>"AACCGGTT" --&gt; "AACCGGTA"</code> 就是一次基因变化。</li>
+</ul>
+
+<p>另有一个基因库 <code>bank</code> 记录了所有有效的基因变化，只有基因库中的基因才是有效的基因序列。（变化后的基因必须位于基因库 <code>bank</code> 中）</p>
+
+<p>给你两个基因序列 <code>start</code> 和 <code>end</code> ，以及一个基因库 <code>bank</code> ，请你找出并返回能够使&nbsp;<code>start</code> 变化为 <code>end</code> 所需的最少变化次数。如果无法完成此基因变化，返回 <code>-1</code> 。</p>
+
+<p>注意：起始基因序列&nbsp;<code>start</code> 默认是有效的，但是它并不一定会出现在基因库中。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>start = "AACCGGTT", end = "AACCGGTA", bank = ["AACCGGTA"]
+<strong>输出：</strong>1
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>start = "AACCGGTT", end = "AAACGGTA", bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
+<strong>输出：</strong>2
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>start = "AAAAACCC", end = "AACCCCCC", bank = ["AAAACCCC","AAACCCCC","AACCCCCC"]
+<strong>输出：</strong>3
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>start.length == 8</code></li>
+	<li><code>end.length == 8</code></li>
+	<li><code>0 &lt;= bank.length &lt;= 10</code></li>
+	<li><code>bank[i].length == 8</code></li>
+	<li><code>start</code>、<code>end</code> 和 <code>bank[i]</code> 仅由字符 <code>['A', 'C', 'G', 'T']</code> 组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 21 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minMutation(self, startGene: str, endGene: str, bank: List[str]) -&gt; int:
+        # 所有target必须在bank里
+        if endGene not in bank:
+            return -1
+        
+        ans = 10
+        if startGene not in bank:
+            bank.append(startGene)
+
+        # 建立邻接矩阵, i-j是否是一次基因变化
+        n = len(bank)
+        edge = [[0 for j in range(n)] for i in range(n)]
+        for i in range(n):
+            for j in range(i + 1, n):
+                cnt = 0
+                for k in range(8):
+                    if bank[i][k] != bank[j][k]:
+                        cnt += 1 
+                if cnt == 1:
+                    edge[i][j] = edge[j][i] = 1 
+        
+        vis = [False for i in range(n)]
+        vis[bank.index(startGene)] = True
+        def dfs(gene, cur):
+            nonlocal ans, vis
+            # base case
+            if gene == endGene:
+                ans = min(ans, cur)
+                return
+
+            # 向着所有可能的方向前进
+            for i in range(n):
+                if not vis[i] and edge[bank.index(gene)][i] == 1:
+                    vis[i] = True
+                    dfs(bank[i], cur + 1)
+                    vis[i] = False
+            
+
+        dfs(startGene, 0)
+
+        if ans == 10:
+            return -1 
+        return ans </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用深度优先搜索的方法来寻找从起始基因序列到目标基因序列的最短变化路径。首先判断目标基因序列是否在基因库中，如果不在则直接返回-1。然后构建一个邻接矩阵表示基因库中每两个基因序列之间是否只差一个字符。接着从起始基因序列开始进行深度优先搜索，每次变化一个字符，搜索所有可能的变化路径，同时记录变化的次数，找到最短的变化路径。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minMutation(self, startGene: str, endGene: str, bank: List[str]) -&gt; int:
+        # 所有target必须在bank里
+        if endGene not in bank:
+            return -1
+        
+        ans = 10
+        if startGene not in bank:
+            bank.append(startGene)
+
+        # 建立邻接矩阵, i-j是否是一次基因变化
+        n = len(bank)
+        edge = [[0 for j in range(n)] for i in range(n)]
+        for i in range(n):
+            for j in range(i + 1, n):
+                cnt = 0
+                for k in range(8):
+                    if bank[i][k] != bank[j][k]:
+                        cnt += 1 
+                if cnt == 1:
+                    edge[i][j] = edge[j][i] = 1 
+        
+        vis = [False for i in range(n)]
+        vis[bank.index(startGene)] = True
+        def dfs(gene, cur):
+            nonlocal ans, vis
+            # base case，找到目标基因序列
+            if gene == endGene:
+                ans = min(ans, cur)
+                return
+
+            # 向着所有可能的方向前进，遍历所有相邻的基因序列
+            for i in range(n):
+                if not vis[i] and edge[bank.index(gene)][i] == 1:
+                    vis[i] = True
+                    dfs(bank[i], cur + 1)
+                    vis[i] = False
+            
+
+        dfs(startGene, 0)
+
+        if ans == 10:
+            return -1 
+        return ans </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建邻接矩阵时，只计算每两个基因序列之间相异字符的数量，并判断是否为1？这种方法是否能准确表示只有一步变化的基因序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法的目的是识别两个基因序列是否可以通过单一字符的变化相互转换，这是题目要求的基因变化的定义。如果两个序列之间恰好有一个字符不同，就表示它们可以直接通过一步的突变相互转换。这种只计算字符差异数量并判断是否为1的方式，是一种准确且直接的方法来实现这个目标。这样可以确保构建的邻接矩阵准确反映出基因序列间的单步变化可能性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在深度优先搜索中，为什么选择递归而不是迭代？这种选择对性能有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在深度优先搜索（DFS）中，递归方法因其直观和简洁而常常被选择，尤其是在处理复杂的树形或图形结构时。递归允许程序自然地回溯到之前的状态，这在DFS中非常重要。然而，递归可能导致大量的堆栈使用，特别是在深度很大或搜索空间很广的情况下，可能会导致性能问题或堆栈溢出。迭代方法虽然可以避免堆栈溢出的问题，但通常会使代码更加复杂，需要手动管理栈来保存状态。对于本题的基因变化路径搜索，递归的方法提供了足够的简洁性和直观性，对于算法的理解和实现都较为有利。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中设置了一个变量 `ans` 初始化为10，这个值的选择有什么特殊意义吗？是否存在更好的初始值设定方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>变量`ans`初始化为10的原因可能是假设在最坏的情况下，基因序列的改变次数不会超过基因长度（这里为8），或者考虑到某些边界情况下改变次数略多于基因长度。这个值作为一个比较大的初始最小值，用来确保能够通过比较找到实际的最小变化次数。更好的初始化方式可以是设置为一个比题目限制还要大的值，比如`float(&#39;inf&#39;)`，这样可以避免对特定题目的假设，使代码更具一般性和可扩展性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果 `startGene` 等于 `endGene`，算法的行为会如何变化？题解中是否考虑了这种特殊情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果`startGene`等于`endGene`，理论上不需要任何变化就已经达到了目标序列。在题解中，这种情况会在DFS开始时直接被处理，因为递归的基本情况是检查当前基因序列是否等于目标序列。如果在一开始调用DFS时`startGene`与`endGene`相等，递归将在首次检查时满足基本情况，返回变化次数0。因此，题解已经隐含地处理了这种特殊情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/word-ladder" class="list-group-item list-group-item-action">
+                                单词接龙
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-genetic-mutation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-genetic-mutation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

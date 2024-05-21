@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小区间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小区间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>你有&nbsp;<code>k</code>&nbsp;个 <strong>非递减排列</strong> 的整数列表。找到一个 <strong>最小 </strong>区间，使得&nbsp;<code>k</code>&nbsp;个列表中的每个列表至少有一个数包含在其中。</p>
+
+<p>我们定义如果&nbsp;<code>b-a &lt; d-c</code>&nbsp;或者在&nbsp;<code>b-a == d-c</code>&nbsp;时&nbsp;<code>a &lt; c</code>，则区间 <code>[a,b]</code> 比 <code>[c,d]</code> 小。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [[4,10,15,24,26], [0,9,12,20], [5,18,22,30]]
+<strong>输出：</strong>[20,24]
+<strong>解释：</strong> 
+列表 1：[4, 10, 15, 24, 26]，24 在区间 [20,24] 中。
+列表 2：[0, 9, 12, 20]，20 在区间 [20,24] 中。
+列表 3：[5, 18, 22, 30]，22 在区间 [20,24] 中。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [[1,2,3],[1,2,3],[1,2,3]]
+<strong>输出：</strong>[1,1]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>nums.length == k</code></li>
+	<li><code>1 &lt;= k &lt;= 3500</code></li>
+	<li><code>1 &lt;= nums[i].length &lt;= 50</code></li>
+	<li><code>-10<sup>5</sup> &lt;= nums[i][j] &lt;= 10<sup>5</sup></code></li>
+	<li><code>nums[i]</code> 按非递减顺序排列</li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 107 ms</p>
+                    <p>内存: 23.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def smallestRange(self, A: List[List[int]]) -&gt; List[int]:
+        groups = len(A)
+        # 每个数字绑定组号, 排序后滑窗, 找到最短满足窗体包含所有组
+        B = [(x, i) for i, v in enumerate(A) for x in v]
+        B.sort()    
+        ans = [-inf, inf]
+        mp = Counter()
+        l = 0
+        for _, (y, y_group) in enumerate(B):
+            mp[y_group] += 1
+            while len(mp) == groups:
+                x, x_group = B[l][0], B[l][1]
+                diff = y - x - (ans[1] - ans[0])
+                if diff &lt; 0 or (diff == 0 and y &lt; ans[0]):
+                    ans = [x, y]
+                mp[x_group] -= 1
+                if not mp[x_group]:
+                    del mp[x_group]
+                l += 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是先将每个数字与其所在的组号绑定在一起,形成(数字,组号)的元组,然后对这些元组进行排序。接着使用滑动窗口的方法,通过左右指针维护一个窗口,保证窗口内包含了所有的组。在滑动窗口的过程中,记录下窗口大小最小的区间作为答案。具体实现时,使用哈希表 mp 来统计当前窗口内每个组出现的次数,当 mp 的大小等于总组数时,说明当前窗口已经包含了所有的组,此时更新最小区间,并尝试通过收缩左边界来缩小区间大小。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def smallestRange(self, A: List[List[int]]) -&gt; List[int]:
+        groups = len(A)
+        # 每个数字绑定组号, 排序后滑窗, 找到最短满足窗体包含所有组
+        B = [(x, i) for i, v in enumerate(A) for x in v]
+        B.sort()    
+        ans = [-inf, inf]
+        mp = Counter()
+        l = 0
+        for _, (y, y_group) in enumerate(B):
+            mp[y_group] += 1
+            while len(mp) == groups:
+                x, x_group = B[l][0], B[l][1]
+                diff = y - x - (ans[1] - ans[0])
+                if diff &lt; 0 or (diff == 0 and y &lt; ans[0]):
+                    ans = [x, y]
+                mp[x_group] -= 1
+                if not mp[x_group]:
+                    del mp[x_group]
+                l += 1
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，如何确保在初始化哈希表`mp`时，它已经包含了所有必要的组号，以便正确地追踪每个组的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在该算法中，初始化哈希表`mp`并不需要预先包含所有组号。哈希表`mp`用于动态追踪窗口内每个组的元素计数。只有当某个组的元素首次出现在窗口中时，该组号才会被加入到`mp`中，并开始计数。这种动态添加的方式可以有效地处理并记录各个组的元素状态，而不需要在初始化时就包含所有组号。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于边界情况，比如当一个或多个列表为空时，这个算法是否仍然有效？如果无效，如何修改算法以处理这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当一个或多个子列表为空时，这个算法不会有效，因为这意味着某些组没有任何元素，从而无法形成一个完整覆盖所有组的窗口。为了处理这种情况，可以在算法开始之前添加一个检查，确保所有输入的子列表都是非空的。如果发现任何一个列表为空，则可以直接返回一个错误信息或特定的输出，表明不可能找到一个包含所有组的区间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在滑动窗口法中，为何选择对元组`(数字, 组号)`进行排序，而不是直接在原始列表上滑动？排序带来了哪些计算上的优势或必要性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对元组`(数字, 组号)`进行排序是为了让所有来自不同组的数字按从小到大的顺序排列，这样可以更容易地通过滑动窗口来找到包含所有组的最小区间。如果直接在原始列表上滑动，由于每个列表的数字可能是无序的，且不同列表之间的数字无法有效比较，将难以实现有效的窗口滑动来覆盖所有组。排序后，可以确保窗口内的数字是连续的，并且每次扩展或收缩窗口都是有序进行，这对于追踪当前最小区间尤为重要。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在滑动窗口中，当删除哈希表`mp`中的一个元素（即当某个组在窗口中的计数为0时）后，为什么立即移动左指针`l`？这样的操作是否可能错过某些潜在的最小区间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在滑动窗口中，左指针`l`的移动是为了尝试缩小当前区间的大小，同时保持窗口内包含所有组。当哈希表`mp`中某个组的计数变为0时，意味着该组的元素已经完全不在当前窗口内，因此需要移动左指针来寻找一个新的可能的最小区间，这可能涉及将左指针移动到新的位置以重新包含丢失的组。这种操作通常不会错过潜在的最小区间，因为一旦某个组元素完全不在窗口内，当前的窗口已经不再有效，必须调整窗口以重新满足条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/smallest-range-covering-elements-from-k-lists')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/smallest-range-covering-elements-from-k-lists/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

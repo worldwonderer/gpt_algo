@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>天际线问题</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>天际线问题</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                        <a href="/problems?tag=line-sweep" class="badge bg-secondary tag-link">扫描线</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>城市的 <strong>天际线</strong> 是从远处观看该城市中所有建筑物形成的轮廓的外部轮廓。给你所有建筑物的位置和高度，请返回 <em>由这些建筑物形成的<strong> 天际线</strong></em> 。</p>
+
+<p>每个建筑物的几何信息由数组 <code>buildings</code> 表示，其中三元组 <code>buildings[i] = [lefti, righti, heighti]</code> 表示：</p>
+
+<ul>
+	<li><code>left<sub>i</sub></code> 是第 <code>i</code> 座建筑物左边缘的 <code>x</code> 坐标。</li>
+	<li><code>right<sub>i</sub></code> 是第 <code>i</code> 座建筑物右边缘的 <code>x</code> 坐标。</li>
+	<li><code>height<sub>i</sub></code> 是第 <code>i</code> 座建筑物的高度。</li>
+</ul>
+
+<p>你可以假设所有的建筑都是完美的长方形，在高度为 <code>0</code>&nbsp;的绝对平坦的表面上。</p>
+
+<p><strong>天际线</strong> 应该表示为由 “关键点” 组成的列表，格式 <code>[[x<sub>1</sub>,y<sub>1</sub>],[x<sub>2</sub>,y<sub>2</sub>],...]</code> ，并按 <strong>x 坐标 </strong>进行 <strong>排序</strong> 。<strong>关键点是水平线段的左端点</strong>。列表中最后一个点是最右侧建筑物的终点，<code>y</code> 坐标始终为 <code>0</code> ，仅用于标记天际线的终点。此外，任何两个相邻建筑物之间的地面都应被视为天际线轮廓的一部分。</p>
+
+<p><strong>注意：</strong>输出天际线中不得有连续的相同高度的水平线。例如 <code>[...[2 3], [4 5], [7 5], [11 5], [12 7]...]</code> 是不正确的答案；三条高度为 5 的线应该在最终输出中合并为一个：<code>[...[2 3], [4 5], [12 7], ...]</code></p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/12/01/merged.jpg" style="height: 331px; width: 800px;" />
+<pre>
+<strong>输入：</strong>buildings = [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]
+<strong>输出：</strong>[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]
+<strong>解释：</strong>
+图 A<strong> </strong>显示输入的所有建筑物的位置和高度，
+图 B 显示由这些建筑物形成的天际线。图 B 中的红点表示输出列表中的关键点。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>buildings = [[0,2,3],[2,5,3]]
+<strong>输出：</strong>[[0,3],[5,0]]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= buildings.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= left<sub>i</sub> &lt; right<sub>i</sub> &lt;= 2<sup>31</sup> - 1</code></li>
+	<li><code>1 &lt;= height<sub>i</sub> &lt;= 2<sup>31</sup> - 1</code></li>
+	<li><code>buildings</code> 按 <code>left<sub>i</sub></code> 非递减排序</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 51 ms</p>
+                    <p>内存: 20.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import defaultdict
+
+class SegmentTree:
+    def __init__(self):
+        # 根据问题背景设置默认值
+        self.tree = defaultdict(lambda: 0)
+        self.lazy = defaultdict(lambda: 0)
+        
+    def pushDown(self, i):
+        # 懒标记下放，注意取最大值
+        if self.lazy[i]:
+            self.tree[2 * i] = max(self.tree[2 * i], self.lazy[i])
+            self.tree[2 * i + 1] = max(self.tree[2 * i + 1], self.lazy[i])
+            self.lazy[2 * i] = max(self.lazy[2 * i], self.lazy[i])
+            self.lazy[2 * i + 1] = max(self.lazy[2 * i + 1], self.lazy[i])
+            self.lazy[i] = -1
+
+    def update(self, start, end, l, r, val, i=1):
+        # 只有在 val 大于当前区间值时才更新区间最大值
+        if l &lt;= start and end &lt;= r:
+            self.tree[i] = max(self.tree[i], val)
+            self.lazy[i] = max(self.lazy[i], val)
+            return
+        m = start + (end - start) // 2
+        self.pushDown(i)
+        if l &lt;= m: 
+            self.update(start, m, l, r, val, 2 * i)
+        if r &gt; m:
+            self.update(m + 1, end, l, r, val, 2 * i + 1)
+        self.tree[i] = max(self.tree[2 * i], self.tree[2 * i + 1])
+
+    def query(self, start, end, l, r, i=1):
+        if l &lt;= start and end &lt;= r:
+            return self.tree[i]
+        m = start + (end - start) // 2
+        self.pushDown(i)
+        ans = 0
+        if l &lt;= m:
+            ans = max(ans, self.query(start, m, l, r, 2 * i))
+        if r &gt; m:
+            ans = max(ans, self.query(m + 1, end, l, r, 2 * i + 1))
+        return ans
+
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -&gt; List[List[int]]:
+        # 端点去重
+        xs = set()
+        for left, right, _ in buildings:
+            xs.add(left)
+            xs.add(right)
+        xs = sorted(xs)
+        n = len(xs)
+        dct = {x : idx for idx, x in enumerate(xs)}
+        # 离散化更新线段树
+        st = SegmentTree()
+        for l, r, h in buildings:
+            st.update(0, n - 1, dct[l], dct[r] - 1, h)
+        # 按照端点进行关键点查询
+        pre_h = 0
+        res = []
+        for x in xs:
+            cur_h = st.query(0, n - 1, dct[x], dct[x])
+            if cur_h != pre_h:
+                res.append([x, cur_h])
+                pre_h = cur_h
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用分治和延迟传播的线段树解决天际线问题。首先，将所有建筑物的左右端点收集并去重，对这些端点进行排序和离散化，映射到连续的整数索引上。之后，使用线段树来维护每个区间的最大高度。对于每个建筑物，将其高度更新到线段树中对应的区间上。更新操作中，如果当前线段树节点的区间完全被建筑物覆盖，则使用延迟更新策略标记最大高度。最后，遍历所有的端点，查询对应的最大高度，如果与前一个高度不同，则该点是天际线的一个转折点。这样可以得到所有转折点，即城市的天际线。</p>
+                                <p>时间复杂度: O(n log m)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">from collections import defaultdict
+
+class SegmentTree:
+    def __init__(self):
+        self.tree = defaultdict(lambda: 0)  # 初始化线段树节点值为0
+        self.lazy = defaultdict(lambda: 0)  # 初始化延迟更新标记为0
+        
+    def pushDown(self, i):
+        # 延迟更新下放
+        if self.lazy[i]:
+            self.tree[2 * i] = max(self.tree[2 * i], self.lazy[i])
+            self.tree[2 * i + 1] = max(self.tree[2 * i + 1], self.lazy[i])
+            self.lazy[2 * i] = max(self.lazy[2 * i], self.lazy[i])
+            self.lazy[2 * i + 1] = max(self.lazy[2 * i + 1], self.lazy[i])
+            self.lazy[i] = 0  # 清除当前节点的延迟标记
+    
+    def update(self, start, end, l, r, val, i=1):
+        # 区间更新操作
+        if l &lt;= start and end &lt;= r:
+            self.tree[i] = max(self.tree[i], val)
+            self.lazy[i] = max(self.lazy[i], val)
+            return
+        m = start + (end - start) // 2
+        self.pushDown(i)  # 下放前一次的延迟更新
+        if l &lt;= m:
+            self.update(start, m, l, r, val, 2 * i)
+        if r &gt; m:
+            self.update(m + 1, end, l, r, val, 2 * i + 1)
+        self.tree[i] = max(self.tree[2 * i], self.tree[2 * i + 1])  # 更新当前节点
+    
+    def query(self, start, end, l, r, i=1):
+        # 区间查询操作
+        if l &lt;= start and end &lt;= r:
+            return self.tree[i]
+        m = start + (end - start) // 2
+        self.pushDown(i)  # 下放延迟更新
+        ans = 0
+        if l &lt;= m:
+            ans = max(ans, self.query(start, m, l, r, 2 * i))
+        if r &gt; m:
+            ans = max(ans, self.query(m + 1, end, l, r, 2 * i + 1))
+        return ans
+
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -&gt; List[List[int]]:
+        # 收集并离散化所有端点
+        xs = set()
+        for left, right, _ in buildings:
+            xs.add(left)
+            xs.add(right)
+        xs = sorted(xs)  # 端点排序
+        n = len(xs)
+        dct = {x : idx for idx, x in enumerate(xs)}  # 创建端点到索引的映射
+        # 初始化线段树并更新建筑物高度
+        st = SegmentTree()
+        for l, r, h in buildings:
+            st.update(0, n - 1, dct[l], dct[r] - 1, h)  # 更新线段树区间
+        # 查询并记录天际线关键点
+        pre_h = 0
+        res = []
+        for x in xs:
+            cur_h = st.query(0, n - 1, dct[x], dct[x])  # 查询每个端点的最大高度
+            if cur_h != pre_h:
+                res.append([x, cur_h])  # 如果高度变化则记录为天际线的一个点
+                pre_h = cur_h
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用线段树而不是其他数据结构来解决天际线问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>线段树是处理区间查询和区间更新问题的有效数据结构。在天际线问题中，需要频繁地对建筑物覆盖的区间进行高度更新（区间更新），并在最终输出时查询每个位置的最大高度（区间查询）。线段树可以在对数时间复杂度内完成这些操作，保证整体算法的效率。此外，线段树支持延迟更新机制，这对于批量更新区间数据特别有用，可以避免不必要的重复计算，提高处理速度。而其他数据结构，如数组或简单的列表，处理这种类型的动态区间问题时，可能会导致过高的时间复杂度，不适合处理大规模数据。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在使用线段树处理天际线问题时，延迟更新机制的具体作用是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>延迟更新机制是线段树优化处理区间更新操作的一种方法。在天际线问题中，当需要将某一区间内所有位置的高度更新到一个新的高度时，如果直接逐个更新，效率会很低。延迟更新允许我们将更新操作标记在某个节点上，而不立即将这个更新应用到所有子节点。只有在必要进行具体查询或进一步的区间更新影响到这些子节点时，才将标记下放，更新子节点的值。这种机制减少了不必要的计算量，特别是在频繁更新区间的情况下，能显著提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的离散化端点的步骤是如何帮助线段树有效处理区间的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>离散化端点是将问题中涉及的所有端点（如建筑物的左右边界）映射到一组连续的整数索引上。这一步骤对线段树处理区间尤为关键，因为线段树是基于连续整数区间来构建和操作的。通过离散化，我们可以把实际的坐标转换为较小的、连续的索引范围，这样就可以使用线段树高效地管理和查询每个端点的最大高度。此外，离散化可以减少线段树所需处理的数据量，因为实际的坐标可能非常分散和广泛，直接使用这些坐标作为线段树的索引会导致树的规模过大，从而影响效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/falling-squares" class="list-group-item list-group-item-action">
+                                掉落的方块
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-skyline-problem')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-skyline-problem/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

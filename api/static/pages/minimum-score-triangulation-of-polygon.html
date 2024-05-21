@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>多边形三角剖分的最低得分</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>多边形三角剖分的最低得分</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你有一个凸的<meta charset="UTF-8" />&nbsp;<code>n</code>&nbsp;边形，其每个顶点都有一个整数值。给定一个整数数组<meta charset="UTF-8" />&nbsp;<code>values</code>&nbsp;，其中<meta charset="UTF-8" />&nbsp;<code>values[i]</code>&nbsp;是第 <code>i</code> 个顶点的值（即 <strong>顺时针顺序</strong> ）。</p>
+
+<p>假设将多边形 <strong>剖分</strong>&nbsp;为 <code>n - 2</code>&nbsp;个三角形。对于每个三角形，该三角形的值是顶点标记的<strong>乘积</strong>，三角剖分的分数是进行三角剖分后所有 <code>n - 2</code>&nbsp;个三角形的值之和。</p>
+
+<p>返回 <em>多边形进行三角剖分后可以得到的最低分</em> 。<br />
+&nbsp;</p>
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/02/25/shape1.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>values = [1,2,3]
+<strong>输出：</strong>6
+<strong>解释：</strong>多边形已经三角化，唯一三角形的分数为 6。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/02/25/shape2.jpg" style="height: 163px; width: 446px;" /></p>
+
+<pre>
+<strong>输入：</strong>values = [3,7,4,5]
+<strong>输出：</strong>144
+<strong>解释：</strong>有两种三角剖分，可能得分分别为：3*7*5 + 4*5*7 = 245，或 3*4*5 + 3*4*7 = 144。最低分数为 144。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/02/25/shape3.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>values = [1,3,1,4,1,5]
+<strong>输出：</strong>13
+<strong>解释：</strong>最低分数三角剖分的得分情况为 1*1*3 + 1*1*4 + 1*1*5 + 1*1*1 = 13。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == values.length</code></li>
+	<li><code>3 &lt;= n &lt;= 50</code></li>
+	<li><code>1 &lt;= values[i] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 54 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minScoreTriangulation(self, v: List[int]) -&gt; int:
+        n = len(v)
+        f = [[0] * n for _ in range(n)]
+        for i in range(n - 3, -1, -1):
+            for j in range(i + 2, n):
+                f[i][j] = min(f[i][k] + f[k][j] + v[i] * v[j] * v[k]
+                              for k in range(i + 1, j))
+        return f[0][-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目是一个经典的动态规划问题，用于求多边形三角剖分的最低得分。动态规划表f[i][j]表示顶点i到顶点j的多边形剖分的最小得分。初始化f[i][j]为0，因为任何小于3个顶点的多边形不能构成三角形。动态规划的转移方程是：f[i][j] = min(f[i][k] + f[k][j] + v[i] * v[j] * v[k])，其中k从i+1到j-1。这个方程表示在顶点i到顶点j的多边形中，选择一个中间顶点k将多边形分为两部分（i到k和k到j）并加上由顶点i, j和k形成的三角形的得分。我们从小到大计算所有可能的多边形的得分，最终得到整个多边形的最小剖分得分。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minScoreTriangulation(self, v: List[int]) -&gt; int:
+        n = len(v)  # 多边形的顶点数
+        f = [[0] * n for _ in range(n)]  # 动态规划表，初始化为0
+        for i in range(n - 3, -1, -1):  # 从后向前遍历所有起点
+            for j in range(i + 2, n):  # 遍历所有终点，至少间隔一个顶点以形成三角形
+                f[i][j] = min(f[i][k] + f[k][j] + v[i] * v[j] * v[k]  # 计算剖分得分的最小值
+                              for k in range(i + 1, j))  # 遍历所有可能的中间点k
+        return f[0][-1]  # 返回整个多边形的最小剖分得分</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划转移方程中，为什么选择顶点k从i+1到j-1作为中间点进行分割？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择顶点k从i+1到j-1作为中间点进行分割是为了确保每次分割都能形成至少一个有效的三角形，并且确保剩下的部分是两个较小的多边形而不是一条线段或一个点。这样的分割才能够递归地应用动态规划求解。如果k不在这个范围内，我们就不能保证每一部分至少有3个顶点，从而无法形成有效的三角形进行计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划表f初始化为0，但是在分割多边形时如何确保小于3个顶点的情况不被计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，表f[i][j]初始化为0是因为任何小于3个顶点的多边形部分不能形成三角形，因此它们的得分自然为0，不需要额外计算。动态规划的过程中，我们只计算那些至少由3个顶点组成的多边形的最小得分。因此，当j - i &lt; 2（即两个顶点之间的距离小于2，不足以形成三角形）时，f[i][j]默认为0，这样就避免了对小于3个顶点的分割进行无效的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在实际编码中，如何处理多边形顶点的循环（即顶点是循环数组的情况）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实际编码中，处理多边形顶点的循环通常不需要特别的数组结构，因为题目中的动态规划算法已经考虑到了顶点的循环性质。即使数组在逻辑上是循环的，我们也只需要在访问时通过取模操作来考虑这种循环性，如v[(i + k) % n]。在实现多边形剖分的动态规划时，本质上是处理一个闭环，但数组的线性表示足以覆盖所有需要的操作，因为我们只计算从i到j的闭合部分。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中的动态规划实现是否考虑了所有可能的分割情况，以确保找到最低得分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，题解中的动态规划实现通过枚举所有可能的中间顶点k从i+1到j-1，并且对每一对起点i和终点j进行计算，确保了所有可能的分割情况都被考虑到。这种方法通过从较小的多边形逐步扩展到较大的多边形，确保每一步都是基于之前计算过的最优解得出的，从而找到整个多边形剖分的最低得分。这种全面的枚举保证了最终的结果是全局最优的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-score-triangulation-of-polygon')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-score-triangulation-of-polygon/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

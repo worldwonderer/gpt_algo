@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子数组的最大频率分数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子数组的最大频率分数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 294 ms</p>
+                    <p>内存: 27.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">import collections
+class Solution(object):
+    def maxFrequencyScore(self, nums, k):
+        n = len(nums)
+        a_set = collections.defaultdict(int)
+        for i in range(k):
+            a_set[nums[i]] += 1
+        now = 0
+        base = 10 ** 9 + 7
+        for key, value in a_set.items():
+            now += pow(key, value, base)
+        now %= base
+        max_ans = now
+        for i in range(k, n):
+            a_set[nums[i - k]] -= 1
+            val = a_set[nums[i - k]]
+            now = now - pow(nums[i - k], val + 1, base)
+            if val &gt; 0:
+                now += pow(nums[i - k], val, base)
+            a_set[nums[i]] += 1
+            val = a_set[nums[i]]
+            now = now + pow(nums[i], val, base)
+            if val &gt; 1:
+                now -= pow(nums[i], val - 1, base)
+            now %= base
+            max_ans = max(max_ans, now)
+        return max_ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用滑动窗口的方法处理子数组的最大频率分数问题。首先，使用一个哈希表a_set记录窗口内各个数的出现次数。接着，定义一个变量now，用以计算当前窗口内各数值的幂和，其中幂的底为数值本身，指数为该数值在窗口中出现的次数，并对结果取一个大质数模以防溢出。初始化时，先处理前k个元素填充窗口，并计算这些元素构成的初始now值。随后，窗口向右滑动，每次移动时，更新哈希表和now值，即从now中减去滑出窗口的数的旧贡献值，并加上新进入窗口的数的新贡献值。同时，用max_ans记录遍历过程中的最大now值。最终，返回max_ans作为结果。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">import collections
+class Solution(object):
+    def maxFrequencyScore(self, nums, k):
+        n = len(nums) # 数组长度
+        a_set = collections.defaultdict(int) # 记录窗口内数字出现频率
+        for i in range(k): # 初始化窗口的频率表
+            a_set[nums[i]] += 1
+        now = 0 # 当前窗口的数值幂和
+        base = 10 ** 9 + 7 # 防止溢出的大质数模
+        for key, value in a_set.items(): # 计算初始窗口的now值
+            now += pow(key, value, base)
+        now %= base
+        max_ans = now # 初始最大now
+        for i in range(k, n): # 滑动窗口
+            a_set[nums[i - k]] -= 1 # 更新窗口，移出一个元素
+            val = a_set[nums[i - k]]
+            now = now - pow(nums[i - k], val + 1, base) # 移出元素的旧贡献
+            if val &gt; 0:
+                now += pow(nums[i - k], val, base) # 如果还在窗口内，加上新贡献
+            a_set[nums[i]] += 1 # 新元素加入窗口
+            val = a_set[nums[i]]
+            now = now + pow(nums[i], val, base) # 新元素的贡献
+            if val &gt; 1:
+                now -= pow(nums[i], val - 1, base) # 减去旧贡献
+            now %= base
+            max_ans = max(max_ans, now) # 更新最大now值
+        return max_ans # 返回最大频率分数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定滑动窗口的大小k，以及这个大小对算法性能和结果的影响是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口的大小k通常由问题的具体需求决定，比如在某些问题中，k可能是固定的，或者是由输入的某些参数决定的。窗口大小k直接影响算法的性能：如果k较大，每次滑动窗口时涉及的元素多，更新哈希表和计算幂的时间成本高；如果k较小，则可能无法充分利用数组中的信息，得到的结果可能不是最优。总的来说，k的大小影响着算法的时间复杂度和空间复杂度，以及最终算法能否正确反映数组的统计特性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在哈希表中更新数值的出现频率时，如何处理频率降至0的情况？是否需要从哈希表中删除这些键值对以节省空间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新哈希表时，如果某个数值的出现频率降至0，理论上这个键值对不再对当前的窗口状态有任何贡献，因此可以从哈希表中移除，以节省存储空间。这不仅可以减少内存占用，还可以在后续操作中减少不必要的查找和更新时间，尤其是在处理大数据集时更为重要。然而，如果频繁地添加和删除操作对性能有较大影响，也可以选择保留这些键值对，特别是在键的总数量相对固定时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中使用的大质数模`10 ** 9 + 7`有什么特殊意义？为什么选择这个数作为模数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中使用大质数模`10 ** 9 + 7`主要是为了防止计算过程中的整数溢出，并保持结果的稳定性。选择`10 ** 9 + 7`是因为它是一个大的质数，且小于`2^30`，使得乘法操作不会导致32位整数溢出。使用质数作为模数在数学上有好处，如在模数运算下有较好的分布性质，可以减小哈希冲突的概率，从而使得值的分布更均匀。此外，这个数在计算机算法竞赛和实际应用中广泛使用，因其性能表现良好。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-frequency-score-of-a-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-frequency-score-of-a-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

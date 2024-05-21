@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>使数组按非递减顺序排列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>使数组按非递减顺序排列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=linked-list" class="badge bg-secondary tag-link">链表</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code> 。在一步操作中，移除所有满足&nbsp;<code>nums[i - 1] &gt; nums[i]</code> 的 <code>nums[i]</code> ，其中 <code>0 &lt; i &lt; nums.length</code> 。</p>
+
+<p>重复执行步骤，直到 <code>nums</code> 变为 <strong>非递减</strong> 数组，返回所需执行的操作数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [5,3,4,4,7,3,6,11,8,5,11]
+<strong>输出：</strong>3
+<strong>解释：</strong>执行下述几个步骤：
+- 步骤 1 ：[5,<em><strong>3</strong></em>,4,4,7,<em><strong>3</strong></em>,6,11,<em><strong>8</strong></em>,<em><strong>5</strong></em>,11] 变为 [5,4,4,7,6,11,11]
+- 步骤 2 ：[5,<em><strong>4</strong></em>,4,7,<em><strong>6</strong></em>,11,11] 变为 [5,4,7,11,11]
+- 步骤 3 ：[5,<em><strong>4</strong></em>,7,11,11] 变为 [5,7,11,11]
+[5,7,11,11] 是一个非递减数组，因此，返回 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [4,5,7,7,13]
+<strong>输出：</strong>0
+<strong>解释：</strong>nums 已经是一个非递减数组，因此，返回 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 158 ms</p>
+                    <p>内存: 30.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def totalSteps(self, nums: List[int]) -&gt; int:
+        stk = []
+        ans, n = 0, len(nums)
+        dp = [0] * n
+        for i in range(n - 1, -1, -1):
+            while stk and nums[i] &gt; nums[stk[-1]]:
+                dp[i] = max(dp[i] + 1, dp[stk.pop()])
+            stk.append(i)
+        return max(dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了单调栈和动态规划的结合方式。首先，初始化一个空栈和一个动态规划数组dp，dp[i]用于记录以nums[i]为起点，数组需要经过的删除步骤数。从数组的末尾开始向前遍历，对于每个元素nums[i]，检查栈顶元素representing the indices of elements in the array。如果栈不为空且nums[i]大于栈顶元素对应的数组值，说明nums[i]能在一次操作中保留下来而栈顶元素会被删除，此时将栈顶元素出栈，并更新dp[i]为max(dp[i] + 1, dp[栈顶元素])，意味着nums[i]能延续的删除步骤至少是之前的步骤加一或者栈顶元素的步骤。将每个元素的索引最终压入栈中。最后，返回dp数组中的最大值，即为整个数组变为非递减数组所需的最大删除步骤数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def totalSteps(self, nums: List[int]) -&gt; int:
+        stk = []  # Initialize a stack
+        ans, n = 0, len(nums)
+        dp = [0] * n  # dp array to store the steps needed to make subarray non-decreasing
+        for i in range(n - 1, -1, -1): # Start from the end of the array
+            while stk and nums[i] &gt; nums[stk[-1]]: # While stack is not empty and current element is bigger than the top of the stack
+                dp[i] = max(dp[i] + 1, dp[stk.pop()]) # Calculate the max steps needed
+            stk.append(i) # Push current index onto the stack
+        return max(dp) # Return the maximum value from dp array, which gives the total steps needed</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在算法中使用单调栈而不是其他数据结构，比如数组或链表？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈的特点是能够在O(1)的时间复杂度内访问到需要比较的元素，并且能够在O(1)的时间复杂度内添加和删除元素。在本算法中，需要频繁地进行元素比较和删除操作，单调栈可以高效地处理这些操作，保证整体算法的效率。相比之下，如果使用数组或链表，虽然也可以实现相同的功能，但在删除元素时可能需要更高的时间复杂度，特别是数组在删除元素后还需要处理元素的移动，效率较低。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中的动态规划数组dp是如何初始化的，为什么所有元素初始值都是0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划数组dp用于记录每个位置i所需的最小删除步骤数，使得从该位置到数组末尾的子数组成为非递减序列。初始化所有元素的值为0是因为每个元素本身不需要任何删除操作就可以作为长度为1的非递减序列，即在最初的情况下，没有需要删除的其他元素，所以初始步骤数为0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在循环中，`while stk and nums[i] &gt; nums[stk[-1]]:` 这个条件是如何确保数组变为非递减的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件用于检查当前元素nums[i]是否大于栈顶元素对应的数组值。如果是，这意味着为了保持非递减序列，栈顶元素（较小的元素）需要被删除，因为它位于当前元素（较大的元素）之后。通过这种方式，算法逐步从数组末尾向前确保任何时刻栈内的元素对应的数组值都是非递减的。每次循环检查和可能的删除操作都是为了维持这个非递减的性质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么每次处理元素时，需要更新`dp[i] = max(dp[i] + 1, dp[stk.pop()])`，这里的逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的更新逻辑是为了确保dp[i]记录的是以nums[i]为起点所需的最大删除步骤数。当nums[i]大于栈顶元素时，栈顶元素需要被删除，此时dp[i]应至少为栈顶元素的dp值加1（表示除了栈顶元素外还可能需要更多的删除步骤）。使用max函数是为了处理可能的多个栈顶元素被连续删除的情况，确保dp[i]始终是正确的最大步骤数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/steps-to-make-array-non-decreasing')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/steps-to-make-array-non-decreasing/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

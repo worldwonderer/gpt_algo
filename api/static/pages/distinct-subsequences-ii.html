@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>不同的子序列 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>不同的子序列 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个字符串 <code>s</code>，计算 <code>s</code> 的 <strong>不同非空子序列</strong> 的个数。因为结果可能很大，所以返回答案需要对<strong> </strong><strong><code>10^9 + 7</code> 取余</strong> 。</p>
+
+<p>字符串的 <strong>子序列</strong> 是经由原字符串删除一些（也可能不删除）字符但不改变剩余字符相对位置的一个新字符串。</p>
+
+<ul>
+	<li>例如，<code>"ace"</code> 是 <code>"<em><strong>a</strong></em>b<em><strong>c</strong></em>d<em><strong>e</strong></em>"</code> 的一个子序列，但 <code>"aec"</code> 不是。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "abc"
+<strong>输出：</strong>7
+<strong>解释：</strong>7 个不同的子序列分别是 "a", "b", "c", "ab", "ac", "bc", 以及 "abc"。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "aba"
+<strong>输出：</strong>6
+<strong>解释：</strong>6 个不同的子序列分别是 "a", "b", "ab", "ba", "aa" 以及 "aba"。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "aaa"
+<strong>输出：</strong>3
+<strong>解释：</strong>3 个不同的子序列分别是 "a", "aa" 以及 "aaa"。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 2000</code></li>
+	<li><code>s</code> 仅由小写英文字母组成</li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def distinctSubseqII(self, s: str) -&gt; int:
+        mod=1000000007 #模数
+        s=list(s)
+        #将a-z转成0-25
+        for i in range(len(s)):
+            s[i]=ord(s[i])-ord(&#39;a&#39;)
+        endCnt=[0]*26 #endCnt[i]表示以i结尾的子序列个数
+        newAdd=0 #表示每轮纯新增的子序列个数(排除掉与之前重复的)
+        ans=1 #记录字符串s的子序列个数 初始认为是1(包括空集,最后减掉即可)
+        for x in s:
+            newAdd=ans-endCnt[x] #纯新增个数
+            endCnt[x]+=newAdd #更新以该字符结尾的子序列个数
+            ans=ans%mod+newAdd%mod #更新答案个数
+        return (ans-1+mod)%mod</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划的思想来计算所有的不同子序列。具体方法是用一个数组endCnt来记录以每个字符结尾的子序列的数量。对于字符串s中的每个字符x，当前所有的子序列可以与x组合形成新的子序列，而新形成的以x结尾的子序列的数量就是在x加入之前的所有子序列数量减去上一次以x结尾的子序列数量。这样可以保证计数的过程中不会重复计算相同的子序列。最终结果需要减去初始化时候计入的空子序列。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># Solution class to compute different subsequences
+
+class Solution:
+    def distinctSubseqII(self, s: str) -&gt; int:
+        mod = 1000000007  # Use mod to avoid large numbers
+        s = list(s)  # Convert string to list for easier manipulation
+        # Convert characters from &#39;a&#39;-&#39;z&#39; to 0-25
+        for i in range(len(s)):
+            s[i] = ord(s[i]) - ord(&#39;a&#39;)
+        endCnt = [0] * 26  # Array to store subsequences count ending with each letter
+        newAdd = 0  # Store count of new subsequences added in each iteration
+        ans = 1  # Initial count includes empty subsequence
+        for x in s:
+            newAdd = ans - endCnt[x]  # Calculate new subsequences excluding those ending with current char previously
+            endCnt[x] += newAdd  # Update count of subsequences ending with current char
+            ans = (ans + newAdd) % mod  # Update total count and apply mod
+        return (ans - 1 + mod) % mod  # Exclude the empty subsequence and apply mod</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么初始化ans为1而不是0？这是否代表已经计入了空子序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，初始化ans为1而不是0是因为在动态规划的过程中已经考虑了空子序列。空子序列是任何字符串的有效子序列之一，因此在开始计算时将其包含进总数。这样做可以简化后续的计算，因为每个新字符引入时，都可以默认存在与空子序列结合成新子序列的情形。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新endCnt数组时，为何需要从ans减去上一次以该字符结尾的子序列数量？这样的操作有什么特别的意义或目的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这样做的目的是为了避免重复计数。在动态规划过程中，每个字符x加入到现有的所有子序列中会形成新的子序列，但如果直接加上前面所有的子序列总数，会重复计算以x结尾的子序列。通过减去上一次以该字符x结尾的子序列数量，我们确保每次加入的都是新生成的、独特的子序列，而不包括之前已经计算过的以x结尾的子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，为了避免重复计算相同的子序列，需要进行某些减法操作。这个逻辑是如何确保算法的正确性的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过减去以当前字符结尾的上一次的子序列数量，我们确保每次添加的子序列都是基于当前字符新形成的。这意味着每个新形成的子序列都是从当前字符和之前计算的所有独立子序列组合而成，而不包括任何之前已经存在的以该字符结尾的子序列。这种方法确保了算法在更新子序列计数时不会出现重复，从而保持了算法的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解最后返回的结果为何要进行(ans - 1 + mod) % mod这样的操作？直接返回ans - 1不行吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接返回ans - 1在大多数情况下是没有问题的。然而考虑到ans可能为0（尤其是在空字符串或者其他特殊情况下），直接做减法可能导致结果为负数。在编程实现中，返回负数可能不符合预期的输出要求。通过添加mod并取模，确保最终结果始终为非负整数，并且在处理大数时防止溢出，符合模运算的常规操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/distinct-subsequences-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/distinct-subsequences-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

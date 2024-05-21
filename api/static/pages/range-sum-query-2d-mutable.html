@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二维区域和检索 - 可变</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二维区域和检索 - 可变</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 55 ms</p>
+                    <p>内存: 19.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class NumMatrix:
+
+    def __init__(self, matrix: List[List[int]]):
+        self.matrix = matrix
+        self.P = [list(accumulate([0]+sub)) for sub in matrix]
+
+    def update(self, row: int, col: int, val: int) -&gt; None:
+        self.matrix[row][col] = val
+        self.P[row] = list(accumulate([0]+self.matrix[row]))
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -&gt; int:
+        return sum(self.P[r][col2+1]-self.P[r][col1] for r in range(row1, row2+1))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了前缀和技巧。在构造函数中，通过对每一行计算前缀和，并将结果存储在二维数组 P 中。当需要更新某个元素时，只需要更新对应行的前缀和数组即可。在计算区域和时，可以利用前缀和的性质，对于每一行，用区域右端点的前缀和减去左端点的前缀和，然后将所有行的结果累加起来，即可得到最终的区域和。</p>
+                                <p>时间复杂度: 构造函数: O(mn), update: O(n), sumRegion: O(m)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">class NumMatrix:
+
+    def __init__(self, matrix: List[List[int]]):
+        # 存储原始矩阵
+        self.matrix = matrix
+        # 计算每一行的前缀和，并存储在二维数组 P 中
+        self.P = [list(accumulate([0]+sub)) for sub in matrix]
+
+    def update(self, row: int, col: int, val: int) -&gt; None:
+        # 更新原始矩阵中的元素值
+        self.matrix[row][col] = val
+        # 重新计算更新行的前缀和数组
+        self.P[row] = list(accumulate([0]+self.matrix[row]))
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -&gt; int:
+        # 计算区域和
+        # 对于每一行，用区域右端点的前缀和减去左端点的前缀和，然后将所有行的结果累加
+        return sum(self.P[r][col2+1]-self.P[r][col1] for r in range(row1, row2+1))
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构造函数中创建前缀和数组时，你是如何处理边界情况，比如矩阵为空或只有一行/一列的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造函数中，我们首先检查矩阵是否为空，如果为空，则前缀和数组也应该被初始化为空数组。对于只有一行或一列的情况，前缀和的计算方法仍然适用。即使矩阵仅有一个元素，我们同样计算其前缀和，这会是一个由一个元素加上一个初始的0组成的列表。总之，我们的前缀和数组的计算对于任何形状的矩阵都是通用的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你的算法在执行 update 操作时是否考虑了可能对同一位置进行多次更新，这是否会影响累计的前缀和结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在执行 update 操作时，我们首先在原始矩阵中更新指定位置的元素值。随后，为了确保前缀和数组的正确性，我们会重新计算整个行的前缀和。这种方法确保了即使同一位置进行多次更新，前缀和数组也总是与当前的矩阵状态保持一致，因此不会累积错误的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在 sumRegion 函数中，你是如何确保计算的区域索引不会超出矩阵的有效边界？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在 sumRegion 函数中，理论上应该有一步检查来确保输入的索引（row1, col1, row2, col2）都在矩阵的有效边界内。然而，在题解中并未明确这种检查。在实际应用中，应该添加适当的边界检查，如果输入的索引超出矩阵范围，应返回错误或进行适当的处理，以避免运行时错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当执行 update 操作后，你只更新了该行的前缀和，这种方法是否考虑了列之间的依赖关系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题解的前缀和数组设计中，每行的前缀和是独立计算的，不依赖于其他行的数据。因此，更新某个元素时，只需重新计算该元素所在行的前缀和，而不需要考虑列之间的依赖关系。这简化了更新操作，但仍能准确计算任何区域的和，因为区域和的计算是通过逐行计算并累加得到的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/range-sum-query-2d-immutable" class="list-group-item list-group-item-action">
+                                二维区域和检索 - 矩阵不可变
+                            </a>
+                        
+                            <a href="/problem/range-sum-query-mutable" class="list-group-item list-group-item-action">
+                                区域和检索 - 数组可修改
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/range-sum-query-2d-mutable')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/range-sum-query-2d-mutable/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

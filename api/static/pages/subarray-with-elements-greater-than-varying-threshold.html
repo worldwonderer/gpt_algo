@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>元素值大于变化阈值的子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>元素值大于变化阈值的子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组&nbsp;<code>nums</code>&nbsp;和一个整数&nbsp;<code>threshold</code>&nbsp;。</p>
+
+<p>找到长度为 <code>k</code>&nbsp;的&nbsp;<code>nums</code>&nbsp;子数组，满足数组中&nbsp;<strong>每个</strong>&nbsp;元素都 <strong>大于</strong>&nbsp;<code>threshold / k</code>&nbsp;。</p>
+
+<p>请你返回满足要求的 <strong>任意</strong>&nbsp;子数组的 <strong>大小</strong>&nbsp;。如果没有这样的子数组，返回&nbsp;<code>-1</code>&nbsp;。</p>
+
+<p><strong>子数组</strong> 是数组中一段连续非空的元素序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums = [1,3,4,3,1], threshold = 6
+<b>输出：</b>3
+<b>解释：</b>子数组 [3,4,3] 大小为 3 ，每个元素都大于 6 / 3 = 2 。
+注意这是唯一合法的子数组。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [6,5,6,5,8], threshold = 7
+<b>输出：</b>1
+<b>解释：</b>子数组 [8] 大小为 1 ，且 8 &gt; 7 / 1 = 7 。所以返回 1 。
+注意子数组 [6,5] 大小为 2 ，每个元素都大于 7 / 2 = 3.5 。
+类似的，子数组 [6,5,6] ，[6,5,6,5] ，[6,5,6,5,8] 都是符合条件的子数组。
+所以返回 2, 3, 4 和 5 都可以。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i], threshold &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 163 ms</p>
+                    <p>内存: 29.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def validSubarraySize(self, nums: List[int], threshold: int) -&gt; int:
+        n = len(nums)
+        left, st = [-1] * n, []  # left[i] 为左侧小于 nums[i] 的最近元素位置（不存在时为 -1）
+        for i, v in enumerate(nums):
+            while st and nums[st[-1]] &gt;= v: st.pop()
+            if st: left[i] = st[-1]
+            st.append(i)
+
+        right, st = [n] * n, []  # right[i] 为右侧小于 nums[i] 的最近元素位置（不存在时为 n）
+        for i in range(n - 1, -1, -1):
+            while st and nums[st[-1]] &gt;= nums[i]: st.pop()
+            if st: right[i] = st[-1]
+            st.append(i)
+
+        for num, l, r in zip(nums, left, right):
+            k = r - l - 1
+            if num &gt; threshold // k: return k
+        return -1
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解首先利用单调栈来预处理出每个元素左右两侧第一个小于它的元素的位置。这样做的目的是为了快速找出以当前元素为最小值的最大可能子数组的长度。然后，该解法遍历整个数组，对于每个元素，计算如果以该元素为最小值时，能形成的最大子数组的长度k，然后检查该元素是否满足条件 num &gt; threshold / k。如果满足，即返回k作为结果。如果遍历完数组都没有找到符合条件的子数组，最终返回-1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def validSubarraySize(self, nums: List[int], threshold: int) -&gt; int:
+        n = len(nums)
+        left, st = [-1] * n, []  # left[i] 为左侧小于 nums[i] 的最近元素位置（不存在时为 -1）
+        for i, v in enumerate(nums):
+            while st and nums[st[-1]] &gt;= v: st.pop()  # 维护栈的单调递减性
+            if st: left[i] = st[-1]
+            st.append(i)
+
+        right, st = [n] * n, []  # right[i] 为右侧小于 nums[i] 的最近元素位置（不存在时为 n）
+        for i in range(n - 1, -1, -1):
+            while st and nums[st[-1]] &gt;= nums[i]: st.pop()  # 维护栈的单调递减性
+            if st: right[i] = st[-1]
+            st.append(i)
+
+        for num, l, r in zip(nums, left, right):
+            k = r - l - 1  # 计算以 num 为最小值的最大可能子数组长度
+            if num &gt; threshold // k: return k  # 检查是否满足条件
+        return -1  # 如果没有找到符合条件的子数组，返回-1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中使用单调栈的目的是什么？为什么单调栈能够有效预处理出每个元素左右两侧第一个小于它的元素的位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中使用单调栈的目的是为了快速确定每个元素左右两边第一个小于它的元素的位置。这种信息对于确定以当前元素为最小值的最大可能子数组的长度是非常有用的。单调栈通过维护一个元素索引的栈，确保栈内的元素值是单调递减的，使得当遍历到新的元素时，可以快速找到栈顶元素为最近的、且比当前元素小的元素。如果新元素小于栈顶元素，就弹出栈顶，这样可以保持栈的单调性。这种结构使得每个元素被压入和弹出栈的操作最多各发生一次，从而高效地预处理出所需的位置信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的单调栈在遇到比栈顶元素小的值时就会弹栈，这种操作的复杂度是怎样的？是否能保证整体的时间复杂度在可接受的范围内？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈的操作复杂度是非常高效的。每个元素最多被压入和弹出栈一次，因此遍历整个数组的过程中，每个元素的进栈和出栈操作的总次数是常数，即O(1)。因此，对于整个数组来说，单调栈的操作复杂度是O(n)。这保证了整体的时间复杂度是线性的，从而在时间上是可接受的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中计算子数组长度`k = r - l - 1`的合理性在哪里？为什么要从减去l再减去1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，`l`和`r`分别表示当前元素左右两侧第一个小于它的元素的索引。因此，子数组的实际范围是从`l+1`到`r-1`（包括两端点）。计算这个范围内元素的数量，即长度`k`，应该用`r - (l + 1)`。简化这个表达式就是`r - l - 1`。这样计算出的`k`是当前元素为最小值时所能达到的最大子数组长度，合理地反映了题目要求的子数组的边界和长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/subarray-with-elements-greater-than-varying-threshold')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/subarray-with-elements-greater-than-varying-threshold/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

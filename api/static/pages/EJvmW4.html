@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>守护太空城</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>守护太空城</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>各位勇者请注意，力扣太空城发布陨石雨红色预警。</p>
+
+<p>太空城中的一些舱室将要受到陨石雨的冲击，这些舱室按照编号 <code>0 ~ N</code>&nbsp;的顺序依次排列。为了阻挡陨石损毁舱室，太空城可以使用能量展开防护屏障，具体消耗如下：</p>
+
+<ul>
+	<li>选择一个舱室开启屏障，能量消耗为 <code>2</code></li>
+	<li>选择相邻两个舱室开启联合屏障，能量消耗为 <code>3</code></li>
+	<li>对于已开启的&nbsp;<strong>一个&nbsp;</strong>屏障，<strong>多维持一时刻</strong>，能量消耗为 <code>1</code></li>
+</ul>
+
+<p>已知陨石雨的影响范围和到达时刻，<code>time[i]</code>&nbsp;和 <code>position[i]</code>&nbsp;分别表示该陨石的到达时刻和冲击位置。请返回太空舱能够守护所有舱室所需要的最少能量。</p>
+
+<p><strong>注意：</strong></p>
+
+<ul>
+	<li>同一时间，一个舱室不能被多个屏障覆盖</li>
+	<li>陨石雨仅在到达时刻对冲击位置处的舱室有影响</li>
+</ul>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+输入：time = [1,2,1], position = [6,3,3]
+
+输出：5
+
+解释：时刻 1，分别开启编号 3、6 舱室的屏障，能量消耗 2*2 = 4。时刻 2，维持编号 3 舱室的屏障，能量消耗 1。因此，最少需要能量 5。
+</pre>
+
+
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+输入：time = [1,1,1,2,2,3,5], position = [1,2,3,1,2,1,3]
+
+输出：9
+
+解释：时刻 1，开启编号 1、2 舱室的联合屏障，能量消耗 3。时刻 1，开启编号 3 舱室的屏障，能量消耗 2 。时刻 2，维持编号 1、2 舱室的联合屏障，能量消耗 1。时刻 3，维持编号 1、2 舱室的联合屏障，能量消耗 1。时刻 5，重新开启编号 3 舱室的屏障，能量消耗 2。因此，最少需要能量 9。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= time.length == position.length &lt;= 500</code></li>
+	<li><code>1 &lt;= time[i] &lt;= 5</code></li>
+	<li><code>0 &lt;= position[i] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 50 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def defendSpaceCity(self, time: List[int], position: List[int]) -&gt; int:
+        rain = [0]*(max(position)+1)
+        maxT = max(time)
+        for t, p in zip(time, position):
+            rain[p] |= 1&lt;&lt;(t-1)
+        mT = 1 &lt;&lt; maxT
+        u = [0]*mT
+        s = [0]*mT
+        for mask in range(1, 1&lt;&lt;maxT):
+            lb = mask &amp; -mask
+            mask1 = mask ^ lb
+            lb2 = mask1 &amp; -mask1
+            u[mask] = u[mask1] + (1 if (lb&lt;&lt;1) == lb2 else 3) 
+            s[mask] = s[mask1] + (1 if (lb&lt;&lt;1) == lb2 else 2) 
+        states, states1 = [inf]*mT, [inf]*mT
+        for mask in range(mT):
+            states[mask] = u[mask] + s[((mT-1)^mask) &amp; rain[0]]
+        for rainMask in rain[1:]:
+            for mask in range(mT):
+                states1[mask] = inf
+                pre = m = (mT-1)^mask
+                while True:
+                    cost = states[pre] + u[mask] + s[(m ^ pre) &amp; rainMask]
+                    states1[mask] = min(states1[mask], cost)
+                    if pre == 0: break
+                    pre = (pre - 1) &amp; m
+            states, states1 = states1, states
+        return states[0]
+
+        
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个问题可以通过使用动态规划来解决。首先，为了处理这些陨石的影响，我们需要知道每个位置在不同时间的状态。我们用一个位掩码来表示每个位置在各个时刻是否会受到陨石的影响。接着，我们定义两个动态规划数组，分别用来存储每个状态的最小能量消耗。具体来说，我们考虑每个位置的每个时间点，检查所有可能的前一个状态，计算从前一个状态转移到当前状态所需的最小能量，并更新当前状态的最小能量。这个过程涉及到位运算和状态压缩，是一个较为复杂的动态规划问题。</p>
+                                <p>时间复杂度: O(P * (2^T)^2)</p>
+                                <p>空间复杂度: O(2^T)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def defendSpaceCity(self, time: List[int], position: List[int]) -&gt; int:
+        # Initialize rain impact array based on the positions and times
+        rain = [0] * (max(position) + 1)
+        maxT = max(time)
+        for t, p in zip(time, position):
+            rain[p] |= 1 &lt;&lt; (t - 1)
+
+        # Precompute the single and maintain costs for all bitmask states
+        mT = 1 &lt;&lt; maxT
+        u = [0] * mT
+        s = [0] * mT
+        for mask in range(1, mT):
+            lb = mask &amp; -mask
+            mask1 = mask ^ lb
+            lb2 = mask1 &amp; -mask1
+            u[mask] = u[mask1] + (1 if (lb &lt;&lt; 1) == lb2 else 3)
+            s[mask] = s[mask1] + (1 if (lb &lt;&lt; 1) == lb2 else 2)
+
+        # Dynamic programming over states
+        states, states1 = [float(&#39;inf&#39;)] * mT, [float(&#39;inf&#39;)] * mT
+        states[0] = u[0] + s[(mT - 1) ^ rain[0]]
+        for rainMask in rain[1:]:
+            for mask in range(mT):
+                states1[mask] = float(&#39;inf&#39;)
+                pre = m = (mT - 1) ^ mask
+                while True:
+                    cost = states[pre] + u[mask] + s[(m ^ pre) &amp; rainMask]
+                    states1[mask] = min(states1[mask], cost)
+                    if pre == 0: break
+                    pre = (pre - 1) &amp; m
+            states, states1 = states1, states
+        return states[0]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在计算从前一个状态到当前状态的能量消耗时，使用了两个动态规划数组&#39;states&#39;和&#39;states1&#39;进行交替更新？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种动态规划问题中，使用两个数组&#39;states&#39;和&#39;states1&#39;进行交替更新是为了避免在更新过程中覆盖或混淆前一个时间点的状态值。在每一轮计算中，一个数组用于保存当前时间点的最小能量消耗值，而另一个数组保存上一个时间点的值。这样，我们可以保证在计算当前状态的最小能量时，有一个准确且未被修改的前一个状态参考，从而确保动态规划的正确性和效率。在每个时间点的计算完成后，两个数组的角色会交换，以准备下一个时间点的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理状态转移时，代码中的&#39;pre = (pre - 1) &amp; m&#39;这一行是如何工作的，它的逻辑和目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这行代码用于生成当前状态掩码&#39;m&#39;的所有可能的子掩码，它是状态压缩动态规划中常见的技术，用于遍历所有子集。在这个特定的代码中，&#39;pre&#39;变量初始化为&#39;m&#39;的补码（即所有未被当前掩码覆盖的位都被设置为1），然后递减&#39;pre&#39;并与&#39;m&#39;进行按位与操作，这样可以确保只考虑&#39;m&#39;的有效位。这种操作可以生成&#39;m&#39;的所有子集，包括空集，从而允许我们在动态规划中考虑所有可能的前一个状态。每次循环生成的&#39;pre&#39;都是&#39;m&#39;的一个有效子集，直到&#39;pre&#39;变为0，即不包含任何有效位，循环结束。这种方法有效地利用位操作来遍历子集，从而提高状态转移的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/EJvmW4')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/EJvmW4/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

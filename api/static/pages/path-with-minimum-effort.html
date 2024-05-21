@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小体力消耗路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小体力消耗路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你准备参加一场远足活动。给你一个二维 <code>rows x columns</code> 的地图 <code>heights</code> ，其中 <code>heights[row][col]</code> 表示格子 <code>(row, col)</code> 的高度。一开始你在最左上角的格子 <code>(0, 0)</code> ，且你希望去最右下角的格子 <code>(rows-1, columns-1)</code> （注意下标从 <strong>0</strong> 开始编号）。你每次可以往 <strong>上</strong>，<strong>下</strong>，<strong>左</strong>，<strong>右</strong> 四个方向之一移动，你想要找到耗费 <strong>体力</strong> 最小的一条路径。</p>
+
+<p>一条路径耗费的 <strong>体力值</strong> 是路径上相邻格子之间 <strong>高度差绝对值</strong> 的 <strong>最大值</strong> 决定的。</p>
+
+<p>请你返回从左上角走到右下角的最小<strong> 体力消耗值</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/10/25/ex1.png" style="width: 300px; height: 300px;" /></p>
+
+<pre>
+<b>输入：</b>heights = [[1,2,2],[3,8,2],[5,3,5]]
+<b>输出：</b>2
+<b>解释：</b>路径 [1,3,5,3,5] 连续格子的差值绝对值最大为 2 。
+这条路径比路径 [1,2,2,2,5] 更优，因为另一条路径差值最大值为 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/10/25/ex2.png" style="width: 300px; height: 300px;" /></p>
+
+<pre>
+<b>输入：</b>heights = [[1,2,3],[3,8,4],[5,3,5]]
+<b>输出：</b>1
+<b>解释：</b>路径 [1,2,3,4,5] 的相邻格子差值绝对值最大为 1 ，比路径 [1,3,5,3,5] 更优。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/10/25/ex3.png" style="width: 300px; height: 300px;" />
+<pre>
+<b>输入：</b>heights = [[1,2,1,1,1],[1,2,1,2,1],[1,2,1,2,1],[1,2,1,2,1],[1,1,1,2,1]]
+<b>输出：</b>0
+<b>解释：</b>上图所示路径不需要消耗任何体力。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>rows == heights.length</code></li>
+	<li><code>columns == heights[i].length</code></li>
+	<li><code>1 <= rows, columns <= 100</code></li>
+	<li><code>1 <= heights[i][j] <= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 334 ms</p>
+                    <p>内存: 17.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumEffortPath(self, heights: List[List[int]]) -&gt; int:
+        moves = [[-1,0],[1,0],[0,-1],[0,1]]
+        n, m = len(heights), len(heights[0])
+        visited = [[False] * m for _ in range(n)]
+        dps = [[inf] * m for _ in range(n)]
+        dps[n - 1][m - 1] = 0
+        heap = [[0,n - 1, m - 1]]
+        while heap:
+            s,y,x = heappop(heap)
+            if visited[y][x]: continue
+            visited[y][x] = True
+            if y == x == 0: break
+            for addY, addX in moves:
+                yy, xx = y + addY, x + addX
+                if yy &lt; 0 or yy &gt;= n or xx &lt; 0 or xx &gt;= m or visited[yy][xx]: continue
+                cs = max(abs(heights[y][x] - heights[yy][xx]), s)
+                if dps[yy][xx] &lt;= cs: continue
+                dps[yy][xx] = cs
+                heappush(heap, [cs,yy, xx])
+        return dps[0][0]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用的是一个优化的 Dijkstra 算法，通过一个最小堆来维持当前探索的路径中的最大高度差的最小值。首先，定义一个二维数组 `dps` 来存储到每个点的最小体力消耗值，并初始化终点的体力消耗值为0。使用优先队列（最小堆）来按体力消耗递增的顺序处理每个格子。对于当前格子，我们检查它的四个邻居，如果这个邻居没有被访问过，并且通过当前格子到该邻居的路径可以得到更小的体力消耗值，我们就更新邻居的体力消耗值，并将其加入堆中。这个过程重复，直到堆为空，或者我们访问到起点。最终，起点的 `dps` 值就是我们要找的答案。</p>
+                                <p>时间复杂度: O((MN) * log(MN))</p>
+                                <p>空间复杂度: O(MN)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumEffortPath(self, heights: List[List[int]]) -&gt; int:
+        moves = [[-1,0],[1,0],[0,-1],[0,1]]  # 定义上下左右四个移动方向
+        n, m = len(heights), len(heights[0])  # 地图的行数和列数
+        visited = [[False] * m for _ in range(n)]  # 访问标记数组
+        dps = [[inf] * m for _ in range(n)]  # 存储到每个节点的最小体力消耗
+        dps[n - 1][m - 1] = 0  # 终点的消耗初始化为0
+        heap = [[0,n - 1, m - 1]]  # 堆初始化，从终点开始
+        while heap:  # 当堆不为空时执行
+            s,y,x = heappop(heap)  # 弹出最小消耗的节点
+            if visited[y][x]: continue  # 如果该节点已访问，则跳过
+            visited[y][x] = True  # 标记当前节点为已访问
+            if y == x == 0: break  # 如果到达起点，则结束循环
+            for addY, addX in moves:  # 检查四个方向的邻居
+                yy, xx = y + addY, x + addX  # 计算邻居的坐标
+                if yy &lt; 0 or yy &gt;= n or xx &lt; 0 or xx &gt;= m or visited[yy][xx]: continue  # 如果邻居越界或已访问，则跳过
+                cs = max(abs(heights[y][x] - heights[yy][xx]), s)  # 计算到该邻居的体力消耗
+                if dps[yy][xx] &lt;= cs: continue  # 如果当前计算的消耗不优于已有的，则跳过
+                dps[yy][xx] = cs  # 更新到邻居的最小体力消耗
+                heappush(heap, [cs,yy, xx])  # 将邻居加入堆中
+        return dps[0][0]  # 返回起点的最小体力消耗</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在该算法中，如何保证每次从堆中弹出的节点确实是当前路径中体力消耗最小的节点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在优化的Dijkstra算法中，使用最小堆（或优先队列）确保每次从堆中弹出的是具有最小体力消耗值的节点。堆的性质是保证堆顶元素是堆中最小的元素，因此每次从堆中弹出的节点是当前所有待处理节点中体力消耗值最小的。这种结构自然而然地按照体力消耗值的升序来处理节点，从而确保探索过程是贪心地选择最小体力消耗的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            优化的 Dijkstra 算法在处理每个节点时如何确定是否需要更新邻居节点的体力消耗值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在优化的Dijkstra算法中，对于当前节点的每个邻居，算法首先计算从当前节点到该邻居节点通过直接路径的体力消耗值。如果这个新计算的体力消耗值小于邻居节点在dps数组中已存储的体力消耗值，则更新邻居节点的体力消耗值，并将邻居节点加入到堆中以便进一步探索。这样的更新确保了只有当找到一条更优（即体力消耗更小）的路径到达该邻居时，才对其进行更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法实现中提到了`如果当前计算的消耗不优于已有的，则跳过`，请问这种情况下的&#39;不优于&#39;是如何定义的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>&#39;不优于&#39;在本算法中意味着新计算的体力消耗值不小于在dps数组中已经记录的到那个节点的体力消耗值。换句话说，如果通过当前节点到达其邻居的体力消耗值大于或等于已知到达该邻居的最小体力消耗值，则无需更新，因为这不会改善到达那个邻居的最优路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在实现中初始化堆时，只将终点（`[0, n-1, m-1]`）加入堆中，而不是起点或其他任何点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题解中，算法从终点开始反向寻找到起点的最小体力消耗路径。这是一种常见的路径搜索优化技术，特别是在目标导向的路径搜索中，从终点开始可以更直接地探索到起点的最优路径。初始化堆时将终点加入是为了从终点开始这一反向搜索，堆中的元素代表当前待处理的节点，其体力消耗值初始化为0，因为从终点到终点的消耗自然是0。这样做有助于简化算法逻辑和实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/path-with-minimum-effort')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/path-with-minimum-effort/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

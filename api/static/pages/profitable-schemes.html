@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>盈利计划</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>盈利计划</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>集团里有 <code>n</code> 名员工，他们可以完成各种各样的工作创造利润。</p>
+
+<p>第 <code>i</code> 种工作会产生 <code>profit[i]</code> 的利润，它要求 <code>group[i]</code> 名成员共同参与。如果成员参与了其中一项工作，就不能参与另一项工作。</p>
+
+<p>工作的任何至少产生 <code>minProfit</code> 利润的子集称为 <strong>盈利计划</strong> 。并且工作的成员总数最多为 <code>n</code> 。</p>
+
+<p>有多少种计划可以选择？因为答案很大，所以<strong> 返回结果模 </strong><code>10^9 + 7</code><strong> 的值</strong>。</p>
+
+<div class="original__bRMd">
+<div>
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, minProfit = 3, group = [2,2], profit = [2,3]
+<strong>输出：</strong>2
+<strong>解释：</strong>至少产生 3 的利润，该集团可以完成工作 0 和工作 1 ，或仅完成工作 1 。
+总的来说，有两种计划。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 10, minProfit = 5, group = [2,3,5], profit = [6,7,8]
+<strong>输出：</strong>7
+<strong>解释：</strong>至少产生 5 的利润，只要完成其中一种工作就行，所以该集团可以完成任何工作。
+有 7 种可能的计划：(0)，(1)，(2)，(0,1)，(0,2)，(1,2)，以及 (0,1,2) 。</pre>
+</div>
+</div>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= n <= 100</code></li>
+	<li><code>0 <= minProfit <= 100</code></li>
+	<li><code>1 <= group.length <= 100</code></li>
+	<li><code>1 <= group[i] <= 100</code></li>
+	<li><code>profit.length == group.length</code></li>
+	<li><code>0 <= profit[i] <= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 307 ms</p>
+                    <p>内存: 16.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def profitableSchemes(self, n: int, minProfit: int, group: List[int], profit: List[int]) -&gt; int:
+        mod = 10 ** 9 + 7
+
+        # 容斥原理 g &lt;= n, p &gt;= minProfit的组合个数为 g&lt;=n的个数减去g&lt;=n,p &lt; minProft的个数
+        # 先求 g&lt;=n 的组合数
+        dp1 = [0] * (n+1)
+        dp1[0] = 1
+        for g in group:
+            for i in range(n,g-1,-1):
+                dp1[i] += dp1[i-g]
+        # p &lt; minProfit的组合数为0
+        if not minProfit:
+            return sum(dp1) % mod
+        
+        # 求 g &lt;= n, p &lt; minProfit的组合数
+        dp2 = [[0] * minProfit for _ in range(n+1)]
+        dp2[0][0] = 1
+        for g,p in zip(group, profit):
+            for i in range(n,g-1,-1):
+                for j in range(minProfit-1,p-1,-1):
+                    dp2[i][j] += dp2[i-g][j-p]
+        return (sum(dp1) - sum(sum(dp2[i]) for i in range(n+1))) % mod
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划和容斥原理。首先使用动态规划求出员工数不超过n的所有组合数，然后再求出利润小于minProfit的组合数。最后根据容斥原理，用员工数不超过n的组合数减去利润小于minProfit的组合数，得到员工数不超过n且利润不小于minProfit的组合数。</p>
+                                <p>时间复杂度: O(n^2+n*minProfit)</p>
+                                <p>空间复杂度: O(n*minProfit)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def profitableSchemes(self, n: int, minProfit: int, group: List[int], profit: List[int]) -&gt; int:
+        mod = 10 ** 9 + 7
+
+        # 容斥原理 g &lt;= n, p &gt;= minProfit的组合个数为 g&lt;=n的个数减去g&lt;=n,p &lt; minProft的个数
+        # 先求 g&lt;=n 的组合数
+        dp1 = [0] * (n+1)
+        dp1[0] = 1
+        for g in group:
+            for i in range(n,g-1,-1):
+                dp1[i] += dp1[i-g]
+        # p &lt; minProfit的组合数为0
+        if not minProfit:
+            return sum(dp1) % mod
+        
+        # 求 g &lt;= n, p &lt; minProfit的组合数
+        dp2 = [[0] * minProfit for _ in range(n+1)]
+        dp2[0][0] = 1
+        for g,p in zip(group, profit):
+            for i in range(n,g-1,-1):
+                for j in range(minProfit-1,p-1,-1):
+                    dp2[i][j] += dp2[i-g][j-p]
+        return (sum(dp1) - sum(sum(dp2[i]) for i in range(n+1))) % mod</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划的实现中，dp1数组初始化为dp1[0] = 1的原理是什么？其他位置为什么初始化为0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，dp1数组用于计算不同的员工组合数，其中dp1[i]代表使用i个员工可以形成的组合数。初始化dp1[0] = 1是因为使用0名员工只有一种情况，即不使用任何员工。这是组合计算的基础，用于在后续迭代中累加新的员工组合。其他位置初始化为0的原因是，这些位置代表的是初始状态下使用相应数量的员工的组合数是未知的，因此从0开始计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于dp1数组中的更新操作`dp1[i] += dp1[i-g]`，这里的逻辑是如何确保不会重复计算同一组工作人员的不同组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新dp1数组时，使用了从后向前的更新方式（即从n到g）。这种更新顺序确保在计算dp1[i]时，加入的dp1[i-g]是在没有考虑当前员工组g之前的状态，从而避免了组合的重复计算。这样的迭代顺序确保每种组合只被计算一次，防止同一组员工在同一轮更新中被重复考虑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理`dp2`数组时，为什么要从后向前更新，即对于内层循环为什么是`range(minProfit-1, p-1, -1)`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp2数组负责计算在员工数不超过n且利润小于minProfit的组合数。在更新时从后向前（即从minProfit-1到p），是为了确保在更新当前利润j的组合数时，所引用的dp2[i-g][j-p]是未加入当前利润p之前的状态。这种从大到小的更新防止了当前轮次内的重复计算，确保每种利润组合都是基于前一状态的结果，避免了重复计算的错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到的容斥原理具体是如何应用的，在这个问题中它起到了什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>容斥原理在这个问题中被用来计算最终符合条件的组合数。具体来说，首先计算所有可能的组合数（即员工数不超过n的组合数），然后计算不符合利润要求（即利润小于minProfit的组合数）。根据容斥原理，最终符合条件的组合数等于总的可能组合数减去不符合利润要求的组合数。这样可以有效地从所有可能的组合中排除那些不满足利润条件的情况，得到精确的符合要求的组合总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/profitable-schemes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/profitable-schemes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

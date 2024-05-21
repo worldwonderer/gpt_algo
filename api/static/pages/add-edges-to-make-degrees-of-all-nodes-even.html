@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>添加边使所有节点度数都为偶数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>添加边使所有节点度数都为偶数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个有 <code>n</code>&nbsp;个节点的 <strong>无向</strong>&nbsp;图，节点编号为&nbsp;<code>1</code>&nbsp;到&nbsp;<code>n</code>&nbsp;。再给你整数&nbsp;<code>n</code>&nbsp;和一个二维整数数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>]</code>&nbsp;表示节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code>&nbsp;之间有一条边。图不一定连通。</p>
+
+<p>你可以给图中添加 <strong>至多</strong>&nbsp;两条额外的边（也可以一条边都不添加），使得图中没有重边也没有自环。</p>
+
+<p>如果添加额外的边后，可以使得图中所有点的度数都是偶数，返回&nbsp;<code>true</code>&nbsp;，否则返回&nbsp;<code>false</code>&nbsp;。</p>
+
+<p>点的度数是连接一个点的边的数目。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/26/agraphdrawio.png" style="width: 500px; height: 190px;" /></p>
+
+<pre>
+<b>输入：</b>n = 5, edges = [[1,2],[2,3],[3,4],[4,2],[1,4],[2,5]]
+<b>输出：</b>true
+<b>解释：</b>上图展示了添加一条边的合法方案。
+最终图中每个节点都连接偶数条边。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/26/aagraphdrawio.png" style="width: 400px; height: 120px;" /></p>
+
+<pre>
+<b>输入：</b>n = 4, edges = [[1,2],[3,4]]
+<b>输出：</b>true
+<b>解释：</b>上图展示了添加两条边的合法方案。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/26/aaagraphdrawio.png" style="width: 150px; height: 158px;" /></p>
+
+<pre>
+<b>输入：</b>n = 4, edges = [[1,2],[1,3],[1,4]]
+<b>输出：</b>false
+<b>解释：</b>无法添加至多 2 条边得到一个符合要求的图。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>2 &lt;= edges.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>1 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt;= n</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li>图中不会有重边</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 180 ms</p>
+                    <p>内存: 48.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isPossible(self, n: int, edges: List[List[int]]) -&gt; bool:
+        m = len(edges)
+        count = {}
+        for i in range(m):
+            u, v = edges[i][0], edges[i][1]
+            if u in count:
+                count[u] += 1
+            else:
+                count[u] = 1
+            if v in count:
+                count[v] += 1
+            else:
+                count[v] = 1
+        odd = []
+        for k in count:
+            if count[k] == n-1 and count[k] % 2 == 1:
+                return False
+            elif count[k] % 2 == 1:
+                odd.append(k)
+        print(odd, count)
+        if len(odd) &gt; 4 or len(odd) % 2 == 1:
+            return False
+        if len(odd) == 0:
+            return True
+        elif len(odd) == 2:
+            if not [odd[0], odd[1]] in edges and not [odd[1], odd[0]] in edges:
+                return True
+            for i in range(1,n+1):
+                if i in odd:
+                    continue
+                else:
+                    if not [odd[0], i] in edges and not [i, odd[0]] in edges and \
+                        not [odd[1], i] in edges and not [i, odd[1]] in edges:
+                        return True
+            return False
+        else:
+            l = 0
+            for i in range(1, 4):
+                a = [odd[0], odd[i]]
+                b = [odd[j] for j in range(1,4) if odd[j] not in a]
+                if not [a[0], a[1]] in edges and not [a[1], a[0]] in edges and \
+                    not [b[0], b[1]] in edges and not [b[1], b[0]] in edges:
+                    return True
+            return False
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是首先统计每个节点的度数，然后根据度数的奇偶性来判断是否可以通过添加边使得所有节点的度数都变为偶数。具体来说，如果某个节点的度数等于n-1且为奇数，则无法通过添加边使其变为偶数，直接返回False。然后将所有度数为奇数的节点收集起来，如果奇数节点的个数大于4或为奇数，则无法通过添加边使得所有节点的度数都变为偶数，返回False。如果没有奇数节点，则不需要添加边，返回True。如果有两个奇数节点，检查是否可以通过添加一条边使得这两个节点的度数都变为偶数。如果有四个奇数节点，检查是否可以通过添加两条边使得这四个节点的度数都变为偶数。</p>
+                                <p>时间复杂度: O(m+n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isPossible(self, n: int, edges: List[List[int]]) -&gt; bool:
+        m = len(edges)
+        count = {}
+        for i in range(m):
+            u, v = edges[i][0], edges[i][1]
+            count[u] = count.get(u, 0) + 1
+            count[v] = count.get(v, 0) + 1
+        odd = []
+        for k in count:
+            if count[k] == n-1 and count[k] % 2 == 1:
+                return False
+            elif count[k] % 2 == 1:
+                odd.append(k)
+        if len(odd) &gt; 4 or len(odd) % 2 == 1:
+            return False
+        if len(odd) == 0:
+            return True
+        elif len(odd) == 2:
+            if not [odd[0], odd[1]] in edges and not [odd[1], odd[0]] in edges:
+                return True
+            for i in range(1,n+1):
+                if i in odd:
+                    continue
+                else:
+                    if not [odd[0], i] in edges and not [i, odd[0]] in edges and \
+                        not [odd[1], i] in edges and not [i, odd[1]] in edges:
+                        return True
+            return False
+        else:
+            for i in range(1, 4):
+                a = [odd[0], odd[i]]
+                b = [odd[j] for j in range(1,4) if odd[j] not in a]
+                if not [a[0], a[1]] in edges and not [a[1], a[0]] in edges and \
+                    not [b[0], b[1]] in edges and not [b[1], b[0]] in edges:
+                    return True
+            return False
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，如果节点的度数为n-1且为奇数就返回False，这种处理方式的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在一个有n个节点的图中，若某个节点的度数为n-1且为奇数时，表示该节点与图中其他所有节点都有连接。因为图中共有n个节点，去除自身后，与该节点连接的节点数为n-1，如果n-1是奇数，则n必然是偶数。为了使该节点的度数变为偶数，需要再添加一个边连接该节点，但是已经与所有其他节点连通，无法增加新的边。因此，无法通过添加边使其度数变为偶数，所以返回False。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解里提到，如果奇数节点的个数大于4或为奇数，则无法通过添加边使所有节点度数变为偶数。为什么是这样的规则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>每添加一条边，会影响两个节点的度数。因此，添加边只能改变两个节点的度数奇偶性。如果奇数节点的总数为奇数，则无论如何添加边，都会剩下至少一个奇数度数的节点，因为每次操作改变的是两个节点的状态。如果奇数节点大于4，虽然可以通过多次添加边改变奇偶性，但处理和确保最终所有节点度数都为偶数的复杂性和可能性会随着奇数节点数量的增加而降低。通常情况下，如果奇数节点数量超过4，要通过多步骤的边添加来平衡度数会变得复杂和不切实际。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于有两个奇数度数的节点，题解考虑了直接连接它们，如果已存在边则尝试通过第三个节点连接。这种方法可能会有哪些潜在问题或限制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>尽管直接连接两个奇数度数的节点是解决问题的简单有效方法，但当这两个节点之间已经存在边时，直接连接不会改变它们的度数奇偶性。此外，尝试通过第三个节点连接这两个奇数节点意味着需要找到两个不与这两个奇数节点相连的其他节点，这可能在密集连接的图中不可行。如果大部分节点都已高度连接，找到这样的第三个节点会很困难，限制了这种方法的适用性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解尝试通过添加两条边来解决四个奇数度数节点的情况，但只考虑了一种特定的两两配对方式。是否存在其他有效的配对方式，这样的配对对算法是否有影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中考虑的是一种特定的配对方式，即首先选择一个节点与其他三个中的一个进行配对，然后将剩下的两个节点配对。虽然这种方法可能有效，但存在其他配对可能性，如完全不同的两两配对方案，可能会在某些情况下更有效或简单。未考虑所有可能的配对方式可能导致某些可行的解决方案被忽略。此外，算法的效率和简洁性可能因为需要检查多种配对方式而受到影响，增加了算法的复杂度和运行时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/add-edges-to-make-degrees-of-all-nodes-even')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/add-edges-to-make-degrees-of-all-nodes-even/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

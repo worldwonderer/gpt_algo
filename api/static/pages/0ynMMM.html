@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>柱状图中最大的矩形</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>柱状图中最大的矩形</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定非负整数数组 <code>heights</code>&nbsp;，数组中的数字用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 <code>1</code> 。</p>
+
+<p>求在该柱状图中，能够勾勒出来的矩形的最大面积。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/01/04/histogram.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>heights = [2,1,5,6,2,3]
+<strong>输出：</strong>10
+<strong>解释：</strong>最大的矩形为图中红色区域，面积为 10
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/01/04/histogram-1.jpg" /></p>
+
+<pre>
+<strong>输入：</strong> heights = [2,4]
+<b>输出：</b> 4</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= heights.length &lt;=10<sup>5</sup></code></li>
+	<li><code>0 &lt;= heights[i] &lt;= 10<sup>4</sup></code></li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 84&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/largest-rectangle-in-histogram/">https://leetcode-cn.com/problems/largest-rectangle-in-histogram/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 122 ms</p>
+                    <p>内存: 26.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def largestRectangleArea(self, heights: List[int]) -&gt; int:
+
+        heights.insert(0, 0)
+        heights.append(0)
+        stack = [0]
+        ans = 0
+        for i in range(1, len(heights)):
+            if heights[i] &gt; heights[stack[-1]]:
+                stack.append(i)
+            elif heights[i] == heights[stack[-1]]:
+                stack.pop()
+                stack.append(i)
+            else:
+                while heights[stack[-1]] &gt; heights[i]:
+                    top_idx = stack.pop()
+                    left = stack[-1]
+                    width = i - left - 1
+                    ans = max(ans, heights[top_idx] * width)
+                stack.append(i)
+        return ans </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用单调栈的方法来解决问题。首先，在数组的开始和结束位置分别添加一个高度为0的柱子，以便处理边界条件。维护一个单调递增的栈，栈中存储的是柱子的索引。遍历输入数组中的每个柱子，当当前柱子的高度大于栈顶元素对应的柱子高度时，直接将当前索引入栈。如果相等，替换栈顶元素。如果当前柱子的高度小于栈顶元素对应的柱子的高度，则持续将栈顶元素弹出，并计算以该栈顶元素为高度的矩形面积，直到栈顶元素的高度小于或等于当前柱子的高度。计算矩形的宽度为当前索引与新的栈顶元素的索引之间的差减一。每次计算完面积后，更新最大面积。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def largestRectangleArea(self, heights: List[int]) -&gt; int:
+
+        # 在数组前后添加高度为0的柱子，处理边界条件
+        heights.insert(0, 0)
+        heights.append(0)
+        # 初始化栈，并将第一个元素（高度为0）的索引入栈
+        stack = [0]
+        ans = 0
+        # 遍历所有的柱子
+        for i in range(1, len(heights)):
+            # 当前柱子高度大于栈顶柱子高度，直接入栈
+            if heights[i] &gt; heights[stack[-1]]:
+                stack.append(i)
+            # 当前柱子高度等于栈顶柱子高度，替换栈顶
+            elif heights[i] == heights[stack[-1]]:
+                stack.pop()
+                stack.append(i)
+            # 当前柱子高度小于栈顶柱子高度，计算可能的最大矩形面积
+            else:
+                while heights[stack[-1]] &gt; heights[i]:
+                    top_idx = stack.pop()
+                    left = stack[-1]
+                    width = i - left - 1
+                    ans = max(ans, heights[top_idx] * width)
+                stack.append(i)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解题思路中需要在数组的开始和结束位置分别添加一个高度为0的柱子？这样做有什么特殊的作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数组的开始和结束位置添加高度为0的柱子主要是为了简化边界条件的处理。这样做确保了无论柱状图的高度如何变化，所有的柱子都可以在遍历结束时被正确地处理。具体来说，添加在开始位置的0高度柱子保证了栈的初始化状态，而结尾位置的0高度柱子则确保最后一个真正的柱子可以被计算（因为任何大于0的高度都会被弹出处理）。这两个边界柱子作为哨兵，简化了代码逻辑，避免了在循环中对栈空状态的额外检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            单调栈中为什么选择维护一个单调递增的栈而不是单调递减的栈？这样的选择对算法的效果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调递增栈的选择允许我们在遍历时，一旦遇到比栈顶元素小的柱子高度，就可以立即计算以栈顶元素为高度的最大矩形面积。因为在单调递增栈中，每个元素的左边界是确定的，即其前一个元素。这样，当某个高度弹出栈时，我们可以确定这个高度的有效宽度，从而快速计算出以该高度为顶的最大矩形面积。如果使用单调递减栈，则在弹栈时难以确定左边界，因此会增加解题的复杂度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在遍历过程中，如果当前柱子高度等于栈顶柱子高度时，为什么要替换栈顶元素而不是保留原栈顶元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当当前柱子的高度等于栈顶柱子的高度时，替换栈顶元素的目的是更新可能的最长宽度的起始位置。如果保留原栈顶元素，那么之后计算宽度时会使用错误的起始索引（即更早的索引），这可能导致宽度被错误地延伸，从而计算出错误的面积。替换成当前的索引能确保，如果后续有相同高度的柱子继续处理，它们的宽度计算是基于最新的、正确的起始位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/0ynMMM')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/0ynMMM/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

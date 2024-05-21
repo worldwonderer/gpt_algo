@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>公平分发饼干</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>公平分发饼干</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>cookies</code> ，其中 <code>cookies[i]</code> 表示在第 <code>i</code> 个零食包中的饼干数量。另给你一个整数 <code>k</code> 表示等待分发零食包的孩子数量，<strong>所有</strong> 零食包都需要分发。在同一个零食包中的所有饼干都必须分发给同一个孩子，不能分开。</p>
+
+<p>分发的 <strong>不公平程度</strong> 定义为单个孩子在分发过程中能够获得饼干的最大总数。</p>
+
+<p>返回所有分发的最小不公平程度。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>cookies = [8,15,10,20,8], k = 2
+<strong>输出：</strong>31
+<strong>解释：</strong>一种最优方案是 [8,15,8] 和 [10,20] 。
+- 第 1 个孩子分到 [8,15,8] ，总计 8 + 15 + 8 = 31 块饼干。
+- 第 2 个孩子分到 [10,20] ，总计 10 + 20 = 30 块饼干。
+分发的不公平程度为 max(31,30) = 31 。
+可以证明不存在不公平程度小于 31 的分发方案。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>cookies = [6,1,3,2,2,4,1,2], k = 3
+<strong>输出：</strong>7
+<strong>解释：</strong>一种最优方案是 [6,1]、[3,2,2] 和 [4,1,2] 。
+- 第 1 个孩子分到 [6,1] ，总计 6 + 1 = 7 块饼干。 
+- 第 2 个孩子分到 [3,2,2] ，总计 3 + 2 + 2 = 7 块饼干。
+- 第 3 个孩子分到 [4,1,2] ，总计 4 + 1 + 2 = 7 块饼干。
+分发的不公平程度为 max(7,7,7) = 7 。
+可以证明不存在不公平程度小于 7 的分发方案。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= cookies.length &lt;= 8</code></li>
+	<li><code>1 &lt;= cookies[i] &lt;= 10<sup>5</sup></code></li>
+	<li><code>2 &lt;= k &lt;= cookies.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 45 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def distributeCookies(self, cookies: List[int], k: int) -&gt; int:
+        cookies.sort()  # 对 cookies进行降序排序，提高效率
+        n = len(cookies)
+        ans = float(&#34;inf&#34;)
+
+        def dfs(buckets):
+            nonlocal ans
+            # 更新答案
+            if not cookies:
+                ans = min(max(buckets), ans)
+                return
+
+            #     # 如果剩下饼干不够分
+            # if len(cookies) &lt; sum(1 for i in buckets if not i):
+            #     return
+
+            # 如果当前buckets中最大的饼干数大于当前答案
+            if max(buckets) &gt;= ans:
+                return
+
+            # 尝试把当前饼干给小朋友
+            cookie = cookies.pop()
+            for i in range(k):
+                # 第一块饼干给哪个小朋友结果都一样
+                # if len(cookies) == (n-1) and i &gt; 0:
+                #     return
+                # 回溯
+                buckets[i] += cookie
+                dfs(buckets)
+                buckets[i] -= cookie
+            cookies.append(cookie)
+            return
+
+        buckets = [0 for _ in range(k)]
+        dfs(buckets)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了深度优先搜索(DFS)的策略来分配饼干，以找到最小不公平程度。首先，对饼干数组进行排序，以便尝试优先分配较大的饼干，从而可能更快地达到递归终止条件。在DFS函数中，尝试将当前饼干分配给不同的孩子，每次分配后，继续进行深入搜索，直到所有饼干都被分配。搜索过程中，通过比较当前已分配的最大饼干数与全局最小不公平程度，可以提前剪枝，避免无意义的搜索。DFS结束后，返回全局最小不公平程度。</p>
+                                <p>时间复杂度: O(k^n)</p>
+                                <p>空间复杂度: O(n+k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def distributeCookies(self, cookies: List[int], k: int) -&gt; int:
+        cookies.sort(reverse=True)  # 将 cookies 进行降序排序
+        n = len(cookies)
+        ans = float(&#39;inf&#39;)
+
+        def dfs(buckets):
+            nonlocal ans
+            if not cookies:  # 如果饼干已经全部考虑完
+                ans = min(max(buckets), ans)  # 更新最小不公平程度
+                return
+            if max(buckets) &gt;= ans:  # 剪枝：当前最大饼干数已超过已知最小不公平程度
+                return
+            cookie = cookies.pop()  # 取出当前要分配的饼干
+            for i in range(k):
+                buckets[i] += cookie  # 尝试将饼干分配给第i个小朋友
+                dfs(buckets)  # 递归继续分配剩余饼干
+                buckets[i] -= cookie  # 回溯：撤销当前饼干的分配
+            cookies.append(cookie)  # 将饼干放回去，以供下一轮分配
+        buckets = [0 for _ in range(k)]  # 初始化每个小朋友的饼干数
+        dfs(buckets)  # 开始DFS搜索
+        return ans  # 返回最小不公平程度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS函数中，为什么在递归过程中需要检查`max(buckets) &gt;= ans`来进行剪枝？这样做的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS递归过程中，检查`max(buckets) &gt;= ans`的目的是为了提高算法的效率和减少不必要的计算。这个条件用于剪枝，意味着如果当前的最大饼干数已经超过了我们之前找到的最小不公平程度（`ans`），那么继续分配饼干只会使不公平程度更大，因此没有必要继续探索这个分支。这样的剪枝可以显著减少搜索空间，加快搜索速度，避免在已知不能提供更优解的情况下浪费计算资源。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到了每块饼干有k种分配方式，那么如何确保这种分配方式能覆盖所有可能的分配情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解通过对每块饼干在DFS中进行循环，考虑每一种可能的分给k个小孩的方式，可以确保所有可能的分配情况都被探索到。对于每块饼干，算法尝试将它分配给每一个小孩（即k种情况），并且这种分配是递归进行的，这意味着每一层递归都会考虑到所有可能的分配方式。由于每次递归都从所有小孩中选择一个来分配当前饼干，这种全面的探索确保了每一种分配组合都能被评估，覆盖了所有的分配情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解提到将饼干回溯放回去，这种回溯方法在DFS中如何确保状态的正确还原？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的回溯方法通过在分配饼干给某个小孩后，递归调用完成后撤销该操作，确保状态的正确还原。具体来说，每当一个饼干被分配给一个小孩时，该小孩的饼干数量会增加，进入下一层递归后，递归返回时会将该小孩的饼干数量减去同样的数值（撤销分配）。这样，状态就被还原到了分配该饼干之前的状态，确保了每次递归调用都从同一个状态开始分配不同的饼干或不同的分配方式。这种精确的状态控制是深度优先搜索中回溯步骤的关键，保证了算法的正确性和完整性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/fair-distribution-of-cookies')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/fair-distribution-of-cookies/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

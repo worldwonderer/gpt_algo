@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最后一块石头的重量 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最后一块石头的重量 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一堆石头，用整数数组&nbsp;<code>stones</code> 表示。其中&nbsp;<code>stones[i]</code> 表示第 <code>i</code> 块石头的重量。</p>
+
+<p>每一回合，从中选出<strong>任意两块石头</strong>，然后将它们一起粉碎。假设石头的重量分别为&nbsp;<code>x</code> 和&nbsp;<code>y</code>，且&nbsp;<code>x &lt;= y</code>。那么粉碎的可能结果如下：</p>
+
+<ul>
+	<li>如果&nbsp;<code>x == y</code>，那么两块石头都会被完全粉碎；</li>
+	<li>如果&nbsp;<code>x != y</code>，那么重量为&nbsp;<code>x</code>&nbsp;的石头将会完全粉碎，而重量为&nbsp;<code>y</code>&nbsp;的石头新重量为&nbsp;<code>y-x</code>。</li>
+</ul>
+
+<p>最后，<strong>最多只会剩下一块 </strong>石头。返回此石头 <strong>最小的可能重量 </strong>。如果没有石头剩下，就返回 <code>0</code>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>stones = [2,7,4,1,8,1]
+<strong>输出：</strong>1
+<strong>解释：</strong>
+组合 2 和 4，得到 2，所以数组转化为 [2,7,1,8,1]，
+组合 7 和 8，得到 1，所以数组转化为 [2,1,1,1]，
+组合 2 和 1，得到 1，所以数组转化为 [1,1,1]，
+组合 1 和 1，得到 0，所以数组转化为 [1]，这就是最优值。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>stones = [31,26,33,21,40]
+<strong>输出：</strong>5
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= stones.length &lt;= 30</code></li>
+	<li><code>1 &lt;= stones[i] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 21 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def lastStoneWeightII(self, stones: List[int]) -&gt; int:
+        total = sum(stones) 
+        odd = total &amp; 1
+        half = total // 2
+        v = 1 &lt;&lt; half
+        for s in stones:
+            v |= v &gt;&gt; s
+        for i in range(half+1):
+            if v &amp; 1:
+                return 2*i+odd
+            v = v &gt;&gt; 1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题可以转化为一个经典的动态规划问题。我们可以将问题理解为如何将石头分为两堆，使得这两堆石头的重量之差最小。这是一个类似于背包问题的变种，其中我们尝试找到总重量不超过总重量一半的最大重量。我们使用一个位向量来表示可以达到的重量，初始时只有重量0是可达的。对于每块石头，我们更新这个位向量，标记新的可达重量。最后，我们从最大可达重量开始向下检查，找到最接近总重量一半的值，这样可以保证两堆石头的重量差最小。</p>
+                                <p>时间复杂度: O(n * total/2)</p>
+                                <p>空间复杂度: O(total/2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def lastStoneWeightII(self, stones: List[int]) -&gt; int:
+        total = sum(stones)  # 计算石头总重量
+        odd = total &amp; 1  # 检查总重量的奇偶性
+        half = total // 2  # 计算总重量的一半
+        v = 1 &lt;&lt; half  # 初始化位向量，只有重量half可达
+        for s in stones:
+            v |= v &gt;&gt; s  # 更新位向量，标记通过当前石头可以达到的新重量
+        for i in range(half+1):
+            if v &amp; 1:  # 从最接近half的位置开始检查
+                return 2*i+odd  # 返回最小可能重量
+            v = v &gt;&gt; 1  # 向右移位，减少检查的重量</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到&#39;将问题转化为动态规划问题&#39;，请问是如何从原问题描述到动态规划这一转变的？具体是哪些逻辑使得这个问题可以看作是背包问题的变形？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>原问题是将一组石头分成两堆，使得它们的重量差最小。这可以转化为寻找一种分配方式，使得一堆石头的重量尽可能接近总重量的一半。如果我们设总重量为sum，那么目标是使其中一堆的重量接近sum/2，这就形成了一个背包问题：从给定的石头中选取若干块，使得它们的总重量不超过sum/2的同时尽可能大。这是一个典型的0/1背包问题，因为每块石头只能选择或不选择（即0或1）。动态规划在这里适用，因为我们可以通过小问题的最优解构建大问题的最优解，即从已知小重量的最优组合推导出包含更多石头时的最优组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划解法中，位向量的更新操作`v |= v &gt;&gt; s`是如何工作的？能否详细解释这个操作如何帮助追踪可达的重量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划解法中使用位向量`v`来表示达到某个重量是否可能。位向量的每个位代表一个重量，如果某位是1，则表示该重量可达。初始化时，只有重量0是可达的，因此位向量只在最低位为1。当加入一块石头重量`s`时，原有的可达重量集合通过向右移动`s`位来创建新的可达重量集合。这意味着，如果之前某个重量`w`可达（即`v`的第`w`位为1），那么加上这块石头后，重量`w+s`也将可达（即`v`的第`w+s`位也应设为1）。操作`v |= v &gt;&gt; s`是将原位向量向右移动`s`位，然后与原位向量进行逻辑或操作，从而更新位向量，使得所有通过添加当前石头能达到的新重量都被标记为可达。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解提到使用位向量来存储状态，这种方法与常规的动态规划数组有何不同？使用位向量有什么特别的优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位向量与常规的动态规划数组的主要区别在于空间效率。位向量通过每个二进制位来表示一个状态，因此相较于通常使用整数数组（其中每个数组元素通常占用至少4个字节）来存储状态的动态规划方法，位向量大大减少了内存占用。例如，一个常规的动态规划数组需要1000个整数来存储状态，则至少需要4000字节，而位向量只需要1000比特，大约125字节。此外，位向量的操作通常可以利用CPU的位操作指令，这可能在某些情况下提高运算效率。然而，位向量的缺点是它不如数组直观，且在某些情况下可能不容易处理更复杂的状态转移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/last-stone-weight-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/last-stone-weight-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

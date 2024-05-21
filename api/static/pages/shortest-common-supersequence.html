@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最短公共超序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最短公共超序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个字符串&nbsp;<code>str1</code> 和&nbsp;<code>str2</code>，返回同时以&nbsp;<code>str1</code>&nbsp;和&nbsp;<code>str2</code>&nbsp;作为 <strong>子序列</strong> 的最短字符串。如果答案不止一个，则可以返回满足条件的 <strong>任意一个</strong> 答案。</p>
+
+<p>如果从字符串 <code>t</code> 中删除一些字符（也可能不删除），可以得到字符串 <code>s</code> ，那么 <code>s</code> 就是 t 的一个子序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>str1 = "abac", str2 = "cab"
+<strong>输出：</strong>"cabac"
+<strong>解释：</strong>
+str1 = "abac" 是 "cabac" 的一个子串，因为我们可以删去 "cabac" 的第一个 "c"得到 "abac"。 
+str2 = "cab" 是 "cabac" 的一个子串，因为我们可以删去 "cabac" 末尾的 "ac" 得到 "cab"。
+最终我们给出的答案是满足上述属性的最短字符串。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>str1 = "aaaaaaaa", str2 = "aaaaaaaa"
+<strong>输出：</strong>"aaaaaaaa"
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= str1.length, str2.length &lt;= 1000</code></li>
+	<li><code>str1</code> 和&nbsp;<code>str2</code>&nbsp;都由小写英文字母组成。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 324 ms</p>
+                    <p>内存: 391.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def shortestCommonSupersequence(self, s1: str, s2: str) -&gt; str:
+        # 匹配最长子序列
+        l1,l2 = len(s1),len(s2)
+        dp = [[&#34;&#34;] * (l2 + 1) for  _ in range(l1 + 1)]
+        for i in range(l1 - 1, -1,-1):
+            for j in range(l2 - 1,-1,-1):
+                if s1[i] == s2[j]:
+                    dp[i][j] = s1[i]+ dp[i + 1][j + 1]
+                else:
+                    if len(dp[i + 1][j]) &gt;= len(dp[i][j + 1]):
+                        dp[i][j] = dp[i + 1][j]
+                    else:
+                        dp[i][j] = dp[i][j + 1]
+        print(dp[0][0])
+        s = dp[0][0]
+        # s = &#34;ab&#34;
+        ans = &#39;&#39;
+        i,j,k = 0,0,0
+        while i &lt; l1 and j &lt; l2 and k &lt; len(s):
+            if s[k] == s1[i] and s[k] == s2[j]:
+                ans += s[k]
+                i+=1
+                j+=1
+                k+=1
+                continue
+            if s[k] != s1[i]:
+                ans += s1[i]
+                i+=1
+            if s[k] != s2[j]:
+                ans += s2[j]
+                j += 1
+        while i &lt; l1:
+            ans += s1[i]
+            i+=1
+        while j &lt; l2:
+            ans += s2[j]
+            j+=1                
+        return ans
+
+        
+
+            
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用动态规划先找出两个字符串的最长公共子序列(LCS)，然后构建最短公共超序列(SCS)。首先，使用一个二维数组dp，其中dp[i][j]存储s1的前i个字符和s2的前j个字符的LCS。遍历两个字符串，填充dp数组。接着，根据dp数组的内容，从头到尾构建出SCS。在构建SCS的过程中，如果当前字符属于LCS，则添加这个字符到结果中，同时移动两个字符串的指针；如果不是，则分别添加两个字符串的当前字符，直到处理完所有字符。</p>
+                                <p>时间复杂度: O(l1 * l2)</p>
+                                <p>空间复杂度: O(l1 * l2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def shortestCommonSupersequence(self, s1: str, s2: str) -&gt; str:
+        # 初始化长度
+        l1, l2 = len(s1), len(s2)
+        # 创建动态规划表
+        dp = [[&#39;&#39;] * (l2 + 1) for _ in range(l1 + 1)]
+        # 填充dp表，计算LCS
+        for i in range(l1 - 1, -1, -1):
+            for j in range(l2 - 1, -1, -1):
+                if s1[i] == s2[j]:
+                    dp[i][j] = s1[i] + dp[i + 1][j + 1]
+                else:
+                    dp[i][j] = dp[i + 1][j] if len(dp[i + 1][j]) &gt;= len(dp[i][j + 1]) else dp[i][j + 1]
+        # 构建最短公共超序列
+        ans = &#39;&#39;
+        i, j, k = 0, 0, 0
+        while i &lt; l1 and j &lt; l2 and k &lt; len(dp[0][0]):
+            if s1[i] == dp[0][0][k] and s2[j] == dp[0][0][k]:
+                ans += dp[0][0][k]
+                i += 1
+                j += 1
+                k += 1
+            else:
+                if s1[i] != dp[0][0][k]:
+                    ans += s1[i]
+                    i += 1
+                if s2[j] != dp[0][0][k]:
+                    ans += s2[j]
+                    j += 1
+        # 添加剩余的字符
+        ans += s1[i:]
+        ans += s2[j:]
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划过程中，dp数组的维度是如何确定的，为什么选择使用二维数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp数组的维度是根据两个输入字符串s1和s2的长度来确定的。具体来说，如果s1长度为l1，s2长度为l2，则dp数组的维度为(l1+1)x(l2+1)。这样的维度选择可以保证dp[i][j]能够表示s1的前i个字符和s2的前j个字符的最长公共子序列。使用二维数组是因为这样可以方便地通过下标来访问和更新两个字符串的任意位置的LCS长度，同时便于实现二维动态规划算法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到构建SCS时，如果当前字符不属于LCS，则同时添加两个字符串的当前字符。这种做法是否可能导致结果不是最短的公共超序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据题解的方法，当当前字符不属于LCS时，确实会同时添加两个字符串的当前字符。这种做法可能会导致结果不是最短的公共超序列，因为它可能同时添加两个不同的字符，而不是选择其中一个字符来保持序列尽可能短。为了保证得到真正的最短公共超序列，应当在添加字符时更加谨慎地考虑哪个字符能够最有效地推进序列构建，而不是简单地同时添加两者。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算LCS时，为何选择从后向前遍历字符串进行动态规划填表，而不是从前向后？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算LCS时，从后向前遍历字符串可以更方便地利用后面已经计算好的结果来更新当前的dp值。这是因为每个dp[i][j]的值依赖于dp[i+1][j]、dp[i][j+1]和dp[i+1][j+1]的值。如果从后向前遍历，这些依赖的值在更新当前dp[i][j]时已经计算完毕，无需额外的存储空间来保存中间结果。这种方式可以减少计算中的冗余并优化空间使用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在构建最短公共超序列的过程中，如何处理两个字符串中的剩余字符，以确保最终结果符合题目要求？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建最短公共超序列的过程中，如果在完成LCS的字符添加后，某个或两个字符串还有剩余字符，则需要将这些剩余字符直接添加到结果字符串的末尾。这是因为这些剩余字符并没有在另一个字符串中找到对应的匹配，但它们是构成超序列的必要部分。添加剩余字符的顺序应当与原字符串中的顺序保持一致，以确保结果是正确的超序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/shortest-common-supersequence')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/shortest-common-supersequence/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

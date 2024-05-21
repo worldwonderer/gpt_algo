@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>计算右侧小于当前元素的个数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>计算右侧小于当前元素的个数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                        <a href="/problems?tag=merge-sort" class="badge bg-secondary tag-link">归并排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code><em> </em>，按要求返回一个新数组&nbsp;<code>counts</code><em> </em>。数组 <code>counts</code> 有该性质： <code>counts[i]</code> 的值是&nbsp; <code>nums[i]</code> 右侧小于&nbsp;<code>nums[i]</code> 的元素的数量。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [5,2,6,1]
+<strong>输出：</strong><code>[2,1,1,0] 
+<strong>解释：</strong></code>
+5 的右侧有 <strong>2 </strong>个更小的元素 (2 和 1)
+2 的右侧仅有 <strong>1 </strong>个更小的元素 (1)
+6 的右侧有 <strong>1 </strong>个更小的元素 (1)
+1 的右侧有 <strong>0 </strong>个更小的元素
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [-1]
+<strong>输出：</strong>[0]
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [-1,-1]
+<strong>输出：</strong>[0,0]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>4</sup> &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 561 ms</p>
+                    <p>内存: 35.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countSmaller(self, nums: List[int]) -&gt; List[int]:
+
+        bucket ={n:i for i, n in enumerate(sorted(set(nums)), start=1)}
+        n = len(bucket) + 1
+        tree = [0]*n
+
+
+        def prefix_sum(i):
+            ans = 0
+            while i &gt; 0:
+                ans += tree[i]
+                i = i &amp; (i-1)
+            return ans
+        def add(i):
+            while i &lt; n:
+                tree[i] += 1
+                i += (i &amp; -i)
+            
+        ans = []
+
+        for x in nums[::-1]:
+            i = bucket[x]
+            ans.append(prefix_sum(i-1))
+            add(i)
+        return ans[::-1]
+
+
+
+
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用树状数组（Binary Indexed Tree）来解决问题。首先将原数组去重并排序，建立数值到索引的映射。然后从右往左遍历原数组，对于每个元素，查询比它小的元素个数即为树状数组中对应索引前面的前缀和，然后将当前元素对应的索引位置加1，表示当前元素已被计入答案。最后将答案数组反转输出。</p>
+                                <p>时间复杂度: O(nlogn)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countSmaller(self, nums: List[int]) -&gt; List[int]:
+        
+        # 将去重后的元素映射到从1开始的索引
+        bucket ={n:i for i, n in enumerate(sorted(set(nums)), start=1)}
+        n = len(bucket) + 1
+        
+        # 初始化大小为n的树状数组
+        tree = [0]*n
+
+        # 查询前缀和
+        def prefix_sum(i):
+            ans = 0
+            while i &gt; 0:
+                ans += tree[i]
+                i = i &amp; (i-1)
+            return ans
+        
+        # 更新树状数组
+        def add(i):
+            while i &lt; n:
+                tree[i] += 1
+                i += (i &amp; -i)
+            
+        ans = []
+
+        # 从右往左遍历数组
+        for x in nums[::-1]:
+            # 查询比当前元素小的个数
+            i = bucket[x]
+            ans.append(prefix_sum(i-1))
+            # 将当前元素加入树状数组 
+            add(i)
+        
+        # 将结果反转后返回
+        return ans[::-1]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，如何处理数组中的重复元素，以及为什么需要去重和排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，数组中的重复元素通过使用`set`去重，然后再对结果排序的方式处理。这样做的目的是将每个数值映射到一个唯一的索引，这样可以在树状数组中正确地跟踪每个数值的出现频率。去重是必要的，因为我们需要对每个唯一的数值在树状数组中维护一个计数，而排序则是为了确保树状数组中的索引可以代表小于当前数值的所有数值的累计频率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            树状数组中的前缀和函数`prefix_sum(i)`是如何确保仅计算到索引i之前的元素个数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>树状数组中的`prefix_sum(i)`函数通过累加树状数组中的值来计算索引`i`之前的所有元素的总和。在函数中，利用了树状数组的性质，通过循环中的`i = i &amp; (i-1)`操作，逐步移除最低位的1，从而向前移动到下一个要累加的区间。这种方式确保了只计算到索引`i`之前的元素总和，因为在树状数组中，每个索引位置包含了从其能覆盖的最右侧区间起到自己的累计和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的树状数组的初始化大小为`n`，这里的`n`是如何计算得出的，为什么要加1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，树状数组的大小`n`是通过计算去重并排序后的数组的长度得出的，这确保了每个唯一数值都有一个对应的索引。加1的原因是树状数组的索引从1开始，因此为了容纳所有索引，数组的长度需要是去重后的数值个数加上1。这样，数组的索引0不会被使用，从而避免了索引混淆并简化了树状数组的操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/count-of-range-sum" class="list-group-item list-group-item-action">
+                                区间和的个数
+                            </a>
+                        
+                            <a href="/problem/queue-reconstruction-by-height" class="list-group-item list-group-item-action">
+                                根据身高重建队列
+                            </a>
+                        
+                            <a href="/problem/reverse-pairs" class="list-group-item list-group-item-action">
+                                翻转对
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-of-smaller-numbers-after-self')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-of-smaller-numbers-after-self/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

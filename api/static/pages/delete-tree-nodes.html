@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>删除树节点</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>删除树节点</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 52 ms</p>
+                    <p>内存: 18.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># from collections import defaultdict
+# class Solution:
+#     def deleteTreeNodes(self, nodes: int, parent: List[int], value: List[int]) -&gt; int:
+#         g=defaultdict(list)
+#         # n=len(parent)
+#         for i,p in enumerate(parent):
+#             g[p].append(i)  
+#         # ans=list(range(nodes))  
+
+#         def dfs(i):
+#             # ret=value[i]
+#             # cnt=1
+#             st=[(value[i],1)]
+#             for j in g[i]:
+#                 # cnt+=dfs[j][1]
+#                 # ret+=dfs(j)[0]
+#                 nxt=dfs[j]
+#                 st.append(nxt)
+#             ret,cnt=0,0
+#             for r,c in st:
+#                 ret+=r
+#                 cnt+=c
+#             if ret==0:
+#                 return 0,0
+#             return (ret,cnt) 
+
+#         return dfs(0)[1]     
+        
+# # # my:DFS+图哈希（refer 官解）                     
+# from collections import defaultdict
+# class Solution:
+#     def deleteTreeNodes(self, nodes: int, parent: List[int], value: List[int]) -&gt; int:
+#         g=defaultdict(list)
+#         # n=len(parent)
+#         for i,p in enumerate(parent):
+#             g[p].append(i)  
+#         # ans=list(range(nodes)) 
+#         ans=[1]*nodes 
+
+#         def dfs(i):
+#             # ret=value[i]
+#             # cnt=1
+#             # st=[(value[i],1)]
+#             for j in g[i]:
+#                 # nxt=dfs[j]
+#                 # st.append(nxt)
+#                 dfs(j)
+#                 value[i]+=value[j]
+#                 ans[i]+=ans[j]
+            
+#             if value[i]==0:
+#                 ans[i]=0
+#             #     return 0,0
+#             # return (ret,cnt) 
+#         dfs(0)
+#         return ans[0] 
+
+# ### 官1：DFS+哈希
+# class Solution:
+#     def deleteTreeNodes(self, nodes: int, parent: List[int], value: List[int]) -&gt; int:
+#         edges = {x: list() for x in range(nodes)}
+#         for x, p in enumerate(parent):
+#             if p != -1:
+#                 edges[p].append(x)
+        
+#         node_cnt = [1] * nodes
+        
+#         def dfs(u):
+#             for v in edges[u]:
+#                 dfs(v)
+#                 value[u] += value[v]
+#                 node_cnt[u] += node_cnt[v]
+#             if value[u] == 0:
+#                 node_cnt[u] = 0
+
+#         dfs(0)
+#         return node_cnt[0]
+
+
+# # # my:DFS+图哈希（后序遍历返回结果）            
+# from collections import defaultdict
+# class Solution:
+#     def deleteTreeNodes(self, nodes: int, parent: List[int], value: List[int]) -&gt; int:
+#         g=defaultdict(list)
+#         # n=len(parent)
+#         for i,p in enumerate(parent):
+#             g[p].append(i)  
+#         # ans=list(range(nodes)) 
+#         # ans=[1]*nodes 
+
+#         def dfs(i):
+#             ret=value[i]
+#             cnt=1
+#             # st=[(value[i],1)]
+#             for j in g[i]:
+#                 nr,nc=dfs(j) ### 这种写法可以通过
+#                 ret+=nr 
+#                 cnt+=nc
+#                 # dfs(j)
+#                 # value[i]+=value[j]
+#                 # ans[i]+=ans[j]
+            
+#             if ret==0:
+#                 return 0,0
+#             return (ret,cnt) 
+#         return dfs(0)[1] 
+
+### 官2：拓扑排序 递归的归过程(就是根据出度为0的叶子节点更新父节点)
+from collections import deque
+class Solution:
+    def deleteTreeNodes(self,nodes,parent,value):
+        in_deg=[0]*nodes
+        for p in parent:
+            if p!=-1:
+                in_deg[p]+=1
+
+        node_cnt=[1]*nodes 
+        q=deque()
+        for i in range(nodes):
+            if in_deg[i]==0:
+                q.append(i)
+
+        while q:
+            v=q.popleft()
+            if value[v]==0:
+                node_cnt[v]=0
+            u=parent[v]
+            if u!=-1:
+                value[u]+=value[v]
+                node_cnt[u]+=node_cnt[v]
+                in_deg[u]-=1
+                if in_deg[u]==0:
+                    q.append(u) 
+        
+        return node_cnt[0]
+                </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用拓扑排序的方法来解决删除树节点的问题。首先，计算每个节点的入度，然后使用一个队列来存储所有入度为0的节点（即叶子节点）。从这些叶子节点开始，逐步向上更新其父节点的节点值和节点数量。如果某个节点的值更新后为0，则该节点以及其所有子节点都不应被计算在内，因此将其节点数量设置为0。最终，队列中会处理每个节点，直到到达根节点。这种方法从底部叶子节点向上至根节点逐层剪枝，直到所有的节点都被处理过。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># from collections import deque
+
+class Solution:
+    def deleteTreeNodes(self, nodes, parent, value):
+        in_deg = [0] * nodes  # 存储每个节点的入度
+        for p in parent:
+            if p != -1:
+                in_deg[p] += 1  # 计算入度
+
+        node_cnt = [1] * nodes  # 初始化每个节点的计数为1
+        q = deque()
+        for i in range(nodes):
+            if in_deg[i] == 0:
+                q.append(i)  # 将所有叶子节点加入队列
+
+        while q:
+            v = q.popleft()
+            if value[v] == 0:
+                node_cnt[v] = 0  # 如果节点值为0，设置节点计数为0
+            u = parent[v]
+            if u != -1:
+                value[u] += value[v]  # 更新父节点的值
+                node_cnt[u] += node_cnt[v]  # 更新父节点的计数
+                in_deg[u] -= 1  # 减少父节点的入度
+                if in_deg[u] == 0:
+                    q.append(u)  # 如果父节点入度为0，加入队列
+
+        return node_cnt[0]  # 返回根节点的节点计数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决删除树节点这个问题时，为什么选择使用拓扑排序而不是其他如深度优先搜索（DFS）或广度优先搜索（BFS）的方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>拓扑排序是处理具有方向性从属关系的问题的一种有效方法，特别是在处理需要从子节点向父节点聚合信息的场景中。在此题中，从叶子节点开始向根节点聚合节点的值和计数信息，能够确保在处理每个节点时，其所有子节点的信息已经被完全处理和更新，这样可以有效地减少重复计算和回溯，提高效率。相比之下，DFS和BFS虽然也能实现节点的遍历，但在处理节点删除或值更新时，可能需要更复杂的回溯操作或多次遍历。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何处理树中某个节点的值更新为0之后，其对应的子节点是否也应该被考虑为删除或值为0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，当某个节点的值更新为0后，该节点以及其所有子节点应被视为在最终的节点计数中不再被包含。这是因为题目的目的是计算保留的有效节点的总数，节点值为0意味着这个节点及其子树不应被计入最终的统计结果中。因此，在实现中，节点值为0时会将该节点的节点计数设置为0，并且在更新父节点时，不再将这些节点的计数加到父节点上。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新父节点的值和节点数量时，如果父节点的值变为0，是否还需要继续更新其父节点的值和节点数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的逻辑中，即使某个父节点的值在更新后变为0，其父节点的值和节点数量仍需要继续更新。这是因为父节点的值变为0是在加入子节点的值之后的结果，而其它子节点的值可能仍然需要加到这个父节点上。只有当处理到这个父节点本身，并发现其值为0时，才将其计数设置为0，并在后续的更新中不再计入其父节点的计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中使用了队列来存储入度为0的节点，这种做法在实际执行中是如何保证从叶子节点逐层向上更新的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码实现中，首先识别所有入度为0的节点，即叶子节点，将它们加入队列。这些节点是没有子节点的，因此可以安全地开始处理它们。在处理过程中，每当一个节点被处理（即从队列中移除并更新其父节点的值和计数），其对应的父节点的入度会减少。当父节点的入度减少到0时，意味着该父节点的所有子节点都已处理完毕，此时将父节点加入队列。这个逐层处理保证了从叶子节点向上至根节点的正确更新顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/delete-tree-nodes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/delete-tree-nodes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

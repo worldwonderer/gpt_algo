@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>从数量最多的堆取走礼物</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>从数量最多的堆取走礼物</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>gifts</code> ，表示各堆礼物的数量。每一秒，你需要执行以下操作：</p>
+
+<ul>
+	<li>选择礼物数量最多的那一堆。</li>
+	<li>如果不止一堆都符合礼物数量最多，从中选择任一堆即可。</li>
+	<li>选中的那一堆留下平方根数量的礼物（向下取整），取走其他的礼物。</li>
+</ul>
+
+<p>返回在 <code>k</code> 秒后剩下的礼物数量<em>。</em></p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>gifts = [25,64,9,4,100], k = 4
+<strong>输出：</strong>29
+<strong>解释：</strong> 
+按下述方式取走礼物：
+- 在第一秒，选中最后一堆，剩下 10 个礼物。
+- 接着第二秒选中第二堆礼物，剩下 8 个礼物。
+- 然后选中第一堆礼物，剩下 5 个礼物。
+- 最后，再次选中最后一堆礼物，剩下 3 个礼物。
+最后剩下的礼物数量分别是 [5,8,9,4,3] ，所以，剩下礼物的总数量是 29 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>gifts = [1,1,1,1], k = 4
+<strong>输出：</strong>4
+<strong>解释：</strong>
+在本例中，不管选中哪一堆礼物，都必须剩下 1 个礼物。 
+也就是说，你无法获取任一堆中的礼物。 
+所以，剩下礼物的总数量是 4 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= gifts.length &lt;= 10<sup>3</sup></code></li>
+	<li><code>1 &lt;= gifts[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= k &lt;= 10<sup>3</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def pickGifts(self, gifts: List[int], k: int) -&gt; int:
+        for i in range(len(gifts)):
+            gifts[i] *= -1  # 变成相反数，这样堆化后就是最大堆了
+        heapify(gifts)  # 原地堆化
+        while k and -gifts[0] &gt; 1:
+            heapreplace(gifts, -isqrt(-gifts[0]))  # 直接修改堆顶
+            k -= 1
+        return -sum(gifts)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解通过将所有礼物堆的数量变为负数并构造最大堆来快速地访问最多礼物的堆。在每个周期中，从堆中取出堆顶元素（最多礼物的堆），留下其平方根个礼物，即修改堆顶的值并保持堆的性质。操作持续 k 秒或直到堆顶的礼物数量小于等于 1。最后，返回堆中所有元素的负数之和，即剩余礼物的总数。</p>
+                                <p>时间复杂度: O(k log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def pickGifts(self, gifts: List[int], k: int) -&gt; int:
+        # 将所有的礼物数量取反，用来构建最大堆
+        for i in range(len(gifts)):
+            gifts[i] *= -1
+        # 将数组堆化，现在数组顶部是最小的数，即最大的原始数的相反数
+        heapify(gifts)
+        # 如果还有剩余的秒数并且堆顶元素绝对值大于1（即原始元素大于1）
+        while k and -gifts[0] &gt; 1:
+            # 将堆顶元素替换为它的平方根的相反数，并重新堆化
+            heapreplace(gifts, -isqrt(-gifts[0]))
+            k -= 1
+        # 返回所有剩余礼物的总数，即负数总和的相反数
+        return -sum(gifts)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在每次操作后选择将礼物数量的平方根留下而非其他函数如对数或立方根？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择平方根作为每次操作后留下的礼物数量的函数，主要是因为平方根可以有效地减少堆顶的值，而又不会过快地减少到接近零，从而保持了游戏的持续性和竞争性。立方根和对数函数在减少大数时可能过于保守或过于激进。平方根提供了一个中等速度的递减，使得大量礼物的堆在多次操作后仍然具有相对较多的礼物，维持游戏的平衡。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中提到将所有礼物数量取反以构建最大堆，这样做有什么特别的优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Python中，标准库的堆（heapq）是最小堆，它总是让最小的元素位于堆顶。通过将所有礼物数量取反，我们实际上是在使用最小堆的性质来模拟一个最大堆的行为。这样做的优势是可以直接使用Python标准库而不需要实现一个最大堆，同时能够快速地访问和处理最多礼物的堆，这对于解题是非常有效和直接的方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            堆操作中的`heapify`和`heapreplace`具体是如何影响算法性能的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`heapify`函数将一个普通列表转换成一个堆结构，这个过程的时间复杂度是O(n)，这是初始化堆的一个高效操作。而`heapreplace`则是一个组合操作，它先弹出堆顶元素，然后将新元素加入堆中，并重新调整堆以维护堆的性质，这个操作的时间复杂度是O(log n)。这两种操作使得我们能够以对数时间复杂度处理堆顶元素并快速更新堆，这对于需要频繁访问和修改堆顶元素的问题非常关键。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果`k`大于数组长度并且数组中存在多个较大值，算法如何确保仍能正确计算剩余的礼物数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过循环处理，不断地将堆顶元素（即最多的礼物堆）的礼物数量取其平方根，然后继续进行堆操作。即使`k`大于数组长度，算法仍然会持续处理直到`k`次操作完成或所有的礼物堆的数量都不再允许按照题目要求进行操作（即堆顶的礼物数量小于等于1）。这确保了无论`k`的值或数组的长度如何，算法都能正确地反复处理并更新堆，最终能准确计算出剩余的礼物总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/take-gifts-from-the-richest-pile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/take-gifts-from-the-richest-pile/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

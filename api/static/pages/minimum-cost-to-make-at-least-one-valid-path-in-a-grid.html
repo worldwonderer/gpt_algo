@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>使网格图至少有一条有效路径的最小代价</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>使网格图至少有一条有效路径的最小代价</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 m x n 的网格图&nbsp;<code>grid</code>&nbsp;。&nbsp;<code>grid</code>&nbsp;中每个格子都有一个数字，对应着从该格子出发下一步走的方向。&nbsp;<code>grid[i][j]</code>&nbsp;中的数字可能为以下几种情况：</p>
+
+<ul>
+	<li><strong>1</strong>&nbsp;，下一步往右走，也就是你会从 <code>grid[i][j]</code>&nbsp;走到 <code>grid[i][j + 1]</code></li>
+	<li><strong>2</strong>&nbsp;，下一步往左走，也就是你会从 <code>grid[i][j]</code>&nbsp;走到 <code>grid[i][j - 1]</code></li>
+	<li><strong>3</strong>&nbsp;，下一步往下走，也就是你会从 <code>grid[i][j]</code>&nbsp;走到 <code>grid[i + 1][j]</code></li>
+	<li><strong>4</strong>&nbsp;，下一步往上走，也就是你会从 <code>grid[i][j]</code>&nbsp;走到 <code>grid[i - 1][j]</code></li>
+</ul>
+
+<p>注意网格图中可能会有&nbsp;<strong>无效数字</strong>&nbsp;，因为它们可能指向&nbsp;<code>grid</code>&nbsp;以外的区域。</p>
+
+<p>一开始，你会从最左上角的格子&nbsp;<code>(0,0)</code>&nbsp;出发。我们定义一条&nbsp;<strong>有效路径</strong>&nbsp;为从格子&nbsp;<code>(0,0)</code>&nbsp;出发，每一步都顺着数字对应方向走，最终在最右下角的格子&nbsp;<code>(m - 1, n - 1)</code>&nbsp;结束的路径。有效路径&nbsp;<strong>不需要是最短路径</strong>&nbsp;。</p>
+
+<p>你可以花费&nbsp;<code>cost = 1</code>&nbsp;的代价修改一个格子中的数字，但每个格子中的数字&nbsp;<strong>只能修改一次</strong>&nbsp;。</p>
+
+<p>请你返回让网格图至少有一条有效路径的最小代价。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/02/29/grid1.png" style="height: 528px; width: 542px;"></p>
+
+<pre><strong>输入：</strong>grid = [[1,1,1,1],[2,2,2,2],[1,1,1,1],[2,2,2,2]]
+<strong>输出：</strong>3
+<strong>解释：</strong>你将从点 (0, 0) 出发。
+到达 (3, 3) 的路径为： (0, 0) --&gt; (0, 1) --&gt; (0, 2) --&gt; (0, 3) 花费代价 cost = 1 使方向向下 --&gt; (1, 3) --&gt; (1, 2) --&gt; (1, 1) --&gt; (1, 0) 花费代价 cost = 1 使方向向下 --&gt; (2, 0) --&gt; (2, 1) --&gt; (2, 2) --&gt; (2, 3) 花费代价 cost = 1 使方向向下 --&gt; (3, 3)
+总花费为 cost = 3.
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/02/29/grid2.png" style="height: 408px; width: 419px;"></p>
+
+<pre><strong>输入：</strong>grid = [[1,1,3],[3,2,2],[1,1,4]]
+<strong>输出：</strong>0
+<strong>解释：</strong>不修改任何数字你就可以从 (0, 0) 到达 (2, 2) 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/02/29/grid3.png" style="height: 302px; width: 314px;"></p>
+
+<pre><strong>输入：</strong>grid = [[1,2],[4,3]]
+<strong>输出：</strong>1
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[2,2,2],[2,2,2]]
+<strong>输出：</strong>3
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[4]]
+<strong>输出：</strong>0
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 103 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">#这道题和上道题目是有区别的，上一道题目的节点只与自身节点有关，而在这道题目中，我所走的节点是与上一个节点有关系的
+# 所以我可能直接就向下走了，代价加1，但这很有可能并不是最优的，我并不能直接去根据我是否最先到达最终节点来判断
+# 因为我有可能我的最优解是在它的左边这个节点然后一路畅通的，这也就是本做法的问题所在，所以我们创建一个数组来记录新的值
+
+# class Solution:
+#     def minCost(self, grid: List[List[int]]) -&gt; int:
+#         #1 右 2左 3下 4上
+#         visited=[[False]*len(grid[0]) for _ in range(len(grid))]
+#         visited[0][0]=True
+#         de=deque([[0,0]])
+#         values=[[float(&#39;inf&#39;)]*len(grid[0]) for _ in range(len(grid))]
+#         values[0][0]=0
+#         dis=[[0,1],[0,-1],[1,0],[-1,0]]
+#         while de:
+#             x,y=de.popleft()
+#             for i in range(4):
+#                 nx,ny=x+dis[i][0],y+dis[i][1]
+#                 if 0&lt;=nx&lt;len(grid) and 0&lt;=ny&lt;len(grid[0]):                
+#                     if visited[nx][ny]==False or values[nx][ny]&gt;values[x][y]+(1 if grid[x][y]!=i+1 else 0) :
+#                         visited[nx][ny]=True
+#                         if grid[x][y]==i+1:
+#                             de.appendleft([nx,ny])
+#                         else:
+#                             de.append([nx,ny])
+#                     values[nx][ny]=min(values[nx][ny],values[x][y]+(1 if grid[x][y]!=i+1 else 0))
+#         return values[-1][-1]
+
+class Solution:
+    def minCost(self, A: List[List[int]]) -&gt; int:
+        n, m = len(A), len(A[0])
+        dist = [[inf] * m for _ in range(n)]
+        dist[0][0] = 0
+        dq = deque([(0, 0)])
+        while dq:
+            x, y = dq.popleft()
+            for nx, ny, op in (x, y + 1, 1), (x, y - 1, 2),(x + 1, y, 3), (x - 1, y, 4):
+                if not(0 &lt;= nx &lt; n and 0 &lt;= ny &lt; m):
+                    continue
+                g = A[x][y]
+                d=dist[x][y] + (1 if g != op else 0)
+                if  dist[nx][ny] &gt; d:
+                    dist[nx][ny] = d
+                    if g == op:#出现0代价的路线，优先加入队列头
+                        dq.appendleft((nx, ny))
+                    else:
+                        dq.append((nx, ny))
+        return dist[-1][-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了一种基于0-1广度优先搜索（BFS）的方法，结合了Dijkstra算法的特点。每个格子可以看作一个节点，格子中的数字决定了从该节点出发可以直接到达的邻接节点的方向。如果当前方向与格子内指定的方向一致，则移动代价为0；如果不一致，则需要修改方向，代价为1。算法从(0, 0)开始，使用双端队列存储待处理的节点，对于代价为0的移动优先处理（添加到队列前端），代价为1的移动则添加到队列末端。利用一个二维数组记录到每个节点的最小代价，不断更新这个数组直到找到到达(m-1, n-1)的最小代价。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2"># 定义Solution类
+
+class Solution:
+    def minCost(self, A: List[List[int]]) -&gt; int:
+        n, m = len(A), len(A[0])  # 获取网格的行数和列数
+        dist = [[float(&#39;inf&#39;)] * m for _ in range(n)]  # 初始化距离数组，初始距离为无穷大
+        dist[0][0] = 0  # 起点的代价为0
+        dq = deque([(0, 0)])  # 使用双端队列，初始化包含起点
+        while dq:  # 当队列不为空
+            x, y = dq.popleft()  # 弹出队列首部元素
+            for nx, ny, op in (x, y + 1, 1), (x, y - 1, 2),(x + 1, y, 3), (x - 1, y, 4):  # 检查四个可能的移动方向
+                if not(0 &lt;= nx &lt; n and 0 &lt;= ny &lt; m):  # 判断新坐标是否越界
+                    continue
+                g = A[x][y]  # 当前格子指定的方向
+                d = dist[x][y] + (1 if g != op else 0)  # 计算到达新坐标的代价
+                if dist[nx][ny] &gt; d:  # 如果找到了更小的代价
+                    dist[nx][ny] = d  # 更新代价
+                    if g == op:  # 如果移动方向与当前格子指定的方向一致，优先处理
+                        dq.appendleft((nx, ny))
+                    else:  # 否则，添加到队列末尾
+                        dq.append((nx, ny))
+        return dist[-1][-1]  # 返回到达终点的最小代价</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中使用的0-1广度优先搜索（BFS）结合Dijkstra算法的处理方式，具体是如何通过代价为0和代价为1的区分进行优化的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，0-1 BFS 结合了 Dijkstra 算法的特点，具体优化来自于处理代价为0和代价为1的不同优先级。在传统的 BFS 中，所有的边都具有相同的权重，而在 Dijkstra 算法中，边的权重可以不同，且算法会选择累计代价最小的路径。在这个题解中，如果移动方向与当前格子指定的方向相同，代价为0，不相同则为1。通过在双端队列中使用不同的插入策略（代价为0的移动优先处理，插入到队列前端；代价为1的移动插入到队列末端），算法能够更快地找到代价最小的路径。这种处理方式实质上是在保证 BFS 的宽度遍历特性的同时，引入了优先考虑低代价移动的策略，从而达到了类似 Dijkstra 的效果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的代码实现中，为什么将满足`g == op`条件的坐标对`(nx, ny)`添加到双端队列的前端，而将不满足条件的添加到末端？这种处理对算法的性能优化有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的代码实现中，将满足`g == op`条件的坐标对`(nx, ny)`添加到双端队列的前端，是因为这种移动的代价为0，代表可以&#39;免费&#39;移动到该节点。将这种移动放在队列前端可以确保这些节点能够被更快地处理，从而迅速扩展出代价最低的路径。相反，不满足条件的移动代价为1，这意味着其路径代价较高，因此被放在队列的末端，等待前面的低代价节点先被处理。这种处理显著优化了算法性能，因为它减少了在高代价路径上的不必要探索，让算法更倾向于沿着最小代价路径前进，从而在实际运行中能更快地找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解说明中提到，每个节点最多被访问和更新4次，这个结论是如何得出的？实际上是否有可能节点被多次访问？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中提到的每个节点最多被访问和更新4次的结论基于每个节点最多有4个可能的移动方向（上、下、左、右）。在算法执行过程中，每个节点可能从任意一个相邻的节点接收到新的代价更新，因此在最坏的情况下，每个节点可能分别从四个方向被更新。但是，实际上每次更新都是基于找到更小的代价，一旦某方向的最小代价被发现并更新，该方向就不会再产生更高的代价更新。因此，虽然理论上一个节点在极端情况下可能被多次访问，实际上的访问次数通常受到有效路径和代价更新逻辑的限制。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-make-at-least-one-valid-path-in-a-grid')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

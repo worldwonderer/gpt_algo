@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>括号生成</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>括号生成</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>正整数&nbsp;<code>n</code>&nbsp;代表生成括号的对数，请设计一个函数，用于能够生成所有可能的并且 <strong>有效的 </strong>括号组合。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 3
+<strong>输出：</strong>[&quot;((()))&quot;,&quot;(()())&quot;,&quot;(())()&quot;,&quot;()(())&quot;,&quot;()()()&quot;]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 1
+<strong>输出：</strong>[&quot;()&quot;]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 8</code></li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 22&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/generate-parentheses/">https://leetcode-cn.com/problems/generate-parentheses/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">from functools import cache
+
+class Solution:
+    def generateParenthesis(self, n: int) -&gt; List[str]:
+        @cache
+        def dfs(n):
+            if n == 0:
+                return [&#34;&#34;]
+            res = []
+            for i in range(n):
+                left = dfs(i)
+                right = dfs(n-1-i)
+                for x in left:
+                    for y in right:
+                        res.append(&#34;(&#34;+x+&#34;)&#34;+y)
+            return res
+    
+        return dfs(n)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了递归加记忆化的方法来生成所有有效的括号组合。基本思路是使用深度优先搜索（DFS），递归地构建每一种可能的括号组合。对于给定的n（括号对数），函数dfs(n)返回所有由n对括号构成的有效组合。递归的基准情况是当n等于0时，只有一个有效的组合，即空字符串。对于n&gt;0的情况，通过枚举左侧括号内包含的括号对数i（从0到n-1），然后对于每个i，计算左侧括号内的组合和右侧的组合，然后将它们组合成一个有效的括号表达式。采用记忆化是为了避免重复计算已经解决的子问题，提高效率。</p>
+                                <p>时间复杂度: O(C_n * n)</p>
+                                <p>空间复杂度: O(C_n * n)</p>
+                                <pre class="bg-light p-2">from functools import cache
+
+class Solution:
+    def generateParenthesis(self, n: int) -&gt; List[str]:
+        @cache
+        def dfs(n):
+            # 基本情况：没有括号对时返回包含空字符串的列表
+            if n == 0:
+                return [&#34;&#34;]
+            res = []
+            # 枚举所有可能的左括号内的括号对数i
+            for i in range(n):
+                left = dfs(i) # 左侧i对括号的所有有效组合
+                right = dfs(n-1-i) # 右侧n-1-i对括号的所有有效组合
+                # 组合左右两边的结果以形成有效的括号字符串
+                for x in left:
+                    for y in right:
+                        res.append(&#34;(&#34;+x+&#34;)&#34;+y)
+            return res
+        return dfs(n)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在递归函数中，为何选择枚举左侧括号内包含的括号对数i，而不是简单地每次只添加一对括号？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择枚举左侧括号内包含的括号对数i的原因是为了生成所有可能的有效括号组合。如果每次只简单地添加一对括号，将无法控制和保证括号的正确匹配和组合。通过枚举每个可能的i，我们可以确保左侧和右侧的括号都是有效的，从而构造出所有有效的括号字符串。这种方法可以确保每个生成的字符串都是唯一的有效组合，避免了生成无效或重复的括号组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            记忆化存储（使用cache装饰器）具体是如何避免重复计算的，能否详细解释其工作原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>记忆化存储通过存储已经计算的结果来避免重复计算，提高算法的效率。在本题解中，使用了Python的cache装饰器，它自动保存每次函数调用的结果。当递归函数dfs被调用时，cache首先检查是否已经计算过给定参数的结果。如果是，直接返回存储的结果，避免了再次进行相同的计算。这种方法特别适用于递归函数，因为递归过程中很多子问题会被重复计算。通过记忆化，我们可以显著减少计算量，尤其是在处理大量数据时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的Catalan数与此问题有何关联，能否详细解释Catalan数在此算法中的作用和意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Catalan数是一系列自然数，它们在各种计数问题中非常重要，包括括号匹配问题。在括号生成问题中，第n个Catalan数表示n对括号可以形成的不同有效括号组合的数量。算法中使用递归来构造所有有效的括号组合，而Catalan数提供了对组合总数的理论验证。具体来说，Catalan数的递推公式 C(n) = Σ（i=0到n-1）C(i) * C(n-1-i)，与我们在递归算法中使用的括号内外分配方法非常吻合，其中每个C(i)代表左侧i对括号的有效组合数，C(n-1-i)代表右侧对应括号的有效组合数。因此，Catalan数不仅预示了结果的数量，还与算法的结构密切相关。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/IDBivT')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/IDBivT/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

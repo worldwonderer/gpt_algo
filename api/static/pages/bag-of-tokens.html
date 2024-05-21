@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>令牌放置</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>令牌放置</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你的初始 <strong>能量</strong> 为 <code>power</code>，初始 <strong>分数</strong> 为&nbsp;<code>0</code>，只有一包令牌以整数数组&nbsp;<code>tokens</code>&nbsp;给出。其中 <code>tokens[i]</code> 是第 <code>i</code> 个令牌的值（下标从 0 开始）。</p>
+
+<p>你的目标是通过有策略地使用这些令牌以&nbsp;<strong>最大化</strong>&nbsp;总 <strong>分数</strong>。在一次行动中，你可以用两种方式中的一种来使用一个&nbsp;<strong>未被使用的</strong> 令牌（但不是对同一个令牌使用两种方式）：</p>
+
+<ul>
+	<li><strong>朝上</strong>：如果你当前&nbsp;<strong>至少</strong> 有&nbsp;<code>tokens[i]</code>&nbsp;点 <strong>能量</strong> ，可以使用令牌 <code>i</code> ，失去&nbsp;<code>tokens[i]</code>&nbsp;点 <strong>能量</strong> ，并得到&nbsp;<code>1</code>&nbsp;<strong>分</strong> 。</li>
+	<li><strong>朝下</strong>：如果你当前至少有&nbsp;<code>1</code>&nbsp;<strong>分 </strong>，可以使用令牌 <code>i</code> ，获得&nbsp;<code>tokens[i]</code> 点 <strong>能量</strong> ，并失去&nbsp;<code>1</code>&nbsp;<strong>分</strong> 。</li>
+</ul>
+
+<p>在使用 <strong>任意</strong> 数量的令牌后，返回我们可以得到的最大 <strong>分数</strong> 。</p>
+
+
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>tokens = [100], power = 50
+<strong>输出：</strong>0
+<strong>解释：</strong>因为你的初始分数为 <code>0，</code>无法使令牌朝下。你也不能使令牌朝上因为你的能量（<code>50</code>）比 <code>tokens[0]</code>&nbsp;少（<code>100</code>）。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>tokens = [200,100], power = 150
+<strong>输出：</strong>1
+<strong>解释：</strong>使令牌 1 正面朝上，能量变为 50，分数变为 1 。
+不必使用令牌 0，因为你无法使用它来提高分数。可得到的最大分数是 <code>1</code>。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>tokens = [100,200,300,400], power = 200
+<strong>输出：</strong>2
+<strong>解释：</strong>按下面顺序使用令牌可以得到 2 分：
+1. 令牌 0 (<code>100</code>)正面朝上，能量变为 <code>100</code> ，分数变为 <code>1</code>
+2. 令牌 3 (<code>400</code>)正面朝下，能量变为 <code>500</code> ，分数变为 <code>0</code>
+3. 令牌 1 (<code>200</code>)正面朝上，能量变为 <code>300</code> ，分数变为 <code>1</code>
+4. 令牌 2 (<code>300</code>)正面朝上，能量变为 <code>0</code> ，分数变为 <code>2</code>
+
+可得的最大分数是 2。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= tokens.length &lt;= 1000</code></li>
+	<li><code>0 &lt;= tokens[i],&nbsp;power &lt; 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+class Solution:
+    def bagOfTokensScore(self, tokens: List[int], power: int) -&gt; int:
+        tokens.sort()  # Sort the tokens in ascending order
+        score = 0  # Initialize the score to 0
+        max_score = 0  # Variable to keep track of the maximum score
+        left = 0  # Pointer to the leftmost token
+        right = len(tokens) - 1  # Pointer to the rightmost token
+
+        while left &lt;= right:
+            # If we have enough power to use the leftmost token, use it and increase the score
+            if power &gt;= tokens[left]:
+                power -= tokens[left]
+                score += 1
+                left += 1
+                max_score = max(max_score, score)
+            # If we have a positive score and want to gain more power, use the rightmost token
+            elif score &gt; 0:
+                power += tokens[right]
+                score -= 1
+                right -= 1
+            # If none of the above conditions are met, we can&#39;t make any more moves
+            else:
+                break
+
+        return max_score
+
+solution = Solution()
+
+print(solution.bagOfTokensScore([100], 50))  # Output: 0
+print(solution.bagOfTokensScore([100, 200], 150))  # Output: 1
+print(solution.bagOfTokensScore([100, 200, 300, 400], 200))  # Output: 2
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了贪心算法的思想，首先对令牌数组进行排序。然后使用两个指针left和right，分别指向数组的最小值和最大值，代表可以使用的令牌范围。在每一次循环中，首先判断是否有足够的能量使用left指向的令牌增加分数，如果可以，则使用该令牌并向右移动left指针。如果能量不足以使用left指向的令牌，但有足够的分数来兑换right指向的令牌获取能量，则使用right指向的令牌并向左移动right指针。循环直到没有足够的资源使用任何令牌。整个过程中跟踪并更新最大分数。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+class Solution:
+    def bagOfTokensScore(self, tokens: List[int], power: int) -&gt; int:
+        tokens.sort()  # 将令牌按能量值升序排序
+        score = 0  # 初始化分数为0
+        max_score = 0  # 记录最大分数
+        left = 0  # 左指针，指向最小令牌
+        right = len(tokens) - 1  # 右指针，指向最大令牌
+
+        while left &lt;= right:
+            if power &gt;= tokens[left]:  # 如果能量足够，使用左侧令牌，增加分数
+                power -= tokens[left]
+                score += 1
+                left += 1
+                max_score = max(max_score, score)  # 更新最大分数
+            elif score &gt; 0:  # 如果分数足够，使用右侧令牌，增加能量
+                power += tokens[right]
+                score -= 1
+                right -= 1
+            else:  # 否则，终止循环
+                break
+
+        return max_score
+
+solution = Solution()
+
+print(solution.bagOfTokensScore([100], 50))  # 输出: 0
+print(solution.bagOfTokensScore([100, 200], 150))  # 输出: 1
+print(solution.bagOfTokensScore([100, 200, 300, 400], 200))  # 输出: 2
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            令牌数组排序后，如何决定使用&#39;朝上&#39;还是&#39;朝下&#39;的策略？会不会因为策略选择不当导致无法达到最大分数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>问题的关键在于贪心策略的应用。通过将令牌按能量值升序排序，我们可以最大化使用令牌的可能性。使用&#39;朝上&#39;策略，即首先使用较小的令牌以增加分数，是为了尽可能地在能量允许的情况下增加分数。当能量不足以继续使用最小的令牌时，若还有分数可用，则考虑&#39;朝下&#39;策略，即使用最大的令牌以换取更多能量，从而可能继续使用中间的小令牌。这种策略是动态的，基于当前的能量和分数来决定下一步的最佳行动，因此通常能够保证达到最大分数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在实现中，当左右指针相遇时，令牌是否还能被使用，或者在某些情况下是否应该继续尝试使用令牌？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当左右指针相遇时，说明只剩下一个令牌未被使用。在这种情况下，如果当前的能量足够使用这个令牌，则应该使用它以增加分数；如果能量不足，而且没有足够的分数来兑换这个令牌的能量，则不再可能使用任何令牌。因此，在指针相遇时，是否继续使用令牌完全取决于当前的能量和分数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在能量不足以使用左侧令牌时选择使用右侧令牌增加能量，这种做法是否总是最优？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种策略基于贪心算法的思想，尽量保持游戏的持续性和分数的最大化。在能量不足以使用左侧令牌（低成本令牌）时，使用右侧令牌（高成本令牌）来获取能量，是为了尽可能地维持或增加能够继续使用更多令牌的可能性。这种策略在大多数情况下是有效的，因为它延长了游戏的进行，并可能在后续步骤中使用更多的低成本令牌来增加分数。然而，这不一定总是最优策略，因为特定的令牌和能量组合可能存在特殊情况，使得这种策略不是最优解。但在没有额外信息的情况下，按照这种策略行动通常能达到较好的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bag-of-tokens')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bag-of-tokens/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

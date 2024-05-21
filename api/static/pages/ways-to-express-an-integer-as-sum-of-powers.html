@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>将一个数字表示成幂的和的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>将一个数字表示成幂的和的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个 <strong>正</strong>&nbsp;整数&nbsp;<code>n</code> 和&nbsp;<code>x</code>&nbsp;。</p>
+
+<p>请你返回将<em>&nbsp;</em><code>n</code>&nbsp;表示成一些&nbsp;<strong>互不相同</strong>&nbsp;正整数的<em>&nbsp;</em><code>x</code>&nbsp;次幂之和的方案数。换句话说，你需要返回互不相同整数&nbsp;<code>[n<sub>1</sub>, n<sub>2</sub>, ..., n<sub>k</sub>]</code>&nbsp;的集合数目，满足&nbsp;<code>n = n<sub>1</sub><sup>x</sup> + n<sub>2</sub><sup>x</sup> + ... + n<sub>k</sub><sup>x</sup></code>&nbsp;。</p>
+
+<p>由于答案可能非常大，请你将它对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;取余后返回。</p>
+
+<p>比方说，<code>n = 160</code> 且&nbsp;<code>x = 3</code>&nbsp;，一个表示&nbsp;<code>n</code>&nbsp;的方法是&nbsp;<code>n = 2<sup>3</sup> + 3<sup>3</sup> + 5<sup>3</sup></code><sup>&nbsp;</sup>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>n = 10, x = 2
+<b>输出：</b>1
+<b>解释：</b>我们可以将 n 表示为：n = 3<sup>2</sup> + 1<sup>2</sup> = 10 。
+这是唯一将 10 表达成不同整数 2 次方之和的方案。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>n = 4, x = 1
+<b>输出：</b>2
+<b>解释：</b>我们可以将 n 按以下方案表示：
+- n = 4<sup>1</sup> = 4 。
+- n = 3<sup>1</sup> + 1<sup>1</sup> = 4 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 300</code></li>
+	<li><code>1 &lt;= x &lt;= 5</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 53 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">MX_N, MX_X = 300, 5
+f = [[1] + [0] * MX_N for _ in range(MX_X)]
+for x in range(MX_X):
+    for i in count(1):
+        v = i ** (x + 1)
+        if v &gt; MX_N: break
+        for s in range(MX_N, v - 1, -1):
+            f[x][s] += f[x][s - v]
+
+class Solution:
+    def numberOfWays(self, n: int, x: int) -&gt; int:
+        return f[x - 1][n] % (10 ** 9 + 7)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了动态规划的方式来解决问题。动态规划数组 f[x][n] 表示使用1到x+1次幂的和来表示数字n的方案数。初始状态是每个f[x][0]为1，因为表示0的方案只有一种，即不选择任何数字。对于每个x次幂，遍历所有可能的底数i，计算出i的x+1次方v，如果v大于n则中断该轮循环。接着，对于每个s&gt;=v，更新f[x][s]，使其加上f[x][s-v]的值，意味着对于每个可能的v，都尝试将其加入到之前计算的结果中去。这样，每个f[x][n]最终存储了使用1到x+1次幂的和来表达n的所有方案数。</p>
+                                <p>时间复杂度: O(n * x * maxBase)</p>
+                                <p>空间复杂度: O(x * n)</p>
+                                <pre class="bg-light p-2"># 动态规划数组初始化，x取值为0到4，n取值为0到300
+MX_N, MX_X = 300, 5
+f = [[1] + [0] * MX_N for _ in range(MX_X)]
+
+# 外层循环针对每个x，内层循环计算可能的i的x+1次幂v
+for x in range(MX_X):
+    for i in count(1):
+        v = i ** (x + 1)
+        if v &gt; MX_N: break
+        # 更新动态规划数组，从大到小更新防止重复使用同一个幂次
+        for s in range(MX_N, v - 1, -1):
+            f[x][s] += f[x][s - v]
+
+class Solution:
+    def numberOfWays(self, n: int, x: int) -&gt; int:
+        # 返回n表示成x次幂之和的方案数，结果模10^9+7
+        return f[x - 1][n] % (10 ** 9 + 7)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在此题解中，动态规划数组f[x][n]的含义是什么？为什么其维度选择为x和n？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此题解中，动态规划数组 f[x][n] 表示使用从1次幂到(x+1)次幂的所有幂次的和来表示数字 n 的方案数。维度 x 代表幂的次数（1到x+1），而维度 n 代表目标数字。之所以选择这样的维度，是为了能够逐步构建每个数字的表示方法，同时考虑不同的幂次。通过这种方式，可以逐渐增加幂的次数，从而找到所有可能的表示方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划初始化为f[x][0] = 1的原因是什么？为何没有选择初始化其他元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划初始化为 f[x][0] = 1 是因为表示数字0的唯一方法是不使用任何数的幂，这相当于一个空集的和。也就是说，不论幂次数如何，都存在一个方案来表达数字0，即不选择任何项。对于其他元素 f[x][n] (n &gt; 0)，它们被初始化为0，因为在开始的时候，没有找到任何用于表达这些数字的幂和方案，这些值将在算法的迭代过程中被更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到对于每个可能的v，都尝试将其加入到之前计算的结果中去。这个过程是如何保证不会重复计算同一个数的幂次的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了避免重复计算同一个数的幂次，动态规划的更新是从大到小进行的。具体来说，对于每一个幂次 v，数组的更新是从 n 向下至 v 进行。这样做的好处是，每次更新 f[x][s] 时，加入的 f[x][s-v] 是在这一轮更新之前就已经确定的值，而不是在当前轮次中更新过的值。因此，每个幂次只会被计算一次，避免了多次使用同一幂次的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/ways-to-express-an-integer-as-sum-of-powers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/ways-to-express-an-integer-as-sum-of-powers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

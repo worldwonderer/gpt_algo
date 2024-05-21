@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最高频元素的频数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最高频元素的频数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>元素的 <strong>频数</strong> 是该元素在一个数组中出现的次数。</p>
+
+<p>给你一个整数数组 <code>nums</code> 和一个整数 <code>k</code> 。在一步操作中，你可以选择 <code>nums</code> 的一个下标，并将该下标对应元素的值增加 <code>1</code> 。</p>
+
+<p>执行最多 <code>k</code> 次操作后，返回数组中最高频元素的 <strong>最大可能频数</strong> <em>。</em></p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,4], k = 5
+<strong>输出：</strong>3<strong>
+解释：</strong>对第一个元素执行 3 次递增操作，对第二个元素执 2 次递增操作，此时 nums = [4,4,4] 。
+4 是数组中最高频元素，频数是 3 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,4,8,13], k = 5
+<strong>输出：</strong>2
+<strong>解释：</strong>存在多种最优解决方案：
+- 对第一个元素执行 3 次递增操作，此时 nums = [4,4,8,13] 。4 是数组中最高频元素，频数是 2 。
+- 对第二个元素执行 4 次递增操作，此时 nums = [1,8,8,13] 。8 是数组中最高频元素，频数是 2 。
+- 对第三个元素执行 5 次递增操作，此时 nums = [1,4,13,13] 。13 是数组中最高频元素，频数是 2 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [3,9,6], k = 2
+<strong>输出：</strong>1
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= nums.length <= 10<sup>5</sup></code></li>
+	<li><code>1 <= nums[i] <= 10<sup>5</sup></code></li>
+	<li><code>1 <= k <= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 247 ms</p>
+                    <p>内存: 26.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxFrequency(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        nums.sort()
+        if n == 1:
+            return 1
+        l,r,ans,s = 0,1,0,0
+        while r &lt; n:
+            s += (r-l)*(nums[r]-nums[r-1])
+            if s &gt; k:
+                ans = max(ans,r-l)
+                while s &gt; k:
+                    s -= nums[r] - nums[l]
+                    l += 1
+            r += 1
+        ans = max(ans,r-l)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了滑动窗口的思路。首先对数组进行排序，然后使用两个指针l和r表示窗口的左右边界。变量s存储为了使窗口内所有元素值相同所需的总增量。窗口扩展时，若s不超过k，右指针r向右移动；若s超过k，左指针l向右移动以缩小窗口，直到s不超过k。每次移动指针时，都会更新最大频率的可能值ans。这个方法依靠排序后的数组特性，保证窗口内的值可以通过增加操作转变为窗口右端的值。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxFrequency(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        nums.sort()
+        if n == 1:
+            return 1
+        l, r, ans, s = 0, 1, 0, 0
+        while r &lt; n:
+            s += (r - l) * (nums[r] - nums[r - 1])  # 增加s以反映新元素到窗口的差距总和
+            while s &gt; k:
+                ans = max(ans, r - l)
+                s -= nums[r] - nums[l]  # 调整窗口左边界，减少s
+                l += 1
+            r += 1
+        ans = max(ans, r - l)  # 最后一次检查窗口大小
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到，为了使窗口内所有元素值相同所需的总增量s，能否具体解释一下如何计算s，以及它如何随窗口的扩展和缩小而变化？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，s代表为了使窗口内所有元素的值都等于窗口内最右端的元素值所需的总增量。具体计算方式是，每当右指针r向右移动以包含一个新的元素时，计算新增元素与窗口最右端之前的元素的差值，然后乘以窗口当前的宽度(即r-l)，加到s上。这是因为，窗口内每个旧元素都需要增加这个差值才能与新的最右端元素对齐。当s超过允许的最大值k时，需要通过移动左指针l向右来缩小窗口，每向右移动一次，减去的值是窗口最左端的元素与新的最左端元素的差值，因为窗口缩小后，这部分增量不再需要。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的代码中，为什么当s超过k时，仅通过移动左指针l来减少s，而不考虑其他可能的调整？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当s超过k时，表示窗口内的元素不能全部通过增加操作转变为窗口右端的值。在这种情况下，我们需要减少s以满足s&lt;=k的条件。移动左指针l是最直接有效的方式来减少s，因为这会直接减少窗口的大小，相应地减少需要变更的元素数量。此外，移动右指针r以缩小窗口并不合适，因为这样做会损失掉窗口的扩展潜力，减少最大频率的可能性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的方法依赖于数组的排序。排序后，为什么可以保证通过增加操作将窗口内的值转变为窗口右端的值是最优的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过数组排序，我们可以确保窗口内的元素是有序的，这意味着窗口右端的值是窗口内最大的。因此，将所有窗口内的元素增加到窗口右端的值，总增量s会是最小的。如果选择将窗口内的元素变为其他非最右端的值，总增量s将会更大，因为窗口内更多的元素需要更大的增量来达到新的目标值。因此，排序后选择最右端的值作为目标是最优的策略，因为这样可以最小化所需的总增量s。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/frequency-of-the-most-frequent-element')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/frequency-of-the-most-frequent-element/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

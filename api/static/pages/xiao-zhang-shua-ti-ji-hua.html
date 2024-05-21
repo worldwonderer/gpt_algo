@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>小张刷题计划</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>小张刷题计划</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>为了提高自己的代码能力，小张制定了 <code>LeetCode</code> 刷题计划，他选中了 <code>LeetCode</code> 题库中的 <code>n</code> 道题，编号从 <code>0</code> 到 <code>n-1</code>，并计划在 <code>m</code> 天内<strong>按照题目编号顺序</strong>刷完所有的题目（注意，小张不能用多天完成同一题）。</p>
+
+<p>在小张刷题计划中，小张需要用 <code>time[i]</code> 的时间完成编号 <code>i</code> 的题目。此外，小张还可以使用场外求助功能，通过询问他的好朋友小杨题目的解法，可以省去该题的做题时间。为了防止&ldquo;小张刷题计划&rdquo;变成&ldquo;小杨刷题计划&rdquo;，小张每天最多使用一次求助。</p>
+
+<p>我们定义 <code>m</code> 天中做题时间最多的一天耗时为 <code>T</code>（小杨完成的题目不计入做题总时间）。请你帮小张求出最小的 <code>T</code>是多少。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<blockquote>
+<p>输入：<code>time = [1,2,3,3], m = 2</code></p>
+
+<p>输出：<code>3</code></p>
+
+<p>解释：第一天小张完成前三题，其中第三题找小杨帮忙；第二天完成第四题，并且找小杨帮忙。这样做题时间最多的一天花费了 3 的时间，并且这个值是最小的。</p>
+</blockquote>
+
+<p><strong>示例 2：</strong></p>
+
+<blockquote>
+<p>输入：<code>time = [999,999,999], m = 4</code></p>
+
+<p>输出：<code>0</code></p>
+
+<p>解释：在前三天中，小张每天求助小杨一次，这样他可以在三天内完成所有的题目并不花任何时间。</p>
+</blockquote>
+
+
+
+<p><strong>限制：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= time.length &lt;= 10^5</code></li>
+	<li><code>1 &lt;= time[i] &lt;= 10000</code></li>
+	<li><code>1 &lt;= m &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 214 ms</p>
+                    <p>内存: 26.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def f(self,T,time):
+        cnt,s=1,0
+        max_time=0
+        for i in time:
+            if i &gt; max_time:
+                s+=max_time
+                max_time=i
+            else:
+                s+=i
+
+            if s &gt; T:
+                s = 0
+                max_time = i
+                cnt+=1
+            # print(T,s)
+        return cnt
+
+    def minTime(self, time: List[int], m: int) -&gt; int:
+
+        low,up = 0, sum(time)
+        while low &lt; up:
+            mid = (low+up)//2
+
+            if self.f(mid, time) &gt; m:
+                low = mid+1
+            else:
+                up=mid
+
+        return low</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了二分查找结合贪心算法的策略。首先定义f函数，该函数用于判断在最大单日时间T的限制下，小张完成所有题目需要的天数。对于每道题，我们维护当前天的总时间s和当天最耗时的题目时间max_time。如果添加新题会使总时间s超过T，那么新开一天，并将当前题作为新一天的第一题。在minTime函数中，通过调整T的值（二分查找）来找到使得f函数返回的天数不超过m的最小T值。</p>
+                                <p>时间复杂度: O(n log(sum(time)))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def f(self,T,time):
+        cnt,s=1,0  # 初始化天数为1，当前天的总时间为0
+        max_time=0  # 初始化当前天的最长单题时间
+        for i in time:
+            if i &gt; max_time:
+                s+=max_time  # 将之前的最长时间加入总时间
+                max_time=i  # 更新最长时间为当前题目时间
+            else:
+                s+=i  # 将当前题目时间加入总时间
+
+            if s &gt; T:  # 当总时间超过T时，开启新的一天
+                s = 0  # 重置当天总时间
+                max_time = i  # 设置当前题目为新一天的第一题
+                cnt+=1  # 天数增加
+        return cnt
+
+    def minTime(self, time: List[int], m: int) -&gt; int:
+
+        low,up = 0, sum(time)  # 二分搜索的起始和结束点
+        while low &lt; up:
+            mid = (low+up)//2  # 计算中点
+
+            if self.f(mid, time) &gt; m:  # 如果需要的天数超过m
+                low = mid+1  # 调整搜索范围的下界
+            else:
+                up=mid  # 调整搜索范围的上界
+
+        return low  # 返回最小的T</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在二分查找的过程中，为什么`low`的初始值设为0，而不是考虑题目中可能存在的最小耗时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，`low` 设为 0 实际上可能不是最优的选择，因为一个更合理的起始值应该是题目中的最小耗时。这样设定是因为，我们在考虑任何合法的单日时间 `T` 时，至少应保证 `T` 不小于任何单个题目的耗时，以确保每个题目都可以在某一天被完成。如果 `low` 设置为 0，则在函数 `f` 中会有额外的判断和处理，确保不会出现无法分配题目的情况。因此，从理论和实用角度看，将 `low` 设置为 `time` 中的最小值是更合适的，这可以减少二分查找的范围并提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用`max_time`来记录最耗时的题目，这种策略在哪些情况下可能会导致不必要的天数增加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用 `max_time` 来记录最耗时的题目的策略可能在题目的时间分布不均时导致不必要的天数增加。例如，如果一天中开始就遇到一个极端耗时的题目，后续题目耗时都很短，这种策略会导致该天只能完成很少的题目，而实际上将一些短的题目安排在耗时题目的同一天可能是可行的。这样就可能增加总天数，尤其是当耗时最长的题目和其他题目的耗时差异很大时更为明显。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在确定二分搜索的上界时，为什么选择`sum(time)`作为上界，这是否意味着在某些情况下一个人一天内可能尝试完成所有题目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择 `sum(time)` 作为上界是因为这是在极端情况下，即不将任何题目分到不同天，一个人在一天内尝试完成所有题目的总耗时。虽然从实际情况来看，这通常不是一个有效的策略，因为这样会导致需要的天数为1，这通常不可能满足题目的其他限制（如天数限制 `m`）。然而，将上界设置为 `sum(time)` 确保了二分搜索能覆盖所有可能的 `T` 值，从最小可能的 `T`（题目耗时的最小值）到最大可能的 `T`（所有题目耗时之和）。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/xiao-zhang-shua-ti-ji-hua')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/xiao-zhang-shua-ti-ji-hua/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

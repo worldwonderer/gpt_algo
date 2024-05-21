@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>检查是否有合法括号字符串路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>检查是否有合法括号字符串路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个括号字符串是一个 <strong>非空</strong>&nbsp;且只包含&nbsp;<code>'('</code>&nbsp;和&nbsp;<code>')'</code>&nbsp;的字符串。如果下面&nbsp;<strong>任意</strong>&nbsp;条件为&nbsp;<strong>真</strong>&nbsp;，那么这个括号字符串就是&nbsp;<strong>合法的</strong>&nbsp;。</p>
+
+<ul>
+	<li>字符串是&nbsp;<code>()</code>&nbsp;。</li>
+	<li>字符串可以表示为&nbsp;<code>AB</code>（<code>A</code>&nbsp;连接&nbsp;<code>B</code>），<code>A</code> 和&nbsp;<code>B</code>&nbsp;都是合法括号序列。</li>
+	<li>字符串可以表示为&nbsp;<code>(A)</code>&nbsp;，其中&nbsp;<code>A</code>&nbsp;是合法括号序列。</li>
+</ul>
+
+<p>给你一个&nbsp;<code>m x n</code>&nbsp;的括号网格图矩阵&nbsp;<code>grid</code>&nbsp;。网格图中一个&nbsp;<strong>合法括号路径</strong>&nbsp;是满足以下所有条件的一条路径：</p>
+
+<ul>
+	<li>路径开始于左上角格子&nbsp;<code>(0, 0)</code>&nbsp;。</li>
+	<li>路径结束于右下角格子&nbsp;<code>(m - 1, n - 1)</code>&nbsp;。</li>
+	<li>路径每次只会向 <strong>下</strong>&nbsp;或者向 <strong>右</strong>&nbsp;移动。</li>
+	<li>路径经过的格子组成的括号字符串是<strong>&nbsp;合法</strong>&nbsp;的。</li>
+</ul>
+
+<p>如果网格图中存在一条 <strong>合法括号路径</strong>&nbsp;，请返回&nbsp;<code>true</code>&nbsp;，否则返回&nbsp;<code>false</code>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/03/15/example1drawio.png" style="width: 521px; height: 300px;" /></p>
+
+<pre>
+<b>输入：</b>grid = [["(","(","("],[")","(",")"],["(","(",")"],["(","(",")"]]
+<b>输出：</b>true
+<b>解释：</b>上图展示了两条路径，它们都是合法括号字符串路径。
+第一条路径得到的合法字符串是 "()(())" 。
+第二条路径得到的合法字符串是 "((()))" 。
+注意可能有其他的合法括号字符串路径。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/03/15/example2drawio.png" style="width: 165px; height: 165px;" /></p>
+
+<pre>
+<b>输入：</b>grid = [[")",")"],["(","("]]
+<b>输出：</b>false
+<b>解释：</b>两条可行路径分别得到 "))(" 和 ")((" 。由于它们都不是合法括号字符串，我们返回 false 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 100</code></li>
+	<li><code>grid[i][j]</code>&nbsp;要么是&nbsp;<code>'('</code>&nbsp;，要么是&nbsp;<code>')'</code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 43 ms</p>
+                    <p>内存: 22.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def hasValidPath(self, grid: List[List[str]]) -&gt; bool:
+        # 将(记作1  )记作-1 整个路径过程中 和&gt;=0 且到达右下角为0
+        n, m = len(grid), len(grid[0])
+        if grid[0][0] == &#34;)&#34; or grid[-1][-1] == &#34;(&#34; or (n + m - 1) % 2:
+            return False
+
+        @cache
+        def dfs(i, j, s):  # 从[i,j]出发是否存在合法路径 s表示前面累计和
+            if s &gt; n - i + m - j - 1:
+                return False  # 剪枝：即使后面都是 &#39;)&#39; 也不能将 c 减为 0
+            if i == n - 1 and j == m - 1:  # 终点一定是 &#39;)&#39;
+                return s == 1
+            s += 1 if grid[i][j] == &#34;(&#34; else -1
+            if s &lt; 0:
+                return False
+            for ni, nj in (i + 1, j), (i, j + 1):
+                if n &gt; ni &gt;= 0 &lt;= nj &lt; m:
+                    if dfs(ni, nj, s):
+                        return True
+            return False
+
+        return dfs(0, 0, 0)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用深度优先搜索(DFS)的方式来判断从左上角到右下角是否存在一条合法的括号路径。首先进行了一些初步的判断，例如起点和终点的字符是否符合要求，以及路径长度是否为偶数。DFS函数使用了记忆化来优化搜索过程。在搜索过程中，使用参数s来记录当前路径上&#39;(&#39;和&#39;)&#39;的数量差，即每遇到&#39;(&#39;则s增加1，遇到&#39;)&#39;则s减少1。如果在任意点s小于0，说明不可能形成合法的括号序列。另外，如果到达终点时s不等于1，则也不是合法路径。此外，还应用了剪枝技术，如果当前的s已经大于从当前位置到终点所需的最少&#39;)&#39;的数量，则可以提前终止搜索。</p>
+                                <p>时间复杂度: O(n*m*2n)</p>
+                                <p>空间复杂度: O(n*m*2n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def hasValidPath(self, grid: List[List[str]]) -&gt; bool:
+        # Define grid dimensions
+        n, m = len(grid), len(grid[0])
+        # Early return if the start or end are invalid, or if the path length is odd
+        if grid[0][0] == &#34;)&#34; or grid[-1][-1] == &#34;(&#34; or (n + m - 1) % 2:
+            return False
+
+        @cache
+        def dfs(i, j, s):  # DFS to find a valid path with balance s
+            # Prune if the remaining maximum possible &#39;)&#39; cannot balance &#39;(&#39;
+            if s &gt; n - i + m - j - 1:
+                return False
+            if i == n - 1 and j == m - 1:  # Check if we reach the end with the exact balance needed
+                return s == 1
+            s += 1 if grid[i][j] == &#34;(&#34; else -1
+            if s &lt; 0:  # Invalid if more &#39;)&#39; than &#39;(&#39;
+                return False
+            # Explore the next possible cells
+            for ni, nj in (i + 1, j), (i, j + 1):
+                if n &gt; ni &gt;= 0 &lt;= nj &lt; m:
+                    if dfs(ni, nj, s):
+                        return True
+            return False
+
+        return dfs(0, 0, 0)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在深度优先搜索中使用记忆化，具体的记忆化策略是怎样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在深度优先搜索中使用记忆化是为了避免重复计算相同状态的结果，从而提高算法效率。具体的记忆化策略是使用一个缓存来存储每个状态（当前位置和当前括号差）的搜索结果。在这个题解中，使用`@cache`装饰器实现了记忆化。这意味着每次调用`dfs`函数时，首先检查是否计算过当前状态的结果，如果计算过，则直接返回之前的结果，否则继续执行搜索。这样可以显著减少不必要的计算，尤其是在面对大规模数据和复杂路径时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在深度优先搜索中，为何开始状态的`s`值设为0，这一值具体代表什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，开始状态的`s`值设为0，这代表在起点时括号&#39;(&#39;和&#39;)&#39;的数量是平衡的，即没有多余的&#39;(&#39;或&#39;)&#39;。这是因为`s`代表从起点到当前点的路径上，&#39;(&#39;和&#39;)&#39;的数量差（即&#39;(&#39;的数量减去&#39;)&#39;的数量）。开始时，由于还未遍历任何格子，因此这个差值为0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            DFS函数中，当`i == n - 1 and j == m - 1`时，为什么要求`s == 1`来判断路径是否合法？是否应该是`s == 0`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，要求`s == 1`来判断路径是否合法是因为在到达终点时，理想的情况是路径上的&#39;(&#39;比&#39;)&#39;多一个，这是因为起点已经被设置为&#39;(&#39;且终点被设置为&#39;)&#39;，整个路径应该是闭合的。如果`s == 0`，则意味着&#39;(&#39;和&#39;)&#39;数量完全相等，考虑到起点和终点的括号设置，这将导致路径在没有闭合的情况下结束，因此不是合法的括号字符串路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到的剪枝条件`if s &gt; n - i + m - j - 1`是如何得出的，这个条件的逻辑依据是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个剪枝条件基于从当前位置到终点的最大可行步数。`n - i + m - j - 1`计算的是从当前位置(i, j)到终点所需的最小步数。如果`s`（当前&#39;(&#39;和&#39;)&#39;的数量差）大于这个值，意味着即使之后的每一步都是&#39;)&#39;，也无法达到平衡（即无法使得最终&#39;(&#39;和&#39;)&#39;的数量相等）。因此，如果`s`超过了这个界限，可以判断当前路径无法形成合法的括号序列，从而提前终止搜索。这是一个有效的剪枝策略，能够减少无效搜索，提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/check-if-there-is-a-valid-parentheses-string-path')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/check-if-there-is-a-valid-parentheses-string-path/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

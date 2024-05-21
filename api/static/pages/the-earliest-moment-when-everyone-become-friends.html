@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>彼此熟识的最早时间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>彼此熟识的最早时间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def earliestAcq(self, a: List[List[int]], n: int) -&gt; int:
+        fa = [j for j in range(n)]
+        a.sort()
+        cnt = n 
+        def find(x):
+            if x!=fa[x]:
+                fa[x] = find(fa[x]) 
+            return fa[x]
+        def union(x, y):
+            nonlocal cnt
+            if find(x)!=find(y):
+                cnt -= 1 
+                fa[fa[x]] = fa[y] 
+        for t, x, y in a:
+            union(x, y) 
+            if cnt == 1:
+                return t 
+        return -1 
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了并查集数据结构来解决问题。题目要求找到所有人都相识的最早时间。解题思路如下：首先对事件按时间排序，保证我们按时间顺序处理每对相识的人。使用一个并查集来管理并跟踪每个人的连通性，每个人最初指向自己，表示各自为一个独立的组。对于每个事件，我们使用 union 操作来合并两个人所在的组。如果两个人已经在同一个组里，那么他们已经是间接或直接相识的。如果通过 union 操作后，所有人都属于同一个组（计数器 cnt 为 1），则返回当前事件的时间，表示这是所有人都彼此相识的最早时间。如果遍历完所有事件后，人们仍不全都相识，则返回 -1。</p>
+                                <p>时间复杂度: O(m log m)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># 定义解决方案类
+
+class Solution:
+    def earliestAcq(self, a: List[List[int]], n: int) -&gt; int:
+        # 初始化并查集数组，每个人最初指向自己
+        fa = [j for j in range(n)]
+        # 将事件按时间排序
+        a.sort()
+        # 初始化计数器，初始时有n个独立组
+        cnt = n 
+        
+        # 查找函数，带路径压缩
+        def find(x):
+            if x != fa[x]:
+                fa[x] = find(fa[x]) 
+            return fa[x]
+        
+        # 合并函数，合并两个组
+        def union(x, y):
+            nonlocal cnt
+            if find(x) != find(y):
+                cnt -= 1  # 合并成功，组数减一
+                fa[fa[x]] = fa[y]  # 将一个组的根指向另一个组的根
+        
+        # 遍历所有事件
+        for t, x, y in a:
+            union(x, y)  # 尝试合并事件中的两个人
+            if cnt == 1:  # 如果组数减少到1，所有人都相识
+                return t  # 返回当前时间
+        return -1  # 如果遍历结束仍有不相识的人，返回-1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理这个问题时选择使用并查集而不是其他数据结构，比如图的遍历方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>并查集是解决动态连通性问题的高效数据结构，特别适合处理组合与查询操作。在这个问题中，我们需要快速判断并合并相识的人群，每次合并后还需检验是否所有人都在同一个组内。并查集通过路径压缩和按秩合并等优化，可以在几乎常数时间内完成这些操作，而图的遍历方法如深度优先搜索或广度优先搜索在每次有新的相识关系时都可能需要重新遍历整个图来检查连通性，这在效率上通常不如并查集。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在合并两个组的操作中，你选择将一个组的根指向另一个组的根，这种选择是否总是有效，或者说是否有可能影响并查集的平衡性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将一个组的根指向另一个组的根是基本的并查集合并操作，但这种基础方法可能会导致不平衡的树结构，从而影响查询和合并操作的效率。为了优化性能和维护平衡，通常会采用按秩合并或按大小合并的策略。按秩合并是根据树的深度（秩）来进行合并，通常将较浅的树的根指向较深的树的根；按大小合并则是将较小的树合并到较大的树上。这些策略可以有效减少树的高度，确保操作的高效性。在题解中没有明确提到使用这些优化策略，可能会在某些情况下影响效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果在所有事件处理完之后还有人不相识（返回-1），这是否意味着输入数据中有人从未出现在任何相识事件中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>返回 -1 表示在处理完所有给定的相识事件后，仍然有人不与其他所有人连通，即并查集中存在多于一个的组。这可能意味着有些人从未在任何相识事件中出现，也可能意味着虽然每个人都参与了至少一个事件，但这些事件不足以连接所有人成一个单一的组。因此，返回 -1 既可能是因为某些人从未出现在事件中，也可能是因为相识的事件不足以覆盖所有人。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/number-of-provinces" class="list-group-item list-group-item-action">
+                                省份数量
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-earliest-moment-when-everyone-become-friends')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-earliest-moment-when-everyone-become-friends/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

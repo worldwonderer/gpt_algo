@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>矩阵中严格递增的单元格数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>矩阵中严格递增的单元格数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>1</strong> 开始、大小为 <code>m x n</code> 的整数矩阵 <code>mat</code>，你可以选择任一单元格作为 <strong>起始单元格</strong> 。</p>
+
+<p>从起始单元格出发，你可以移动到 <strong>同一行或同一列</strong> 中的任何其他单元格，但前提是目标单元格的值<strong> 严格大于 </strong>当前单元格的值。</p>
+
+<p>你可以多次重复这一过程，从一个单元格移动到另一个单元格，直到无法再进行任何移动。</p>
+
+<p>请你找出从某个单元开始访问矩阵所能访问的 <strong>单元格的最大数量</strong> 。</p>
+
+<p>返回一个表示可访问单元格最大数量的整数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2023/04/23/diag1drawio.png" style="width: 200px; height: 176px;"></strong></p>
+
+<pre><strong>输入：</strong>mat = [[3,1],[3,4]]
+<strong>输出：</strong>2
+<strong>解释：</strong>上图展示了从第 1 行、第 2 列的单元格开始，可以访问 2 个单元格。可以证明，无论从哪个单元格开始，最多只能访问 2 个单元格，因此答案是 2 。 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2023/04/23/diag3drawio.png" style="width: 200px; height: 176px;"></strong></p>
+
+<pre><strong>输入：</strong>mat = [[1,1],[1,1]]
+<strong>输出：</strong>1
+<strong>解释：</strong>由于目标单元格必须严格大于当前单元格，在本示例中只能访问 1 个单元格。 
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2023/04/23/diag4drawio.png" style="width: 350px; height: 250px;"></strong></p>
+
+<pre><strong>输入：</strong>mat = [[3,1,6],[-9,5,7]]
+<strong>输出：</strong>4
+<strong>解释：</strong>上图展示了从第 2 行、第 1 列的单元格开始，可以访问 4 个单元格。可以证明，无论从哪个单元格开始，最多只能访问 4 个单元格，因此答案是 4 。  
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == mat.length&nbsp;</code></li>
+	<li><code>n == mat[i].length&nbsp;</code></li>
+	<li><code>1 &lt;= m, n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= m * n &lt;= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>5</sup>&nbsp;&lt;= mat[i][j] &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 704 ms</p>
+                    <p>内存: 54.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxIncreasingCells(self, grid: List[List[int]]) -&gt; int:
+        m, n = len(grid), len(grid[0])
+        ans = [[0 for _ in range(n)] for _ in range(m)]
+        res = []
+        for i in range(m):
+            for j in range(n):
+                res.append((grid[i][j],i,j))
+        res.sort(key = lambda c:c[0])
+        rowMax = [0] * m
+        colMax = [0] * n
+        pre = res[0][0]
+        cache = []
+        for v,x,y in res:
+            if v &gt; pre:
+                pre = v
+                # 先更新Max
+                for cache_v,cache_x,cache_y in cache:
+                    rowMax[cache_x] = max(rowMax[cache_x],cache_v)
+                    colMax[cache_y] = max(colMax[cache_y],cache_v)
+                cache = []
+            ans[x][y] = max(rowMax[x] , colMax[y]) + 1
+            cache.append((ans[x][y] ,x,y))
+        return max(ans[i][j] for i in range(m) for j in range(n)) 
+        # @cache
+        # def dfs(i: int, j: int) -&gt; int:
+        #     res = 0
+        #     for x in range(m):
+        #         if x!= i and grid[x][j] &gt; grid[i][j]:
+        #             res = max(res,dfs(x, j))
+        #     for y in range(n):
+        #         if y!= j and grid[i][y] &gt; grid[i][j]:
+        #             res = max(res,dfs(i, y))
+        #     return res +1
+        # return max(dfs(i, j) for i in range(m) for j in range(n)) </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了动态规划和排序的方法来解决问题。首先，将矩阵中的所有单元格与它们的坐标一起存储到列表中，并按照单元格的值进行排序。接着，定义两个数组 rowMax 和 colMax 来存储每行和每列的最大可访问单元格数。通过遍历排序后的单元格列表，利用动态规划的思想，计算从每个单元格开始可以访问的最大单元格数量。如果当前单元格的值与前一个不同，则更新 rowMax 和 colMax。对于每个单元格，其可访问数是其所在行和列的最大可访问数中的最大值加一。最后，返回所有单元格的最大可访问数。</p>
+                                <p>时间复杂度: O(mn log(mn))</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxIncreasingCells(self, grid: List[List[int]]) -&gt; int:
+        m, n = len(grid), len(grid[0])
+        ans = [[0 for _ in range(n)] for _ in range(m)]
+        res = []
+        for i in range(m):
+            for j in range(n):
+                res.append((grid[i][j],i,j))
+        res.sort(key = lambda c:c[0])
+        rowMax = [0] * m
+        colMax = [0] * n
+        pre = res[0][0]
+        cache = []
+        for v,x,y in res:
+            if v &gt; pre:
+                pre = v
+                for cache_v,cache_x,cache_y in cache:
+                    rowMax[cache_x] = max(rowMax[cache_x],cache_v)
+                    colMax[cache_y] = max(colMax[cache_y],cache_v)
+                cache = []
+            ans[x][y] = max(rowMax[x] , colMax[y]) + 1
+            cache.append((ans[x][y] ,x,y))
+        return max(ans[i][j] for i in range(m) for j in range(n))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么将所有单元格以它们的值进行排序？这个排序对解题思路有什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，将所有单元格按它们的值进行排序是为了确保在处理每一个单元格时，我们已经考虑了所有小于当前单元格值的单元格。这样的排序保证了在动态规划的过程中，我们从最小的值开始，向上扩展到更大的值，这是确保每个单元格被正确考虑在内，并计算出以该单元格为起点的最长递增路径的关键。通过这种方式，可以简化状态转移的复杂度，因为我们总是在已经处理过并存储了最优结果的单元格上进行构建。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解提到使用动态规划，能否详细解释动态规划在此问题中的具体应用和状态转移方程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，动态规划用于计算每个单元格作为起点的最长递增路径的长度。状态转移方程是通过比较当前单元格的最大可能递增路径与其所在行和列已知的最大路径长度。具体来说，对于每个单元格 (x, y)，其最大递增路径为 `ans[x][y] = max(rowMax[x], colMax[y]) + 1`。这里，`rowMax[x]` 和 `colMax[y]` 分别表示在行x和列y中，截至当前单元格之前能达到的最大递增路径的长度。通过这种方式，我们可以确保利用已经计算过的信息来更新当前单元格的最大路径长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到更新rowMax和colMax数组，这个更新过程是如何确保不遗漏任何可能的路径的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>更新 `rowMax` 和 `colMax` 数组的过程中，这两个数组分别记录了当前行和列中所有已处理单元格的最大递增路径长度。当处理一个新的值时（即当前单元格的值与前一个单元格的值不同时），我们会遍历 `cache` 列表中暂存的单元格信息，这个列表包含了具有相同值的所有单元格的最大路径以及它们的坐标。通过这样的更新，我们确保在转移到新的单元格值时，已经充分利用了之前计算的结果，从而不会遗漏任何可能的递增路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中使用了一个cache列表来临时存储数据，在什么情况下需要清空cache，并将其值更新到rowMax和colMax数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的实现中，`cache` 列表用于暂时存储在处理具有相同值的单元格群时计算得到的最大递增路径长度及其坐标。只有当我们在遍历过程中遇到一个新的单元格值时（即当前单元格的值大于前一个处理的单元格的值），我们才清空 `cache` 列表，并将其值更新到 `rowMax` 和 `colMax` 数组。这个更新是必要的，因为它标志着我们已经完成了对当前值所有单元格的处理，并且可以安全地更新行和列的最大值，为处理下一个更大值的单元格做准备。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-strictly-increasing-cells-in-a-matrix')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-strictly-increasing-cells-in-a-matrix/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

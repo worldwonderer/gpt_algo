@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>每个元音包含偶数次的最长子字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>每个元音包含偶数次的最长子字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>s</code>&nbsp;，请你返回满足以下条件的最长子字符串的长度：每个元音字母，即&nbsp;&#39;a&#39;，&#39;e&#39;，&#39;i&#39;，&#39;o&#39;，&#39;u&#39; ，在子字符串中都恰好出现了偶数次。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = &quot;eleetminicoworoep&quot;
+<strong>输出：</strong>13
+<strong>解释：</strong>最长子字符串是 &quot;leetminicowor&quot; ，它包含 <strong>e，i，o</strong>&nbsp;各 2 个，以及 0 个 <strong>a</strong>，<strong>u </strong>。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = &quot;leetcodeisgreat&quot;
+<strong>输出：</strong>5
+<strong>解释：</strong>最长子字符串是 &quot;leetc&quot; ，其中包含 2 个 <strong>e</strong> 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = &quot;bcbcbc&quot;
+<strong>输出：</strong>6
+<strong>解释：</strong>这个示例中，字符串 &quot;bcbcbc&quot; 本身就是最长的，因为所有的元音 <strong>a，</strong><strong>e，</strong><strong>i，</strong><strong>o，</strong><strong>u</strong> 都出现了 0 次。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 5 x 10^5</code></li>
+	<li><code>s</code>&nbsp;只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 149 ms</p>
+                    <p>内存: 22.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findTheLongestSubstring(self, s: str) -&gt; int:
+        mp = {j: 1 &lt;&lt; i for i, j in enumerate(&#34;aeiou&#34;)}
+        st = [0] * (len(s)+1)
+        n = len(st)
+        for i, j in enumerate(s):
+            st[i+1] = (st[i] ^ p) if (p:=mp.get(j)) else st[i]
+        for i in range(n-1, 0, -1):
+            for j in range(n - i):
+                if st[j + i] == st[j]:
+                    return i
+        return 0</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题的核心思想是使用位掩码来跟踪元音字母的出现次数的奇偶性。每个元音字母对应于位掩码中的一个位，如果该字母出现奇数次，相应的位为1，偶数次则为0。通过XOR操作更新位掩码，从而不需要直接计数。数组`st`用于存储从字符串开头到当前位置的所有字符的位掩码。如果在两个位置`i`和`j`（其中`i &lt; j`）的位掩码相同，这意味着从`i+1`到`j`的子字符串中所有元音字母出现了偶数次。因此，问题转化为寻找最大的`j - i`，其中`st[j] == st[i]`。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findTheLongestSubstring(self, s: str) -&gt; int:
+        mp = {j: 1 &lt;&lt; i for i, j in enumerate(&#39;aeiou&#39;)} # 创建映射，每个元音对应一个位掩码
+        st = [0] * (len(s)+1) # 初始化位掩码数组，st[0]为0表示空字符串的位掩码
+        n = len(st)
+        for i, j in enumerate(s): # 构建st数组，记录到当前字符为止的位掩码状态
+            st[i+1] = (st[i] ^ p) if (p:=mp.get(j)) else st[i]
+        for i in range(n-1, 0, -1): # 从后向前检查每个可能的子字符串长度
+            for j in range(n - i): # 检查该长度下所有可能的起始位置
+                if st[j + i] == st[j]: # 如果位掩码相同，返回当前长度
+                    return i
+        return 0 # 如果没有找到，返回0</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在位掩码的方法中，为什么使用位异或操作来跟踪元音字母出现的次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位异或操作（XOR）非常适合于跟踪出现次数的奇偶性。在二进制中，XOR操作具有翻转特性：对同一个数值进行两次XOR操作会恢复原值。因此，每次字符出现时，通过对应位进行XOR操作，可以有效地切换该位的状态（从0到1或从1到0），直接反映该字符出现次数的奇偶变化。这种方法既节省了存储空间，又简化了计算过程。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何确保位掩码数组`st`在初始化时正确地反映了字符串中每个位置的元音出现奇偶性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位掩码数组`st`的初始化是将`st[0]`设置为0，表示一个空字符串的位掩码。该初始值表明此时没有任何字符被处理，所有元音字母的出现次数默认为偶数（即0次）。随后，遍历字符串中的每个字符，若该字符是元音，则根据元音字母到位掩码的映射来更新当前位掩码，使用XOR操作反映其出现次数的变化。这种逐步构建保证了数组在每个位置上都正确反映了到该位置为止所有元音字母的出现奇偶性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到如果`st[j] == st[i]`则从`i+1`到`j`的子字符串中所有元音字母出现了偶数次，能否详细解释这种情况为什么成立？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个位置的位掩码相同，即`st[j] == st[i]`，这表明从字符串的开始到位置`i`和到位置`j`的元音字母出现次数的奇偶性完全相同。因此，从`i+1`到`j`的区间内，每个元音字母的出现次数必然是偶数次，因为其在这段区间内的出现次数变化抵消了（即奇偶性没有改变）。这是因为任何元音字母的奇数次出现都会改变其对应位的状态，而状态未改变说明出现次数为偶数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实现中，如何处理不在映射`mp`中的非元音字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于不在映射`mp`中的非元音字符，它们不会影响元音字母出现次数的奇偶性跟踪。在题解的算法实现中，当遍历到非元音字符时，位掩码不进行更新，即`st[i+1]`直接继承`st[i]`的值。这样处理保证了位掩码数组只记录和更新元音字母的状态，而忽略非元音字符的干扰。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-longest-substring-containing-vowels-in-even-counts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-longest-substring-containing-vowels-in-even-counts/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

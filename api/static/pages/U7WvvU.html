@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树灯饰</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树灯饰</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>「力扣嘉年华」的中心广场放置了一个巨型的二叉树形状的装饰树。每个节点上均有一盏灯和三个开关。节点值为&nbsp;<code>0</code> 表示灯处于「关闭」状态，节点值为 <code>1</code>&nbsp;表示灯处于「开启」状态。每个节点上的三个开关各自功能如下：</p>
+
+<ul>
+	<li>开关 <code>1</code>：切换当前节点的灯的状态；</li>
+	<li>开关 <code>2</code>：切换 <strong>以当前节点为根</strong>&nbsp;的子树中，所有节点上的灯的状态；</li>
+	<li>开关 <code>3</code>：切换 <strong>当前节点及其左右子节点</strong>（若存在的话） 上的灯的状态；</li>
+</ul>
+
+<p>给定该装饰的初始状态 <code>root</code>，请返回最少需要操作多少次开关，可以关闭所有节点的灯。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>root = [1,1,0,null,null,null,1]
+<strong>输出：</strong>2
+<strong>解释：</strong>以下是最佳的方案之一，如图所示
+<img alt="" src="https://pic.leetcode-cn.com/1629357030-GSbzpY-b71b95bf405e3b223e00b2820a062ba4.gif" style="width: 300px; height: 225px;" />
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>root = [1,1,1,1,null,null,1]
+<strong>输出：</strong>1
+<strong>解释：</strong>以下是最佳的方案，如图所示
+<img alt="" src="https://pic.leetcode-cn.com/1629356950-HZsKZC-a4091b6448a0089b4d9e8f0390ff9ac6.gif" style="width: 300px; height: 225px;" />
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>root = [0,null,0]
+<strong>输出：</strong>0
+<strong>解释：</strong>无需操作开关，当前所有节点上的灯均已关闭
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= 节点个数 &lt;= 10^5</code></li>
+	<li><code>0 &lt;= Node.val &lt;= 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 305 ms</p>
+                    <p>内存: 31.7 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def closeLampInTree(self, root: TreeNode) -&gt; int:
+        # 1:全亮 2:全灭 3:当前灯亮,其余全灭 4:当前灯灭,其余全亮
+        def dfs(c):
+            if not c:
+                return 0,0,0,0
+            l1,l2,l3,l4 = dfs(c.left)
+            r1,r2,r3,r4 = dfs(c.right)
+            if c.val:
+                t1 = min(l1 + r1,2 + l2 + r2,2 + l3 + r3,2 + l4 + r4)
+                t2 = min(1 + l2 + r2,l1 + r1 + 1,l3 + r3 + 1,l4 + r4 + 3)
+                t3 = min(l1 + r1 + 2,l2 + r2,l3 + r3 + 2,l4 + r4 + 2)
+                t4 = min(l1 + r1 + 1,l2 + r2 + 1,l3 + r3 + 3,l4 + r4 + 1)
+            else:
+                t1 = min(l1 + r1 + 1,1 + l2 + r2,3 + l3 + r3,1 + l4 + r4)
+                t2 = min(l2 + r2,l1 + r1 + 2,l3 + r3 + 2,l4 + r4 + 2)
+                t3 = min(l1 + r1 + 1,l2 + r2 + 1,l3 + r3 + 1,l4 + r4 + 3)
+                t4 = min(l1 + r1,l2 + r2 + 2,l3 + r3 + 2,l4 + r4 + 2)
+            return t1,t2,t3,t4
+        
+        ans = dfs(root)
+        return ans[1]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>The solution employs a dynamic programming approach using depth-first search (DFS) to determine the minimum number of switch operations needed to turn off all the lights in a binary tree. At each node, four states are computed, representing the minimum operations required for different configurations: 1) all lights on, 2) all lights off, 3) only the current node light on, and 4) only the current node light off. These states are computed based on the node&#39;s current state (light on or off) and the minimal operations required for its children&#39;s states. The recursive DFS function calculates the optimal switch operations for each state by combining results from left and right children and considering all possible switch actions at the current node.</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(h) where h is the height of the tree, worst-case O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def closeLampInTree(self, root: TreeNode) -&gt; int:
+        # Recursive DFS to compute the minimal switch operations for each node&#39;s states
+        def dfs(c):
+            if not c:
+                return 0,0,0,0 # Base case: if current node is None, return zero operations for all states
+            # Recurse on left and right children
+            l1,l2,l3,l4 = dfs(c.left)
+            r1,r2,r3,r4 = dfs(c.right)
+            # Calculate min operations for each state based on current node&#39;s light status
+            if c.val: # If current node&#39;s light is on
+                t1 = min(l1 + r1, 2 + l2 + r2, 2 + l3 + r3, 2 + l4 + r4) # all lights on
+                t2 = min(1 + l2 + r2, l1 + r1 + 1, l3 + r3 + 1, l4 + r4 + 3) # all lights off
+                t3 = min(l1 + r1 + 2, l2 + r2, l3 + r3 + 2, l4 + r4 + 2) # current on, others off
+                t4 = min(l1 + r1 + 1, l2 + r2 + 1, l3 + r3 + 3, l4 + r4 + 1) # current off, others on
+            else: # If current node&#39;s light is off
+                t1 = min(l1 + r1 + 1, 1 + l2 + r2, 3 + l3 + r3, 1 + l4 + r4) # all lights on
+                t2 = min(l2 + r2, l1 + r1 + 2, l3 + r3 + 2, l4 + r4 + 2) # all lights off
+                t3 = min(l1 + r1 + 1, l2 + r2 + 1, l3 + r3 + 1, l4 + r4 + 3) # current on, others off
+                t4 = min(l1 + r1, l2 + r2 + 2, l3 + r3 + 2, l4 + r4 + 2) # current off, others on
+            return t1, t2, t3, t4 # Return calculated states
+        # Start DFS from the root
+        ans = dfs(root)
+        return ans[1] # Return the minimum operations to turn all lights off</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            解题思路中提到的四种状态具体是如何定义的？能否详细解释每个状态的具体意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，每个节点都计算了四种不同的状态，这些状态反映了不同的灯光配置及其所需的最小操作次数。这四种状态分别为：1) 所有灯都亮着；2) 所有灯都熄灭；3) 仅当前节点的灯亮着，其他都熄灭；4) 当前节点的灯熄灭，其他都亮着。第一种状态用于计算将当前节点以及其所有子节点的灯全部点亮所需的最小操作数。第二种状态用于计算将所有灯熄灭的最小操作数。第三种状态专注于只有当前节点灯亮，其余节点灯都熄灭的情形，这在一些情况下可以最小化操作次数。第四种状态则是当前节点灯熄灭，其他节点灯亮的配置，这也是一种特殊的灯光状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在考虑转换状态时，为什么需要考虑`1 + l2 + r2`和`l1 + r1 + 1`这样的状态转换？这里的1代表什么操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，`1`代表进行一次开关操作，无论是将灯从开启状态切换到关闭状态，还是从关闭状态切换到开启状态。例如，在表达式`1 + l2 + r2`中，`1`表示对当前节点进行一次操作（如果当前灯是亮的，就关闭它；如果是灭的，就打开它），而`l2`和`r2`分别表示左、右子树已经全部熄灭的最小操作数。同理，`l1 + r1 + 1`中的`1`也表示对当前节点进行一次操作，`l1`和`r1`表示左右子树处于全亮状态的最小操作数。这些操作确保了在转换状态时，能够从一个状态准确地转换到另一个所需状态，同时保证操作次数最小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            解法中提到了利用深度优先搜索（DFS），请问这种方法在处理节点的子树状态时是如何确保所有情况都被考虑到的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>深度优先搜索（DFS）是一种递归遍历树的方法，它从根节点开始，递归地访问每个节点的左子树和右子树。在这个题解中，DFS被用来计算每个节点在四种不同状态下的最小操作数。通过递归调用，DFS确保了从每个叶子节点开始到根节点的每一步中，都将左子树和右子树的所有可能状态考虑在内。这样，每次递归返回时，都会结合当前节点的状态和其子节点的状态，计算出当前节点的最优状态。这种自底向上的计算方式确保了每个节点在计算时都有完整的子树信息，从而保证了所有可能的情况都被充分考虑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/U7WvvU')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/U7WvvU/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

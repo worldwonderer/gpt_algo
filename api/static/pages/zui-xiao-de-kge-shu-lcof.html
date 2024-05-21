@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>库存管理 III</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>库存管理 III</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=quickselect" class="badge bg-secondary tag-link">快速选择</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>仓库管理员以数组 <code>stock</code> 形式记录商品库存表，其中 <code>stock[i]</code> 表示对应商品库存余量。请返回库存余量最少的 <code>cnt</code> 个商品余量，返回&nbsp;<strong>顺序不限</strong>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>stock = [2,5,7,4], cnt = 1
+<strong>输出：</strong>[2]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>stock = [0,2,3,6], cnt = 2
+<strong>输出：</strong>[0,2] 或 [2,0]</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= cnt &lt;= stock.length &lt;= 10000<br />
+	0 &lt;= stock[i] &lt;= 10000</code></li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 116 ms</p>
+                    <p>内存: 15.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def getLeastNumbers(self, arr: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return []
+        if len(arr) &lt;= k:
+            return arr
+
+        self.partition_helper(arr, 0, len(arr) - 1, k)
+        return arr[:k]
+
+    def partition_helper(self, arr, lo, hi, k):
+        j = self.partition(arr, lo, hi)
+        if j &gt; k:
+            self.partition_helper(arr, lo, j-1, k)
+        elif j &lt; k:
+            self.partition_helper(arr, j+1, hi, k)
+
+    def partition(self, arr, lo, hi):
+        if lo == hi:
+            return lo
+        v = arr[lo]
+        i = lo
+        j = hi+1
+        while True:
+            while True:
+                i += 1
+                if arr[i] &gt; v:
+                    break
+                if i &gt;= hi:
+                    break
+            while True:
+                j -= 1
+                if arr[j] &lt; v:
+                    break
+                if j &lt;= lo:
+                    break
+            if i &gt;= j:
+                break
+            arr[i], arr[j] = arr[j], arr[i]
+        arr[lo], arr[j] = arr[j], arr[lo]
+        return j
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了快速选择（Quickselect）算法，这是一种用于在未排序的数组中找到第 k 个最小元素的方法。算法的核心思想是快速排序的一部分，即选取一个枢轴元素并对数组进行分区，将小于枢轴的元素放在其左侧，大于枢轴的元素放在其右侧。根据枢轴的位置与 k 的比较，递归地在需要的一侧继续进行分区操作，直到找到第 k 个最小元素。在本题中，我们不需要完全排序，只需要找到最小的 k 个元素即可。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(log n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def getLeastNumbers(self, arr: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return []  # 如果 k 为 0，直接返回空列表
+        if len(arr) &lt;= k:
+            return arr  # 如果数组长度不大于 k，直接返回整个数组
+
+        self.partition_helper(arr, 0, len(arr) - 1, k)  # 调用辅助函数来进行分区
+        return arr[:k]  # 返回最小的 k 个数
+
+    def partition_helper(self, arr, lo, hi, k):
+        j = self.partition(arr, lo, hi)  # 执行一次分区操作
+        if j &gt; k:
+            self.partition_helper(arr, lo, j-1, k)  # 如果枢轴位置大于 k，递归左侧
+        elif j &lt; k:
+            self.partition_helper(arr, j+1, hi, k)  # 如果枢轴位置小于 k，递归右侧
+
+    def partition(self, arr, lo, hi):
+        if lo == hi:
+            return lo
+        v = arr[lo]  # 选择枢轴元素
+        i = lo
+        j = hi+1
+        while True:
+            while True:
+                i += 1
+                if i &gt;= hi or arr[i] &gt; v:
+                    break
+            while True:
+                j -= 1
+                if j &lt;= lo or arr[j] &lt; v:
+                    break
+            if i &gt;= j:
+                break  # 当两个指针相遇时跳出循环
+            arr[i], arr[j] = arr[j], arr[i]  # 交换元素
+        arr[lo], arr[j] = arr[j], arr[lo]  # 将枢轴元素放到正确位置
+        return j  # 返回枢轴的最终位置</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到如果 k 等于 0 则返回空列表，这是否意味着函数对所有可能的 k 值都进行了错误处理和边界检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解确实处理了 k 等于 0 的情况，返回空列表，这是一个有效的边界条件处理。然而，题解也应该明确处理 k 为负数的情况，因为负数不是有效的 k 值。另外，如果 k 大于数组长度，虽然题解返回整个数组，但这种情况下可能也应该有特定的处理或者提示，以确保函数对所有输入值都进行了适当的错误处理和边界检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在快速选择算法的递归实现中，是否存在堆栈溢出的风险，特别是在数组长度非常大的情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>快速选择算法的递归实现确实存在堆栈溢出的风险，尤其是在最坏情况下，即每次选择的枢轴都不将数组有效分割成较小的部分时。这种情况下递归的深度可以达到数组的长度，从而导致堆栈溢出。为了减少这种风险，可以采用迭代方法，或者改进枢轴选择策略，如使用随机枢轴或三数中值分割法来尽可能确保分割的均匀性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解提到返回最小的 k 个元素，那么算法是如何确保在递归结束时这 k 个元素是数组中最小的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>快速选择算法通过递归地调整枢轴的位置来确保枢轴左侧的所有元素都不大于右侧的元素。当枢轴的最终位置正好是 k-1 时，它及其左侧的所有元素（总共 k 个元素）就是数组中最小的 k 个元素。算法将只在需要的部分（即包含 k 个最小元素的部分）上进行递归操作，从而在递归结束时保证得到正确的最小 k 个元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在分区函数中，内部的两个 while 循环是如何确保不会跳出数组界限的，特别是在极端情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在分区函数中，内部的两个 while 循环通过条件检查来确保 i 和 j 不会越界。对于 i 的循环，它会停止递增当 i 为 hi 或者 arr[i] 大于枢轴值 v。对于 j 的循环，它会停止递减当 j 为 lo 或者 arr[j] 小于 v。这样的条件确保了即使在极端情况下，如数组已经有序或枢轴选取不佳时，循环也不会导致数组访问越界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/zui-xiao-de-kge-shu-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/zui-xiao-de-kge-shu-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

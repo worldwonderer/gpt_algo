@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>N 天后的牢房</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>N 天后的牢房</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>监狱中 <code>8</code> 间牢房排成一排，每间牢房可能被占用或空置。</p>
+
+<p>每天，无论牢房是被占用或空置，都会根据以下规则进行变更：</p>
+
+<ul>
+	<li>如果一间牢房的两个相邻的房间都被占用或都是空的，那么该牢房就会被占用。</li>
+	<li>否则，它就会被空置。</li>
+</ul>
+
+<p><strong>注意</strong>：由于监狱中的牢房排成一行，所以行中的第一个和最后一个牢房不存在两个相邻的房间。</p>
+
+<p>给你一个整数数组 <code>cells</code> ，用于表示牢房的初始状态：如果第 <code>i</code> 间牢房被占用，则 <code>cell[i]==1</code>，否则 <code>cell[i]==0</code> 。另给你一个整数 <code>n</code> 。</p>
+
+<p>请你返回 <code>n</code> 天后监狱的状况（即，按上文描述进行 <code>n</code> 次变更）。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>cells = [0,1,0,1,1,0,0,1], n = 7
+<strong>输出：</strong>[0,0,1,1,0,0,0,0]
+<strong>解释：</strong>下表总结了监狱每天的状况：
+Day 0: [0, 1, 0, 1, 1, 0, 0, 1]
+Day 1: [0, 1, 1, 0, 0, 0, 0, 0]
+Day 2: [0, 0, 0, 0, 1, 1, 1, 0]
+Day 3: [0, 1, 1, 0, 0, 1, 0, 0]
+Day 4: [0, 0, 0, 0, 0, 1, 0, 0]
+Day 5: [0, 1, 1, 1, 0, 1, 0, 0]
+Day 6: [0, 0, 1, 0, 1, 1, 0, 0]
+Day 7: [0, 0, 1, 1, 0, 0, 0, 0]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>cells = [1,0,0,1,0,0,1,0], n = 1000000000
+<strong>输出：</strong>[0,0,1,1,1,1,1,0]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>cells.length == 8</code></li>
+	<li><code>cells[i]</code> 为 <code>0</code> 或 <code>1</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 24 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def prisonAfterNDays(self, cells: List[int], n: int) -&gt; List[int]:
+        indexState = {}
+        cycle = 0
+        old_cells = cells
+        for i in range(n):
+            new_cells = [-1]*len(cells)
+            for j in range(len(cells)):
+                if j-1 &lt; 0 or j+1 &gt;= len(cells):
+                    new_cells[j] = 0
+                    continue
+                else:
+                    new_cells[j] = 0
+                if (old_cells[j-1] == 0 and old_cells[j+1] == 0) or (old_cells[j-1] == 1 and old_cells[j+1] == 1):
+                    new_cells[j] = 1
+                else:
+                    new_cells[j] = 0
+            old_cells = new_cells
+            # cells_state = &#34;&#34;.join(map(str, new_cells))
+            cells_state = tuple(new_cells)
+            if cells_state not in indexState:
+                indexState[cells_state] = i+1
+                cycle += 1
+            else:
+                break
+        states = list(indexState.keys())
+        # print(states, len(states), n, cycle)
+        return states[-1] if n == cycle else states[n%cycle-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解通过模拟牢房状态的变化，并使用哈希表来检测循环出现的状态，从而优化长周期的模拟过程。首先，算法模拟了牢房状态的每日变化，根据题目规则更新每个牢房。然后，使用一个元组来存储每日牢房的状态，用哈希表记录每个状态第一次出现的天数。如果某个状态已经在哈希表中，则意味着找到了循环周期，可以停止模拟。最后，根据天数 n 与周期长度，利用取余操作确定最终的牢房状态。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 定义解决方案类
+
+class Solution:
+    def prisonAfterNDays(self, cells: List[int], n: int) -&gt; List[int]:
+        indexState = {}  # 用于记录每种状态第一次出现的日子
+        cycle = 0  # 记录状态变化的周期
+        old_cells = cells  # 当前牢房的状态
+        for i in range(n):  # 模拟n天的状态变化
+            new_cells = [-1]*len(cells)  # 初始化新的一天的牢房状态
+            for j in range(len(cells)):  # 更新每个牢房的状态
+                if j-1 &lt; 0 or j+1 &gt;= len(cells):  # 特殊处理第一个和最后一个牢房
+                    new_cells[j] = 0
+                    continue
+                # 根据相邻牢房的状态更新当前牢房状态
+                new_cells[j] = 1 if (old_cells[j-1] == old_cells[j+1]) else 0
+            old_cells = new_cells  # 更新旧状态为当前状态
+            cells_state = tuple(new_cells)  # 将状态转换为元组以便存储和比较
+            if cells_state not in indexState:  # 如果状态是首次出现
+                indexState[cells_state] = i+1
+                cycle += 1  # 更新周期
+            else:  # 如果状态重复，说明找到了循环
+                break
+        states = list(indexState.keys())  # 获取所有独特的状态
+        # 根据n和周期计算最终状态
+        return states[-1] if n == cycle else states[n%cycle-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么第一个和最后一个牢房的状态在每一天的更新中始终设为0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据题目的规则，牢房状态的更新依赖于相邻两个牢房的状态。对于第一个和最后一个牢房，由于它们分别只有右侧和左侧邻居，不存在两个有效的相邻牢房，因此在模拟状态更新时，无法按照正常规则进行更新。为了简化处理，直接将这两个牢房的状态设置为0。这种处理方式符合题目中对边界情况的默许规则，即边界外没有牢房被视为状态为0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到了状态循环的可能性，具体是如何判断状态开始循环的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，使用哈希表来记录每一个牢房状态第一次出现的天数。每次生成新的牢房状态后，会将其转换为元组形式并检查这个状态是否已存在于哈希表中。如果这个状态之前已被记录，那么意味着状态开始重复，从而形成了一个循环。由于状态重复出现的那一天与这一状态首次出现的天数之间，牢房的变化状态将会周期性重复，因此一旦检测到重复状态，就可以确定状态的循环周期已经形成。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解的逻辑中，当找到循环时如何计算剩余天数和循环周期之间的关系，并确定最终状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>一旦确定了循环周期，题解首先计算出循环开始前非循环状态的天数（即首次出现重复状态的天数与循环周期的关系）。当总天数n小于循环开始的天数时，直接从记录的状态中获取第n天的状态。如果n大于或等于循环开始的天数，首先确定循环周期的长度，然后使用 n 对循环周期长度进行取余操作，得到的结果指出在循环周期中的具体位置。最后，根据这个位置从循环周期中的状态列表获取最终的牢房状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/prison-cells-after-n-days')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/prison-cells-after-n-days/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

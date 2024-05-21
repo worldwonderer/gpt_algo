@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单词拆分</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单词拆分</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串 <code>s</code> 和一个字符串列表 <code>wordDict</code> 作为字典。如果可以利用字典中出现的一个或多个单词拼接出 <code>s</code>&nbsp;则返回 <code>true</code>。</p>
+
+<p><strong>注意：</strong>不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入:</strong> s = "leetcode", wordDict = ["leet", "code"]
+<strong>输出:</strong> true
+<strong>解释:</strong> 返回 true 因为 "leetcode" 可以由 "leet" 和 "code" 拼接成。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入:</strong> s = "applepenapple", wordDict = ["apple", "pen"]
+<strong>输出:</strong> true
+<strong>解释:</strong> 返回 true 因为 <code>"</code>applepenapple<code>"</code> 可以由 <code>"</code>apple" "pen" "apple<code>" 拼接成</code>。
+&nbsp;    注意，你可以重复使用字典中的单词。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入:</strong> s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+<strong>输出:</strong> false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 300</code></li>
+	<li><code>1 &lt;= wordDict.length &lt;= 1000</code></li>
+	<li><code>1 &lt;= wordDict[i].length &lt;= 20</code></li>
+	<li><code>s</code> 和 <code>wordDict[i]</code> 仅由小写英文字母组成</li>
+	<li><code>wordDict</code> 中的所有字符串 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 17 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -&gt; bool:
+        # 容量为len(s)的背包，物品为wordDict中的单词
+        # 单词可重复使用，为完全背包问题
+        # 1. dp[j]：物品能否达成容量为j的背包；j：长度
+        # 2. 递推式：dp[j] = dp[j] or (dp[j - wordDict[i]] and s[j - wordDict[i] : j + 1] == wordDict[i])
+        # 3. 初始化：dp[0] = True, dp[j] = False
+        # 3. 遍历顺序：内外层背包物品均可，均需正序
+        dp = [False] * (len(s) + 1)
+        dp[0] = True
+        for j in range(len(s) + 1):
+            for i in range(len(wordDict)):
+                if j &gt;= len(wordDict[i]):
+                    dp[j] = dp[j] or (dp[j - len(wordDict[i])] and s[j - len(wordDict[i]) : j] == wordDict[i])
+        return dp[len(s)]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用动态规划来解决单词拆分问题。它将问题转化为一个完全背包问题，其中背包的容量为字符串s的长度，物品为字典wordDict中的单词。dp[j]表示物品能否达成容量为j的背包。状态转移方程为：dp[j] = dp[j] or (dp[j - len(wordDict[i])] and s[j - len(wordDict[i]) : j] == wordDict[i])，即如果dp[j - len(wordDict[i])]为True，且s[j - len(wordDict[i]) : j]等于wordDict[i]，则dp[j]为True。最后返回dp[len(s)]即可得到结果。</p>
+                                <p>时间复杂度: O(len(s) * len(wordDict))</p>
+                                <p>空间复杂度: O(len(s))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -&gt; bool:
+        # 容量为len(s)的背包，物品为wordDict中的单词
+        # 单词可重复使用，为完全背包问题
+        # 1. dp[j]：物品能否达成容量为j的背包；j：长度
+        # 2. 递推式：dp[j] = dp[j] or (dp[j - len(wordDict[i])] and s[j - len(wordDict[i]) : j] == wordDict[i])
+        # 3. 初始化：dp[0] = True, dp[j] = False
+        # 4. 遍历顺序：内外层背包物品均可，均需正序
+        dp = [False] * (len(s) + 1)  # 初始化dp数组
+        dp[0] = True  # 初始化dp[0]为True
+        for j in range(len(s) + 1):  # 外层循环遍历背包容量
+            for i in range(len(wordDict)):  # 内层循环遍历物品
+                if j &gt;= len(wordDict[i]):  # 如果当前背包容量大于等于当前物品的长度
+                    # 状态转移方程
+                    dp[j] = dp[j] or (dp[j - len(wordDict[i])] and s[j - len(wordDict[i]) : j] == wordDict[i])
+        return dp[len(s)]  # 返回最终结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            动态规划中的状态转移方程 `dp[j] = dp[j] or (dp[j - len(wordDict[i])] and s[j - len(wordDict[i]) : j] == wordDict[i])` 是如何确保不会重复使用同一位置的字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在状态转移方程中，每次考虑的是从位置 `j - len(wordDict[i])` 到 `j` 的子字符串是否与 `wordDict[i]` 相匹配，且前一个状态 `dp[j - len(wordDict[i])]` 必须为真，即以 `j - len(wordDict[i])` 为结尾的字符串可以被 `wordDict` 中的其他单词分割。这种方法每次转移是基于之前已验证的子字符串，所以不会重复使用同一位置的字符，每个字符位置只被用来验证一次是否能形成有效的单词分割。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划的实现中，对于 `dp` 数组的初始化，为什么只有 `dp[0]` 被设置为 `True`，而其他位置初始化为 `False`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dp[0]` 被设置为 `True` 是因为一个长度为0的字符串（空字符串）自然无需分割就是一个有效的分割。其他的 `dp[j]` 初始化为 `False` 表示在开始时，假设所有长度的字符串都不能被 `wordDict` 中的单词完全分割，这是一个安全的默认假设，只有当找到有效的单词匹配组合时才将对应的 `dp[j]` 更新为 `True`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到这是一个完全背包问题，如何解释字符串 `s` 和 `wordDict` 之间的关系与传统的完全背包问题中的物品和容量之间的关系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在传统的完全背包问题中，我们有一系列物品，每个物品可以被无限次选用，目标是填满一个给定的容量背包。在单词拆分问题中，字符串 `s` 的长度相当于背包的容量，而 `wordDict` 中的每个单词相当于背包问题中的一个物品。单词可以无限次使用来填充这个背包，即填充字符串 `s`。目标是完全使用 `wordDict` 中的单词填满整个字符串 `s` 的长度，不留空隙。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么题解建议外层循环遍历背包容量，内层循环遍历物品，这种遍历顺序对问题解决有什么特别的帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种遍历顺序有助于确保在更新 `dp[j]` 值时，所有可能的单词长度和对应的子问题（即更小的 `j` 值）已经被考虑。这样可以保证在尝试填充任何长度为 `j` 的背包时，我们已经考虑了所有可能的单词组合来达到这个长度。此外，这种方法避免了在更新 `dp[j]` 时重复计算或遗漏任何单词的可能性，使得动态规划的表填充更为有效和系统。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/word-break-ii" class="list-group-item list-group-item-action">
+                                单词拆分 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/word-break')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/word-break/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

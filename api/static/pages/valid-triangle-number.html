@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>有效三角形的个数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>有效三角形的个数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个包含非负整数的数组&nbsp;<code>nums</code> ，返回其中可以组成三角形三条边的三元组个数。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> nums = [2,2,3,4]
+<strong>输出:</strong> 3
+<strong>解释:</strong>有效的组合是: 
+2,3,4 (使用第一个 2)
+2,3,4 (使用第二个 2)
+2,2,3
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> nums = [4,2,3,4]
+<strong>输出:</strong> 4</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 1000</code></li>
+	<li><code>0 &lt;= nums[i] &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 437 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def triangleNumber(self, nums: List[int]) -&gt; int:
+        # 三角形 任意两边之和 大于第三边
+        # 数组有序 c &gt; b &gt; a   a+b &gt; c =&gt;  a+c &gt; b b+c &gt; a
+
+        nums.sort()
+        ans = 0
+        for k in range(2, len(nums)):
+            c = nums[k]
+            a = 0
+            b = k - 1
+            while a &lt; b:
+                if nums[a] + nums[b] &gt; c:
+                    ans += b - a
+                    b = b - 1
+                else:
+                    a = a + 1
+        return ans </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了二分查找的思路。首先将数组按升序排序，然后固定最长边 c，用双指针 a 和 b 分别指向最短边和中间边。在 a 和 b 范围内查找符合条件的三角形组合。如果 nums[a] + nums[b] &gt; c，说明存在满足条件的三角形，数量为 b - a，然后将 b 左移缩小范围；否则将 a 右移扩大范围。最后遍历所有可能的最长边 c，将满足条件的三角形数量累加到结果中。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def triangleNumber(self, nums: List[int]) -&gt; int:
+        # 三角形 任意两边之和 大于第三边
+        # 数组有序 c &gt; b &gt; a   a+b &gt; c =&gt;  a+c &gt; b b+c &gt; a
+        
+        nums.sort()  # 对数组进行升序排序
+        ans = 0
+        for k in range(2, len(nums)):  # 遍历所有可能的最长边 c
+            c = nums[k]
+            a = 0  # 最短边指针
+            b = k - 1  # 中间边指针
+            while a &lt; b:  # 双指针查找满足条件的三角形
+                if nums[a] + nums[b] &gt; c:  # 找到满足条件的三角形
+                    ans += b - a  # 累加满足条件的三角形数量
+                    b = b - 1  # 缩小中间边范围
+                else:
+                    a = a + 1  # 扩大最短边范围
+        return ans  # 返回满足条件的三角形总数
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在实现中选择首先对数组进行排序？排序对解题策略有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对数组进行排序是为了简化三角形合法性的检查过程。排序后，可以保证任意选取的三个数满足 c &gt;= b &gt;= a，这样只需要检查 a + b &gt; c 是否成立即可。此外，排序使得使用双指针策略成为可能，这样可以有效地减少不必要的组合检查，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在选择固定最长边c并使用双指针a和b时，这种方法是否确保了检查所有可能的三元组组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，该方法通过固定最长边c，并使用双指针a和b（分别指向可能的最短边和中间边），确保了遍历所有可能的三元组组合。双指针从数组的两端向中间移动，能够覆盖所有可能使得 a + b &gt; c 的组合，从而不遗漏任何一个可能的有效三角形。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么当`nums[a] + nums[b] &gt; c`时，可以直接累加`b - a`作为有效的组合数目？这样做的数学逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 nums[a] + nums[b] &gt; c 时，由于数组已经排序，说明从指针a到指针b-1的任意一个位置 i，nums[i] + nums[b] 都将大于 c（因为 nums[i] &gt;= nums[a]）。因此，对于固定的 b，从 a 到 b-1 的任意位置都可以与 b 形成有效的三角形组合。累加 b - a 是因为这是从 a 到 b-1 的元素个数，即所有满足条件的三元组的数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果在某次迭代中`nums[a] + nums[b] &lt;= c`，为什么选择移动指针a（最短边）而不是指针b（中间边）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 nums[a] + nums[b] &lt;= c 时，说明当前最短边 a 太短，无法与 b 组成有效的三角形。因此需要尝试更大的最短边，即将 a 向右移动，以寻找可能存在的有效组合。移动 b（向左移动）将不会帮助增加 nums[a] + nums[b] 的值，反而可能错过一些有效组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/3sum-smaller" class="list-group-item list-group-item-action">
+                                较小的三数之和
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/valid-triangle-number')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/valid-triangle-number/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

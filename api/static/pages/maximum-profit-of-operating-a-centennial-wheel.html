@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>经营摩天轮的最大利润</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>经营摩天轮的最大利润</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你正在经营一座摩天轮，该摩天轮共有 <strong>4 个座舱</strong> ，每个座舱<strong> 最多可以容纳 4 位游客</strong> 。你可以 <strong>逆时针</strong>&nbsp;轮转座舱，但每次轮转都需要支付一定的运行成本 <code>runningCost</code> 。</p>
+
+<p>给你一个长度为 <code>n</code> 的数组 <code>customers</code> ， <code>customers[i]</code> 是在第 <code>i</code> 次轮转（下标从 0 开始）之前到达的新游客的数量。这也意味着你必须在新游客到来前轮转 <code>i</code> 次。<strong>如果有座舱空闲就不能让游客等待。</strong>每位游客在登上离地面最近的座舱前都会支付登舱成本 <code>boardingCost</code> ，一旦该座舱再次抵达地面，他们就会离开座舱结束游玩。</p>
+
+<p>你可以随时停下摩天轮，即便是 <strong>在服务所有游客之前</strong> 。如果你决定停止运营摩天轮，为了保证所有游客安全着陆，<strong>将免费进行</strong><strong>所有后续轮转</strong>&nbsp;。注意，如果有超过 4 位游客在等摩天轮，那么只有 4 位游客可以登上摩天轮，其余的需要等待 <strong>下一次轮转</strong> 。</p>
+
+<p>返回最大化利润所需执行的 <strong>最小轮转次数</strong> 。 如果不存在利润为正的方案，则返回 <code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/26/wheeldiagram12.png" /></p>
+
+<pre>
+<strong>输入：</strong>customers = [8,3], boardingCost = 5, runningCost = 6
+<strong>输出：</strong>3
+<strong>解释：</strong>座舱上标注的数字是该座舱的当前游客数。
+1. 8 位游客抵达，4 位登舱，4 位等待下一舱，摩天轮轮转。当前利润为 4 * $5 - 1 * $6 = $14 。
+2. 3 位游客抵达，4 位在等待的游客登舱，其他 3 位等待，摩天轮轮转。当前利润为 8 * $5 - 2 * $6 = $28 。
+3. 最后 3 位游客登舱，摩天轮轮转。当前利润为 11 * $5 - 3 * $6 = $37 。
+轮转 3 次得到最大利润，最大利润为 $37 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>customers = [10,9,6], boardingCost = 6, runningCost = 4
+<strong>输出：</strong>7
+<strong>解释：</strong>
+1. 10 位游客抵达，4 位登舱，6 位等待下一舱，摩天轮轮转。当前利润为 4 * $6 - 1 * $4 = $20 。
+2. 9 位游客抵达，4 位登舱，11 位等待（2 位是先前就在等待的，9 位新加入等待的），摩天轮轮转。当前利润为 8 * $6 - 2 * $4 = $40 。
+3. 最后 6 位游客抵达，4 位登舱，13 位等待，摩天轮轮转。当前利润为 12 * $6 - 3 * $4 = $60 。
+4. 4 位登舱，9 位等待，摩天轮轮转。当前利润为 * $6 - 4 * $4 = $80 。
+5. 4 位登舱，5 位等待，摩天轮轮转。当前利润为 20 * $6 - 5 * $4 = $100 。
+6. 4 位登舱，1 位等待，摩天轮轮转。当前利润为 24 * $6 - 6 * $4 = $120 。
+7. 1 位登舱，摩天轮轮转。当前利润为 25 * $6 - 7 * $4 = $122 。
+轮转 7 次得到最大利润，最大利润为$122 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>customers = [3,4,0,5,1], boardingCost = 1, runningCost = 92
+<strong>输出：</strong>-1
+<strong>解释：</strong>
+1. 3 位游客抵达，3 位登舱，0 位等待，摩天轮轮转。当前利润为 3 * $1 - 1 * $92 = -$89 。
+2. 4 位游客抵达，4 位登舱，0 位等待，摩天轮轮转。当前利润为 7 * $1 - 2 * $92 = -$177 。
+3. 0 位游客抵达，0 位登舱，0 位等待，摩天轮轮转。当前利润为 7 * $1 - 3 * $92 = -$269 。
+4. 5 位游客抵达，4 位登舱，1 位等待，摩天轮轮转。当前利润为 11 * $1 - 4 * $92 = -$357 。
+5. 1 位游客抵达，2 位登舱，0 位等待，摩天轮轮转。当前利润为 13 * $1 - 5 * $92 = -$447 。
+利润永不为正，所以返回 -1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == customers.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= customers[i] &lt;= 50</code></li>
+	<li><code>1 &lt;= boardingCost, runningCost &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 20.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minOperationsMaxProfit(self, customers: List[int], boardingCost: int, runningCost: int) -&gt; int:
+        if boardingCost * 4 &lt;= runningCost:
+            return -1
+        max_profit = float(&#34;-inf&#34;)
+        min_index = float(&#34;inf&#34;)
+        boarded_customer = 0
+        remain_customer = 0
+        running_round = 0
+        while running_round &lt; len(customers) or remain_customer:
+            if running_round &lt; len(customers):
+                remain_customer += customers[running_round]
+            if remain_customer &lt;= 4:
+                boarded_customer+=remain_customer
+                remain_customer = 0
+                running_round+=1
+            else:
+                boarded_customer += (remain_customer -remain_customer % 4)
+                new_round = remain_customer // 4
+                remain_customer = remain_customer % 4
+                if running_round &lt; len(customers):
+                    remain_customer += sum(customers[running_round+1:running_round+new_round])
+                running_round += new_round
+            now_profit = boarded_customer * boardingCost - running_round * runningCost
+            if now_profit &gt; max_profit:
+                max_profit = now_profit
+                min_index = running_round
+        return min_index if max_profit &gt; 0 else -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解旨在通过模拟每一轮的摩天轮运行，计算出在何时停止运行可以达到最大利润。首先判断如果每轮的最大登舱费用不能覆盖运行成本，则直接返回-1。接着，使用循环来模拟每一轮摩天轮的运行，处理每轮到达的顾客数，计算在当前轮顾客登舱后的剩余顾客数。然后更新当前的总利润，并检查是否达到了新的最大利润。循环结束时，如果存在正利润，则返回达到该利润时的最小轮次；否则返回-1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minOperationsMaxProfit(self, customers: List[int], boardingCost: int, runningCost: int) -&gt; int:
+        if boardingCost * 4 &lt;= runningCost:
+            # 如果每轮最大的登舱收入都无法覆盖运行成本，则直接返回-1
+            return -1
+        max_profit = float(&#39;-inf&#39;)
+        min_index = float(&#39;inf&#39;)
+        boarded_customer = 0
+        remain_customer = 0
+        running_round = 0
+        # 循环处理每一轮的顾客
+        while running_round &lt; len(customers) or remain_customer:
+            if running_round &lt; len(customers):
+                # 添加新一轮到达的顾客
+                remain_customer += customers[running_round]
+            if remain_customer &lt;= 4:
+                # 如果剩余顾客少于等于4人，全部登舱
+                boarded_customer += remain_customer
+                remain_customer = 0
+                running_round += 1
+            else:
+                # 如果剩余顾客多于4人，最多4人登舱
+                boarded_customer += (remain_customer - remain_customer % 4)
+                new_round = remain_customer // 4
+                remain_customer = remain_customer % 4
+                if running_round &lt; len(customers):
+                    # 将新的顾客加入到剩余顾客中
+                    remain_customer += sum(customers[running_round+1:running_round+new_round])
+                running_round += new_round
+            # 计算当前的利润
+            now_profit = boarded_customer * boardingCost - running_round * runningCost
+            if now_profit &gt; max_profit:
+                # 更新最大利润和对应的轮次
+                max_profit = now_profit
+                min_index = running_round
+        # 如果最大利润为正，返回最小轮次；否则返回-1
+        return min_index if max_profit &gt; 0 else -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在判断是否直接返回-1时，你是如何确定每轮最大的登舱费用不能覆盖运行成本就应该结束运营的？是否考虑了累积效应？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中，我考虑的是每轮摩天轮的最大登舱收入（即4人全满时的收入）。如果这个收入乘以每人的登舱费用仍然小于或等于运行成本，那么无论客流如何变化，单轮运营都不可能实现盈利。这里没有考虑累积效应，因为累积效应指的是随时间累计而可能提高的利润，但如果单轮运营本身就不盈利，那么累计也无法覆盖持续的亏损。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在代码中，remain_customer的处理逻辑似乎有误。当remain_customer大于4时，你是如何处理超出的顾客数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当remain_customer大于4时，我的代码中确实有一些处理上的逻辑问题。理论上，应该将每轮最多4人登舱，超出的顾客数量应保留到下一轮。但在代码中，通过remain_customer % 4计算得到的是本轮实际登舱的顾客数，而remain_customer // 4得到的new_round用于增加已经运行的轮次。这里的处理逻辑应更清晰地反映出每轮只处理4个顾客，多余的顾客滚动到下一轮。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            循环中，如果remain_customer大于4，计算new_round时使用的逻辑是否正确？为什么要将remain_customer除以4得到的值加到running_round上？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的逻辑确实有误。remain_customer除以4得到的是可以完整处理的轮数，而不是应该直接加到running_round上的。这种处理方式错误地假设了每轮都能处理完4个顾客，忽略了在实际情况中可能存在的顾客不足4人的情况。正确的做法应该是对于每一轮仅增加1到running_round，直到处理完所有顾客。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新最大利润时，你是如何确定当前轮次是达到最大利润的最小轮次的？是否有可能在后续的轮次中虽然利润没有增加但轮次数更少？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中通过比较当前利润与之前记录的最大利润来更新最大利润和对应的轮次。如果当前利润大于之前的最大利润，就更新最大利润并记录当前的轮次。这确保了一旦出现新的最高利润，就会记录下达到这一利润的最小轮次。后续轮次的利润如果没有超过这一最大值，则不会影响记录的轮次。这确保了只在利润增加时更新轮次，避免了您提到的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-profit-of-operating-a-centennial-wheel')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-profit-of-operating-a-centennial-wheel/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

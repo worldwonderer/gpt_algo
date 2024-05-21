@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子数组中占绝大多数的元素</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子数组中占绝大多数的元素</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>设计一个数据结构，有效地找到给定子数组的 <strong>多数元素</strong> 。</p>
+
+<p>子数组的 <strong>多数元素</strong> 是在子数组中出现&nbsp;<code>threshold</code>&nbsp;次数或次数以上的元素。</p>
+
+<p>实现 <code>MajorityChecker</code> 类:</p>
+
+<ul>
+	<li><code>MajorityChecker(int[] arr)</code>&nbsp;会用给定的数组 <code>arr</code>&nbsp;对&nbsp;<code>MajorityChecker</code> 初始化。</li>
+	<li><code>int query(int left, int right, int threshold)</code>&nbsp;返回子数组中的元素 &nbsp;<code>arr[left...right]</code>&nbsp;至少出现&nbsp;<code>threshold</code>&nbsp;次数，如果不存在这样的元素则返回 <code>-1</code>。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入:</strong>
+["MajorityChecker", "query", "query", "query"]
+[[[1, 1, 2, 2, 1, 1]], [0, 5, 4], [0, 3, 3], [2, 3, 2]]
+<strong>输出：</strong>
+[null, 1, -1, 2]
+
+<b>解释：</b>
+MajorityChecker majorityChecker = new MajorityChecker([1,1,2,2,1,1]);
+majorityChecker.query(0,5,4); // 返回 1
+majorityChecker.query(0,3,3); // 返回 -1
+majorityChecker.query(2,3,2); // 返回 2
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= arr[i] &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= left &lt;= right &lt; arr.length</code></li>
+	<li><code>threshold &lt;= right - left + 1</code></li>
+	<li><code>2 * threshold &gt; right - left + 1</code></li>
+	<li>调用&nbsp;<code>query</code>&nbsp;的次数最多为&nbsp;<code>10<sup>4</sup></code>&nbsp;</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 341 ms</p>
+                    <p>内存: 26.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class MajorityChecker:
+    k = 10
+
+    def __init__(self, arr: List[int]):
+        self.arr = arr
+        self.loc = defaultdict(list)
+
+        for i, val in enumerate(arr):
+            self.loc[val].append(i)
+
+    def query(self, left: int, right: int, threshold: int) -&gt; int:
+        arr_ = self.arr
+        loc_ = self.loc
+        
+        length = right - left + 1
+        for i in range(MajorityChecker.k):
+            x = arr_[randint(left, right)]
+            pos = loc_[x]
+            occ = bisect_right(pos, right) - bisect_left(pos, left)
+            if occ &gt;= threshold:
+                return x
+            elif occ * 2 &gt;= length:
+                return -1
+
+        return -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了随机化和二分查找的方法来解决问题。首先，通过遍历数组arr，将每个元素的索引位置存储在一个哈希表loc中。然后在query方法中，随机选择k次数组中的一个元素x，并查找这个元素在子数组[left, right]中出现的次数，使用二分查找来快速计算元素x在子数组中的出现次数。如果x的出现次数大于等于阈值threshold，则返回x；如果x的出现次数大于等于子数组长度的一半，但小于threshold，则说明子数组中不存在多数元素，返回-1。如果k次随机选择都没有找到多数元素，则最终也返回-1。</p>
+                                <p>时间复杂度: O(n + k log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class MajorityChecker:
+    k = 10
+
+    def __init__(self, arr: List[int]):
+        self.arr = arr
+        self.loc = defaultdict(list)
+
+        for i, val in enumerate(arr):
+            self.loc[val].append(i)
+
+    def query(self, left: int, right: int, threshold: int) -&gt; int:
+        arr_ = self.arr
+        loc_ = self.loc
+        
+        length = right - left + 1
+        for i in range(MajorityChecker.k):
+            x = arr_[randint(left, right)]
+            pos = loc_[x]
+            occ = bisect_right(pos, right) - bisect_left(pos, left)
+            if occ &gt;= threshold:
+                return x
+            elif occ * 2 &gt;= length:
+                return -1
+
+        return -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在初始化阶段，为何选择使用哈希表来存储每个元素的所有索引位置？这种数据结构有什么特定的优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用哈希表存储每个元素的所有索引位置能够快速地检索任何元素在数组中的所有出现位置。这种数据结构的优势在于其提供了高效的查找、插入和删除操作。在本题中，哈希表使得我们能够在O(1)时间复杂度内访问到任何元素的索引列表，从而支持快速地计算任意子数组中元素的出现次数。这是非常适合需要频繁查询和处理数组中特定元素位置信息的场景。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            随机选择元素的方法是否可能导致查询结果的不稳定性？如果是，如何评估这种方法的可靠性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>随机选择元素的方法确实可能导致查询结果的不稳定性，因为每次查询可能选取不同的元素进行检查，从而可能在不同的查询中得到不同的结果。为了评估这种方法的可靠性，可以考虑增加随机选择的次数k，这样可以提高找到多数元素的概率。此外，可以通过实验或理论分析来确定在特定数据分布条件下，选择的k值能够以多大的概率确保结果的准确性。通常，k值的增加会提高算法的稳定性和准确性，但同时也会增加算法的运行时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`query`方法中，为何选择进行k次随机尝试，k值的大小如何影响算法的效率和准确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`query`方法中进行k次随机尝试是为了增加算法找到多数元素的概率。k值的大小直接影响算法的效率和准确性。较大的k值意味着更高的准确性，因为算法有更多机会找到真正的多数元素，但同时也会导致算法运行时间的增加，降低效率。反之，较小的k值可能无法找到多数元素，导致算法准确性下降。因此，选择适当的k值是一种效率与准确性之间的权衡。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            二分查找在此题解中是如何应用的，能否详细解释其在计算元素出现次数中的具体作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找在本题解中用于快速计算某个元素在特定子数组[left, right]中的出现次数。具体方法是：利用二分查找算法，在该元素的索引列表中查找大于等于left的最小位置（通过`bisect_left`）和小于等于right的最大位置（通过`bisect_right`）。两者的位置差即为该元素在子数组中的出现次数。这种方法的优势在于，通过对排序好的索引列表进行二分查找，能够在O(log n)的时间复杂度内完成查找，相比线性搜索大幅提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/online-majority-element-in-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/online-majority-element-in-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

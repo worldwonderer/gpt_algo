@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大方阵和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大方阵和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>n x n</code>&nbsp;的整数方阵&nbsp;<code>matrix</code>&nbsp;。你可以执行以下操作&nbsp;<strong>任意次</strong>&nbsp;：</p>
+
+<ul>
+	<li>选择&nbsp;<code>matrix</code>&nbsp;中&nbsp;<strong>相邻</strong>&nbsp;两个元素，并将它们都 <strong>乘以</strong>&nbsp;<code>-1</code>&nbsp;。</li>
+</ul>
+
+<p>如果两个元素有 <strong>公共边</strong>&nbsp;，那么它们就是 <strong>相邻</strong>&nbsp;的。</p>
+
+<p>你的目的是 <strong>最大化</strong>&nbsp;方阵元素的和。请你在执行以上操作之后，返回方阵的&nbsp;<strong>最大</strong>&nbsp;和。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/07/16/pc79-q2ex1.png" style="width: 401px; height: 81px;">
+<pre><b>输入：</b>matrix = [[1,-1],[-1,1]]
+<b>输出：</b>4
+<b>解释：</b>我们可以执行以下操作使和等于 4 ：
+- 将第一行的 2 个元素乘以 -1 。
+- 将第一列的 2 个元素乘以 -1 。
+</pre>
+
+<p><strong>示例&nbsp;2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/07/16/pc79-q2ex2.png" style="width: 321px; height: 121px;">
+<pre><b>输入：</b>matrix = [[1,2,3],[-1,-2,-3],[1,2,3]]
+<b>输出：</b>16
+<b>解释：</b>我们可以执行以下操作使和等于 16 ：
+- 将第二行的最后 2 个元素乘以 -1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == matrix.length == matrix[i].length</code></li>
+	<li><code>2 &lt;= n &lt;= 250</code></li>
+	<li><code>-10<sup>5</sup> &lt;= matrix[i][j] &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 83 ms</p>
+                    <p>内存: 23.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxMatrixSum(self, matrix: List[List[int]]) -&gt; int:
+        &#34;&#34;&#34;
+        每一行: 如果负数个数为偶数, 可以都变成正数
+                如果负数个数为奇数, 可以转换到只剩下一个负数, 那么选者绝对值最小的那个数成为负数, 记录下负数的坐标
+        统计:
+            每一行, 要么全是正数, 要么至多有一个负数
+            我们可以把每行的负数都调整到同一列上, 这样如果该列负数的个数为偶数, 那么我们在列上进行转换, 可以都转换为正数
+            否则,我们就只能转换到只剩下一个最小的负数了
+
+        综上所述, 最终 整个矩阵中只有一个负数, 我们将选择矩阵中绝对值最小的那个数成为负数
+        &#34;&#34;&#34;
+
+        n = len(matrix)
+        cnt = 0  # 记录转换后留有一个负数的行数
+        sm = 0  # 记录所有数字的绝对值累加和
+        mn = abs(matrix[0][0])  # 记录绝对值最小的数
+        for i in range(n):
+            neg_cnt = 0
+            for num in matrix[i]:
+                x = abs(num)
+                sm += x
+                if x &lt; mn:
+                    mn = x
+
+                if num &lt; 0:
+                    neg_cnt += 1
+            if neg_cnt % 2 == 1:
+                cnt += 1
+
+        return sm if cnt % 2 == 0 else sm - mn * 2
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目的思路是通过矩阵的行和列的操作，使得矩阵中尽可能多的元素变为正数，从而最大化矩阵元素的和。首先遍历矩阵的每一行，统计每行中负数的个数。如果负数的个数为偶数，那么可以通过翻转操作使得该行所有元素都变为正数。如果负数的个数为奇数，那么可以翻转除了一个绝对值最小的负数以外的所有负数，使得该行只剩下一个负数。接着，统计转换后留有一个负数的行数，如果这个数为偶数，那么可以通过列的翻转操作，使得所有行都变为正数。如果这个数为奇数，那么最终会剩下一个负数，我们选择矩阵中绝对值最小的那个数成为负数。最后，返回矩阵所有元素的绝对值之和，如果有剩余的负数，则减去该负数的两倍。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxMatrixSum(self, matrix: List[List[int]]) -&gt; int:
+        n = len(matrix)
+        cnt = 0  # 记录转换后留有一个负数的行数
+        sm = 0  # 记录所有数字的绝对值累加和
+        mn = abs(matrix[0][0])  # 记录绝对值最小的数
+        for i in range(n):
+            neg_cnt = 0
+            for num in matrix[i]:
+                x = abs(num)
+                sm += x
+                if x &lt; mn:
+                    mn = x
+
+                if num &lt; 0:
+                    neg_cnt += 1
+            if neg_cnt % 2 == 1:
+                cnt += 1
+
+        return sm if cnt % 2 == 0 else sm - mn * 2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决方案中，你是如何确定将哪一行或哪一列的元素进行翻转？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解决方案中，首先遍历每一行，如果一行中负数的个数为偶数，则可以通过翻转整行使所有元素变为正数。如果负数的个数为奇数，则翻转除了一个绝对值最小的负数以外的所有负数。这样处理后，会记录下来留有一个负数的行的数量。如果这个数量为奇数，说明存在奇数行只有一个负数，此时需要通过翻转列来尝试消除多余的负数。如果数量为偶数，这表示所有行都可以被调整为全正数，无需进一步翻转列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在负数个数为奇数的行中，选择保留绝对值最小的负数而不是其他负数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择保留绝对值最小的负数是为了在后续可能需要调整该负数为正数时，影响到整体和的减少最小。因为在最终计算矩阵的总和时，如果行中负数个数的总和为奇数，我们必须保留一个负数。此时，如果保留的是绝对值最小的负数，最终从总和中减去这个负数的两倍（因为先前已经以正数加入总和一次），对总和的影响最小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何处理矩阵中所有元素均为负数的情况？是否存在特殊的翻转策略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果矩阵中所有元素均为负数，在每行执行翻转可以使所有元素变为正数。由于负数的个数在每行都是奇数，翻转除了绝对值最小的负数以外的所有负数后，每行都将剩下一个负数。然后，可以通过列的翻转来尝试减少剩余负数的总数。最终可能需要保留一个绝对值最小的负数，以保证总和最大化。因此，特殊翻转策略主要涉及先行后列地尽可能转正更多的数，最后可能保留一个最小的负数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在进行行和列的翻转操作时，是否考虑了翻转顺序可能对最终结果的影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本算法中，翻转顺序主要是先对行进行处理，后对列进行处理。这是因为行翻转是基于每行的负数计数来决定的，而列翻转是用来调整那些仍然保留一个负数的行的数量。翻转顺序对结果有影响，因为先行后列的方式可以先局部优化每行，然后全局调整列，以确保最终结果的最大化。如果先进行列翻转可能会破坏行的最优状态，导致无法达到最大的总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-matrix-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-matrix-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

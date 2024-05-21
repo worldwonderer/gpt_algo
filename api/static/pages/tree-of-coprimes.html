@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>互质树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>互质树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>n</code> 个节点的树（也就是一个无环连通无向图），节点编号从 <code>0</code> 到 <code>n - 1</code> ，且恰好有 <code>n - 1</code> 条边，每个节点有一个值。树的 <strong>根节点</strong> 为 0 号点。</p>
+
+<p>给你一个整数数组 <code>nums</code> 和一个二维数组 <code>edges</code> 来表示这棵树。<code>nums[i]</code> 表示第 <code>i</code> 个点的值，<code>edges[j] = [u<sub>j</sub>, v<sub>j</sub>]</code> 表示节点 <code>u<sub>j</sub></code> 和节点 <code>v<sub>j</sub></code> 在树中有一条边。</p>
+
+<p>当 <code>gcd(x, y) == 1</code> ，我们称两个数 <code>x</code> 和 <code>y</code> 是 <strong>互质的</strong> ，其中 <code>gcd(x, y)</code> 是 <code>x</code> 和 <code>y</code> 的 <strong>最大公约数</strong> 。</p>
+
+<p>从节点 <code>i</code> 到 <strong>根</strong> 最短路径上的点都是节点 <code>i</code> 的祖先节点。一个节点 <strong>不是</strong> 它自己的祖先节点。</p>
+
+<p>请你返回一个大小为 <code>n</code> 的数组 <code>ans</code> ，其中<em> </em><code>ans[i]</code>是离节点 <code>i</code> 最近的祖先节点且满足<em> </em><code>nums[i]</code> 和<em> </em><code>nums[ans[i]]</code> 是 <strong>互质的</strong> ，如果不存在这样的祖先节点，<code>ans[i]</code> 为 <code>-1</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/02/20/untitled-diagram.png" style="width: 191px; height: 281px;" /></strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,3,3,2], edges = [[0,1],[1,2],[1,3]]
+<b>输出：</b>[-1,0,0,1]
+<b>解释：</b>上图中，每个节点的值在括号中表示。
+- 节点 0 没有互质祖先。
+- 节点 1 只有一个祖先节点 0 。它们的值是互质的（gcd(2,3) == 1）。
+- 节点 2 有两个祖先节点，分别是节点 1 和节点 0 。节点 1 的值与它的值不是互质的（gcd(3,3) == 3）但节点 0 的值是互质的(gcd(2,3) == 1)，所以节点 0 是最近的符合要求的祖先节点。
+- 节点 3 有两个祖先节点，分别是节点 1 和节点 0 。它与节点 1 互质（gcd(3,2) == 1），所以节点 1 是离它最近的符合要求的祖先节点。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/02/20/untitled-diagram1.png" style="width: 441px; height: 291px;" /></p>
+
+<pre>
+<strong>输入：</strong>nums = [5,6,10,2,3,6,15], edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6]]
+<b>输出：</b>[-1,0,-1,0,0,0,-1]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>nums.length == n</code></li>
+	<li><code>1 <= nums[i] <= 50</code></li>
+	<li><code>1 <= n <= 10<sup>5</sup></code></li>
+	<li><code>edges.length == n - 1</code></li>
+	<li><code>edges[j].length == 2</code></li>
+	<li><code>0 <= u<sub>j</sub>, v<sub>j</sub> < n</code></li>
+	<li><code>u<sub>j</sub> != v<sub>j</sub></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 432 ms</p>
+                    <p>内存: 71.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def getCoprimes(self, nums: List[int], edges: List[List[int]]) -&gt; List[int]:
+        n=len(nums)
+        g=[[] for _ in range(n)]
+        for i,j in edges:
+            g[i].append(j)
+            g[j].append(i)
+        d=defaultdict(set)
+        arr=list(set(nums))
+        nn=len(arr)
+        for i in range(nn):
+            for j in range(i,nn):
+                if gcd(arr[i],arr[j])==1:
+                    d[arr[i]].add(arr[j])
+                    d[arr[j]].add(arr[i])
+        ans=[-1]*n
+        temp=defaultdict(int)
+        def dfs(x,fa,res):
+            if nums[x] in res:
+                ans[x]=res[nums[x]]
+            res2=res.copy()
+            for i in d[nums[x]]:
+                res2[i]=x
+            for i in g[x]:
+                if i!=fa:
+                    dfs(i,x,res2)
+        dfs(0,0,temp)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的思路是首先构建无向图的邻接表表示树结构。然后通过预处理找出所有数对之间是否互质，构建一个互质关系的字典。使用深度优先搜索（DFS）遍历树，同时维护每个数值最近的祖先节点信息。在DFS过程中，对每个节点检查其值与其所有可能的互质数的最近祖先节点，更新结果数组。这种方法避免了在DFS遍历中对每个节点重新计算gcd，从而优化了性能。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">python
+class Solution:
+    def getCoprimes(self, nums: List[int], edges: List[List[int]]) -&gt; List[int]:
+        n = len(nums)
+        g = [[] for _ in range(n)]  # 邻接表表示图的结构
+        for i, j in edges:
+            g[i].append(j)
+            g[j].append(i)
+
+        d = defaultdict(set)  # 存储互质关系
+        arr = list(set(nums))
+        nn = len(arr)
+        for i in range(nn):  # 预处理互质关系
+            for j in range(i, nn):
+                if gcd(arr[i], arr[j]) == 1:
+                    d[arr[i]].add(arr[j])
+                    d[arr[j]].add(arr[i])
+
+        ans = [-1] * n  # 结果数组
+        temp = defaultdict(int)  # 祖先节点信息
+
+        def dfs(x, fa, res):
+            if nums[x] in res:
+                ans[x] = res[nums[x]]  # 更新结果
+            res2 = res.copy()  # 拷贝当前的祖先节点信息
+            for i in d[nums[x]]:
+                res2[i] = x  # 更新祖先节点信息
+            for i in g[x]:
+                if i != fa:
+                    dfs(i, x, res2)  # 递归遍历子节点
+
+        dfs(0, 0, temp)  # 从根节点开始DFS
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何高效地预处理所有数对之间的互质关系，具体是如何选择和组织数对来确保覆盖所有必要的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了高效预处理所有数对之间的互质关系，首先从输入的`nums`数组中提取所有唯一的数值，存入数组`arr`。然后对`arr`中的每一对元素(i, j)计算它们的最大公约数（gcd）。如果gcd为1，则认为这两个数是互质的，将它们互相加入到互质关系的字典`d`中。这样，通过只比较不同的数值，可以确保覆盖所有必要的情况而不重复计算，从而提高效率。预处理过程中，使用双层循环遍历`arr`中的每个元素，外层循环元素为i，内层循环元素为j，从i开始，这样可以避免重复检查并减少计算量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            DFS函数中，`res`参数的具体作用是什么？它如何在递归过程中维护和更新祖先节点的信息？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`res`参数在DFS函数中用于存储和跟踪当前递归路径上各个数值的最近祖先节点的索引。在DFS遍历过程中，每当遍历到一个新节点x时，会检查`nums[x]`在`res`中是否已有记录，如果有，则将对应的祖先节点索引更新到结果数组`ans`中。此外，每次递归调用之前，会复制`res`到`res2`，然后更新`res2`以包含当前节点x的信息。这样，每个递归层级都有其对应的祖先信息，确保了信息的正确传递和更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在DFS中，为什么需要使用`res2 = res.copy()`进行深拷贝？直接使用`res`不行吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS中，使用`res2 = res.copy()`进行深拷贝是必要的，因为这样可以确保在递归过程中对祖先信息的更新不会影响其他递归分支的祖先信息。如果直接使用`res`而不进行拷贝，那么在递归过程中对`res`的修改将影响到所有使用`res`的递归分支，这将导致错误的祖先信息传递。通过深拷贝，每个递归调用都维护了一个独立的祖先信息状态，从而确保了每个节点的处理是正确和独立的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到每次DFS调用最多更新50个祖先节点信息，这个数字50是如何得出的？与输入数据的哪些属性有关？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中提到的数字50并未直接提及其来源，因此这可能是基于对题目数据范围的理解或假设。例如，如果输入的数值范围限制在1到50之间，那么理论上最多可能有50个不同的数值需要跟踪其最近的祖先节点。因此，每次DFS调用更新的祖先节点信息数量取决于这些数值的范围和特性。如果题目或输入数据确实限制了数值范围或类型，那么这个数字就与输入数据的这些属性有关。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/tree-of-coprimes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/tree-of-coprimes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

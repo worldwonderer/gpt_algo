@@ -1,10 +1,12 @@
 import os
 
 
-MONGODB_SETTINGS = {
-    'db': 'rob_b_hood',
-    'host': os.getenv("MONGODB_HOST")
-}
+class Config:
+    STATIC_PAGES_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/pages')
+    MONGODB_SETTINGS = {
+        'db': 'rob_b_hood',
+        'host': os.getenv("MONGODB_HOST")
+    }
 
 
 REDIS_SETTINGS = {

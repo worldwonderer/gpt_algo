@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>完美矩形</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>完美矩形</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=line-sweep" class="badge bg-secondary tag-link">扫描线</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个数组 <code>rectangles</code> ，其中 <code>rectangles[i] = [x<sub>i</sub>, y<sub>i</sub>, a<sub>i</sub>, b<sub>i</sub>]</code> 表示一个坐标轴平行的矩形。这个矩形的左下顶点是 <code>(x<sub>i</sub>, y<sub>i</sub>)</code> ，右上顶点是 <code>(a<sub>i</sub>, b<sub>i</sub>)</code> 。</p>
+
+<p>如果所有矩形一起精确覆盖了某个矩形区域，则返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+&nbsp;
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/27/perectrec1-plane.jpg" style="height: 294px; width: 300px;" />
+<pre>
+<strong>输入：</strong>rectangles = [[1,1,3,3],[3,1,4,2],[3,2,4,4],[1,3,2,4],[2,3,3,4]]
+<strong>输出：</strong>true
+<strong>解释：</strong>5 个矩形一起可以精确地覆盖一个矩形区域。 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/27/perfectrec2-plane.jpg" style="height: 294px; width: 300px;" />
+<pre>
+<strong>输入：</strong>rectangles = [[1,1,2,3],[1,3,2,4],[3,1,4,2],[3,2,4,4]]
+<strong>输出：</strong>false
+<strong>解释：</strong>两个矩形之间有间隔，无法覆盖成一个矩形。</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/27/perfecrrec4-plane.jpg" style="height: 294px; width: 300px;" />
+<pre>
+<strong>输入：</strong>rectangles = [[1,1,3,3],[3,1,4,2],[1,3,2,4],[2,2,4,4]]
+<strong>输出：</strong>false
+<strong>解释：</strong>因为中间有相交区域，虽然形成了矩形，但不是精确覆盖。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= rectangles.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>rectangles[i].length == 4</code></li>
+	<li><code>-10<sup>5</sup> &lt;= x<sub>i</sub>, y<sub>i</sub>, a<sub>i</sub>, b<sub>i</sub> &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 66 ms</p>
+                    <p>内存: 20.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isRectangleCover(self, rectangles: List[List[int]]) -&gt; bool:
+        corners = set()
+        area = 0
+        for x1, y1, x2, y2 in rectangles:
+            area += (x2 - x1) * (y2 - y1)
+            corners ^= {(x1, y1), (x2, y2), (x1, y2), (x2, y1)}
+        if len(corners) != 4:
+            return False
+        corners = sorted(corners)
+        return area == (corners[-1][0] - corners[0][0]) * (corners[-1][1] - corners[0][1])</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是通过计算所有矩形的面积之和，并记录所有矩形的四个顶点坐标。如果所有矩形恰好覆盖一个大矩形，那么所有矩形的面积之和应该等于最终大矩形的面积，并且除了最终大矩形的四个顶点外，其余顶点都应该出现偶数次（因为每个内部顶点都是两个矩形的交点）。最后，通过比较面积和顶点坐标来判断是否恰好覆盖。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isRectangleCover(self, rectangles: List[List[int]]) -&gt; bool:
+        corners = set()
+        area = 0
+        for x1, y1, x2, y2 in rectangles:
+            # 计算当前矩形的面积，并累加到总面积中
+            area += (x2 - x1) * (y2 - y1)
+            # 记录当前矩形的四个顶点坐标，使用异或操作来统计每个顶点出现的次数
+            corners ^= {(x1, y1), (x2, y2), (x1, y2), (x2, y1)}
+        # 如果最终剩下的顶点数量不等于4，说明不能恰好覆盖一个大矩形
+        if len(corners) != 4:
+            return False
+        # 对剩下的四个顶点坐标进行排序
+        corners = sorted(corners)
+        # 比较所有矩形的面积之和与最终大矩形的面积是否相等
+        return area == (corners[-1][0] - corners[0][0]) * (corners[-1][1] - corners[0][1])
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，顶点的记录和管理使用了异或操作。这种方法在何种情况下可能会失败？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>异或操作用于顶点的管理在记录顶点出现次数时非常有效，因为每对相同的顶点异或两次后会消除，最终留下的是出现奇数次的顶点。这种方法可能会失败的情况是：如果有多余四个顶点出现奇数次，或者出现奇数次的顶点形成的不是矩形。此外，如果矩形的顶点由于精度问题（如浮点数计算误差）而被错误地认为是不同顶点，异或操作也可能导致错误结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，最终剩下的顶点数量应为4，能否详细解释为什么是4个顶点而不是其他数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解假设所有小矩形合并成一个完美的大矩形。在这种情况下，理想的大矩形应该只有四个角落的顶点，这四个顶点分别是最小的x和y的组合，最小的x和最大的y的组合，最大的x和最小的y的组合，以及最大的x和最大的y的组合。内部任何交点或边界顶点在完美覆盖的情况下都会被相邻矩形顶点抵消，因此只剩下四个外围顶点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中假设了所有矩形恰好能够恰好覆盖一个大矩形的情况。这种假设是否意味着该方法不能处理部分矩形重叠或完全不接触的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，题解的方法假设所有小矩形合并为一个无间隙、无重叠的完美大矩形。如果存在矩形之间的重叠或者矩形之间完全不接触的空隙，那么这些情况都不符合完美矩形的条件。在这些情况下，小矩形的总面积将不等于大矩形的面积，或者顶点的处理（特别是异或消除）将无法正确反映所有小矩形构成大矩形的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中未明确说明如何处理坐标重合导致的重复顶点，这种情况如何影响算法的准确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解使用异或操作来自动处理重复顶点，因为任何顶点如果出现两次，其异或结果会归零，即消除该顶点。如果一个顶点恰好出现四次（两个矩形共用一边），它也会被消除。这种处理确保只有出现奇数次的顶点被保留。然而，这种方法假设矩形完美拼接，没有重叠和空隙。如果处理的数据或场景不符合这种假设，算法的准确性将受影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/perfect-rectangle')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/perfect-rectangle/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

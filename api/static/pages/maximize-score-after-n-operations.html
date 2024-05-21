@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>N 次操作后的最大分数和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>N 次操作后的最大分数和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你 <code>nums</code> ，它是一个大小为 <code>2 * n</code> 的正整数数组。你必须对这个数组执行 <code>n</code> 次操作。</p>
+
+<p>在第 <code>i</code> 次操作时（操作编号从 <strong>1</strong> 开始），你需要：</p>
+
+<ul>
+	<li>选择两个元素 <code>x</code> 和 <code>y</code> 。</li>
+	<li>获得分数 <code>i * gcd(x, y)</code> 。</li>
+	<li>将 <code>x</code> 和 <code>y</code> 从 <code>nums</code> 中删除。</li>
+</ul>
+
+<p>请你返回 <code>n</code> 次操作后你能获得的分数和最大为多少。</p>
+
+<p>函数 <code>gcd(x, y)</code> 是 <code>x</code> 和 <code>y</code> 的最大公约数。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums = [1,2]
+<b>输出：</b>1
+<b>解释：</b>最优操作是：
+(1 * gcd(1, 2)) = 1
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [3,4,6,8]
+<b>输出：</b>11
+<b>解释：</b>最优操作是：
+(1 * gcd(3, 6)) + (2 * gcd(4, 8)) = 3 + 8 = 11
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>nums = [1,2,3,4,5,6]
+<b>输出：</b>14
+<b>解释：</b>最优操作是：
+(1 * gcd(1, 5)) + (2 * gcd(2, 4)) + (3 * gcd(3, 6)) = 1 + 4 + 9 = 14
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 7</code></li>
+	<li><code>nums.length == 2 * n</code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 756 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxScore(self, nums: List[int]) -&gt; int:
+        nums.sort()
+        def gcd(x, y):
+            # if x &gt; y:
+            #     x, y = y, x
+            if y % x == 0:
+                return x
+            return gcd(y%x, x)
+        n = len(nums)
+        gcds = [[0]*n for _ in range(n)]
+        for x in range(n):
+            for y in range(x, n):
+                gcds[x][y] = gcd(nums[x], nums[y])
+
+        
+        
+        dp = [0] * (1&lt;&lt;n)
+        for m in range(1&lt;&lt;n):
+            if (t:=m.bit_count()) % 2:
+                continue
+            bits = [i for i, b in enumerate(bin(m)[2:][::-1]) if b==&#39;1&#39;]
+            for i, x in enumerate(bits):
+                for y in bits[i+1:]:
+                    cnt = dp[m ^ (1&lt;&lt;x) ^ (1&lt;&lt;y)] + (t&gt;&gt;1) * gcds[x][y]
+                    dp[m] = max(cnt, dp[m])
+
+        return dp[-1]
+
+
+
+
+
+
+            
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划与预处理的最大公约数（GCD）的方法。首先，数组被排序，然后计算并存储任意两个元素之间的GCD到一个二维数组中，以减少后续计算中的重复工作。接着，定义一个dp数组，其索引代表一个二进制数，二进制数的每一位表示数组中对应位置的元素是否已经被选择（1代表选择，0代表未选择）。dp数组中的值存储到目前为止可获得的最大分数。对于dp数组的每个状态，如果选取的元素个数是偶数（即可以完全成对），则尝试所有可能的配对方式，计算可能的分数并更新dp状态。最后，dp数组的最后一项（所有元素都被选择时的状态）就是最大分数。</p>
+                                <p>时间复杂度: O(2^(2n) * n^2)</p>
+                                <p>空间复杂度: O((2n)^2 + 2^(2n))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxScore(self, nums: List[int]) -&gt; int:
+        nums.sort()
+        def gcd(x, y):
+            if y % x == 0:
+                return x
+            return gcd(y%x, x)
+        n = len(nums)
+        gcds = [[0]*n for _ in range(n)]
+        for x in range(n):
+            for y in range(x, n):
+                gcds[x][y] = gcd(nums[x], nums[y])
+        dp = [0] * (1&lt;&lt;n)
+        for m in range(1&lt;&lt;n):
+            if (t:=m.bit_count()) % 2:
+                continue
+            bits = [i for i, b in enumerate(bin(m)[2:][::-1]) if b==&#39;1&#39;]
+            for i, x in enumerate(bits):
+                for y in bits[i+1:]:
+                    cnt = dp[m ^ (1&lt;&lt;x) ^ (1&lt;&lt;y)] + (t&gt;&gt;1) * gcds[x][y]
+                    dp[m] = max(cnt, dp[m])
+        return dp[-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定初始化`gcds`二维数组时，使用的循环边界确实涵盖了所有必要的元素对？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化`gcds`数组时，外层循环遍历数组`nums`的所有元素，内层循环从外层循环的当前元素开始至数组末尾。这种方式确保了每一对元素（x, y），其中x &lt;= y，都被考虑到了。由于`gcd(x, y)`与`gcd(y, x)`的结果相同，这种方法避免了重复计算，并且保证了所有可能的元素对都被计算了一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划的实现中，为什么选择使用二进制数来代表数组中元素的选取状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用二进制数来表示元素的选取状态是一种高效的方法，可以直接通过位操作来快速检查、更新和枚举子集。在这种表示方法中，如果一个二进制数的第i位是1，则表示数组中的第i个元素被选取了；如果是0，则表示未被选取。这使得动态规划的状态转移和子状态的检索变得更加直接和高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解中提到的`dp[m]`数组更新过程中，`cnt`的计算是如何确保每次都是在正确的基础上增加新的分数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新`dp[m]`时，`cnt`的计算考虑了从状态m移除两个已选元素x和y的子状态`dp[m ^ (1&lt;&lt;x) ^ (1&lt;&lt;y)]`，即未选择x和y之前的状态。然后，基于该子状态的分数，加上当前步骤的分数`(t&gt;&gt;1) * gcds[x][y]`。这样做确保了每次更新是在正确的基础上增加新的分数，因为它建立在之前已经计算好的最优子问题解的基础上。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算`(t&gt;&gt;1) * gcds[x][y]`时，`t&gt;&gt;1`代表了什么含义，它是如何与操作次数`i`联系起来的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`t`是当前状态m中选取的元素个数的二进制表示中1的个数。`t&gt;&gt;1`是`t`右移一位的结果，即`t`除以2的整数结果，这代表了已经进行的配对次数（因为每次配对需要两个元素）。每次配对的分数是当前配对次数乘以这对元素的最大公约数。这里的操作次数`i`实际上是通过`t&gt;&gt;1`来计算的，`i`表示第i次配对，从1开始计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-score-after-n-operations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-score-after-n-operations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

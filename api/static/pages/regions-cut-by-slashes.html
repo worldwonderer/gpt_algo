@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>由斜杠划分区域</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>由斜杠划分区域</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在由 <code>1 x 1</code> 方格组成的 <code>n&nbsp;x n</code>&nbsp;网格&nbsp;<code>grid</code> 中，每个 <code>1 x 1</code>&nbsp;方块由 <code>'/'</code>、<code>'\'</code> 或空格构成。这些字符会将方块划分为一些共边的区域。</p>
+
+<p>给定网格&nbsp;<code>grid</code>&nbsp;表示为一个字符串数组，返回 <em>区域的数量</em> 。</p>
+
+<p>请注意，反斜杠字符是转义的，因此&nbsp;<code>'\'</code> 用 <code>'\\'</code>&nbsp;表示。</p>
+
+
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2018/12/15/1.png" style="height: 200px; width: 200px;" /></p>
+
+<pre>
+<strong>输入：</strong>grid = [" /","/ "]
+<strong>输出：</strong>2</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2018/12/15/2.png" style="height: 198px; width: 200px;" /></p>
+
+<pre>
+<strong>输入：</strong>grid = [" /","  "]
+<strong>输出：</strong>1
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2018/12/15/4.png" style="height: 200px; width: 200px;" /></p>
+
+<pre>
+<strong>输入：</strong>grid = ["/\\","\\/"]
+<strong>输出：</strong>5
+<strong>解释：</strong>回想一下，因为 \ 字符是转义的，所以 "/\\" 表示 /\，而 "\\/" 表示 \/。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == grid.length == grid[i].length</code></li>
+	<li><code>1 &lt;= n &lt;= 30</code></li>
+	<li><code>grid[i][j]</code> 是&nbsp;<code>'/'</code>、<code>'\'</code>、或&nbsp;<code>' '</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 53 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def regionsBySlashes(self, grid: List[str]) -&gt; int:
+        n = len(grid)
+        num_points = (n+1) * (n+1)
+
+        uf = WeightedUnionFindWithCompressedPath(num_points)
+        for i in range(n):
+            uf.union(i, i+1)
+        
+        for i in range(n):
+            uf.union(n*(n+1)+i, n*(n+1)+i+1)
+        
+        for j in range(n):
+            uf.union((n+1)*j, (n+1)*(j+1))
+        
+        for j in range(n):
+            uf.union((n+1)*j + n, (n+1)*(j+1) + n)
+        
+        num_area = 1
+
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == &#34; &#34;:
+                    continue
+                # [i, j] --- [i, j+1]
+                #    |          |
+                # [i+1,j] --- [i+1, j+1]
+                if grid[i][j] == &#34;/&#34;:
+                    p1 = i * (n+1) + j + 1
+                    p2 = (i+1) * (n+1) + j
+                else:
+                    p1 = i * (n+1) + j
+                    p2 = (i+1) * (n+1) + j + 1
+                
+                if uf.connected(p1, p2):
+                    num_area += 1
+                    continue
+                uf.union(p1, p2)
+        
+        return num_area
+
+
+class WeightedUnionFindWithCompressedPath(object):
+    def __init__(self, n):
+        self.parent = [i for i in range(n)]
+        self.size = [1 for _ in range(n)]
+        self.count = n
+    
+
+    def find(self, p):
+        node = p
+        while self.parent[node] != node:
+            node = self.parent[node]
+        root = node
+
+        node = p
+        while self.parent[node] != node:
+            parent = self.parent[node]
+            if self.parent[node] != root:
+                self.parent[node] = root
+                self.size[parent] -= self.size[node]
+            node = parent
+
+        return root
+    
+    def connected(self, p, q):
+        return self.find(p) == self.find(q)
+    
+    def union(self, p, q):
+        root_p = self.find(p)
+        root_q = self.find(q)
+
+        if root_p == root_q:
+            return
+        
+        if self.size[root_p] &lt; self.size[root_q]:
+            self.parent[root_p] = root_q
+            self.size[root_q] += self.size[root_p]
+        else:
+            self.parent[root_q] = root_p
+            self.size[root_p] += self.size[root_q]
+        self.count -= 1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用并查集（Union Find）算法来解决问题。思路是将每个小方格的四个角视为独立的点，通过斜线将这些点连接起来。如果两个点被同一条斜线连接，则它们属于同一个区域。为了处理边界情况，将网格的四条边界也视为被连接起来的。遍历整个网格，根据斜线的位置将点进行合并，如果发现两个点已经在同一个集合中，则说明形成了一个新的区域。</p>
+                                <p>时间复杂度: O(n^2α(n))</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def regionsBySlashes(self, grid: List[str]) -&gt; int:
+        n = len(grid)
+        num_points = (n+1) * (n+1)
+
+        uf = WeightedUnionFindWithCompressedPath(num_points)
+        # Connect the edges of the grid
+        for i in range(n):
+            uf.union(i, i+1)
+        for i in range(n):
+            uf.union(n*(n+1)+i, n*(n+1)+i+1)
+        for j in range(n):
+            uf.union((n+1)*j, (n+1)*(j+1))
+        for j in range(n):
+            uf.union((n+1)*j + n, (n+1)*(j+1) + n)
+        
+        num_area = 1
+
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == &#39; &#39;:
+                    continue
+                # Determine the points to be connected based on the slash
+                if grid[i][j] == &#39;/&#39;:
+                    p1 = i * (n+1) + j + 1
+                    p2 = (i+1) * (n+1) + j
+                else:
+                    p1 = i * (n+1) + j
+                    p2 = (i+1) * (n+1) + j + 1
+                
+                # If the points are already connected, a new area is formed
+                if uf.connected(p1, p2):
+                    num_area += 1
+                    continue
+                uf.union(p1, p2)
+        
+        return num_area
+
+
+class WeightedUnionFindWithCompressedPath(object):
+    def __init__(self, n):
+        self.parent = [i for i in range(n)]
+        self.size = [1 for _ in range(n)]
+        self.count = n
+    
+    def find(self, p):
+        # Path compression
+        node = p
+        while self.parent[node] != node:
+            node = self.parent[node]
+        root = node
+
+        node = p
+        while self.parent[node] != node:
+            parent = self.parent[node]
+            if self.parent[node] != root:
+                self.parent[node] = root
+                self.size[parent] -= self.size[node]
+            node = parent
+
+        return root
+    
+    def connected(self, p, q):
+        return self.find(p) == self.find(q)
+    
+    def union(self, p, q):
+        root_p = self.find(p)
+        root_q = self.find(q)
+
+        if root_p == root_q:
+            return
+        
+        # Weighted union
+        if self.size[root_p] &lt; self.size[root_q]:
+            self.parent[root_p] = root_q
+            self.size[root_q] += self.size[root_p]
+        else:
+            self.parent[root_q] = root_p
+            self.size[root_p] += self.size[root_q]
+        self.count -= 1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何理解这个问题中每个小方格的四个角被视为独立点，并通过斜线连接的处理方式？这种处理对解题有什么帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，每个小方格被视为由其四个角（左上、右上、左下、右下）组成的独立单元。将这些角视为独立点可以帮助我们更准确地模拟斜线如何将空间分割成不同的区域。斜线连接了某两个角点，将这两个点视为相连的一部分。这种处理方式允许我们使用并查集数据结构来有效地管理和查找哪些点是通过斜线直接或间接相连的。具体来说，通过这种方式，每次插入斜线时，我们只需考虑连接或合并两个角点的集合，这样可以简化问题的空间和逻辑复杂度，使得问题变得更易解决。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            并查集中的路径压缩技术是如何具体实现的？这种方法对提高算法性能有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>路径压缩是并查集优化技术中的一种。在执行 find 操作时，路径压缩技术确保每个节点直接指向其根节点。这是通过在 find 函数中，当我们递归地查找一个节点的根节点时，将该节点及其所有祖先节点直接链接到根节点上实现的。在代码中，每次我们查找节点的根时，我们遍历该节点到根节点的路径，并更新路径上所有节点的父节点为根节点。这种方法显著减少了查找根节点的时间，因此在执行多次 union 和 connected 操作时，可以大幅提高并查集的效率。整体上，路径压缩将 find 操作的平摊时间复杂度降低到接近 O(1)，极大地提高了数据结构的性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，如果两个点已经在同一个集合中，则形成一个新的区域。这种情况是如何在代码中检测和处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，检测两个点是否在同一个集合中是通过并查集的 connected 方法实现的。当我们尝试通过斜线连接网格中两个角点时，首先使用 connected 方法检查这两个点是否已经属于同一个集合。如果是，这意味着在连接这两个点之前，它们已经通过其他路径被连接，因此连接这两个点将会形成一个封闭区域，即形成一个新的区域。代码中对此情况的处理是，如果 connected 方法返回 true，表示这两个点已经连接，我们就将区域数量 num_area 增加 1。然后继续执行后续的连接操作，或者遍历其他的斜线。这样能确保我们正确计算了由斜线引起的所有区域的数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/regions-cut-by-slashes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/regions-cut-by-slashes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

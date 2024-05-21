@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>非重叠矩形中的随机点</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>非重叠矩形中的随机点</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=reservoir-sampling" class="badge bg-secondary tag-link">水塘抽样</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                        <a href="/problems?tag=randomized" class="badge bg-secondary tag-link">随机化</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个由非重叠的轴对齐矩形的数组 <code>rects</code> ，其中 <code>rects[i] = [ai, bi, xi, yi]</code> 表示 <code>(ai, bi)</code> 是第 <code>i</code> 个矩形的左下角点，<code>(xi, yi)</code> 是第 <code>i</code> 个矩形的右上角点。设计一个算法来随机挑选一个被某一矩形覆盖的整数点。矩形周长上的点也算做是被矩形覆盖。所有满足要求的点必须等概率被返回。</p>
+
+<p>在给定的矩形覆盖的空间内的任何整数点都有可能被返回。</p>
+
+<p><strong>请注意&nbsp;</strong>，整数点是具有整数坐标的点。</p>
+
+<p>实现&nbsp;<code>Solution</code>&nbsp;类:</p>
+
+<ul>
+	<li><code>Solution(int[][] rects)</code>&nbsp;用给定的矩形数组&nbsp;<code>rects</code> 初始化对象。</li>
+	<li><code>int[] pick()</code>&nbsp;返回一个随机的整数点 <code>[u, v]</code> 在给定的矩形所覆盖的空间内。</li>
+</ul>
+
+<ol>
+</ol>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/07/24/lc-pickrandomrec.jpg" style="height: 539px; width: 419px;" /></p>
+
+<pre>
+<strong>输入: 
+</strong>["Solution", "pick", "pick", "pick", "pick", "pick"]
+[[[[-2, -2, 1, 1], [2, 2, 4, 6]]], [], [], [], [], []]
+<strong>输出: 
+</strong>[null, [1, -2], [1, -1], [-1, -2], [-2, -2], [0, 0]]
+
+<strong>解释：</strong>
+Solution solution = new Solution([[-2, -2, 1, 1], [2, 2, 4, 6]]);
+solution.pick(); // 返回 [1, -2]
+solution.pick(); // 返回 [1, -1]
+solution.pick(); // 返回 [-1, -2]
+solution.pick(); // 返回 [-2, -2]
+solution.pick(); // 返回 [0, 0]</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= rects.length &lt;= 100</code></li>
+	<li><code>rects[i].length == 4</code></li>
+	<li><code>-10<sup>9</sup>&nbsp;&lt;= a<sub>i</sub>&nbsp;&lt; x<sub>i</sub>&nbsp;&lt;= 10<sup>9</sup></code></li>
+	<li><code>-10<sup>9</sup>&nbsp;&lt;= b<sub>i</sub>&nbsp;&lt; y<sub>i</sub>&nbsp;&lt;= 10<sup>9</sup></code></li>
+	<li><code>x<sub>i</sub>&nbsp;- a<sub>i</sub>&nbsp;&lt;= 2000</code></li>
+	<li><code>y<sub>i</sub>&nbsp;- b<sub>i</sub>&nbsp;&lt;= 2000</code></li>
+	<li>所有的矩形不重叠。</li>
+	<li><code>pick</code> 最多被调用&nbsp;<code>10<sup>4</sup></code>&nbsp;次。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 73 ms</p>
+                    <p>内存: 19.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def __init__(self, rects: List[List[int]]):
+        self.rects = rects
+        self.sum = [0]
+        for a, b, x, y in rects:
+            self.sum.append(self.sum[-1] + (x - a + 1) * (y - b + 1))
+
+    def pick(self) -&gt; List[int]:
+        k = randrange(self.sum[-1])
+        rectIndex = bisect_right(self.sum, k) - 1
+        a, b, _, y = self.rects[rectIndex]
+        da, db = divmod(k - self.sum[rectIndex], y - b + 1)
+        return [a + da, b + db]
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路包括两个主要步骤：首先，在初始化阶段，计算每个矩形包含的整数点数量，并使用前缀和数组来快速计算点的总数。其次，使用随机抽取的方法，根据权重（即矩形覆盖的点的数量）随机选择一个矩形，然后在这个矩形中随机选择一个点。具体实现中，首先生成一个随机数来确定被选中的矩形，然后计算这个随机数落在该矩形的哪个位置。</p>
+                                <p>时间复杂度: O(log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def __init__(self, rects: List[List[int]]):
+        self.rects = rects  # 存储输入的矩形
+        self.sum = [0]  # 前缀和数组，用于存储每个矩形内点的累积总数
+        for a, b, x, y in rects:
+            # 计算每个矩形内的点数，并更新前缀和数组
+            self.sum.append(self.sum[-1] + (x - a + 1) * (y - b + 1))
+
+    def pick(self) -&gt; List[int]:
+        k = randrange(self.sum[-1])  # 生成一个随机数
+        rectIndex = bisect_right(self.sum, k) - 1  # 二分查找确定随机数落在哪个矩形范围内
+        a, b, _, y = self.rects[rectIndex]  # 获取被选矩形的坐标
+        da, db = divmod(k - self.sum[rectIndex], y - b + 1)  # 计算随机点的相对位置
+        return [a + da, b + db]  # 返回随机点的绝对坐标</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算每个矩形内整数点数量时，能否详细解释如何从矩形的坐标计算出点的总数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于每个矩形，其由坐标对(a, b)和(x, y)定义，表示矩形的左下角和右上角。矩形内的整数点总数可通过计算两个坐标间的水平和垂直距离来确定。水平方向上的整数点数为`(x - a + 1)`，垂直方向上的整数点数为`(y - b + 1)`。将这两个数值相乘，即得到该矩形内整数点的总数。这是因为每个水平位置上都有`(y - b + 1)`个垂直位置的点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            您提到使用前缀和数组来快速计算点的总数，这种方法如何处理大量矩形或非常大的矩形导致的潜在整数溢出问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为防止整数溢出，通常会选择使用更大的整数类型，如在Python中使用`int`类型，该类型可以自动处理大整数。此外，可以通过适当的模运算来确保数值在安全范围内。在极端情况下，如果数据规模非常大，可能需要采用特殊的数据结构或算法来避免溢出。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用`bisect_right`进行二分查找时，您是如何确保这种方法总是能准确地找到正确的矩形索引？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`bisect_right`函数查找的是元素应该插入的位置，使得序列仍然保持有序。在使用`bisect_right`查找随机数`k`应该插入的位置后，实际上我们得到的是该随机数刚好大于前一个索引的位置，因此需要减去1来得到随机数所在的矩形索引。这确保了即使随机数恰好等于某个矩形的前缀和界限值，也能正确地归类到前一个矩形。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            初始化过程中，为什么选择在构造函数中计算所有矩形的点数而不是在每次调用`pick`时计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造函数中预先计算每个矩形的点数并存储前缀和，是为了优化`pick`函数的效率。这种方法使每次调用`pick`时，只需进行简单的随机数生成和二分查找，而不需要重复计算矩形的点数。这在多次调用`pick`的情况下显著减少了计算量，提高了算法的整体性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/random-pick-with-weight" class="list-group-item list-group-item-action">
+                                按权重随机选择
+                            </a>
+                        
+                            <a href="/problem/generate-random-point-in-a-circle" class="list-group-item list-group-item-action">
+                                在圆内随机生成点
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/random-point-in-non-overlapping-rectangles')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/random-point-in-non-overlapping-rectangles/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

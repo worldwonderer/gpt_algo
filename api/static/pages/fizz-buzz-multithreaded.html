@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>交替打印字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>交替打印字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=concurrency" class="badge bg-secondary tag-link">多线程</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>编写一个可以从 1 到 n 输出代表这个数字的字符串的程序，但是：</p>
+
+<ul>
+	<li>如果这个数字可以被 3 整除，输出 "fizz"。</li>
+	<li>如果这个数字可以被 5 整除，输出 "buzz"。</li>
+	<li>如果这个数字可以同时被 3 和 5 整除，输出 "fizzbuzz"。</li>
+</ul>
+
+<p>例如，当 <code>n = 15</code>，输出： <code>1, 2, fizz, 4, buzz, fizz, 7, 8, fizz, buzz, 11, fizz, 13, 14, fizzbuzz</code>。</p>
+
+<p>假设有这么一个类：</p>
+
+<pre>
+class FizzBuzz {
+  public FizzBuzz(int n) { ... }               // constructor
+  public void fizz(printFizz) { ... }          // only output "fizz"
+  public void buzz(printBuzz) { ... }          // only output "buzz"
+  public void fizzbuzz(printFizzBuzz) { ... }  // only output "fizzbuzz"
+  public void number(printNumber) { ... }      // only output the numbers
+}</pre>
+
+<p>请你实现一个有四个线程的多线程版  <code>FizzBuzz</code>， 同一个 <code>FizzBuzz</code> 实例会被如下四个线程使用：</p>
+
+<ol>
+	<li>线程A将调用 <code>fizz()</code> 来判断是否能被 3 整除，如果可以，则输出 <code>fizz</code>。</li>
+	<li>线程B将调用 <code>buzz()</code> 来判断是否能被 5 整除，如果可以，则输出 <code>buzz</code>。</li>
+	<li>线程C将调用 <code>fizzbuzz()</code> 来判断是否同时能被 3 和 5 整除，如果可以，则输出 <code>fizzbuzz</code>。</li>
+	<li>线程D将调用 <code>number()</code> 来实现输出既不能被 3 整除也不能被 5 整除的数字。</li>
+</ol>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>本题已经提供了打印字符串的相关方法，如 <code>printFizz()</code> 等，具体方法名请参考答题模板中的注释部分。</li>
+</ul>
+
+<p> </p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 16.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">from threading import Thread, Lock, Condition
+
+class FizzBuzz:
+    def __init__(self, n: int):
+        self.n = n
+        self.lock = Lock()
+        self.cv = Condition(self.lock)
+        self.current = 1
+
+    # printFizz() outputs &#34;fizz&#34;
+    def fizz(self, printFizz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 == 0 and self.current % 5 != 0:  # Only divisible by 3
+                    printFizz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    # printBuzz() outputs &#34;buzz&#34;
+    def buzz(self, printBuzz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 5 == 0 and self.current % 3 != 0:  # Only divisible by 5
+                    printBuzz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    # printFizzBuzz() outputs &#34;fizzbuzz&#34;
+    def fizzbuzz(self, printFizzBuzz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 == 0 and self.current % 5 == 0:  # Divisible by both 3 and 5
+                    printFizzBuzz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    # printNumber(x) outputs &#34;x&#34;, where x is an integer.
+    def number(self, printNumber: &#39;Callable[[int], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 != 0 and self.current % 5 != 0:  # Not divisible by 3 or 5
+                    printNumber(self.current)
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+def print_fizz():
+    print(&#34;fizz&#34;)
+
+def print_buzz():
+    print(&#34;buzz&#34;)
+
+def print_fizzbuzz():
+    print(&#34;fizzbuzz&#34;)
+
+def print_number(x):
+    print(x)
+
+n = 15
+fizz_buzz = FizzBuzz(n)
+
+threads = [
+    Thread(target=fizz_buzz.fizz, args=(print_fizz,)),
+    Thread(target=fizz_buzz.buzz, args=(print_buzz,)),
+    Thread(target=fizz_buzz.fizzbuzz, args=(print_fizzbuzz,)),
+    Thread(target=fizz_buzz.number, args=(print_number,))
+]
+
+for thread in threads:
+    thread.start()
+
+for thread in threads:
+    thread.join()
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了四个线程来并发处理从1到n的数字，每个线程根据数字的特性（能否被3、5整除）来执行特定的打印任务。利用锁（Lock）和条件变量（Condition）来同步不同的线程，确保在任意时刻只有一个线程能够执行并修改共享资源current的值。每个方法（fizz, buzz, fizzbuzz, number）对应一个线程，它们在内部循环中检查当前数字（self.current）是否符合打印条件，如果符合则打印并通知其他线程，否则等待其他线程的通知。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">from threading import Thread, Lock, Condition
+
+class FizzBuzz:
+    def __init__(self, n: int):
+        self.n = n
+        self.lock = Lock()
+        self.cv = Condition(self.lock)
+        self.current = 1
+
+    def fizz(self, printFizz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 == 0 and self.current % 5 != 0:
+                    printFizz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    def buzz(self, printBuzz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 5 == 0 and self.current % 3 != 0:
+                    printBuzz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    def fizzbuzz(self, printFizzBuzz: &#39;Callable[[], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 == 0 and self.current % 5 == 0:
+                    printFizzBuzz()
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+    def number(self, printNumber: &#39;Callable[[int], None]&#39;) -&gt; None:
+        with self.lock:
+            while self.current &lt;= self.n:
+                if self.current % 3 != 0 and self.current % 5 != 0:
+                    printNumber(self.current)
+                    self.current += 1
+                    self.cv.notify_all()
+                else:
+                    self.cv.wait()
+
+# 示例函数，用于打印字符串
+
+def print_fizz():
+    print(&#39;fizz&#39;)
+
+def print_buzz():
+    print(&#39;buzz&#39;)
+
+def print_fizzbuzz():
+    print(&#39;fizzbuzz&#39;)
+
+def print_number(x):
+    print(x)
+
+# 初始化FizzBuzz实例，并启动线程
+
+n = 15
+fizz_buzz = FizzBuzz(n)
+
+threads = [
+    Thread(target=fizz_buzz.fizz, args=(print_fizz,)),
+    Thread(target=fizz_buzz.buzz, args=(print_buzz,)),
+    Thread(target=fizz_buzz.fizzbuzz, args=(print_fizzbuzz,)),
+    Thread(target=fizz_buzz.number, args=(print_number,))
+]
+
+for thread in threads:
+    thread.start()
+
+for thread in threads:
+    thread.join()
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在FizzBuzz类中，如何确保在多个线程中同时只有一个线程能够修改`self.current`值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在FizzBuzz类中，使用了一个锁（Lock）和条件变量（Condition）来确保同一时间只有一个线程可以修改`self.current`的值。每个线程在尝试读取或修改`self.current`之前必须先获取锁。这是通过`with self.lock:`语句块实现的，该语句块确保了在该块内的代码执行期间，当前线程持有锁。这样，当一个线程在修改`self.current`时，其他线程会被阻塞，直到锁被释放，确保了对`self.current`的访问和修改是线程安全的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么每个条件检查后都要调用`self.cv.notify_all()`而不是`self.cv.notify()`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>调用`self.cv.notify_all()`而不是`self.cv.notify()`确保所有等待的线程都被通知并有机会获取锁来检查条件是否已经满足其需要。因为该问题设计四个线程分别负责不同的打印任务，如果使用`self.cv.notify()`，则只会随机唤醒一个等待中的线程，这可能导致必要的条件更新被延迟处理，比如当前数字适合多个打印条件但只唤醒了一个相关线程。使用`self.cv.notify_all()`可以减少这种情况的发生，确保程序的正确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果数字n非常大，这种多线程方法相比单线程有什么明显的性能提升吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数字n非常大，多线程方法相比单线程可能会有一定的性能提升，但这种提升可能不如预期明显。这是因为虽然多线程可以并行处理不同的打印任务（如fizz、buzz、fizzbuzz和number），但由于所有线程共享访问和修改同一个变量`self.current`，频繁的锁操作和线程间的同步可能导致较大的开销。此外，线程调度和上下文切换也可能增加额外的开销。因此，性能提升的程度依赖于系统的多线程管理效率和具体实现方式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在多线程环境下，`self.cv.wait()`会如何影响程序的效率和线程的调度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在多线程环境下，`self.cv.wait()`会使调用它的线程挂起，直到其他线程通过`self.cv.notify()`或`self.cv.notify_all()`发出通知。这个操作涉及线程的挂起和唤醒，会导致线程上下文切换，这是一个相对昂贵的操作。频繁的使用`self.cv.wait()`和对应的唤醒操作会增加系统的负担，降低程序的整体效率。此外，如果不当使用（如在不适当的时机调用`wait()`），可能导致死锁或者程序逻辑错误。因此，虽然`self.cv.wait()`是线程同步中必要的工具，但需要谨慎使用，确保在合适的逻辑和条件下调用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/fizz-buzz-multithreaded')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/fizz-buzz-multithreaded/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

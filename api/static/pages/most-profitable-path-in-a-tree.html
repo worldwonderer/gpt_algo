@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>树上最大得分和路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>树上最大得分和路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个 <code>n</code>&nbsp;个节点的无向树，节点编号为&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;，树的根结点是&nbsp;<code>0</code>&nbsp;号节点。给你一个长度为 <code>n - 1</code>&nbsp;的二维整数数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>]</code>&nbsp;，表示节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code>&nbsp;在树中有一条边。</p>
+
+<p>在每一个节点&nbsp;<code>i</code>&nbsp;处有一扇门。同时给你一个都是偶数的数组&nbsp;<code>amount</code>&nbsp;，其中&nbsp;<code>amount[i]</code>&nbsp;表示：</p>
+
+<ul>
+	<li>如果 <code>amount[i]</code>&nbsp;的值是负数，那么它表示打开节点&nbsp;<code>i</code>&nbsp;处门扣除的分数。</li>
+	<li>如果 <code>amount[i]</code>&nbsp;的值是正数，那么它表示打开节点 <code>i</code>&nbsp;处门加上的分数。</li>
+</ul>
+
+<p>游戏按照如下规则进行：</p>
+
+<ul>
+	<li>一开始，Alice 在节点&nbsp;<code>0</code>&nbsp;处，Bob 在节点&nbsp;<code>bob</code>&nbsp;处。</li>
+	<li>每一秒钟，Alice 和 Bob <strong>分别</strong>&nbsp;移动到相邻的节点。Alice 朝着某个&nbsp;<strong>叶子结点</strong>&nbsp;移动，Bob 朝着节点&nbsp;<code>0</code>&nbsp;移动。</li>
+	<li>对于他们之间路径上的 <strong>每一个</strong>&nbsp;节点，Alice 和 Bob 要么打开门并扣分，要么打开门并加分。注意：
+	<ul>
+		<li>如果门 <strong>已经打开</strong>&nbsp;（被另一个人打开），不会有额外加分也不会扣分。</li>
+		<li>如果&nbsp;Alice 和 Bob <strong>同时</strong>&nbsp;到达一个节点，他们会共享这个节点的加分或者扣分。换言之，如果打开这扇门扣&nbsp;<code>c</code>&nbsp;分，那么&nbsp;Alice 和 Bob 分别扣&nbsp;<code>c / 2</code>&nbsp;分。如果这扇门的加分为&nbsp;<code>c</code>&nbsp;，那么他们分别加&nbsp;<code>c / 2</code>&nbsp;分。</li>
+	</ul>
+	</li>
+	<li>如果 Alice 到达了一个叶子结点，她会停止移动。类似的，如果&nbsp;Bob 到达了节点&nbsp;<code>0</code>&nbsp;，他也会停止移动。注意这些事件互相 <strong>独立</strong>&nbsp;，不会影响另一方移动。</li>
+</ul>
+
+<p>请你返回&nbsp;Alice 朝最优叶子结点移动的 <strong>最大</strong>&nbsp;净得分。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/29/eg1.png" style="width: 275px; height: 275px;"></p>
+
+<pre><b>输入：</b>edges = [[0,1],[1,2],[1,3],[3,4]], bob = 3, amount = [-2,4,2,-4,6]
+<b>输出：</b>6
+<b>解释：</b>
+上图展示了输入给出的一棵树。游戏进行如下：
+- Alice 一开始在节点 0 处，Bob 在节点 3 处。他们分别打开所在节点的门。
+  Alice 得分为 -2 。
+- Alice 和 Bob 都移动到节点 1 。
+&nbsp; 因为他们同时到达这个节点，他们一起打开门并平分得分。
+&nbsp; Alice 的得分变为 -2 + (4 / 2) = 0 。
+- Alice 移动到节点 3 。因为 Bob 已经打开了这扇门，Alice 得分不变。
+&nbsp; Bob 移动到节点 0 ，并停止移动。
+- Alice 移动到节点 4 并打开这个节点的门，她得分变为 0 + 6 = 6 。
+现在，Alice 和 Bob 都不能进行任何移动了，所以游戏结束。
+Alice 无法得到更高分数。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/10/29/eg2.png" style="width: 250px; height: 78px;"></p>
+
+<pre><b>输入：</b>edges = [[0,1]], bob = 1, amount = [-7280,2350]
+<b>输出：</b>-7280
+<b>解释：</b>
+Alice 按照路径 0-&gt;1 移动，同时 Bob 按照路径 1-&gt;0 移动。
+所以 Alice 只打开节点 0 处的门，她的得分为 -7280 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>edges.length == n - 1</code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt; n</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li><code>edges</code>&nbsp;表示一棵有效的树。</li>
+	<li><code>1 &lt;= bob &lt; n</code></li>
+	<li><code>amount.length == n</code></li>
+	<li><code>amount[i]</code>&nbsp;是范围&nbsp;<code>[-10<sup>4</sup>, 10<sup>4</sup>]</code>&nbsp;之间的一个&nbsp;<strong>偶数</strong>&nbsp;。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 222 ms</p>
+                    <p>内存: 54.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def mostProfitablePath(self, edges: List[List[int]], bob: int, amount: List[int]) -&gt; int:
+        n = len(edges) + 1
+        g = [[] for _ in range(n)]
+        for x, y in edges:
+            g[x].append(y)
+            g[y].append(x)
+        bob_time = [n] * n  # bob_time[i]表示bob访问节点i的时间
+        def dfs_bob(x, fa, t):
+            if x == 0:
+                bob_time[x] = t
+                return True
+            for y in g[x]:
+                if y != fa and dfs_bob(y, x, t + 1):
+                    bob_time[x] = t  # 只有可以到达0才标记访问时间
+                    return True
+            return False
+        dfs_bob(bob, -1, 0)
+
+        g[0].append(-1)  # 防止把根节点当做叶子
+        ans = -inf
+        
+        def dfs_alice(x, fa, alice_time, tot):
+            if alice_time &lt; bob_time[x]:
+                tot += amount[x]
+            elif alice_time == bob_time[x]:
+                tot += amount[x] // 2
+            if len(g[x]) == 1:  # 到达叶子节点
+                nonlocal ans
+                ans = max(ans, tot)  # 更新答案
+                return
+            for y in g[x]:
+                if y != fa:
+                    dfs_alice(y, x, alice_time + 1, tot)
+        dfs_alice(0, -1, 0, 0)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了深度优先搜索（DFS）来解决问题。首先，对于Bob，我们从Bob所在的节点开始，使用DFS找到Bob到根节点0的路径，并记录Bob访问每个节点的时间。然后，我们再次从根节点0开始，使用DFS遍历树，同时记录Alice访问每个节点的时间。在这个过程中，我们比较Alice和Bob访问每个节点的时间，根据题目规则计算得分，并更新最大得分。当Alice到达一个叶子节点时，我们检查并更新最大得分。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def mostProfitablePath(self, edges: List[List[int]], bob: int, amount: List[int]) -&gt; int:
+        n = len(edges) + 1
+        g = [[] for _ in range(n)]
+        for x, y in edges:
+            g[x].append(y)
+            g[y].append(x)
+        bob_time = [n] * n  # bob_time[i]表示bob访问节点i的时间
+        def dfs_bob(x, fa, t):
+            if x == 0:
+                bob_time[x] = t
+                return True
+            for y in g[x]:
+                if y != fa and dfs_bob(y, x, t + 1):
+                    bob_time[x] = t  # 只有可以到达0才标记访问时间
+                    return True
+            return False
+        dfs_bob(bob, -1, 0)
+
+        g[0].append(-1)  # 防止把根节点当做叶子
+        ans = -inf
+        
+        def dfs_alice(x, fa, alice_time, tot):
+            if alice_time &lt; bob_time[x]:
+                tot += amount[x]
+            elif alice_time == bob_time[x]:
+                tot += amount[x] // 2
+            if len(g[x]) == 1:  # 到达叶子节点
+                nonlocal ans
+                ans = max(ans, tot)  # 更新答案
+                return
+            for y in g[x]:
+                if y != fa:
+                    dfs_alice(y, x, alice_time + 1, tot)
+        dfs_alice(0, -1, 0, 0)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在`dfs_alice`函数中，当Alice和Bob同时到达一个节点时，分数只加了一半？这种处理方式在题目描述中有明确说明吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的代码中，当Alice和Bob同时到达一个节点时，节点的分数只加了一半，这是为了体现出这个节点同时被两人到达时的分配公平性。若两人同时到达一个节点，则他们共享该节点的分数，每人获得一半。这种处理是基于题目背景的合理假设，尽管这个细节在题目描述中可能没有明确说明，但根据常见的竞赛和实际问题处理逻辑，这种处理方式是合理的，可以避免重复计分的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            解决方案中提到在根节点添加了一个边界值`g[0].append(-1)`，这样做的目的是什么？如果没有这一步会发生什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在根节点添加一个边界值`g[0].append(-1)`的目的是为了避免根节点被错误地判断为叶子节点。在`dfs_alice`函数中，通过检查一个节点的邻接列表长度是否为1来判断是否是叶子节点。如果不添加这个边界值，根节点在只有一个邻接节点时会被错误地判断为叶子节点，这会导致程序逻辑错误，因为根节点不应被视为叶子节点。这一步是为了确保遍历的正确性和逻辑的严谨性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`dfs_alice`函数中，对于每个节点的处理逻辑是如何确保Alice始终朝向叶子节点移动的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`dfs_alice`函数中，Alice的移动是通过递归的深度优先搜索完成的。函数中通过遍历当前节点`x`的所有邻接节点`y`，并且只有当`y`不是父节点`fa`时才会递归地调用`dfs_alice`进入节点`y`。这样可以确保Alice从根节点出发，逐渐向下遍历树的每一个分支，直到到达叶子节点。通过这种方式，Alice可以探索所有可能的路径直到叶子节点，这保证了Alice始终朝向叶子节点移动。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在`dfs_bob`函数中，如果Bob所在的节点无法通过一条路径到达根节点0，这种情况在代码中是如何处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`dfs_bob`函数中，如果Bob所在的节点无法通过一条路径到达根节点0，这种情况意味着从Bob的起点到根节点0不存在可达路径。在代码中，这通过递归函数的返回值来处理。如果从某节点`x`出发无法到达根节点，则递归调用`dfs_bob(y, x, t + 1)`将会返回`False`，并且不会更新`bob_time[x]`的值。因此，`bob_time[x]`将保持初始化的值，这意味着Bob从该节点到根节点的路径是不可达的。这样的处理可以在后续的比较中排除这些不可达的节点，确保程序的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/most-profitable-path-in-a-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/most-profitable-path-in-a-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

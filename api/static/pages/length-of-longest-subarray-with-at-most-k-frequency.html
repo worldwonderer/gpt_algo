@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最多 K 个重复元素的最长子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最多 K 个重复元素的最长子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组&nbsp;<code>nums</code>&nbsp;和一个整数&nbsp;<code>k</code>&nbsp;。</p>
+
+<p>一个元素 <code>x</code>&nbsp;在数组中的 <strong>频率</strong>&nbsp;指的是它在数组中的出现次数。</p>
+
+<p>如果一个数组中所有元素的频率都 <strong>小于等于&nbsp;</strong><code>k</code>&nbsp;，那么我们称这个数组是 <strong>好</strong>&nbsp;数组。</p>
+
+<p>请你返回 <code>nums</code>&nbsp;中 <strong>最长好</strong>&nbsp;子数组的长度。</p>
+
+<p><strong>子数组</strong> 指的是一个数组中一段连续非空的元素序列。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,2,3,1,2,3,1,2], k = 2
+<b>输出：</b>6
+<strong>解释：</strong>最长好子数组是 [1,2,3,1,2,3] ，值 1 ，2 和 3 在子数组中的频率都没有超过 k = 2 。[2,3,1,2,3,1] 和 [3,1,2,3,1,2] 也是好子数组。
+最长好子数组的长度为 6 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,1,2,1,2,1,2], k = 1
+<b>输出：</b>2
+<b>解释：</b>最长好子数组是 [1,2] ，值 1 和 2 在子数组中的频率都没有超过 k = 1 。[2,1] 也是好子数组。
+最长好子数组的长度为 2 。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [5,5,5,5,5,5,5], k = 4
+<b>输出：</b>4
+<b>解释：</b>最长好子数组是 [5,5,5,5] ，值 5 在子数组中的频率没有超过 k = 4 。
+最长好子数组的长度为 4 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= k &lt;= nums.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 224 ms</p>
+                    <p>内存: 31.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxSubarrayLength(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+
+        cnt = defaultdict(int)
+
+        ans = l = 0
+        for r in range(n):
+
+            cnt[nums[r]] += 1
+            if cnt[nums[r]] &gt; k:
+                ans = max(ans, r-l)
+                while nums[l] != nums[r]:
+                    cnt[nums[l]]-=1
+                    l+=1
+                cnt[nums[l]] -= 1
+                l+=1
+
+        ans = max(ans, r-l+1)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了滑动窗口的方法来找出最长的好子数组。通过一个左指针l和一个右指针r来定义窗口的边界。随着右指针r的向右移动，使用哈希表cnt来记录窗口内每个元素的出现次数。每次右指针向右移动时，将新的元素加入计数，如果此元素的计数超过k，则记录当前窗口的长度，并调整左指针l，直到该元素的计数不超过k。这样可以确保窗口内的所有元素频率都不超过k，从而找到满足条件的最长子数组。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxSubarrayLength(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)  # 数组的长度
+
+        cnt = defaultdict(int)  # 存储元素及其频率的哈希表
+
+        ans = l = 0  # 初始化最长长度ans和左指针l
+        for r in range(n):  # 主循环，r为右指针
+
+            cnt[nums[r]] += 1  # 将右指针指向的元素加入计数
+            if cnt[nums[r]] &gt; k:  # 如果计数超过k
+                ans = max(ans, r-l)  # 更新最长好子数组的长度
+                while nums[l] != nums[r]:  # 调整左指针，直到当前元素的计数不超过k
+                    cnt[nums[l]] -= 1
+                    l += 1
+                cnt[nums[l]] -= 1  # 对于左指针指向的当前元素也要减少计数
+                l += 1  # 移动左指针
+
+        ans = max(ans, r-l+1)  # 处理最后一个窗口的长度
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，你是如何确保更新`ans`时考虑了所有可能的最长好子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，每次当右指针`r`向右移动并发现一个元素的计数超过了`k`时，就会更新`ans`记录当前的最长好子数组长度。这是在前一个元素的计数导致窗口不再有效时进行的。随后，左指针`l`被调整直到窗口内的所有元素的频率都不超过`k`。因此，每次窗口状态变化都会考虑是否更新`ans`，确保覆盖了所有可能的最长好子数组的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在元素频率超过`k`时，需要通过移动左指针`l`来调整窗口，而不是采用其他方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当元素频率超过`k`时，说明当前窗口已经不满足题目条件（即窗口内的所有元素的频率都不超过`k`）。为了快速恢复窗口的有效性，最直接的方法是减少窗口内频率超标的元素数量，这可以通过移动左指针`l`实现。这种方法可以直接减少特定元素的计数，而如果采用其他方法如重新构建窗口或跳过某些元素，则可能导致较大的时间开销和复杂性增加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在循环结束后，为何需要再次更新`ans`来计算最后一个窗口的长度？这是否意味着前面的循环中可能漏掉了某些情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在循环结束后需要再次更新`ans`是因为循环内部更新`ans`的条件是元素的计数超过`k`时，这时会提前结束当前窗口的考察。如果整个数组被遍历完而没有触发计数超过`k`的情况，最后一个窗口可能不会在循环中被正确地更新。因此，循环结束后需要再次检查并更新`ans`以确保最后一个窗口也被考虑进去。这不是漏掉了某些情况，而是确保所有情况都被正确处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            哈希表`cnt`在记录元素频率时，是否有可能因为重复元素的频繁增减导致性能问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>虽然哈希表`cnt`会频繁地增加和减少元素的计数，但哈希表的平均时间复杂度为O(1)，因此从理论上讲，增减操作的性能是非常高效的。然而，在极端情况下（例如非常大的数组或极端的数据分布），频繁的操作可能导致性能下降。但在大多数实际应用中，使用哈希表来记录元素频率是有效且性能良好的方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/length-of-longest-subarray-with-at-most-k-frequency')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/length-of-longest-subarray-with-at-most-k-frequency/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

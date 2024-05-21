@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最短回文串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最短回文串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=string-matching" class="badge bg-secondary tag-link">字符串匹配</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个字符串 <em><strong>s</strong></em>，你可以通过在字符串前面添加字符将其转换为<span data-keyword="palindrome-string">回文串</span>。找到并返回可以用这种方式转换的最短回文串。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "aacecaaa"
+<strong>输出：</strong>"aaacecaaa"
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "abcd"
+<strong>输出：</strong>"dcbabcd"
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= s.length &lt;= 5 * 10<sup>4</sup></code></li>
+	<li><code>s</code> 仅由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 41 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def shortestPalindrome(self, s: str) -&gt; str:
+        s1 = s[::-1]
+        if s == s1:
+            return s
+        n = len(s)
+        a, b, i = 1, n // 2, 0
+        while b:
+            while a &lt;= b:
+                c = a + b &gt;&gt; 1
+                j = s1.find(s[:c], i)
+                if j &lt; 0 or j &gt; n - c * 2:
+                    b = c - 1
+                    i = max(i, n - c * 2 + 1)
+                    continue
+                m = n - j &gt;&gt; 1
+                if s1[j + c:j + m] == s[c:m]:
+                    return s1[:j] + s
+                i = j + 1
+                a = c
+            a = 1
+        return s1[:-1] + s</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了二分查找的思路。首先将原字符串 s 翻转得到 s1。如果 s 本身就是回文串，直接返回 s。否则，通过二分查找的方式，在 s1 中查找 s 的前缀，找到最长的能够形成回文串的前缀。查找过程中，使用双指针 a 和 b 分别指向查找范围的起始和结束位置，每次取中点 c，判断 s1 中是否存在 s[:c] 子串。如果存在，则判断 s1[j+c:j+m] 与 s[c:m] 是否相等（其中 j 为 s[:c] 在 s1 中的起始位置，m 为 s[:c] 的中点），如果相等则找到了最长的回文前缀，返回 s1[:j] + s。如果不相等，则将查找范围缩小到 [c, b]。如果 s[:c] 在 s1 中不存在，则将查找范围缩小到 [a, c-1]。最后，如果没有找到任何回文前缀，则返回 s1[:-1] + s。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def shortestPalindrome(self, s: str) -&gt; str:
+        s1 = s[::-1]  # 将字符串 s 翻转得到 s1
+        if s == s1:  # 如果 s 本身是回文串，直接返回 s
+            return s
+        n = len(s)  # 字符串长度
+        a, b, i = 1, n // 2, 0  # 二分查找的起始位置 a，结束位置 b，查找起始位置 i
+        while b:
+            while a &lt;= b:
+                c = a + b &gt;&gt; 1  # 二分查找的中点 c
+                j = s1.find(s[:c], i)  # 在 s1 中查找 s[:c] 子串的起始位置 j
+                if j &lt; 0 or j &gt; n - c * 2:  # 如果 s[:c] 在 s1 中不存在或者位置不合法
+                    b = c - 1  # 将查找范围缩小到 [a, c-1]
+                    i = max(i, n - c * 2 + 1)  # 更新查找起始位置 i
+                    continue
+                m = n - j &gt;&gt; 1  # s[:c] 的中点位置 m
+                if s1[j + c:j + m] == s[c:m]:  # 判断 s1[j+c:j+m] 与 s[c:m] 是否相等
+                    return s1[:j] + s  # 如果相等，找到了最长的回文前缀，返回结果
+                i = j + 1  # 如果不相等，将查找起始位置更新为 j+1
+                a = c  # 将查找范围缩小到 [c, b]
+            a = 1  # 如果当前查找范围没有找到回文前缀，将 a 重置为 1，继续查找
+        return s1[:-1] + s  # 如果没有找到任何回文前缀，返回 s1[:-1] + s</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么要将原字符串翻转得到 s1 来进行处理？这样做的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将原字符串 s 翻转得到 s1 主要是为了方便查找和确认 s 的前缀是否能与 s1 的后缀匹配，从而构成回文。回文的特性是前后对称，所以通过比较原字符串的前缀与翻转字符串的后缀（实际上在翻转字符串中的位置相当于前缀），可以有效地判定最长的回文前缀。这种方法简化了判断过程，避免了复杂的回文判断操作，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在二分查找中，你是如何确定查找区间 [a, b] 的初始值及其调整逻辑的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>查找区间 [a, b] 的初始值是基于最坏情况的考虑，即寻找直到中点的前缀以检查其中可能的最长回文前缀。初始值设置为从 1 到 n//2 主要是因为回文前缀的长度至少为 1 且最长不会超过字符串长度的一半。查找区间的调整逻辑是基于二分查找的原理，每次根据中点 c 的判断结果来缩小查找范围，如果 s[:c] 在 s1 中位置不合法或不存在，说明当前 c 作为回文前缀的可能性较小，因此调整查找范围到 [a, c-1]。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当 s1.find(s[:c]) 返回 -1 时，为什么选择将查找范围调整到 [a, c-1] 而不是其他区间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 s1.find(s[:c]) 返回 -1 时，这意味着 s[:c] 这个前缀在 s1 中没有找到匹配的子串，即 s1 中不存在以该前缀结束的子串。因此，任何长于 c 的前缀也不可能在 s1 中找到匹配的子串。所以，为了找到可能存在的最长回文前缀，我们需要缩短前缀长度，即将查找范围调整到 [a, c-1]，继续在更短的前缀中寻找匹配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法中提到，如果 s1[j+c:j+m] 与 s[c:m] 相等，则找到了最长的回文前缀。这里的判断逻辑是怎样的？能否详细解释一下这部分的比较机制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这部分的逻辑中，s1[j+c:j+m] 与 s[c:m] 的比较是为了确认在找到 s[:c] 在 s1 中的匹配后，这个匹配是否能扩展到更长的回文。具体来说，j 是 s[:c] 在 s1 中的起始位置，c 是当前考虑的前缀长度，m 是 s1 中匹配的结束位置的中点。这个比较确认从 j+c 到 j+m 的子串是否与 s 从 c 到 m 的子串相等，如果相等，说明 s 的起始部分到 m 可以和 s1 的相应部分形成回文，因此这部分 s 加上 s1 的前 j 个字符（即 s1 中与 s 前缀相匹配的部分之前的字符）构成了所求的最短回文串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/longest-palindromic-substring" class="list-group-item list-group-item-action">
+                                最长回文子串
+                            </a>
+                        
+                            <a href="/problem/find-the-index-of-the-first-occurrence-in-a-string" class="list-group-item list-group-item-action">
+                                找出字符串中第一个匹配项的下标
+                            </a>
+                        
+                            <a href="/problem/palindrome-pairs" class="list-group-item list-group-item-action">
+                                回文对
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/shortest-palindrome')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/shortest-palindrome/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

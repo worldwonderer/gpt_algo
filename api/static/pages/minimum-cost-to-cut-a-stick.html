@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>切棍子的最小成本</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>切棍子的最小成本</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一根长度为 <code>n</code> 个单位的木棍，棍上从 <code>0</code> 到 <code>n</code> 标记了若干位置。例如，长度为 <strong>6</strong> 的棍子可以标记如下：</p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/09/statement.jpg" style="height: 111px; width: 521px;" /></p>
+
+<p>给你一个整数数组 <code>cuts</code> ，其中 <code>cuts[i]</code> 表示你需要将棍子切开的位置。</p>
+
+<p>你可以按顺序完成切割，也可以根据需要更改切割的顺序。</p>
+
+<p>每次切割的成本都是当前要切割的棍子的长度，切棍子的总成本是历次切割成本的总和。对棍子进行切割将会把一根木棍分成两根较小的木棍（这两根木棍的长度和就是切割前木棍的长度）。请参阅第一个示例以获得更直观的解释。</p>
+
+<p>返回切棍子的 <strong>最小总成本</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/09/e1.jpg" style="height: 284px; width: 350px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 7, cuts = [1,3,4,5]
+<strong>输出：</strong>16
+<strong>解释：</strong>按 [1, 3, 4, 5] 的顺序切割的情况如下所示：
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/09/e11.jpg" style="height: 284px; width: 350px;" />
+第一次切割长度为 7 的棍子，成本为 7 。第二次切割长度为 6 的棍子（即第一次切割得到的第二根棍子），第三次切割为长度 4 的棍子，最后切割长度为 3 的棍子。总成本为 7 + 6 + 4 + 3 = 20 。
+而将切割顺序重新排列为 [3, 5, 1, 4] 后，总成本 = 16（如示例图中 7 + 4 + 3 + 2 = 16）。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 9, cuts = [5,6,1,4,2]
+<strong>输出：</strong>22
+<strong>解释：</strong>如果按给定的顺序切割，则总成本为 25 。总成本 <= 25 的切割顺序很多，例如，[4, 6, 5, 2, 1] 的总成本 = 22，是所有可能方案中成本最小的。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 <= n <= 10^6</code></li>
+	<li><code>1 <= cuts.length <= min(n - 1, 100)</code></li>
+	<li><code>1 <= cuts[i] <= n - 1</code></li>
+	<li><code>cuts</code> 数组中的所有整数都 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 234 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minCost(self, n: int, cuts: List[int]) -&gt; int:
+        # using bottom-up method
+        m = len(cuts)
+        cuts = [0] + sorted(cuts) + [n]
+        # cuts = sorted([0] + cuts + [n])
+        dp = [[float(&#39;inf&#39;)] * (m+2) for _ in range(m+2)]
+
+        for i in range(m+1):
+            dp[i][i+1] = 0
+        
+        for k in range(2, m+2):
+            for i in range(m -k+2):
+                dp[i][i+k] = min([dp[i][j] + dp[j][i+k] for j in range(i+1, i+k)]) + cuts[i+k] - cuts[i]
+        # print(dp)
+        return dp[0][m+1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个问题可以通过动态规划来解决。首先，将切割点数组按升序排序，并在数组的起始和结尾分别添加0和n，这样方便处理边界情况。定义dp[i][j]为从切割点cuts[i]到cuts[j]的最小切割成本。初始化dp[i][i+1]为0，因为相邻切割点之间没有棍子长度，不需要成本。对于每个长度k从2到m+2，遍历所有可能的切割点对i和j，其中j=i+k。对于每对i和j，计算通过任意中间点cuts[m]切割的成本总和，选择最小的成本更新dp[i][j]。最终dp[0][m+1]将包含从0到n的整个棍子的最小切割成本。</p>
+                                <p>时间复杂度: O(m^3)</p>
+                                <p>空间复杂度: O(m^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minCost(self, n: int, cuts: List[int]) -&gt; int:
+        # 使用自底向上的动态规划方法
+        m = len(cuts)
+        # 在cuts数组中添加0和n，并排序
+        cuts = [0] + sorted(cuts) + [n]
+        # 初始化动态规划表，所有值设为无限大
+        dp = [[float(&#39;inf&#39;)] * (m+2) for _ in range(m+2)]
+
+        # 相邻切割点之间的成本为0
+        for i in range(m+1):
+            dp[i][i+1] = 0
+        
+        # 遍历所有可能的切割段长度
+        for k in range(2, m+2):
+            for i in range(m - k + 2):
+                # 计算并更新dp[i][i+k]的最小成本
+                dp[i][i+k] = min([dp[i][j] + dp[j][i+k] for j in range(i+1, i+k)]) + cuts[i+k] - cuts[i]
+
+        # 返回整个棍子的最小切割成本
+        return dp[0][m+1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划问题中，为什么要在切割点数组`cuts`中添加0和n？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在切割点数组`cuts`中添加0和n是为了方便处理边界情况。0表示棍子的开始位置，而n表示棍子的结束位置。这样做可以确保在进行切割成本计算时，可以包括从棍子的最开始到最末端的整个区间，而无需额外的逻辑来处理这些边界条件。添加这两个点后，可以简化算法的实现，使得每个切割区间都统一处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于数组`dp`中的初始化值为`float(&#39;inf&#39;)`的选择，请问这是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划数组`dp`中，初始化值设为`float(&#39;inf&#39;)`是为了在后续的最小值比较中方便地更新成本。因为我们的目标是找到最小的切割成本，初始化为无穷大可以保证任何实际的切割成本都会小于初始化值，从而在使用`min`函数比较时，能正确地更新为较小的成本值。这是一种常见的技巧，用于确保在开始动态规划计算之前，任何未计算的值都不会影响到最终的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划中，`dp[i][i+1]`被设置为0代表什么意义，为什么相邻切割点之间的成本为0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dp[i][i+1]`被设置为0表示相邻切割点之间没有实际的棍子长度来进行切割。因为相邻切割点代表的是同一个位置或是连续的位置，所以在这两个点之间不存在需要额外切割的部分。由于没有棍子可以被切割，因此这部分的成本自然为0。这样的设置有助于在实现算法时，为各个切割区间的成本计算提供一个正确的起始条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算`dp[i][i+k]`时，通过寻找所有可能的中间切割点来更新最小成本的方法是否最优，还有没有更高效的算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当前的方法通过枚举所有可能的中间切割点来找到使成本最小化的切割方式是一种正确的方法，但它可能不是最高效的方法。该方法的时间复杂度为O(m^3)，其中m是切割点的数量，因为它需要三层循环来计算所有可能的切割点组合。尽管这种方法是有效的，但在切割点数量非常多时可能会变得相对低效。目前动态规划是解决这类问题的标准方法，虽然有可能存在更优化的算法，比如使用更高效的数据结构或是采用不同的策略来减少计算量，但这通常需要更复杂的技术或是特定的优化技巧。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-cut-a-stick')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-cut-a-stick/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

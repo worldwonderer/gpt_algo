@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>每段建筑物的平均高度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>每段建筑物的平均高度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 335 ms</p>
+                    <p>内存: 86.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def averageHeightOfBuildings(self, buildings: List[List[int]]) -&gt; List[List[int]]:
+        diff = defaultdict(int)
+        cnts = defaultdict(int)
+        for a, b, h in buildings:
+            diff[a] += h
+            diff[b] -= h
+            cnts[a] += 1
+            cnts[b] -= 1
+        cur, cnt, last, last_p, ans = 0, 0, None, None, []
+        for k in sorted(diff.keys()):
+            cur += diff[k]
+            if last:
+                if ans and ans[-1][1] == last_p and ans[-1][2] == last // cnt:
+                    ans[-1][1] = k
+                else:
+                    ans.append([last_p, k, last // cnt])
+            cnt += cnts[k]
+            last, last_p = cur, k
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>The solution uses a line sweep algorithm combined with differential counting. For each building, start and end positions are marked in a &#39;diff&#39; dictionary where heights are added at the start and subtracted at the end. Another &#39;cnts&#39; dictionary tracks how many buildings start or end at each point. By iterating over the sorted keys of these dictionaries, we compute the current total height and count of buildings at each position. This allows us to determine the average height for any segment where it remains constant. The result is appended to the list if the average height changes from the previous segment or a new segment starts.</p>
+                                <p>时间复杂度: O(k log k)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def averageHeightOfBuildings(self, buildings: List[List[int]]) -&gt; List[List[int]]:
+        diff = defaultdict(int)  # Differential map to track height changes at each point
+        cnts = defaultdict(int)  # Count map to track number of buildings starting or ending
+        for a, b, h in buildings:
+            diff[a] += h  # Add height at the start of a building
+            diff[b] -= h  # Subtract height at the end of a building
+            cnts[a] += 1  # Increment building count at start
+            cnts[b] -= 1  # Decrement building count at end
+        cur, cnt, last, last_p, ans = 0, 0, None, None, []
+        for k in sorted(diff.keys()):
+            cur += diff[k]  # Update current total height
+            if last:
+                if ans and ans[-1][1] == last_p and ans[-1][2] == last // cnt:
+                    ans[-1][1] = k  # Extend the last segment if average height is the same
+                else:
+                    ans.append([last_p, k, last // cnt])  # Start a new segment
+            cnt += cnts[k]  # Update the count of overlapping buildings
+            last, last_p = cur, k  # Store the current height and position for next iteration
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何保证在使用`diff`和`cnts`字典时，所有建筑的开始和结束位置都被正确处理，没有遗漏或重复？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过为每个建筑的开始和结束位置在`diff`和`cnts`字典中分别增加和减少相应的高度和计数，可以确保没有遗漏或重复。每次循环添加建筑时，都会精确地修改这两个字典，因此只要输入的建筑数据是准确的，就能保证每个建筑的开始和结束都被正确地记录。此外，通过使用字典的键来唯一标识每个位置点，避免了重复处理同一位置的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算平均高度时，如果`cnt`为零会怎样处理？即没有建筑物覆盖的区间应如何表示？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现中，如果`cnt`（即当前位置的建筑数量）为零，这意味着在该位置没有建筑物覆盖。在算法中，这种情况通常会跳过处理，因为没有建筑物覆盖的区间不需要计算平均高度。因此，这种区间不会在结果列表`ans`中表示。应当注意确保在两个有建筑物的有效区间之间的无覆盖区间不会被错误地计入结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当两个或多个建筑物在某些点重叠时，如何确保`diff`字典和`cnts`字典能正确反映所有建筑的总高度和数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当多个建筑物在同一位置重叠时，`diff`字典通过累加或累减每个建筑的高度变化来正确计算该点的总高度变化。同样，`cnts`字典通过对每个建筑在该点的开始和结束进行计数调整，确保正确地反映了重叠的建筑数量。因此，通过对每个建筑独立处理并更新这两个字典，算法可以准确地处理并记录重叠区域的总高度和建筑数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在最后一个位置处理结束后，如何确保最后一个区间被正确添加到结果列表`ans`中，尤其是当最后一个区间的平均高度与之前的不同时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法的实现中，每次迭代结束时，都会检查是否需要将当前计算得到的区间添加到结果列表`ans`中。当迭代到最后一个位置时，如果存在未处理的有效区间（即`last`非空且`cnt`不为零），算法会进行一次最后的检查，确保这个区间被加入`ans`。这包括比较当前区间的平均高度是否与前一个区间不同，如果不同，则将其作为新区间添加到结果中。这样可以确保所有有效的区间都被正确记录，包括最后一个区间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/average-height-of-buildings-in-each-segment')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/average-height-of-buildings-in-each-segment/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

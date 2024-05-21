@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>图中最相似的路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>图中最相似的路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 605 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def mostSimilar(self, n: int, roads: List[List[int]], names: List[str], targetPath: List[str]) -&gt; List[int]:
+        d = {_:[] for _ in range(n)}
+        for road in roads:
+            d[road[0]].append(road[1])
+            d[road[1]].append(road[0])
+        maximum = 1000000
+        m = len(targetPath)
+        dp = [[maximum for _ in range(n)] for _ in range(m)]
+        marker = [[-1 for _ in range(n)] for _ in range(m)]
+        for j in range(n):
+            dp[0][j] = 0 if names[j] == targetPath[0] else 1
+        for i in range(1,m):
+            for j in range(n):
+                temp = 0 if names[j] == targetPath[i] else 1
+                cost = 0
+                for front in d[j]:
+                    cost = dp[i-1][front] + temp
+                    if cost &gt; m:
+                        continue
+                    if cost &lt; dp[i][j]:
+                        dp[i][j] = cost
+                        marker[i][j] = front
+        path = []
+        j = dp[m-1].index(min(dp[m-1]))
+        path = [j,]
+        temp = marker[m-1][j]
+        counter = m - 1
+        while counter:
+            path.append(temp)
+            j = marker[counter][j]
+            counter -= 1
+            temp = marker[counter][j]
+        if len(path) == m:
+            path.reverse()
+            return path
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用动态规划的方法来找到与目标路径最相似的路径。首先，构建一个图的邻接表表示所有的道路。定义dp[i][j]表示到达目标路径中的第i个位置时，选择城市j的最小不匹配数。如果城市j的名称和目标路径中第i个位置的名称相同，则不匹配数为0，否则为1。通过遍历图中的所有相邻城市来更新dp数组，以确保找到最小的不匹配数。使用一个额外的数组marker来记录路径，最后通过回溯marker数组来构建最终的路径。</p>
+                                <p>时间复杂度: O(m * n^2)</p>
+                                <p>空间复杂度: O(m * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def mostSimilar(self, n: int, roads: List[List[int]], names: List[str], targetPath: List[str]) -&gt; List[int]:
+        # 创建图的邻接表
+        d = {_:[] for _ in range(n)}
+        for road in roads:
+            d[road[0]].append(road[1])
+            d[road[1]].append(road[0])
+        # 初始化dp数组和路径记录数组
+        maximum = 1000000
+        m = len(targetPath)
+        dp = [[maximum for _ in range(n)] for _ in range(m)]
+        marker = [[-1 for _ in range(n)] for _ in range(m)]
+        # 初始化起点的dp值
+        for j in range(n):
+            dp[0][j] = 0 if names[j] == targetPath[0] else 1
+        # 动态规划填表
+        for i in range(1,m):
+            for j in range(n):
+                temp = 0 if names[j] == targetPath[i] else 1
+                for front in d[j]:
+                    cost = dp[i-1][front] + temp
+                    if cost &lt; dp[i][j]:
+                        dp[i][j] = cost
+                        marker[i][j] = front
+        # 通过marker数组回溯找到路径
+        path = []
+        j = dp[m-1].index(min(dp[m-1]))
+        path = [j,]
+        temp = marker[m-1][j]
+        counter = m - 1
+        while counter:
+            path.append(temp)
+            j = marker[counter][j]
+            counter -= 1
+            temp = marker[counter][j]
+        if len(path) == m:
+            path.reverse()
+            return path</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划的解法中，如何确定dp数组的初始状态，并为什么选择这样的初始化方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此动态规划解法中，dp数组的初始状态是基于第一个目标路径名与所有城市名的匹配程度来设定的。具体操作为，将dp[0][j]设置为0如果城市j的名称与目标路径的第一个位置的名称相同，否则设置为1。这种初始化方式的选择是因为动态规划解法需要一个起点来开始计算，而目标路径的起始位置提供了一个自然的起点。这样的初始化确保了dp数组在开始填充时已经考虑了与目标路径第一个元素的匹配情况，为后续的递推计算奠定了基础。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新dp数组时，为什么需要遍历每个城市的所有邻居？这种方法是否最有效，还有没有其他可能的优化方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新dp数组时，需要遍历每个城市的所有邻居是为了确保能找到从一个城市到达下一个目标路径位置的最小不匹配数。通过检查当前城市所有可能的前驱城市（即所有邻居），我们能够确保计算出来的dp值是基于最优的前驱路径得到的。尽管这种方法在保证找到最小不匹配数方面是有效的，但在效率上可能不是最优的，特别是当图非常密集时。优化方法可能包括使用优先队列（即最小堆）来只更新最有潜力（即当前不匹配数最小）的邻居，或者使用更复杂的图算法如A*搜索算法来引导搜索方向，减少需要考虑的路径数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            回溯过程中，如何确保通过marker数组能够正确构建出一条最优路径？存在哪些潜在的错误可能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过marker数组回溯构建最优路径的关键在于在dp数组的填充过程中，正确记录每个位置的最优前驱节点。确保这一点的方法是在更新dp[i][j]时，同时更新marker[i][j]为导致dp[i][j]取得最小值的城市索引。潜在的错误可能包括没有正确更新marker数组，或者在回溯过程中逻辑错误，如错误地处理索引，这些都可能导致无法回溯到正确的起点或构建出错误的路径。此外，如果dp数组中存在相同的最小值且选择了不合适的起点，也可能导致构建出的路径并非预期的最优路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在解题过程中，算法如何处理图中可能存在的环或是多条路径到达同一城市的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该算法通过动态规划处理图中可能存在的环或多条路径到达同一城市的情况。动态规划的过程中，每个dp[i][j]的更新是基于前一个目标路径位置的所有可能的城市状态来决定的，这意味着算法考虑了从任何可能的城市到达当前城市的所有路径。即使存在环或多条路径，算法通过比较所有可能的前驱路径来选择最小不匹配数，从而保证了即使在复杂的图结构中也能找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-most-similar-path-in-a-graph')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-most-similar-path-in-a-graph/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

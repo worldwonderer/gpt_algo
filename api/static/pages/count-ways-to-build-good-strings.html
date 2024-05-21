@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计构造好字符串的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计构造好字符串的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你整数&nbsp;<code>zero</code>&nbsp;，<code>one</code>&nbsp;，<code>low</code>&nbsp;和&nbsp;<code>high</code>&nbsp;，我们从空字符串开始构造一个字符串，每一步执行下面操作中的一种：</p>
+
+<ul>
+	<li>将&nbsp;<code>'0'</code>&nbsp;在字符串末尾添加&nbsp;<code>zero</code>&nbsp; 次。</li>
+	<li>将&nbsp;<code>'1'</code>&nbsp;在字符串末尾添加&nbsp;<code>one</code>&nbsp;次。</li>
+</ul>
+
+<p>以上操作可以执行任意次。</p>
+
+<p>如果通过以上过程得到一个 <strong>长度</strong>&nbsp;在&nbsp;<code>low</code> 和&nbsp;<code>high</code>&nbsp;之间（包含上下边界）的字符串，那么这个字符串我们称为&nbsp;<strong>好</strong>&nbsp;字符串。</p>
+
+<p>请你返回满足以上要求的 <strong>不同</strong>&nbsp;好字符串数目。由于答案可能很大，请将结果对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong>&nbsp;后返回。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>low = 3, high = 3, zero = 1, one = 1
+<b>输出：</b>8
+<b>解释：</b>
+一个可能的好字符串是 "011" 。
+可以这样构造得到："" -&gt; "0" -&gt; "01" -&gt; "011" 。
+从 "000" 到 "111" 之间所有的二进制字符串都是好字符串。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>low = 2, high = 3, zero = 1, one = 2
+<b>输出：</b>5
+<b>解释：</b>好字符串为 "00" ，"11" ，"000" ，"110" 和 "011" 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= low&nbsp;&lt;= high&nbsp;&lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= zero, one &lt;= low</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 91 ms</p>
+                    <p>内存: 20.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countGoodStrings(self, low: int, high: int, zero: int, one: int) -&gt; int:
+        MOD = 10 ** 9 + 7
+        dp = [1] + [0] * (high + 1)
+        for i in range(1, high + 1):
+            if i &gt;= one:
+                dp[i] = (dp[i] + dp[i - one]) % MOD
+            if i &gt;= zero:
+                dp[i] = (dp[i] + dp[i - zero]) % MOD
+        return sum(dp[low:]) % MOD
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用了动态规划的方法来计算所有可能的好字符串的数目。定义dp数组，其中dp[i]表示长度为i的字符串的构造方案数。数组初始化为dp[0] = 1（空字符串有一种构造方式），其余为0。对于每个长度i（从1到high），更新dp[i]的值，通过检查是否可以从长度i-one或i-zero的字符串通过添加&#39;1&#39;或&#39;0&#39;来达到长度i。最后，将low到high之间的所有dp值求和得到答案。</p>
+                                <p>时间复杂度: O(high)</p>
+                                <p>空间复杂度: O(high)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countGoodStrings(self, low: int, high: int, zero: int, one: int) -&gt; int:
+        MOD = 10 ** 9 + 7
+        dp = [1] + [0] * (high + 1)  # 初始化dp数组，dp[0]为1表示空字符串的一种构造方式
+        for i in range(1, high + 1):
+            if i &gt;= one:
+                dp[i] = (dp[i] + dp[i - one]) % MOD  # 如果可以加one个&#39;1&#39;达到长度i，增加相应的方案数
+            if i &gt;= zero:
+                dp[i] = (dp[i] + dp[i - zero]) % MOD  # 如果可以加zero个&#39;0&#39;达到长度i，增加相应的方案数
+        return sum(dp[low:]) % MOD  # 计算low到high长度的字符串的总方案数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划算法中，为什么初始化dp[0]为1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中初始化dp[0]为1是因为长度为0的字符串（即空字符串）只有一种构造方式，就是什么也不做。这个初始化提供了递推的基础，使得当我们在计算更长的字符串的方案数时，可以正确地从这个基础情况累加起来。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新dp数组时，为什么要对每个长度先检查是否可以从长度i-one或i-zero来通过添加&#39;1&#39;或&#39;0&#39;达到长度i？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新dp数组时，检查长度i-one和i-zero是为了确保只有当当前长度i减去添加的字符&#39;1&#39;或&#39;0&#39;的数目（one或zero）仍然为非负时，这种构造方式才是有效的。这样的检查确保我们可以从一个有效的较短字符串通过添加相应数量的&#39;1&#39;或&#39;0&#39;来构造出长度为i的字符串。这也避免了指向dp数组无效索引的错误访问。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你是如何保证在计算过程中不会重复计算相同长度的字符串的构造方案数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个动态规划算法中，每个dp[i]只被计算一次，并且每次计算都是基于前面的结果dp[i-one]和dp[i-zero]。通过这种方式，我们确保了在计算dp[i]时，之前计算的每个字符串长度的方案数都已被考虑，而不会被重复计算。这种从小到大计算并存储结果的方法避免了重复计算的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算low到high长度的字符串的总方案数时，为什么要使用求和然后取余的方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用求和然后取余的方法是为了防止在累加过程中结果数值过大导致的整数溢出问题，同时也是为了满足可能的计算结果要求。MOD通常是一个大质数，如10^9+7，它可以确保结果在一个可管理的范围内，并且取余操作是在确保在数学上结果仍然正确的前提下，符合给定的模数约束。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-ways-to-build-good-strings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-ways-to-build-good-strings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计全 1 子矩形</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计全 1 子矩形</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>m x n</code>&nbsp;的二进制矩阵&nbsp;<code>mat</code>&nbsp;，请你返回有多少个&nbsp;<strong>子矩形</strong>&nbsp;的元素全部都是 1 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/10/27/ones1-grid.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>mat = [[1,0,1],[1,1,0],[1,1,0]]
+<strong>输出：</strong>13
+<strong>解释：
+</strong>有 <strong>6</strong>&nbsp;个 1x1 的矩形。
+有 <strong>2</strong> 个 1x2 的矩形。
+有 <strong>3</strong> 个 2x1 的矩形。
+有 <strong>1</strong> 个 2x2 的矩形。
+有 <strong>1</strong> 个 3x1 的矩形。
+矩形数目总共 = 6 + 2 + 3 + 1 + 1 = <strong>13</strong>&nbsp;。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/10/27/ones2-grid.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>mat = [[0,1,1,0],[0,1,1,1],[1,1,1,0]]
+<strong>输出：</strong>24
+<strong>解释：</strong>
+有 <strong>8</strong> 个 1x1 的子矩形。
+有 <strong>5</strong> 个 1x2 的子矩形。
+有 <strong>2</strong> 个 1x3 的子矩形。
+有 <strong>4</strong> 个 2x1 的子矩形。
+有 <strong>2</strong> 个 2x2 的子矩形。
+有 <strong>2</strong> 个 3x1 的子矩形。
+有 <strong>1</strong> 个 3x2 的子矩形。
+矩形数目总共 = 8 + 5 + 2 + 4 + 2 + 2 + 1 = <strong>24</strong><strong> 。</strong>
+
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= m, n &lt;= 150</code></li>
+	<li><code>mat[i][j]</code>&nbsp;仅包含&nbsp;<code>0</code>&nbsp;或&nbsp;<code>1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 68 ms</p>
+                    <p>内存: 16.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numSubmat(self, mat: List[List[int]]) -&gt; int:
+        m, n = len(mat), len(mat[0])
+        pre = [0] * (n + 1)
+        ans = 0
+
+        for i in range(m):
+            dp = [0] * n
+            stack = [-1]
+            for j in range(n):
+                pre[j] = pre[j] + 1 if mat[i][j] == 1 else 0
+                while pre[stack[-1]] &gt; pre[j]:
+                    stack.pop()
+                dp[j] = dp[stack[-1]] + pre[j] * (j - stack[-1])
+                stack.append(j)
+            ans += sum(dp)
+        
+        return ans </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用动态规划和单调栈的方法来计算所有全1子矩形的数量。首先，定义一个&#39;pre&#39;数组来保存当前列中连续1的数量，每次遇到1时在前一个基础上加1，遇到0则重置为0。接着，使用动态规划数组&#39;dp&#39;来计算以每个位置为底的所有可能的全1子矩形的数量。具体地，通过维护一个单调栈来快速找到当前列之前的较小值位置，并根据这个位置更新当前位置的&#39;dp&#39;值。&#39;dp[j]&#39;表示在第i行中，以第j列为右下角的矩形数量。最后，将所有行的&#39;dp&#39;值累加得到最终答案。</p>
+                                <p>时间复杂度: O(m * n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numSubmat(self, mat: List[List[int]]) -&gt; int:
+        m, n = len(mat), len(mat[0])  # 获取矩阵的行数和列数
+        pre = [0] * (n + 1)  # 初始化前缀和数组，用于计算每列连续1的数量
+        ans = 0  # 初始化结果变量
+
+        for i in range(m):  # 遍历每一行
+            dp = [0] * n  # 初始化当前行的dp数组
+            stack = [-1]  # 初始化单调栈，用于记录列索引
+            for j in range(n):  # 遍历当前行的每一列
+                pre[j] = pre[j] + 1 if mat[i][j] == 1 else 0  # 更新连续1的数量
+                while pre[stack[-1]] &gt; pre[j]:  # 维护单调递增栈
+                    stack.pop()  # 弹出栈顶元素
+                dp[j] = dp[stack[-1]] + pre[j] * (j - stack[-1])  # 计算以mat[i][j]为右下角的子矩形数量
+                stack.append(j)  # 将当前列索引压入栈
+            ans += sum(dp)  # 将当前行的子矩形数量加到总数中
+        
+        return ans  # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划中，为什么要使用单调栈来维护列索引？这个方法与单调栈的典型用途有什么关联吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中使用单调栈来维护列索引，是为了快速找到每个元素左边和右边第一个小于当前元素的位置，这种方法广泛应用于处理类似直方图的问题。单调栈能够帮助我们维护一个递增或递减的序列，从而在O(n)时间复杂度内解决问题。在这个题目中，单调栈用于维护一个递增的栈，这样可以快速确定每个位置左侧连续1的最大可能扩展范围，从而高效计算每个位置作为右下角时的子矩形数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何理解`dp[j] = dp[stack[-1]] + pre[j] * (j - stack[-1])`这个状态转移方程？特别是`pre[j] * (j - stack[-1])`部分是如何计算的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个状态转移方程的含义是计算以当前位置为右下角的所有全1子矩形的数量。`dp[stack[-1]]`表示之前(即栈顶元素指向的位置)已计算的矩形数量。而`pre[j] * (j - stack[-1])`部分表示当前列高度为`pre[j]`的矩形数量，乘以这种高度矩形从栈顶元素到当前位置j的宽度`(j - stack[-1])`。这样，我们就可以将从栈顶位置到当前位置的所有以`pre[j]`为高的矩形数量加上之前的数量，得到以当前位置为右下角的矩形总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理矩阵每一行时，为什么要单独维护一个`pre`数组来记录连续的1的数量？这个统计有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`pre`数组用于记录每一列连续的1的数量。这是因为只有连续的1才能构成子矩形。如果在某一列中间有0出现，那么它上面的所有1都不能与它下面的1形成更大的矩形。通过维护`pre`数组，我们可以快速知道到当前行为止，每一列最多能向上扩展多少行，这是计算全1子矩形不可或缺的信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在单调栈中，当遇到`pre[j] &lt; pre[stack[-1]]`的情况需要弹出栈顶元素，这里的逻辑是为了保证什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的逻辑是为了保证栈中维持的是一个递增的序列。在栈中，每个元素都代表一个高度，且栈顶元素是最近的一个比当前高度小的值。当当前列的高度`pre[j]`小于栈顶列的高度`pre[stack[-1]]`时，意味着栈顶元素不能作为当前矩形的边界（因为它比当前要高，会阻断当前高度的扩展），因此需要将其移除。这样可以保证每个矩形的右边界是正确的，且计算的子矩形数量是准确的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-submatrices-with-all-ones')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-submatrices-with-all-ones/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

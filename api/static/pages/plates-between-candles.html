@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>蜡烛之间的盘子</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>蜡烛之间的盘子</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长桌子，桌子上盘子和蜡烛排成一列。给你一个下标从 <strong>0</strong>&nbsp;开始的字符串&nbsp;<code>s</code>&nbsp;，它只包含字符&nbsp;<code>'*'</code> 和&nbsp;<code>'|'</code>&nbsp;，其中&nbsp;<code>'*'</code>&nbsp;表示一个 <strong>盘子</strong>&nbsp;，<code>'|'</code>&nbsp;表示一支&nbsp;<strong>蜡烛</strong>&nbsp;。</p>
+
+<p>同时给你一个下标从 <strong>0</strong>&nbsp;开始的二维整数数组&nbsp;<code>queries</code>&nbsp;，其中&nbsp;<code>queries[i] = [left<sub>i</sub>, right<sub>i</sub>]</code>&nbsp;表示 <strong>子字符串</strong>&nbsp;<code>s[left<sub>i</sub>...right<sub>i</sub>]</code>&nbsp;（<strong>包含左右端点的字符</strong>）。对于每个查询，你需要找到 <strong>子字符串中</strong>&nbsp;在 <strong>两支蜡烛之间</strong>&nbsp;的盘子的 <b>数目</b>&nbsp;。如果一个盘子在 <strong>子字符串中</strong>&nbsp;左边和右边 <strong>都</strong>&nbsp;至少有一支蜡烛，那么这个盘子满足在 <strong>两支蜡烛之间</strong>&nbsp;。</p>
+
+<ul>
+	<li>比方说，<code>s = "||**||**|*"</code>&nbsp;，查询&nbsp;<code>[3, 8]</code>&nbsp;，表示的是子字符串&nbsp;<code>"*||<strong><em>**</em></strong>|"</code>&nbsp;。子字符串中在两支蜡烛之间的盘子数目为&nbsp;<code>2</code>&nbsp;，子字符串中右边两个盘子在它们左边和右边 <strong>都 </strong>至少有一支蜡烛。</li>
+</ul>
+
+<p>请你返回一个整数数组&nbsp;<code>answer</code>&nbsp;，其中&nbsp;<code>answer[i]</code>&nbsp;是第&nbsp;<code>i</code>&nbsp;个查询的答案。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<p><img alt="ex-1" src="https://assets.leetcode.com/uploads/2021/10/04/ex-1.png" style="width: 400px; height: 134px;"></p>
+
+<pre><b>输入：</b>s = "**|**|***|", queries = [[2,5],[5,9]]
+<b>输出：</b>[2,3]
+<b>解释：</b>
+- queries[0] 有两个盘子在蜡烛之间。
+- queries[1] 有三个盘子在蜡烛之间。
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<p><img alt="ex-2" src="https://assets.leetcode.com/uploads/2021/10/04/ex-2.png" style="width: 600px; height: 193px;"></p>
+
+<pre><b>输入：</b>s = "***|**|*****|**||**|*", queries = [[1,17],[4,5],[14,17],[5,11],[15,16]]
+<b>输出：</b>[9,0,0,0,0]
+<strong>解释：</strong>
+- queries[0] 有 9 个盘子在蜡烛之间。
+- 另一个查询没有盘子在蜡烛之间。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s</code>&nbsp;只包含字符&nbsp;<code>'*'</code> 和&nbsp;<code>'|'</code>&nbsp;。</li>
+	<li><code>1 &lt;= queries.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>queries[i].length == 2</code></li>
+	<li><code>0 &lt;= left<sub>i</sub> &lt;= right<sub>i</sub> &lt; s.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 164 ms</p>
+                    <p>内存: 47.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def platesBetweenCandles(self, s: str, queries: List[List[int]]) -&gt; List[int]:
+        n = len(s)
+        preSum = [0] * n 
+        sum_ = 0
+        left = [0] * n 
+        l = -1 
+        for i, ch in enumerate(s):
+            if ch == &#39;*&#39;:
+                sum_ += 1 
+            else:
+                l = i 
+            preSum[i] = sum_ # 表示前i个位置有多少个盘子 &#39;*｜**&#39; -&gt; [1,1,2,3]
+            left[i] = l # 表示i这个位置的时候，右端点左侧的第一个蜡烛
+
+        right = [0] * n
+        r = -1 
+        # 找区间左端点右侧最近的蜡烛
+        for i in range(n - 1, -1, -1):
+            if s[i] == &#39;|&#39;:
+                r = i 
+            right[i] = r 
+        
+        ans = [0] * len(queries)
+        for i, (x, y) in enumerate(queries):
+            left_cand, right_cand = right[x], left[y]
+            if left_cand &gt;= 0 and right_cand &gt;= 0 and left_cand &lt; right_cand:
+                ans[i] = preSum[right_cand] - preSum[left_cand]
+        return ans 
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了预处理数组的方法来优化查询。首先，使用前缀和数组 preSum 来记录从字符串开头到当前位置的盘子数量。其次，使用两个数组 left 和 right 分别存储每个位置左侧最近的蜡烛位置和右侧最近的蜡烛位置。通过这种方式，对于每一个查询，可以快速找到查询范围内左侧和右侧的第一个蜡烛，并计算这两个蜡烛之间的盘子数量。</p>
+                                <p>时间复杂度: O(n + q)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def platesBetweenCandles(self, s: str, queries: List[List[int]]) -&gt; List[int]:
+        n = len(s)
+        preSum = [0] * n  # 前缀和数组，记录到每个位置为止的盘子数量
+        sum_ = 0
+        left = [0] * n  # 记录每个位置左侧最近的蜡烛位置
+        l = -1
+        for i, ch in enumerate(s):
+            if ch == &#39;*&#39;:
+                sum_ += 1  # 遇到盘子，增加计数
+            else:
+                l = i  # 更新最近的蜡烛位置
+            preSum[i] = sum_
+            left[i] = l
+
+        right = [0] * n  # 记录每个位置右侧最近的蜡烛位置
+        r = -1
+        for i in range(n - 1, -1, -1):
+            if s[i] == &#39;|&#39;:
+                r = i  # 更新最近的蜡烛位置
+            right[i] = r
+
+        ans = [0] * len(queries)
+        for i, (x, y) in enumerate(queries):
+            left_cand, right_cand = right[x], left[y]  # 查询区间内的两个蜡烛位置
+            if left_cand &gt;= 0 and right_cand &gt;= 0 and left_cand &lt; right_cand:
+                ans[i] = preSum[right_cand] - preSum[left_cand]  # 计算两蜡烛之间的盘子数量
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么需要使用前缀和数组来记录盘子的数量？直接在处理查询时统计不可以吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用前缀和数组记录盘子的数量可以大大优化性能。如果直接在处理每个查询时统计盘子数量，我们需要对每个查询区间进行遍历，这在最坏情况下的时间复杂度是O(n*m)，其中n是字符串的长度，m是查询的数量。通过使用前缀和数组，我们可以预处理出一个数组，在O(1)的时间内回答任何区间内盘子的数量，从而使得每个查询的时间复杂度降低到O(1)，整体上查询的总时间复杂度为O(m)。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构建left和right数组时，如果在s字符串的起始或结束位置很长一段没有蜡烛，这种情况下如何保证算法的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，left数组在起始位置很长一段将记录为-1，表示没有找到任何蜡烛；right数组在结束位置很长一段也将记录为-1。在处理查询时，我们检查由right和left数组确定的蜡烛位置。如果这些位置为-1，说明在查询区间内没有蜡烛，或者蜡烛不满足在所查询的子区间内的条件。这种方式确保了即使在没有蜡烛的长段中，算法仍能正确地返回结果0，因为没有蜡烛意味着没有盘子可以被计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            请问为什么要从右向左再次遍历字符串s来构建right数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从右向左遍历字符串s来构建right数组是为了记录每个位置右侧最近的蜡烛位置。这种从右向左的遍历方式允许我们在单次遍历中有效地更新右侧最近的蜡烛位置。如果我们只从左向右遍历，则无法在遍历过程中知道右侧的蜡烛位置，因此需要从右向左遍历以适应这一要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理查询时，如果查询区间内没有蜡烛怎么处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果查询区间内没有蜡烛，则由right数组和left数组所确定的蜡烛位置将为-1。在算法实现中，我们首先检查由right[x]和left[y]确定的蜡烛位置是否有效（即不为-1）且right[x]小于left[y]。如果这些条件不满足，则查询区间内没有有效的蜡烛，因此返回的盘子数量应为0。这确保了在没有蜡烛的情况下算法返回正确的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/plates-between-candles')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/plates-between-candles/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

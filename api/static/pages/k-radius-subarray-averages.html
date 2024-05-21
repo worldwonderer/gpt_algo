@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>半径为 k 的子数组平均值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>半径为 k 的子数组平均值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的数组 <code>nums</code> ，数组中有 <code>n</code> 个整数，另给你一个整数 <code>k</code> 。</p>
+
+<p><strong>半径为 k 的子数组平均值</strong> 是指：<code>nums</code> 中一个以下标 <code>i</code> 为 <strong>中心</strong> 且 <strong>半径</strong> 为 <code>k</code> 的子数组中所有元素的平均值，即下标在&nbsp;<code>i - k</code> 和 <code>i + k</code> 范围（<strong>含</strong> <code>i - k</code> 和 <code>i + k</code>）内所有元素的平均值。如果在下标 <code>i</code> 前或后不足 <code>k</code> 个元素，那么<strong> 半径为 k 的子数组平均值 </strong>是 <code>-1</code> 。</p>
+
+<p>构建并返回一个长度为 <code>n</code> 的数组<em> </em><code>avgs</code><em> </em>，其中<em> </em><code>avgs[i]</code><em> </em>是以下标 <code>i</code> 为中心的子数组的<strong> 半径为 k 的子数组平均值 </strong>。</p>
+
+<p><code>x</code> 个元素的 <strong>平均值</strong> 是 <code>x</code> 个元素相加之和除以 <code>x</code> ，此时使用截断式 <strong>整数除法</strong> ，即需要去掉结果的小数部分。</p>
+
+<ul>
+	<li>例如，四个元素 <code>2</code>、<code>3</code>、<code>1</code> 和 <code>5</code> 的平均值是 <code>(2 + 3 + 1 + 5) / 4 = 11 / 4 = 2.75</code>，截断后得到 <code>2</code> 。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/11/07/eg1.png" style="width: 343px; height: 119px;" /></p>
+
+<pre>
+<strong>输入：</strong>nums = [7,4,3,9,1,8,5,2,6], k = 3
+<strong>输出：</strong>[-1,-1,-1,5,4,4,-1,-1,-1]
+<strong>解释：</strong>
+- avg[0]、avg[1] 和 avg[2] 是 -1 ，因为在这几个下标前的元素数量都不足 k 个。
+- 中心为下标 3 且半径为 3 的子数组的元素总和是：7 + 4 + 3 + 9 + 1 + 8 + 5 = 37 。
+  使用截断式 <strong>整数除法</strong>，avg[3] = 37 / 7 = 5 。
+- 中心为下标 4 的子数组，avg[4] = (4 + 3 + 9 + 1 + 8 + 5 + 2) / 7 = 4 。
+- 中心为下标 5 的子数组，avg[5] = (3 + 9 + 1 + 8 + 5 + 2 + 6) / 7 = 4 。
+- avg[6]、avg[7] 和 avg[8] 是 -1 ，因为在这几个下标后的元素数量都不足 k 个。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [100000], k = 0
+<strong>输出：</strong>[100000]
+<strong>解释：</strong>
+- 中心为下标 0 且半径 0 的子数组的元素总和是：100000 。
+  avg[0] = 100000 / 1 = 100000 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [8], k = 100000
+<strong>输出：</strong>[-1]
+<strong>解释：</strong>
+- avg[0] 是 -1 ，因为在下标 0 前后的元素数量均不足 k 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= nums[i], k &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 109 ms</p>
+                    <p>内存: 29.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def getAverages(self, nums: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return nums
+        l = 2*k + 1
+        n = len(nums)
+        num = sum(nums[:l])
+        f = [-1] * n
+
+        if n &gt; l:
+            f[k] = num // l
+        elif n == l:
+            f[k] = num // l
+            return f
+        else:
+            return f
+
+        for i in range(k+1, n-k):
+            num -= nums[i-k-1]
+            num += nums[i+k]
+            f[i] = num // l
+        return f</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了滑动窗口的算法策略。首先，检查特殊情况，如果 k 为 0，直接返回原数组 nums，因为不需要任何窗口操作。接下来，计算窗口长度 l 为 2*k + 1，这是因为窗口需要覆盖从 i-k 到 i+k 的元素。初始化一个长度为 n 的数组 f，全部填充为 -1，用来存储最终的结果。通过在 nums 的开始计算初始窗口的总和 num。如果 n 大于等于 l，说明存在至少一个合法的窗口，将首个窗口的平均值存入 f[k]。然后，利用滑动窗口技术，依次更新窗口中的元素总和，计算并更新每个合法窗口的平均值。这个过程一直进行，直到无法再形成一个完整的窗口，即窗口的右边界超出了数组的长度。最后，返回填充好的数组 f。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def getAverages(self, nums: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return nums  # k为0时，直接返回原数组
+        l = 2*k + 1  # 计算窗口的宽度
+        n = len(nums)
+        if n &lt; l:
+            return [-1] * n  # 如果数组长度小于窗口宽度，直接返回全为-1的数组
+        num = sum(nums[:l])  # 计算初始窗口的元素总和
+        f = [-1] * n  # 初始化结果数组为-1
+
+        if n &gt;= l:
+            f[k] = num // l  # 计算第一个窗口的平均值并存储
+
+        for i in range(k+1, n-k):
+            num -= nums[i-k-1]  # 移除窗口最左边的元素
+            num += nums[i+k]  # 添加窗口最右边的新元素
+            f[i] = num // l  # 计算新窗口的平均值并存储
+        return f  # 返回计算得到的结果数组</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在计算窗口的初始总和时，使用的是`sum(nums[:l])`而不是其他范围的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，窗口的大小是固定的，长度为`2*k + 1`，即`l`。为了计算第一个窗口（覆盖数组中从位置0到位置`2*k`的元素）的平均值，必须首先计算这个窗口中所有元素的总和。这就是为什么使用`sum(nums[:l])`来计算初始窗口的总和，因为这正好覆盖了初始窗口需要的元素范围。使用其他范围的元素将无法正确反映第一个窗口的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在滑动窗口时，总和的更新操作`num -= nums[i-k-1]; num += nums[i+k]`是如何保证窗口始终包含正确的元素数目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在滑动窗口技术中，更新操作`num -= nums[i-k-1]; num += nums[i+k]`用于移除窗口左端的一个元素并添加一个新的元素至窗口右端。这种操作保证了窗口内的元素数量总是保持不变，即`2*k + 1`个元素。当窗口从一个位置滑向下一个位置时，只需移除当前窗口最左端的元素，并加上一个新的最右端的元素，这样可以有效地更新窗口的总和而不需要重新计算整个窗口内的元素总和，从而提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在数组长度小于窗口长度时，直接返回全为-1的数组，这种处理方式是否能处理所有边界情况，比如`n=0`或`k&gt;n`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当数组长度`n`小于窗口长度`l`时，意味着无法形成一个完整的窗口（因为窗口需要`2*k + 1`个元素）。因此，在任何情况下，只要`n &lt; l`，不论是`n=0`还是`k&gt;n`，返回全为-1的数组都是有效的处理方式，因为这些情况下都不可能形成一个有效的滑动窗口来计算平均值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理窗口平均值时使用的是整数除法`num // l`，这种处理方式是否会导致结果的精度问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中使用的是整数除法`num // l`主要是因为题目可能期望返回结果为整数。此操作确实可能导致精度问题，因为它会丢弃小数部分，只保留结果的整数部分。如果题目需要更精确的结果，可以考虑使用浮点数除法并四舍五入到最接近的整数。不过，具体取决于题目的要求和预期的输出格式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/k-radius-subarray-averages')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/k-radius-subarray-averages/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>除法求值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>除法求值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个变量对数组 <code>equations</code> 和一个实数值数组 <code>values</code> 作为已知条件，其中 <code>equations[i] = [A<sub>i</sub>, B<sub>i</sub>]</code> 和 <code>values[i]</code> 共同表示等式 <code>A<sub>i</sub> / B<sub>i</sub> = values[i]</code> 。每个 <code>A<sub>i</sub></code> 或 <code>B<sub>i</sub></code> 是一个表示单个变量的字符串。</p>
+
+<p>另有一些以数组 <code>queries</code> 表示的问题，其中 <code>queries[j] = [C<sub>j</sub>, D<sub>j</sub>]</code> 表示第 <code>j</code> 个问题，请你根据已知条件找出 <code>C<sub>j</sub> / D<sub>j</sub> = ?</code> 的结果作为答案。</p>
+
+<p>返回 <strong>所有问题的答案</strong> 。如果存在某个无法确定的答案，则用 <code>-1.0</code> 替代这个答案。如果问题中出现了给定的已知条件中没有出现的字符串，也需要用 <code>-1.0</code> 替代这个答案。</p>
+
+<p><strong>注意：</strong>输入总是有效的。可以假设除法运算中不会出现除数为 0 的情况，且不存在任何矛盾的结果。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>equations = [[&quot;a&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;c&quot;]], values = [2.0,3.0], queries = [[&quot;a&quot;,&quot;c&quot;],[&quot;b&quot;,&quot;a&quot;],[&quot;a&quot;,&quot;e&quot;],[&quot;a&quot;,&quot;a&quot;],[&quot;x&quot;,&quot;x&quot;]]
+<strong>输出：</strong>[6.00000,0.50000,-1.00000,1.00000,-1.00000]
+<strong>解释：</strong>
+条件：<em>a / b = 2.0</em>, <em>b / c = 3.0</em>
+问题：<em>a / c = ?</em>, <em>b / a = ?</em>, <em>a / e = ?</em>, <em>a / a = ?</em>, <em>x / x = ?</em>
+结果：[6.0, 0.5, -1.0, 1.0, -1.0 ]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>equations = [[&quot;a&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;c&quot;],[&quot;bc&quot;,&quot;cd&quot;]], values = [1.5,2.5,5.0], queries = [[&quot;a&quot;,&quot;c&quot;],[&quot;c&quot;,&quot;b&quot;],[&quot;bc&quot;,&quot;cd&quot;],[&quot;cd&quot;,&quot;bc&quot;]]
+<strong>输出：</strong>[3.75000,0.40000,5.00000,0.20000]
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>equations = [[&quot;a&quot;,&quot;b&quot;]], values = [0.5], queries = [[&quot;a&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;a&quot;],[&quot;a&quot;,&quot;c&quot;],[&quot;x&quot;,&quot;y&quot;]]
+<strong>输出：</strong>[0.50000,2.00000,-1.00000,-1.00000]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= equations.length &lt;= 20</code></li>
+	<li><code>equations[i].length == 2</code></li>
+	<li><code>1 &lt;= A<sub>i</sub>.length, B<sub>i</sub>.length &lt;= 5</code></li>
+	<li><code>values.length == equations.length</code></li>
+	<li><code>0.0 &lt; values[i] &lt;= 20.0</code></li>
+	<li><code>1 &lt;= queries.length &lt;= 20</code></li>
+	<li><code>queries[i].length == 2</code></li>
+	<li><code>1 &lt;= C<sub>j</sub>.length, D<sub>j</sub>.length &lt;= 5</code></li>
+	<li><code>A<sub>i</sub>, B<sub>i</sub>, C<sub>j</sub>, D<sub>j</sub></code> 由小写英文字母与数字组成</li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 399&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/evaluate-division/">https://leetcode-cn.com/problems/evaluate-division/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 19 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def dfs (self,x,target,temp,visted,graph):
+        if x == target:
+            return temp
+        for node,value in graph[x]:
+            if visted[node]:
+                continue
+            visted[node] = True
+            result = self.dfs(node,target,temp / value,visted, graph)
+            visted[node] = False
+            if result != -1:
+                return result
+        return -1
+    def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -&gt; List[float]:
+        
+        graph = collections.defaultdict(list)
+        node = set()
+        for i, (v1,v2) in enumerate(equations):
+            graph[v1].append([v2,1/values[i]])
+            graph[v2].append([v1,values[i]])
+            node.add(v1)
+            node.add(v2)
+        result = []
+        visted = {n:False for n in node}
+        for x,y in queries:
+            if x not in node or y not in node:
+                result.append(-1)
+                continue
+            visted[x] = True
+            result.append(self.dfs(x,y,1,visted,graph))
+            visted[x] = False
+        return result
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        a = list(zip(equations,values))
+        a = sorted(a)
+        equations = []
+        values = []
+        for pair in a:
+            e,v = pair
+            equations.append(e)
+            values.append(v)
+        help_dict = {}
+        v1,v2 = equations[0]
+        help_dict[v1] = 1
+        help_dict[v2] = help_dict[v1] / values[0]
+        for i in range(1,len(equations)):
+            v1, v2 = equations[i]
+            if v1 not in help_dict and v2 not in help_dict:
+                help_dict[v2] = 1
+                help_dict[v1] = help_dict[v2] * values[i]
+            elif v1 not in help_dict:
+                help_dict[v1] = help_dict[v2] * values[i]
+            elif v2 not in help_dict:
+                help_dict[v2] = help_dict[v1] / values[i]
+        result = []
+        for q in queries:
+            v1, v2 = q
+            v1_list = v1.split()
+            v2_list = v2.split()
+            # for i in range(len(v1_list)):
+            #     ele = v1_list[i]
+            #     if ele in v2_list:
+            #         v1_list.pop(i)
+            #         v2_list.remove(ele)
+            v1_result = 1
+            v2_result = 1
+            judge = False
+            for ele in v1_list:
+                if ele not in help_dict:
+                    result.append(-1)
+                    judge = True
+                    break
+                v1_result *= help_dict[ele]
+            if judge:
+                continue
+            for ele in v2_list:
+                if ele not in help_dict:
+                    result.append(-1)
+                    judge = True
+                    break
+                v2_result *= help_dict[ele]
+            if judge:
+                continue
+            result.append(v1_result/v2_result)
+        return result
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了图的深度优先搜索（DFS）来解决问题。首先，构建一个图，每个节点代表一个变量，每条边代表两个变量之间的除法关系，并存储这个比值。对于每个查询，使用DFS从起点变量尝试到达终点变量，并沿途计算乘积。如果能到达目标节点，则返回计算的结果，否则返回-1。为了避免环路和重复访问，使用一个visited字典来记录访问过的节点。</p>
+                                <p>时间复杂度: O(Q*(V+E))</p>
+                                <p>空间复杂度: O(V+E)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def dfs(self, x, target, temp, visited, graph):
+        # 如果当前节点等于目标节点，返回当前计算的结果
+        if x == target:
+            return temp
+        # 遍历当前节点的所有邻接节点
+        for node, value in graph[x]:
+            if visited[node]:
+                continue
+            visited[node] = True
+            result = self.dfs(node, target, temp / value, visited, graph)
+            visited[node] = False
+            if result != -1:
+                return result
+        return -1
+    def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -&gt; List[float]:
+        # 构建图
+        graph = collections.defaultdict(list)
+        node = set()
+        for i, (v1, v2) in enumerate(equations):
+            graph[v1].append([v2, 1/values[i]])
+            graph[v2].append([v1, values[i]])
+            node.add(v1)
+            node.add(v2)
+        result = []
+        visited = {n: False for n in node}
+        # 处理每个查询
+        for x, y in queries:
+            if x not in node or y not in node:
+                result.append(-1)
+                continue
+            visited[x] = True
+            result.append(self.dfs(x, y, 1, visited, graph))
+            visited[x] = False
+        return result</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建图时，为什么要同时添加正向和反向的边，并存储相应的除法结果和其倒数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建图时，添加正向和反向的边以及存储除法结果及其倒数，是为了确保无论查询的方向如何，都能通过图中已有的边来找到一条有效路径。例如，如果存在除法关系 a / b = 2，则同时存储 b / a = 0.5。这样，无论查询是要求 a / b 还是 b / a，都可以直接在图中找到对应的边来计算结果。这种双向连接也便于图遍历算法如DFS能在任一方向上探索并找到解答。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            DFS方法中，如果遇到了一个已经访问过的节点，为什么选择跳过而不是尝试使用该节点继续寻找路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中跳过已访问的节点是为了防止无限循环和重复计算，从而提高算法效率。如果在递归的过程中重新访问一个已经访问过的节点，可能会形成一个环，导致算法陷入无限循环。此外，重复访问同一节点通常意味着重复执行相同的计算，这不仅无助于找到正确答案，还会增加时间复杂度。因此，避免重复访问可以保持DFS的正确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到使用visited字典记录访问过的节点，这种方法如何确保在多个查询中不会互相影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理每个查询之前，visited字典会被重置，确保每次查询都从一个干净的状态开始。这样做可以避免不同查询之间的相互干扰。对于每个查询，DFS开始前将visited标记为所有节点未访问。一旦该查询结束，visited状态会重置，为下一个查询提供了一个未访问的新环境。这保证了每个查询都是独立处理，保持了查询结果的独立性和准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/vlzXQL')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/vlzXQL/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

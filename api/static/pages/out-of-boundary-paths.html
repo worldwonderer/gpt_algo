@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>出界的路径数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>出界的路径数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为 <code>m x n</code> 的网格和一个球。球的起始坐标为 <code>[startRow, startColumn]</code> 。你可以将球移到在四个方向上相邻的单元格内（可以穿过网格边界到达网格之外）。你 <strong>最多</strong> 可以移动 <code>maxMove</code> 次球。</p>
+
+<p>给你五个整数 <code>m</code>、<code>n</code>、<code>maxMove</code>、<code>startRow</code> 以及 <code>startColumn</code> ，找出并返回可以将球移出边界的路径数量。因为答案可能非常大，返回对 <code>10<sup>9</sup> + 7</code> <strong>取余</strong> 后的结果。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/04/28/out_of_boundary_paths_1.png" style="width: 500px; height: 296px;" />
+<pre>
+<strong>输入：</strong>m = 2, n = 2, maxMove = 2, startRow = 0, startColumn = 0
+<strong>输出：</strong>6
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/04/28/out_of_boundary_paths_2.png" style="width: 500px; height: 293px;" />
+<pre>
+<strong>输入：</strong>m = 1, n = 3, maxMove = 3, startRow = 0, startColumn = 1
+<strong>输出：</strong>12
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= m, n &lt;= 50</code></li>
+	<li><code>0 &lt;= maxMove &lt;= 50</code></li>
+	<li><code>0 &lt;= startRow &lt; m</code></li>
+	<li><code>0 &lt;= startColumn &lt; n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 65 ms</p>
+                    <p>内存: 21.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findPaths(self, m: int, n: int, maxMove: int, startRow: int, startColumn: int) -&gt; int:
+        MOD = 10 ** 9 + 7
+
+        if maxMove == 0:
+            return 0
+
+        @cache
+        def countPaths(currX: int, currY: int, maxMove: int) -&gt; int:
+            if maxMove == 1:
+                return (currX == 0) + (currX == m - 1) + (currY == 0) + (currY == n - 1)
+            
+            return sum([
+                countPaths(currX - 1, currY, maxMove - 1) if currX &gt; 0 else 1,
+                countPaths(currX + 1, currY, maxMove - 1) if currX &lt; m - 1 else 1,
+                countPaths(currX, currY - 1, maxMove - 1) if currY &gt; 0 else 1,
+                countPaths(currX, currY + 1, maxMove - 1) if currY &lt; n - 1 else 1
+            ]) % MOD
+        
+        return countPaths(startRow, startColumn, maxMove)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了记忆化递归的方法。首先判断如果最大移动次数为0，直接返回0。然后定义了一个递归函数countPaths，用来计算从当前位置(currX, currY)出发，在剩余的maxMove步内出界的路径数量。如果只剩下1步，那么只需判断当前位置是否在边界上，在的话就返回1，否则返回0。如果还有多步，就分别向上下左右四个方向递归调用countPaths，如果某个方向已经出界，则该方向的返回值为1。最后将四个方向的结果求和取模即可。主函数中调用countPaths(startRow, startColumn, maxMove)得到最终结果。</p>
+                                <p>时间复杂度: O(m * n * maxMove)</p>
+                                <p>空间复杂度: O(m * n * maxMove)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findPaths(self, m: int, n: int, maxMove: int, startRow: int, startColumn: int) -&gt; int:
+        MOD = 10 ** 9 + 7
+
+        if maxMove == 0:
+            return 0
+
+        @cache
+        def countPaths(currX: int, currY: int, maxMove: int) -&gt; int:
+            # 如果只剩下1步，判断当前位置是否在边界上
+            if maxMove == 1:
+                return (currX == 0) + (currX == m - 1) + (currY == 0) + (currY == n - 1)
+            
+            # 否则向四个方向递归调用，并将结果求和
+            return sum([
+                countPaths(currX - 1, currY, maxMove - 1) if currX &gt; 0 else 1,  # 向上移动
+                countPaths(currX + 1, currY, maxMove - 1) if currX &lt; m - 1 else 1,  # 向下移动
+                countPaths(currX, currY - 1, maxMove - 1) if currY &gt; 0 else 1,  # 向左移动
+                countPaths(currX, currY + 1, maxMove - 1) if currY &lt; n - 1 else 1  # 向右移动
+            ]) % MOD
+        
+        return countPaths(startRow, startColumn, maxMove)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在递归函数`countPaths`中，当只剩下1步时，是通过检查当前位置是否在边界上来决定是否返回1，这样的逻辑是否确保了所有可能的出界路径都被正确计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数`countPaths`中，当只剩下1步时，通过检查当前位置是否在边界上来确定是否返回1，确实确保了所有可能的出界路径被正确计算。这里的逻辑基于的是，如果还有一步可以走，且当前位置已经在边界上（顶部、底部、左侧或右侧），那么在下一步必然可以直接走出界，因此直接返回1代表这一可能性。如果不在边界上，则无法在一步内走出界，因此返回0。这样的处理方式精确地覆盖了所有能在最后一步直接走出界的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果某个方向已经出界，则该方向的返回值为1。请问这种处理方式是否可能导致对某些路径的重复计数，特别是在接近边界的位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式不会导致路径的重复计数。在题解中，每个递归调用都是基于当前位置和剩余可移动的步数来决定的。如果某个方向已经出界，即当前方向的下一步没有有效的格子可走，直接返回1是因为这确实代表了一条成功的出界路径。由于每次递归调用都是独立考虑各个方向的，所以即使在边界附近，每个方向的出界都是独立计算，不会重复。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在没有任何移动时（maxMove为0），直接返回0的做法是否考虑了所有边界条件，例如如果开始位置就在边缘上是否应该有不同的返回值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在没有任何移动时直接返回0是合理的，因为题目要求的是在给定的移动次数内出边界的路径数量。即使开始位置已经在边界上，如果没有移动次数（maxMove为0），则没有任何移动可以执行，因此不能形成任何有效的出界路径。这种设定是基于题目要求的移动次数内完成出界的规则。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解说明了使用`@cache`来避免重复计算，但如何确保缓存机制在这种多参数递归函数中有效提高性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`@cache`装饰器可以有效地避免在递归过程中对相同参数值的重复计算，从而显著提高性能。在这个问题中，递归函数`countPaths`有三个参数：当前坐标（currX, currY）和剩余可移动步数（maxMove）。由于在递归过程中可能会多次访问到相同的位置与相同的剩余步数，使用缓存可以保存这些结果，避免重复的计算过程。每次调用时，如果这些参数的组合之前已经计算过，就直接从缓存中返回结果，减少了计算量和执行时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/knight-probability-in-chessboard" class="list-group-item list-group-item-action">
+                                骑士在棋盘上的概率
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/out-of-boundary-paths')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/out-of-boundary-paths/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

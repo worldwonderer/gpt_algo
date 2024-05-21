@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最接近的二叉搜索树值 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最接近的二叉搜索树值 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-search-tree" class="badge bg-secondary tag-link">二叉搜索树</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 18.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def closestKValues(self, root: Optional[TreeNode], target: float, k: int) -&gt; List[int]:
+        ans = []
+        arr = []
+        def dfs(root):
+            if root is None:
+                return
+            dfs(root.left)
+            arr.append(root.val)
+            dfs(root.right)
+        dfs(root)
+        right = bisect.bisect_left(arr, target)
+        left = right - 1
+
+        for i in range(k):
+            if left &gt;= 0 and right &lt; len(arr):
+                if abs(arr[left]-target) &lt; abs(arr[right]-target):
+                    ans.append(arr[left])
+                    left -= 1
+                else:
+                    ans.append(arr[right])
+                    right += 1
+            elif left &gt;= 0:
+                ans.append(arr[left])
+                left -= 1
+            elif right &lt; len(arr):
+                ans.append(arr[right])
+                right += 1
+        return ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是先通过中序遍历将二叉搜索树转换成一个有序数组，然后利用二分查找找到最接近目标值的位置。接着用双指针从该位置向两边扩展，每次选择与目标值差距更小的那个点加入答案，直至选出 k 个最接近的值。</p>
+                                <p>时间复杂度: O(n + k)</p>
+                                <p>空间复杂度: O(n + k)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def closestKValues(self, root: Optional[TreeNode], target: float, k: int) -&gt; List[int]:
+        ans = []
+        arr = []
+        
+        # 中序遍历将二叉搜索树转换成有序数组
+        def dfs(root):
+            if root is None:
+                return
+            dfs(root.left)
+            arr.append(root.val)
+            dfs(root.right)
+        
+        dfs(root)
+        
+        # 二分查找最接近目标值的位置
+        right = bisect.bisect_left(arr, target)
+        left = right - 1
+
+        # 双指针扩展并选出 k 个最接近目标值的点
+        for i in range(k):
+            if left &gt;= 0 and right &lt; len(arr):
+                if abs(arr[left]-target) &lt; abs(arr[right]-target):
+                    ans.append(arr[left])
+                    left -= 1
+                else:
+                    ans.append(arr[right])
+                    right += 1
+            elif left &gt;= 0:
+                ans.append(arr[left])
+                left -= 1
+            elif right &lt; len(arr):
+                ans.append(arr[right])
+                right += 1
+        
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择中序遍历来将二叉搜索树转换成有序数组？中序遍历与其他遍历方法（如前序或后序）相比有何优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二叉搜索树（BST）中，中序遍历的过程会按照从小到大的顺序访问所有节点，这是因为对于任何一个节点，中序遍历先访问其左子树，然后是节点本身，最后是右子树。这样的访问顺序恰好符合二叉搜索树的有序性质。相比之下，前序和后序遍历则无法保证输出一个有序数组，因为它们访问节点的顺序与节点的大小顺序不一致。例如，前序遍历首先访问根节点，然后是左子树和右子树，这不会直接产生有序数组。因此，中序遍历是转换BST为有序数组的最自然和直接的方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            二分查找找到的位置为何用`bisect_left`而不是`bisect_right`？这样选择对结果有什么潜在影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`bisect_left`函数在数组中找到第一个不小于目标值的元素的位置，而`bisect_right`则找到第一个大于目标值的元素的位置。使用`bisect_left`意味着如果目标值正好等于数组中的某个元素，那么返回的位置将是这些相等元素的最左侧位置。这种选择有助于在后续双指针过程中更平均地考虑目标值两侧的元素，避免偏向任一侧。如果使用`bisect_right`，则在相等元素较多的情况下可能跳过最接近的一侧，从而可能影响结果的最优性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在双指针扩展过程中，当`left`或`right`指针越界时，程序如何保证仍然能选出足够的k个最接近的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在双指针过程中，如果一个指针（`left`或`right`）越界，程序会继续移动另一个仍在数组范围内的指针，直到收集到足够的k个元素。例如，如果`left`指针越界（小于0），则只增加`right`指针，反之亦然。由于数组已经包含了所有树节点的值，这种方法保证了即使一个方向的指针越界，仍然可以从另一方向获取足够的元素来满足k的需求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果目标值target非常接近某个节点值，但不完全等于任何节点值，二分查找和双指针策略在这种情况下是否还能有效工作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，二分查找和双指针策略仍然有效。二分查找通过`bisect_left`找到最接近目标值的起始位置，即便这个位置的元素值不完全等于目标值。之后，双指针策略从这个位置开始向两边扩展，比较左右元素与目标值的差距，逐步选择最接近的元素。这种方法确保了即使目标值不等于任何节点值，也能找到最接近的k个值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/binary-tree-inorder-traversal" class="list-group-item list-group-item-action">
+                                二叉树的中序遍历
+                            </a>
+                        
+                            <a href="/problem/closest-binary-search-tree-value" class="list-group-item list-group-item-action">
+                                最接近的二叉搜索树值
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/closest-binary-search-tree-value-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/closest-binary-search-tree-value-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>设计一个 ATM 机器</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>设计一个 ATM 机器</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个 ATM 机器，存有&nbsp;<code>5</code>&nbsp;种面值的钞票：<code>20</code>&nbsp;，<code>50</code>&nbsp;，<code>100</code>&nbsp;，<code>200</code>&nbsp;和&nbsp;<code>500</code>&nbsp;美元。初始时，ATM 机是空的。用户可以用它存或者取任意数目的钱。</p>
+
+<p>取款时，机器会优先取 <b>较大</b>&nbsp;数额的钱。</p>
+
+<ul>
+	<li>比方说，你想取&nbsp;<code>$300</code>&nbsp;，并且机器里有&nbsp;<code>2</code>&nbsp;张 <code>$50</code>&nbsp;的钞票，<code>1</code>&nbsp;张&nbsp;<code>$100</code>&nbsp;的钞票和<code>1</code>&nbsp;张&nbsp;<code>$200</code>&nbsp;的钞票，那么机器会取出&nbsp;<code>$100</code> 和&nbsp;<code>$200</code>&nbsp;的钞票。</li>
+	<li>但是，如果你想取&nbsp;<code>$600</code>&nbsp;，机器里有&nbsp;<code>3</code>&nbsp;张&nbsp;<code>$200</code>&nbsp;的钞票和<code>1</code>&nbsp;张&nbsp;<code>$500</code>&nbsp;的钞票，那么取款请求会被拒绝，因为机器会先取出&nbsp;<code>$500</code>&nbsp;的钞票，然后无法取出剩余的&nbsp;<code>$100</code>&nbsp;。注意，因为有&nbsp;<code>$500</code>&nbsp;钞票的存在，机器&nbsp;<strong>不能</strong>&nbsp;取&nbsp;<code>$200</code>&nbsp;的钞票。</li>
+</ul>
+
+<p>请你实现 ATM 类：</p>
+
+<ul>
+	<li><code>ATM()</code>&nbsp;初始化 ATM 对象。</li>
+	<li><code>void deposit(int[] banknotesCount)</code>&nbsp;分别存入&nbsp;<code>$20</code>&nbsp;，<code>$50</code>，<code>$100</code>，<code>$200</code>&nbsp;和&nbsp;<code>$500</code>&nbsp;钞票的数目。</li>
+	<li><code>int[] withdraw(int amount)</code>&nbsp;返回一个长度为&nbsp;<code>5</code>&nbsp;的数组，分别表示&nbsp;<code>$20</code>&nbsp;，<code>$50</code>，<code>$100</code>&nbsp;，<code>$200</code>&nbsp;和&nbsp;<code>$500</code>&nbsp;钞票的数目，并且更新 ATM 机里取款后钞票的剩余数量。如果无法取出指定数额的钱，请返回&nbsp;<code>[-1]</code>&nbsp;（这种情况下 <strong>不</strong>&nbsp;取出任何钞票）。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>
+["ATM", "deposit", "withdraw", "deposit", "withdraw", "withdraw"]
+[[], [[0,0,1,2,1]], [600], [[0,1,0,1,1]], [600], [550]]
+<strong>输出：</strong>
+[null, null, [0,0,1,0,1], null, [-1], [0,1,0,0,1]]
+
+<strong>解释：</strong>
+ATM atm = new ATM();
+atm.deposit([0,0,1,2,1]); // 存入 1 张 $100 ，2 张 $200 和 1 张 $500 的钞票。
+atm.withdraw(600);        // 返回 [0,0,1,0,1] 。机器返回 1 张 $100 和 1 张 $500 的钞票。机器里剩余钞票的数量为 [0,0,0,2,0] 。
+atm.deposit([0,1,0,1,1]); // 存入 1 张 $50 ，1 张 $200 和 1 张 $500 的钞票。
+                          // 机器中剩余钞票数量为 [0,1,0,3,1] 。
+atm.withdraw(600);        // 返回 [-1] 。机器会尝试取出 $500 的钞票，然后无法得到剩余的 $100 ，所以取款请求会被拒绝。
+                          // 由于请求被拒绝，机器中钞票的数量不会发生改变。
+atm.withdraw(550);        // 返回 [0,1,0,0,1] ，机器会返回 1 张 $50 的钞票和 1 张 $500 的钞票。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>banknotesCount.length == 5</code></li>
+	<li><code>0 &lt;= banknotesCount[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= amount &lt;= 10<sup>9</sup></code></li>
+	<li><strong>总共</strong>&nbsp;最多有&nbsp;<code>5000</code>&nbsp;次&nbsp;<code>withdraw</code> 和&nbsp;<code>deposit</code>&nbsp;的调用。</li>
+	<li><span style="">函数 </span><code>withdraw</code> 和&nbsp;<code>deposit</code>&nbsp;至少各有 <strong>一次&nbsp;</strong>调用。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 77 ms</p>
+                    <p>内存: 18.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class ATM:
+
+    def __init__(self):
+        self.dic = {500:0, 200:0, 100:0, 50:0, 20:0}
+
+    def deposit(self, banknotesCount: List[int]) -&gt; None:
+        self.dic[500] += banknotesCount[4]
+        self.dic[200] += banknotesCount[3]
+        self.dic[100] += banknotesCount[2]
+        self.dic[50] += banknotesCount[1]
+        self.dic[20] += banknotesCount[0]
+
+    def withdraw(self, amount: int) -&gt; List[int]:
+        ans = [0,0,0,0,0]
+        while amount &gt; 0:
+            if self.dic[500] &gt; ans[4] and amount &gt;= 500:
+                ans[4] += min(amount // 500, self.dic[500])
+                amount -= 500 * ans[4]
+            elif self.dic[200] &gt; ans[3] and amount &gt;= 200:
+                ans[3] += min(amount // 200, self.dic[200])
+                amount -= 200 * ans[3]
+            elif self.dic[100] &gt; ans[2] and amount &gt;= 100:
+                ans[2] += min(amount // 100, self.dic[100])
+                amount -= 100 * ans[2]
+            elif self.dic[50] &gt; ans[1] and amount &gt;= 50:
+                ans[1] += min(amount // 50, self.dic[50])
+                amount -= 50 * ans[1]
+            elif self.dic[20] &gt; ans[0] and amount &gt;= 20:
+                ans[0] += min(amount // 20, self.dic[20])
+                amount -= 20 * ans[0]
+            else:
+                break
+        if amount == 0:
+            self.dic[500] -= ans[4]
+            self.dic[200] -= ans[3]
+            self.dic[100] -= ans[2]
+            self.dic[50] -= ans[1]
+            self.dic[20] -= ans[0]
+            return ans
+        else:
+            return [-1]
+
+# Your ATM object will be instantiated and called as such:
+# obj = ATM()
+# obj.deposit(banknotesCount)
+# param_2 = obj.withdraw(amount)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了贪心算法的思想。存款操作直接将对应面值的钞票数量加到字典中。取款操作先尝试从面值最大的钞票开始取，每次取尽量多的张数，直到不能再取为止，然后依次尝试更小面值的钞票。如果最后成功取出了指定金额，就更新字典中的钞票数量并返回取出的钞票数；如果无法取出指定金额，就返回[-1]。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class ATM:
+
+    def __init__(self):
+        # 初始化一个字典，用于存储每种面值钞票的数量
+        self.dic = {500:0, 200:0, 100:0, 50:0, 20:0}
+
+    def deposit(self, banknotesCount: List[int]) -&gt; None:
+        # 存款操作，更新字典中每种面值钞票的数量
+        self.dic[500] += banknotesCount[4]
+        self.dic[200] += banknotesCount[3]
+        self.dic[100] += banknotesCount[2]
+        self.dic[50] += banknotesCount[1]
+        self.dic[20] += banknotesCount[0]
+
+    def withdraw(self, amount: int) -&gt; List[int]:
+        # 初始化一个长度为5的答案数组，表示每种面值取出的钞票数
+        ans = [0,0,0,0,0]
+        # 从面值最大的钞票开始尝试取款
+        while amount &gt; 0:
+            if self.dic[500] &gt; ans[4] and amount &gt;= 500:
+                ans[4] += min(amount // 500, self.dic[500])
+                amount -= 500 * ans[4]
+            elif self.dic[200] &gt; ans[3] and amount &gt;= 200:
+                ans[3] += min(amount // 200, self.dic[200])
+                amount -= 200 * ans[3]
+            elif self.dic[100] &gt; ans[2] and amount &gt;= 100:
+                ans[2] += min(amount // 100, self.dic[100])
+                amount -= 100 * ans[2]
+            elif self.dic[50] &gt; ans[1] and amount &gt;= 50:
+                ans[1] += min(amount // 50, self.dic[50])
+                amount -= 50 * ans[1]
+            elif self.dic[20] &gt; ans[0] and amount &gt;= 20:
+                ans[0] += min(amount // 20, self.dic[20])
+                amount -= 20 * ans[0]
+            else:
+                break
+        # 如果成功取出指定金额，更新字典中的钞票数量并返回答案数组
+        if amount == 0:
+            self.dic[500] -= ans[4]
+            self.dic[200] -= ans[3]
+            self.dic[100] -= ans[2]
+            self.dic[50] -= ans[1]
+            self.dic[20] -= ans[0]
+            return ans
+        # 如果无法取出指定金额，返回[-1]
+        else:
+            return [-1]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在取款函数中，如何处理当最大面额钞票无法完全满足取款金额时的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在取款函数中，如果最大面额的钞票无法完全满足取款金额，算法会自动尝试使用下一个较小的面额。这个过程是通过一个循环实现的，循环中会依次检查每种面额的钞票。如果当前面额无法满足或无法完全满足剩余的取款金额，就会继续检查更小的面额，直到找到足够的组合或检查完所有面额。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择使用字典来存储各面值钞票的数量而不是使用列表或其他数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用字典来存储各面值钞票的数量可以方便地通过钞票面额直接访问其数量，使得代码更加直观和易于理解。字典提供了键值对的存储方式，其中键是钞票面额，值是该面额钞票的数量。这种方式比使用列表或数组更灵活，因为它允许直接通过面额来增减钞票数量，而无需记住面额在列表中的具体位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在取款操作中，如果某一面值的钞票数量已经为零，代码如何确保不会尝试从这个面值取钱？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>代码中在尝试从某一面额取钱前会检查该面额的钞票数量是否大于零。这通过条件判断 `self.dic[denomination] &gt; 0` 来实现，其中 `denomination` 是当前面额。如果钞票数量为零，则该条件为假，因此代码不会执行取钱操作，并会继续检查下一个较小的面额。这样确保了不会尝试从数量为零的面额中取钱。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            取款操作中，如果在尝试所有面值后仍有剩余金额，为何直接返回[-1]而不是尝试其他组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接返回[-1]是因为采用了贪心算法的策略，该策略优先使用大面额钞票以减少交易中钞票的总张数。一旦尝试了所有面额后仍有剩余金额，这意味着在当前的钞票配置下无法组合出所需的金额。尝试其他组合会大幅增加算法的复杂度，并可能导致性能问题，尤其是在钞票种类和数量较多的情况下。因此，为了保持算法的效率和简洁性，选择在无法满足条件时直接返回[-1]。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/design-an-atm-machine')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/design-an-atm-machine/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>摘樱桃 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>摘樱桃 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>rows x cols</code> 的矩阵&nbsp;<code>grid</code>&nbsp;来表示一块樱桃地。 <code>grid</code>&nbsp;中每个格子的数字表示你能获得的樱桃数目。</p>
+
+<p>你有两个机器人帮你收集樱桃，机器人 1 从左上角格子 <code>(0,0)</code> 出发，机器人 2 从右上角格子 <code>(0, cols-1)</code> 出发。</p>
+
+<p>请你按照如下规则，返回两个机器人能收集的最多樱桃数目：</p>
+
+<ul>
+	<li>从格子&nbsp;<code>(i,j)</code> 出发，机器人可以移动到格子&nbsp;<code>(i+1, j-1)</code>，<code>(i+1, j)</code> 或者&nbsp;<code>(i+1, j+1)</code>&nbsp;。</li>
+	<li>当一个机器人经过某个格子时，它会把该格子内所有的樱桃都摘走，然后这个位置会变成空格子，即没有樱桃的格子。</li>
+	<li>当两个机器人同时到达同一个格子时，它们中只有一个可以摘到樱桃。</li>
+	<li>两个机器人在任意时刻都不能移动到 <code>grid</code>&nbsp;外面。</li>
+	<li>两个机器人最后都要到达&nbsp;<code>grid</code>&nbsp;最底下一行。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/05/30/sample_1_1802.png" style="height: 182px; width: 139px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[3,1,1],[2,5,1],[1,5,5],[2,1,1]]
+<strong>输出：</strong>24
+<strong>解释：</strong>机器人 1 和机器人 2 的路径在上图中分别用绿色和蓝色表示。
+机器人 1 摘的樱桃数目为 (3 + 2 + 5 + 2) = 12 。
+机器人 2 摘的樱桃数目为 (1 + 5 + 5 + 1) = 12 。
+樱桃总数为： 12 + 12 = 24 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/05/30/sample_2_1802.png" style="height: 257px; width: 284px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[1,0,0,0,0,0,1],[2,0,0,0,0,3,0],[2,0,9,0,0,0,0],[0,3,0,5,4,0,0],[1,0,2,3,0,0,6]]
+<strong>输出：</strong>28
+<strong>解释：</strong>机器人 1 和机器人 2 的路径在上图中分别用绿色和蓝色表示。
+机器人 1 摘的樱桃数目为 (1 + 9 + 5 + 2) = 17 。
+机器人 2 摘的樱桃数目为 (1 + 3 + 4 + 3) = 11 。
+樱桃总数为： 17 + 11 = 28 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[1,0,0,3],[0,0,0,3],[0,0,3,3],[9,0,3,3]]
+<strong>输出：</strong>22
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[1,1],[1,1]]
+<strong>输出：</strong>4
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>rows == grid.length</code></li>
+	<li><code>cols == grid[i].length</code></li>
+	<li><code>2 &lt;= rows, cols &lt;= 70</code></li>
+	<li><code>0 &lt;= grid[i][j] &lt;= 100&nbsp;</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 358 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def cherryPickup(self, grid: List[List[int]]) -&gt; int:
+        m = len(grid)
+        n = len(grid[0])
+
+        dp = [[0] * (n + 2) for _ in range(n + 2)]
+        dp2 = [[0] * (n + 2) for _ in range(n + 2)]
+        dp[1][-2] = grid[0][0] + grid[0][-1]
+        res = 0
+        for row in range(1, m):
+            for i in range(min(row + 1, n)):
+                for j in range(max(i + 1, n - row - 1), n):
+                    tmp = 0
+                    for r1 in [-1, 0, 1]:
+                        for r2 in [-1, 0, 1]:
+                            tmp = max(tmp, dp[i + 1 + r1][j + 1 + r2])
+                    dp2[i + 1][j + 1] = grid[row][i] + grid[row][j] + tmp
+                    if row == m - 1 and res &lt;dp2[i + 1][j + 1]:
+                        res = dp2[i + 1][j + 1]
+            dp, dp2 = dp2, dp
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用动态规划的方法解决两个机器人同时从不同位置出发摘樱桃的问题。设dp[i][j]为机器人1在位置i、机器人2在位置j时能摘到的最多樱桃数量。因为机器人只能向下或对角线方向移动，所以我们需要从上一行的相关位置更新当前位置的最大值。由于两个机器人不能占据同一个格子，故在遍历时确保两个机器人不在同一列。循环遍历每一行，对于每个可能的机器人位置组合，计算可能的最大樱桃数，并根据上一行的状态转移而来。最终，最后一行中的最大值就是答案。</p>
+                                <p>时间复杂度: O(m*n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def cherryPickup(self, grid: List[List[int]]) -&gt; int:
+        m = len(grid)
+        n = len(grid[0])
+
+        # 初始化DP表，扩展两行两列便于处理边界情况
+        dp = [[0] * (n + 2) for _ in range(n + 2)]
+        dp2 = [[0] * (n + 2) for _ in range(n + 2)]
+        # 初始状态，两个机器人分别在左上角和右上角
+        dp[1][-2] = grid[0][0] + grid[0][-1]
+        res = 0
+        # 遍历每一行
+        for row in range(1, m):
+            # 遍历可能的机器人1的位置
+            for i in range(min(row + 1, n)):
+                # 遍历可能的机器人2的位置，确保不在同一列
+                for j in range(max(i + 1, n - row - 1), n):
+                    tmp = 0
+                    # 考虑来自上一行的所有可能位置
+                    for r1 in [-1, 0, 1]:
+                        for r2 in [-1, 0, 1]:
+                            tmp = max(tmp, dp[i + 1 + r1][j + 1 + r2])
+                    # 更新当前位置的最大樱桃数
+                    dp2[i + 1][j + 1] = grid[row][i] + (grid[row][j] if i != j else 0) + tmp
+                    # 更新最终结果
+                    if row == m - 1 and res &lt; dp2[i + 1][j + 1]:
+                        res = dp2[i + 1][j + 1]
+            # 交换dp和dp2，为下一行准备
+            dp, dp2 = dp2, dp
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划的方法中，为什么我们要考虑上一行的9种可能状态？这种方法如何确保不遗漏任何可能的路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，考虑上一行的9种可能状态是因为每个机器人可以向下移动或者向左下、右下对角线移动。因此，对于每个机器人位置组合(i, j)，必须考虑从(i-1, j-1)，(i-1, j)，(i-1, j+1)以及(j-1, i-1)，(j-1, i)，(j-1, i+1)等组合转移过来的情况。这样的状态转移设计确保了从任何可能的路径到达当前位置的最大樱桃数都被计算在内，从而确保不遗漏任何可能的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在初始化DP表时，要扩展两行两列，这种扩展是怎样帮助处理边界情况的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化DP表时扩展两行两列主要是为了简化边界条件的处理。扩展的两行两列允许在进行状态转移时不需要额外检查数组越界的问题。例如，当机器人处于网格的边缘时，如果没有这两行两列的扩展，我们需要特别处理机器人向网格外移动的情况。通过扩展，我们可以保证即使在网格边缘也能按照同样的状态转移逻辑来更新DP表，从而简化代码并减少出错的可能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划中，如何处理两个机器人同时到达同一个格子的情况？具体的实现逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，处理两个机器人同时到达同一个格子的情况通过确保他们不会在同一时间出现在同一列来实现。具体的实现逻辑是在更新DP表时，在内层循环中对机器人2的位置进行限制，使其始终大于机器人1的列位置。这样做可以避免两个机器人抵达同一格子，从而在计算樱桃总数时不会重复计算同一个格子上的樱桃。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到，机器人1的位置遍历范围是`min(row + 1, n)`，机器人2的位置遍历范围是`max(i + 1, n - row - 1)`到`n`，这样设置的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中这样设置机器人1和机器人2的位置遍历范围是为了确保机器人只在有效的格子内移动，并且避免重复计算。机器人1的位置遍历范围`min(row + 1, n)`确保了机器人不会超出当前行的实际列数，并且随着行数增加，机器人可以访问的列数也相应增加，直到最多为n列。机器人2的位置从`max(i + 1, n - row - 1)`开始，确保了它始终在机器人1的右侧，同时也确保了在行数较少时不会超出列的界限。这样的设置帮助确保了遍历是高效和正确的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/cherry-pickup-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/cherry-pickup-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

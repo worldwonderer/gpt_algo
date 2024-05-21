@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>解码异或后的排列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>解码异或后的排列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>perm</code> ，它是前 <code>n</code> 个正整数的排列，且 <code>n</code> 是个 <strong>奇数</strong> 。</p>
+
+<p>它被加密成另一个长度为 <code>n - 1</code> 的整数数组 <code>encoded</code> ，满足 <code>encoded[i] = perm[i] XOR perm[i + 1]</code> 。比方说，如果 <code>perm = [1,3,2]</code> ，那么 <code>encoded = [2,1]</code> 。</p>
+
+<p>给你 <code>encoded</code> 数组，请你返回原始数组 <code>perm</code> 。题目保证答案存在且唯一。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>encoded = [3,1]
+<b>输出：</b>[1,2,3]
+<b>解释：</b>如果 perm = [1,2,3] ，那么 encoded = [1 XOR 2,2 XOR 3] = [3,1]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>encoded = [6,5,4,6]
+<b>输出：</b>[2,4,1,5,3]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= n &lt; 10<sup>5</sup></code></li>
+	<li><code>n</code> 是奇数。</li>
+	<li><code>encoded.length == n - 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 80 ms</p>
+                    <p>内存: 32.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def decode(self, encoded: List[int]) -&gt; List[int]:
+        n, a, b = len(encoded) + 1, 0, 0
+        ans = [0] * n
+        for i in range(0,n - 1,2):
+            a ^= encoded[i]
+        for i in range(1,n + 1):
+            b ^= i
+        ans[n - 1] =  a ^ b
+        for i in range(n - 2,-1,-1):
+            ans[i] = ans[i + 1] ^ encoded[i]
+        return ans
+ 
+
+&#39;&#39;&#39;
+它是前 n 个正整数的排列，且 n 是个 奇数 。
+x ^ y = 6
+y ^ z = 7
+
+x ^ z = 8
+&#39;&#39;&#39;
+
+&#39;&#39;&#39;
+
+en[i] = pe[i] ^ pe[i + 1]
+en[i + 1] = pe[i + 1] ^ pe[i + 2]
+en[i + 2] = pe[i + 2] ^ pe[i + 3]
+&#39;&#39;&#39;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解利用了异或运算的性质（自反性：a ^ a = 0和交换律），首先计算出perm数组的最后一个元素。由于perm是前n个正整数的排列，通过异或所有1到n的整数得到b，同时通过异或编码数组中的奇数位置元素得到a。由于n是奇数，perm数组中的奇数位置元素和偶数位置元素分别异或，最终差异将体现在最后一个元素上。因此，通过a ^ b得到perm的最后一个元素。之后，利用encoded数组和已知的perm中的最后一个元素，通过逆向解码还原整个perm数组。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def decode(self, encoded: List[int]) -&gt; List[int]:
+        n, a, b = len(encoded) + 1, 0, 0  # 初始化n, a, b
+        ans = [0] * n  # 初始化输出数组
+        for i in range(0, n - 1, 2):
+            a ^= encoded[i]  # 计算所有奇数位置的异或结果
+        for i in range(1, n + 1):
+            b ^= i  # 计算1到n的所有数字的异或结果
+        ans[n - 1] = a ^ b  # 计算原数组的最后一个元素
+        for i in range(n - 2, -1, -1):
+            ans[i] = ans[i + 1] ^ encoded[i]  # 逆向利用encoded还原原数组的其余部分
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解码过程中，为何首先计算perm数组的最后一个元素而不是从第一个元素开始？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解码过程中，首先计算perm数组的最后一个元素是因为通过异或编码数组中奇数位置的元素和1到n的所有数字的异或结果，可以直接得到perm的最后一个元素。由于异或运算具有自反性和交换律，这种方法可以有效地利用编码数组的结构特性。而如果从第一个元素开始计算，会因为缺乏足够的信息（即不知道后面的元素情况）而难以直接确定任何一个元素。因此，首先确定最后一个元素，再逆向解码是一种更加直接和高效的策略。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中提到通过计算所有奇数位置的异或结果得到变量a，这种选择是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择计算所有奇数位置的异或结果得到变量a是因为，这样可以利用异或运算的性质排除掉偶数位置的元素影响，从而与1到n所有数字的异或结果（变量b）结合来直接计算出perm数组的最后一个元素。由于编码数组的奇数位置元素是由perm数组中两个相邻元素异或得到，这样的计算方式可以有效地利用编码数组提供的信息结构，简化计算过程。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            解题中提到的计算1到n的所有数字的异或结果（变量b），这个操作是如何确保能与变量a结合来正确还原perm数组的最后一个元素的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>计算1到n的所有数字的异或结果（变量b），并将其与所有奇数位置元素的异或结果（变量a）结合，可以确保正确还原perm数组的最后一个元素，因为所有其他元素在异或运算中相互抵消。由于perm是1到n的一个排列，所以包含所有这些数字一次，而奇数位置上使用了perm数组的元素，其结合方式确保了能够通过a^b直接获取到perm数组的最后一个元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到利用encoded数组和已知的perm中的最后一个元素逆向解码，能否详细解释逆向解码的步骤和原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>逆向解码的步骤和原理基于已知perm数组的最后一个元素和encoded数组的特性。已知perm数组的最后一个元素后，我们可以使用encoded数组中的最后一个元素和perm的倒数第二个元素的关系（因为encoded[i] = perm[i] ^ perm[i+1]），逆向计算出perm的倒数第二个元素。然后，继续使用encoded数组中的前一个元素和perm数组中新计算出的元素，重复此过程，直到计算出perm的第一个元素。这种逆向解码有效地利用了异或运算的性质，即每次可以使用已知元素和encoded数组中的对应元素来恢复出前一个元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/decode-xored-permutation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/decode-xored-permutation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

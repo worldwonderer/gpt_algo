@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>望远镜中最高的海拔</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>望远镜中最高的海拔</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=monotonic-queue" class="badge bg-secondary tag-link">单调队列</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>科技馆内有一台虚拟观景望远镜，它可以用来观测特定纬度地区的地形情况。该纬度的海拔数据记于数组 <code>heights</code> ，其中 <code>heights[i]</code> 表示对应位置的海拔高度。请找出并返回望远镜视野范围 <code>limit</code> 内，可以观测到的最高海拔值。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>heights = [14,2,27,-5,28,13,39], limit = 3
+<strong>输出：</strong>[27,27,28,28,39]
+<strong>解释：</strong>
+  滑动窗口的位置                最大值
+---------------               -----
+[14 2 27] -5 28 13 39          27
+14 [2 27 -5] 28 13 39          27
+14 2 [27 -5 28] 13 39          28
+14 2 27 [-5 28 13] 39          28
+14 2 27 -5 [28 13 39]          39</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<p>你可以假设输入总是有效的，在输入数组不为空的情况下：</p>
+
+<ul>
+	<li><code>1 &lt;= limit &lt;= heights.length</code></li>
+	<li><code>-10000 &lt;= heights[i] &lt;= 10000</code></li>
+</ul>
+
+<p>注意：本题与主站 239 题相同：<a href="https://leetcode-cn.com/problems/sliding-window-maximum/">https://leetcode-cn.com/problems/sliding-window-maximum/</a></p>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 452 ms</p>
+                    <p>内存: 18.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxAltitude(self, heights: List[int], limit: int) -&gt; List[int]:
+
+        q = deque()
+        res = []
+        for i, x in enumerate(heights):
+            while q and i - q[0] + 1 &gt; limit:
+                q.popleft()
+            while q and heights[q[-1]] &lt;= x:
+                q.pop()
+            q.append(i)
+            if i + 1 &gt;= limit:
+                res.append(heights[q[0]])
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了单调队列的数据结构来解决滑动窗口中的最大值问题。整体思路是维护一个单调递减的队列，队列中存储的是数组索引，确保队列的队首始终是当前滑动窗口的最大值的索引。对于每个元素，首先判断队首元素是否超出了当前滑动窗口的范围，如果超出则将其从队首移除。之后，从队尾开始，移除所有小于或等于当前元素的索引，以维持队列的单调递减性。最后将当前元素的索引加入队尾。如果已经遍历的元素数量达到窗口大小，则将队首对应的元素值加入结果数组。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxAltitude(self, heights: List[int], limit: int) -&gt; List[int]:
+        q = deque()  # 初始化双端队列
+        res = []  # 初始化结果列表
+        for i, x in enumerate(heights):  # 遍历高度列表
+            while q and i - q[0] + 1 &gt; limit:  # 移除超出滑动窗口范围的队首元素
+                q.popleft()
+            while q and heights[q[-1]] &lt;= x:  # 维持队列的单调递减
+                q.pop()
+            q.append(i)  # 将当前元素索引加入队列
+            if i + 1 &gt;= limit:  # 当窗口大小达到limit时，记录结果
+                res.append(heights[q[0]])  # 队首元素即为当前窗口的最大值
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在单调队列中，为什么选择保持队列的单调递减而不是单调递增？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，我们需要在每个滑动窗口中快速获取最大值。如果维持一个单调递减的队列，队首元素就是窗口中的最大值。这样，每次窗口滑动时，只需检查队首元素即可直接得到最大值，从而保证了操作的高效性。如果队列是单调递增的，则需要遍历整个队列来找到最大值，这将增加计算的复杂性和时间消耗。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果`limit`大于数组`heights`的长度，该算法是否还能正确返回结果，需要怎样的调整？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果`limit`大于`heights`的长度，整个数组都在一个滑动窗口中。在这种情况下，算法应该返回整个数组中的最大值。为了适应这种情况，可以在算法开始时添加一个判断：如果`limit`大于或等于`heights`长度，直接找出并返回`heights`中的最大值，而无需执行滑动窗口的逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在单调队列的实现中，移除队首元素的条件为`i - q[0] + 1 &gt; limit`，请问为什么这里使用`+1`进行计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里使用`+1`是为了将索引间的距离转换为元素数量。在数组中，`i`和`q[0]`分别是当前元素和队首元素的索引。索引差`i - q[0]`实际上表示的是两者之间的间隔数量。为了得到包括两端在内的元素总数，需要加1。因此，`i - q[0] + 1`表示的是从队首到当前元素包含的元素总数。当这个数大于`limit`时，说明队首元素已不在当前滑动窗口范围内，需要被移除。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/hua-dong-chuang-kou-de-zui-da-zhi-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/hua-dong-chuang-kou-de-zui-da-zhi-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

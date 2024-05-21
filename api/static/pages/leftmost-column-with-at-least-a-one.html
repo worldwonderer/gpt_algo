@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>至少有一个 1 的最左端列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>至少有一个 1 的最左端列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=interactive" class="badge bg-secondary tag-link">交互</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 83 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre"># &#34;&#34;&#34;
+# This is BinaryMatrix&#39;s API interface.
+# You should not implement it, or speculate about its implementation
+# &#34;&#34;&#34;
+# class BinaryMatrix(object):
+#    def get(self, row: int, col: int) -&gt; int:
+#    def dimensions(self) -&gt; list[]:
+
+class Solution:
+    def leftMostColumnWithOne(self, binaryMatrix: &#39;BinaryMatrix&#39;) -&gt; int:
+        m, n = binaryMatrix.dimensions()
+        res = n
+        last = n -1
+        for i in range(m):
+            start, end = 0, last
+            while start + 1 &lt; end: # this line
+                mid =(start + end)//2
+                if binaryMatrix.get(i, mid) ==1:
+                    end = mid
+                else:
+                    start = mid
+            if binaryMatrix.get(i, start) ==1:
+                res = min(res, start)
+                last = res
+            elif binaryMatrix.get(i, end) ==1:
+                res = min(res, end)
+                lsat = res
+        return res if res != n else -1
+# TC: O(m log n), where m is the number of rows and n is the number of columns. 
+# class Solution:
+#     def leftMostColumnWithOne(self, binaryMatrix: &#39;BinaryMatrix&#39;) -&gt; int:
+
+#         m, n = binaryMatrix.dimensions()
+#         i, j = 0, n-1
+#         res = -1
+#         while i &lt; m and j &gt;= 0:
+#             if binaryMatrix.get(i, j) == 1:
+#                 res = j  # Update result since we found a 1
+#                 j -= 1  # Move left
+#             else:
+#                 i += 1  # Move down
+#         return res
+# TC: O(M+N); SC: O(1)
+ #The second solution is better. It has a linear time complexity relative 
+#  to the dimensions of the matrix</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解中使用的是二分搜索来优化查找最左端包含1的列。对于每一行，都从0到上一行找到的最左端一列的索引(last)进行二分搜索。如果在中点找到1，那么尝试寻找是否有更左侧的1；否则继续向右搜索。这种方法利用了矩阵的性质：如果当前行的某列为1，那么所有下面行的同列也为1。因此，每找到一个新的最左端的1，都可以缩小后续行搜索的范围，提高效率。</p>
+                                <p>时间复杂度: O(m log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 定义一个类Solution
+
+class Solution:
+    def leftMostColumnWithOne(self, binaryMatrix: &#39;BinaryMatrix&#39;) -&gt; int:
+        m, n = binaryMatrix.dimensions()  # 获取矩阵的维度，行和列
+        res = n  # 初始化结果为列数，表示还未找到包含1的最左列 
+        last = n - 1  # 设置最初的搜索边界为最右列
+        for i in range(m):  # 遍历每一行
+            start, end = 0, last  # 设置当前行的搜索范围
+            while start + 1 &lt; end:  # 使用二分搜索找到包含1的最左列
+                mid = (start + end) // 2  # 计算中点
+                if binaryMatrix.get(i, mid) == 1:  # 如果中点是1
+                    end = mid  # 更新结束点
+                else:
+                    start = mid  # 更新开始点
+            if binaryMatrix.get(i, start) == 1:  # 检查开始点是否为1
+                res = min(res, start)  # 更新结果
+                last = res  # 更新搜索边界
+            elif binaryMatrix.get(i, end) == 1:  # 检查结束点是否为1
+                res = min(res, end)  # 更新结果
+                last = res  # 更新搜索边界
+        return res if res != n else -1  # 如果找到了包含1的列，返回其索引，否则返回-1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么在每一行的搜索开始前要重置`start`为0，尽管`end`已被上一行的结果调整？这样会不会导致不必要的重复搜索？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，每一行的搜索开始前将`start`重置为0是为了确保不错过可能存在于当前行更左侧的1。尽管`end`已被上一行的结果调整，但当前行可能在更左侧的列包含1。尽管这样做可能会导致一些重复的搜索，但它确保了算法不会错过任何更左侧的1，这对于找到最左端包含1的列是必要的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            二分搜索中使用`start + 1 &lt; end`而不是`start &lt;= end`作为循环条件的具体原因是什么？这种方法在什么情况下可能导致漏检某些列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`start + 1 &lt; end`作为循环条件是为了防止二分搜索进入死循环，并在循环结束时留下两个潜在的候选列（即`start`和`end`），这两列需要进一步检查以确定哪一列是包含1的最左列。如果使用`start &lt;= end`作为条件，可能在某些情况下，循环不会留下这两个候选列，从而可能错过最左侧的1。该方法不会导致漏检列，而是为了更准确地识别最左侧的1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在二分搜索结束后，为什么要分别检查`start`和`end`位置的值？直接检查`end`是否为1不足以确定最左端的1吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分搜索结束后，需要分别检查`start`和`end`位置的值，因为二分搜索的退出条件是`start + 1 &lt; end`，这意味着最后`start`和`end`两点是相邻的，因此都有可能是最左端的1。仅检查`end`可能会错过`start`位置如果它更左侧且为1的情况。因此，为了确保找到最左侧的1，需要检查这两个位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果在某一行中`last`已经是0，即最左列，题解中的逻辑是否还会继续执行二分搜索？这是否是一种资源浪费？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果在某一行中`last`已经是0，此时的逻辑依然会执行二分搜索，尽管此时的搜索区间非常小（从0到0）。这确实是一种资源的浪费，因为在这种情况下，没有必要执行二分搜索。为了优化，可以在开始搜索之前添加一个检查，如果`last`为0，则直接返回0，避免不必要的搜索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/leftmost-column-with-at-least-a-one')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/leftmost-column-with-at-least-a-one/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

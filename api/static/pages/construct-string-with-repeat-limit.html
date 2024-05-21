@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>构造限制重复的字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>构造限制重复的字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串 <code>s</code> 和一个整数 <code>repeatLimit</code> ，用 <code>s</code> 中的字符构造一个新字符串 <code>repeatLimitedString</code> ，使任何字母 <strong>连续</strong> 出现的次数都不超过 <code>repeatLimit</code> 次。你不必使用 <code>s</code> 中的全部字符。</p>
+
+<p>返回 <strong>字典序最大的</strong><em> </em><code>repeatLimitedString</code> 。</p>
+
+<p>如果在字符串 <code>a</code> 和 <code>b</code> 不同的第一个位置，字符串 <code>a</code> 中的字母在字母表中出现时间比字符串 <code>b</code> 对应的字母晚，则认为字符串 <code>a</code> 比字符串 <code>b</code> <strong>字典序更大</strong> 。如果字符串中前 <code>min(a.length, b.length)</code> 个字符都相同，那么较长的字符串字典序更大。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>s = "cczazcc", repeatLimit = 3
+<strong>输出：</strong>"zzcccac"
+<strong>解释：</strong>使用 s 中的所有字符来构造 repeatLimitedString "zzcccac"。
+字母 'a' 连续出现至多 1 次。
+字母 'c' 连续出现至多 3 次。
+字母 'z' 连续出现至多 2 次。
+因此，没有字母连续出现超过 repeatLimit 次，字符串是一个有效的 repeatLimitedString 。
+该字符串是字典序最大的 repeatLimitedString ，所以返回 "zzcccac" 。
+注意，尽管 "zzcccca" 字典序更大，但字母 'c' 连续出现超过 3 次，所以它不是一个有效的 repeatLimitedString 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>s = "aababab", repeatLimit = 2
+<strong>输出：</strong>"bbabaa"
+<strong>解释：</strong>
+使用 s 中的一些字符来构造 repeatLimitedString "bbabaa"。 
+字母 'a' 连续出现至多 2 次。 
+字母 'b' 连续出现至多 2 次。 
+因此，没有字母连续出现超过 repeatLimit 次，字符串是一个有效的 repeatLimitedString 。 
+该字符串是字典序最大的 repeatLimitedString ，所以返回 "bbabaa" 。 
+注意，尽管 "bbabaaa" 字典序更大，但字母 'a' 连续出现超过 2 次，所以它不是一个有效的 repeatLimitedString 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= repeatLimit &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 87 ms</p>
+                    <p>内存: 17.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def repeatLimitedString(self, s: str, repeatLimit: int) -&gt; str:
+        cnt = Counter(s)
+        sl = sorted(cnt,reverse=True)
+        f,s = 0,1
+        res = &#39;&#39;
+        while True:
+            if f == len(sl):
+                break
+            fc = sl[f]
+            if s &gt;= len(sl):
+                res += fc * min(repeatLimit, cnt[fc] )
+                break 
+            sc = sl[s]
+            if cnt[fc] &gt; cnt[sc] * repeatLimit:
+                res += (fc * repeatLimit + sc) * cnt[sc]
+                cnt[fc] -= repeatLimit * cnt[ sc]
+                s = s + 1
+            elif cnt[fc]  &lt; cnt[sc] * repeatLimit:
+                res += (fc * repeatLimit + sc) * ( (cnt[fc]-1) // repeatLimit ) + fc * (cnt[fc] - (cnt[fc]-1) // repeatLimit * repeatLimit)
+                cnt[sc] -= (cnt[fc]-1) // repeatLimit
+                f = s
+                s = f + 1
+            else:
+                res += (fc * repeatLimit + sc) * cnt[sc]
+                f = s + 1
+                s = f + 1
+            # print(res,f,s,cnt)
+        return res
+
+
+        
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用排序和贪心策略构建字典序最大的字符串。首先，使用计数器统计字符串s中每个字符的出现次数。然后，对字符进行降序排序。通过迭代排序后的字符列表，贪心地构建结果字符串。每次尝试添加最大字母直到达到其限制repeatLimit，如果剩余数量仍较多，则尝试插入次大字母一次，以打破重复序列，再继续添加最大字母。此过程循环进行，直到无法添加更多字符为止。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def repeatLimitedString(self, s: str, repeatLimit: int) -&gt; str:
+        cnt = Counter(s)  # 计数s中每个字符的出现次数
+        sl = sorted(cnt, reverse=True)  # 按字典序降序排列字符
+        f, s = 0, 1  # 初始化指针f和s
+        res = &#39;&#39;  # 初始化结果字符串
+        while True:
+            if f == len(sl):
+                break  # 如果f指针遍历完成，则退出循环
+            fc = sl[f]  # 最大的字符
+            if s &gt;= len(sl):
+                res += fc * min(repeatLimit, cnt[fc])
+                break  # 只剩一个字符，添加其最大可能重复数
+            sc = sl[s]  # 次大的字符
+            if cnt[fc] &gt; cnt[sc] * repeatLimit:
+                res += (fc * repeatLimit + sc) * cnt[sc]
+                cnt[fc] -= repeatLimit * cnt[sc]
+                s = s + 1
+            elif cnt[fc] &lt; cnt[sc] * repeatLimit:
+                res += (fc * repeatLimit + sc) * ((cnt[fc] - 1) // repeatLimit) + fc * (cnt[fc] - (cnt[fc] - 1) // repeatLimit * repeatLimit)
+                cnt[sc] -= (cnt[fc] - 1) // repeatLimit
+                f = s
+                s = f + 1
+            else:
+                res += (fc * repeatLimit + sc) * cnt[sc]
+                f = s + 1
+                s = f + 1
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在贪心选择时优先尝试添加字典序最大的字符直到达到其repeatLimit？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造字典序最大的字符串时，优先使用字典序最大的字符可以确保结果字符串尽可能大。贪心策略的核心是每一步都做出在当前看来最优的选择，这里的最优即为尽可能地使用字典序最大的字符。repeatLimit的限制确保了在保持字符最大化的同时，也不会超过字符的重复使用限制，从而平衡了结果字符串的构成。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理只剩一个字符时，为什么选择添加该字符的最大可能重复数而不是尝试其他可能的字符组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当只剩一个字符时，选择添加该字符的最大可能重复数是因为没有其他字符可以选择用来打破重复或增加字符串长度。此时，使用剩余的单一字符到其最大重复限制是唯一可行的选择，以确保字符串尽可能长且符合repeatLimit的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当f指针的字符数量大于s指针的字符数量乘以repeatLimit时，为什么选择重复添加f指针的字符和s指针的字符的组合直到s用完？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当f指针的字符数量远大于s指针的字符数量乘以repeatLimit时，如果只使用f指针的字符，很快就会达到该字符的重复限制。为了最大化使用f指针的字符同时避免违反repeatLimit，通过插入s指针的字符来打破可能的重复序列。这种方式可以有效利用字符库存，同时保持字符串的字典序尽可能大。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在代码中如何处理当fc的数量小于sc的数量乘以repeatLimit时的情况，具体的逻辑是怎样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当fc的数量小于sc的数量乘以repeatLimit时，表示fc字符不足以填满可能的插入点。代码中，这种情况通过先尽可能地重复使用fc字符直到达到其repeatLimit，然后使用sc字符。计算fc能重复使用的次数，然后剩余的fc字符数量按照其实际数量添加。这样的处理方式保证了即使在字符数量有限的情况下，也能尽量构建出字典序最大的字符串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/construct-string-with-repeat-limit')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/construct-string-with-repeat-limit/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>分割数组的最大值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>分割数组的最大值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个非负整数数组 <code>nums</code> 和一个整数&nbsp;<code>k</code> ，你需要将这个数组分成&nbsp;<code>k</code><em>&nbsp;</em>个非空的连续子数组。</p>
+
+<p>设计一个算法使得这&nbsp;<code>k</code><em>&nbsp;</em>个子数组各自和的最大值最小。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [7,2,5,10,8], k = 2
+<strong>输出：</strong>18
+<strong>解释：</strong>
+一共有四种方法将 nums 分割为 2 个子数组。 
+其中最好的方式是将其分为 [7,2,5] 和 [10,8] 。
+因为此时这两个子数组各自的和的最大值为18，在所有情况中最小。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,3,4,5], k = 2
+<strong>输出：</strong>9
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,4,4], k = 3
+<strong>输出：</strong>4
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 1000</code></li>
+	<li><code>0 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+	<li><code>1 &lt;= k &lt;= min(50, nums.length)</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def splitArray(self, nums: List[int], k: int) -&gt; int:
+        max_val = max(nums)
+        array_sum = sum(nums)
+
+        left = max_val
+        right = array_sum
+        while right &gt; left:
+            mid = (right-left) // 2 + left 
+            if self.canSplit(nums, k, mid):
+                right = mid 
+            else:
+                left = mid + 1
+        return left 
+    
+    def canSplit(self, nums, k, max_val):
+        count = 1
+        array_sum = 0
+        for num in nums:
+            array_sum += num
+            if array_sum &gt; max_val:
+                count += 1
+                array_sum = num 
+            if count &gt; k:
+                return False 
+        return True</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用二分查找的方法。首先定义二分查找的左边界为数组中的最大值，右边界为数组所有元素之和。二分查找的目标是找到最小的最大子数组和，使得数组可以被分割成k个子数组。在二分查找的每一步中，判断当前的中间值是否可以将数组分割成k个子数组，如果可以，则右边界更新为中间值；如果不可以，则左边界更新为中间值加一。最终二分查找的结果即为答案。判断是否可以分割成k个子数组的方法是，遍历数组，累加数组元素，如果当前子数组和超过了最大允许值，则开始一个新的子数组，同时子数组的数量加一。如果最终子数组的数量大于k，则说明无法分割，返回False；否则返回True。</p>
+                                <p>时间复杂度: O(n*log(sum-max))，其中sum为数组元素之和，max为数组中的最大值；极端情况下退化为O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def splitArray(self, nums: List[int], k: int) -&gt; int:
+        max_val = max(nums)  # 数组最大值作为二分查找左边界
+        array_sum = sum(nums)  # 数组和作为二分查找右边界
+
+        left = max_val
+        right = array_sum
+        while right &gt; left:
+            mid = (right-left) // 2 + left  # 计算中间值
+            if self.canSplit(nums, k, mid):  # 判断中间值是否可以分割
+                right = mid  # 可以分割，更新右边界
+            else:
+                left = mid + 1  # 不可以分割，更新左边界
+        return left  # 二分查找的最终结果
+    
+    def canSplit(self, nums, k, max_val):
+        count = 1  # 当前子数组计数
+        array_sum = 0  # 当前子数组和
+        for num in nums:
+            array_sum += num  # 累加当前元素到子数组
+            if array_sum &gt; max_val:  # 子数组和超过最大允许值
+                count += 1  # 新开一个子数组
+                array_sum = num  # 重置子数组和为当前元素
+            if count &gt; k:  # 子数组数量超过k
+                return False  # 无法分割
+        return True  # 可以分割</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在二分查找中选择数组中的最大值作为左边界？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分查找中选择数组中的最大值作为左边界是因为无论如何分割数组，任何一个子数组中至少会包含一个元素，因此该子数组的和至少为数组中的最大值。这保证了左边界是一个合理和有效的起点，确保所有分割后的子数组的最大和不会小于这个值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            二分查找的停止条件为什么是当右边界大于左边界时？是否有可能出现左右边界相等的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找的停止条件设置为当右边界大于左边界时，是因为我们需要在左右边界相遇或交错时结束搜索，这表示找到了满足条件的最小可能值。当左右边界相等时，确实可能出现，此时这个值就是可能的最小最大子数组和。如果继续进行二分查找，将不会有新的中点产生，会导致重复计算或无限循环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            函数canSplit中，如果当前元素num大于max_val会发生什么？这种情况下如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在函数canSplit中，如果当前元素num大于max_val，这种情况下，我们无法将num加入到当前子数组中而不超过max_val的限制。此时必须将num作为新的子数组的开始，即使它单独一个元素就超过了max_val。这种处理确保了算法的正确性，但实际上在调用canSplit之前，我们已经设定了左边界为数组中的最大值，理论上这种情况不应出现，除非在初始条件设置错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际运用中，如何确定二分查找中的mid是否确实可以将数组有效地分割成k个子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实际应用中，确定二分查找中的mid是否可以有效地将数组分割成k个子数组，是通过实现一个辅助函数canSplit来完成的。这个函数通过尝试使用mid作为最大子数组和来分割数组，如果在限定的最大值内可以将数组分割成不超过k个子数组，则返回True，表示mid是一个有效的值；否则返回False。通过这种方式，二分查找逐步调整mid值，直到找到最小的符合条件的mid。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/split-array-largest-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/split-array-largest-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

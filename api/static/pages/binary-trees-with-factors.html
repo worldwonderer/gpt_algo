@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>带因子的二叉树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>带因子的二叉树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给出一个含有不重复整数元素的数组 <code>arr</code> ，每个整数 <code>arr[i]</code> 均大于 1。</p>
+
+<p>用这些整数来构建二叉树，每个整数可以使用任意次数。其中：每个非叶结点的值应等于它的两个子结点的值的乘积。</p>
+
+<p>满足条件的二叉树一共有多少个？答案可能很大，返回<strong> 对 </strong><code>10<sup>9</sup> + 7</code> <strong>取余</strong> 的结果。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> <code>arr = [2, 4]</code>
+<strong>输出:</strong> 3
+<strong>解释:</strong> 可以得到这些二叉树: <code>[2], [4], [4, 2, 2]</code></pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> <code>arr = [2, 4, 5, 10]</code>
+<strong>输出:</strong> <code>7</code>
+<strong>解释:</strong> 可以得到这些二叉树: <code>[2], [4], [5], [10], [4, 2, 2], [10, 2, 5], [10, 5, 2]</code>.</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length &lt;= 1000</code></li>
+	<li><code>2 &lt;= arr[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>arr</code> 中的所有值 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 58 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numFactoredBinaryTrees(self, arr: List[int]) -&gt; int:
+        arr.sort()
+        l = len(arr)
+        d = {}
+        for i in arr:d[i] = []
+        for i in range(l):
+            if arr[i]**2 &gt; arr[-1]:break
+            for j in range(i,l):
+                s = arr[i] * arr[j]
+                if s in d:d[s].append([arr[i],arr[j]])
+                elif s &gt; arr[-1]:break
+        @cache
+        def f(x):
+            if not d[x]:return 1
+            res = 1
+            for i,j in d[x]:
+                res += f(i) * f(j) * (2 if i != j else 1)
+            return res%1000000007
+        res = 0
+        for i in arr:res += f(i)
+        return res%1000000007</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是首先对输入数组进行排序，然后用哈希表记录每个数的因子对。接着使用记忆化搜索，对于每个数，如果它没有因子对，则只有它自己这一种情况；如果有因子对，则结果是它的每个因子对的情况数相乘再相加。最后对每个数的情况数求和并取模即可。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numFactoredBinaryTrees(self, arr: List[int]) -&gt; int:
+        arr.sort()  # 对输入数组排序
+        l = len(arr)
+        d = {}  # 哈希表，用于存储每个数的因子对
+        for i in arr:
+            d[i] = []
+        for i in range(l):
+            if arr[i]**2 &gt; arr[-1]:  # 优化：如果当前数的平方已经大于最大数，就没必要继续了
+                break
+            for j in range(i,l):
+                s = arr[i] * arr[j]
+                if s in d:  # 如果乘积在数组中，则加入哈希表
+                    d[s].append([arr[i],arr[j]])
+                elif s &gt; arr[-1]:  # 优化：如果乘积已经大于最大数，就没必要继续了
+                    break
+        
+        @cache  # 记忆化搜索
+        def f(x):
+            if not d[x]:  # 如果没有因子对，则只有自己这一种情况
+                return 1
+            res = 1
+            for i,j in d[x]:  # 遍历所有因子对
+                res += f(i) * f(j) * (2 if i != j else 1)  # 乘以因子对的情况数，如果两个因子相同，则不用乘2
+            return res % 1000000007
+        
+        res = 0
+        for i in arr:  # 对每个数的情况数求和
+            res += f(i)
+        return res % 1000000007  # 取模</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在题解中首先对输入数组进行排序？排序对解题有什么帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中对输入数组进行排序的原因是为了简化因子对的查找过程。排序后，数组中的每个元素都按照从小到大的顺序排列，这样在遍历数组以构建因子对的哈希表时，可以更有效地确定哪些数可以组成因子对。此外，排序还允许使用二分查找来加速查找过程，虽然在这个具体的题解中没有直接使用二分查找，但排序本身对于确定因子对的上界和下界是有帮助的。例如，如果已知一个数的平方已经大于数组中的最大数，则可以直接停止内层循环，避免不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构建哈希表时，为什么需要检查当前数的平方是否大于数组中的最大数，这个优化的具体逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个优化的逻辑基于一个事实：如果某个数的平方已经大于数组中的最大数，那么这个数与数组中任何数的乘积也必然大于数组中的最大数。因此，当发现当前数的平方超过了数组中的最大数时，就可以停止考虑以这个数作为因子对中一个因子的可能性，从而跳出循环。这种优化减少了不必要的迭代和计算，提高了整体算法的效率，尤其是在数组中包含较大数值时更为明显。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了`@cache`进行记忆化搜索，具体来说，这种方法在此问题中解决了哪些性能问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`@cache`进行记忆化搜索可以大幅提升性能，主要是通过避免重复计算已经计算过的结果。在这个问题中，每个数的因子对可能会在求解其他数的因子对情况时被重复计算多次。通过记忆化搜索，一旦某个数的所有因子对的情况数被计算过，就会存储起来，后续的搜索可以直接使用存储的结果，无需再次进行复杂的计算。这样大大减少了计算量，尤其是在面对较大的输入数组时，能有效避免算法的时间复杂度指数级增加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            对于乘积大于数组中最大值的情况直接跳出循环是基于什么考虑？会不会遗漏某些有效的因子对？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>基于的考虑是效率和计算的精确性。当发现某个因子对的乘积超过数组中的最大数时，这个乘积不可能作为有效的因子对出现在任何结果中，因为数组中不存在这样的数。因此，继续计算这种情况下的乘积是不必要的，直接跳出循环可以节省计算资源。这种做法不会遗漏有效的因子对，因为所有有效的因子对的乘积必须是数组中已存在的数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/binary-trees-with-factors')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/binary-trees-with-factors/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

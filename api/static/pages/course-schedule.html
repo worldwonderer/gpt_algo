@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>课程表</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>课程表</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你这个学期必须选修 <code>numCourses</code> 门课程，记为&nbsp;<code>0</code>&nbsp;到&nbsp;<code>numCourses - 1</code> 。</p>
+
+<p>在选修某些课程之前需要一些先修课程。 先修课程按数组&nbsp;<code>prerequisites</code> 给出，其中&nbsp;<code>prerequisites[i] = [a<sub>i</sub>, b<sub>i</sub>]</code> ，表示如果要学习课程&nbsp;<code>a<sub>i</sub></code> 则 <strong>必须</strong> 先学习课程&nbsp; <code>b<sub>i</sub></code><sub> </sub>。</p>
+
+<ul>
+	<li>例如，先修课程对&nbsp;<code>[0, 1]</code> 表示：想要学习课程 <code>0</code> ，你需要先完成课程 <code>1</code> 。</li>
+</ul>
+
+<p>请你判断是否可能完成所有课程的学习？如果可以，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>numCourses = 2, prerequisites = [[1,0]]
+<strong>输出：</strong>true
+<strong>解释：</strong>总共有 2 门课程。学习课程 1 之前，你需要完成课程 0 。这是可能的。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>numCourses = 2, prerequisites = [[1,0],[0,1]]
+<strong>输出：</strong>false
+<strong>解释：</strong>总共有 2 门课程。学习课程 1 之前，你需要先完成​课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= numCourses &lt;= 2000</code></li>
+	<li><code>0 &lt;= prerequisites.length &lt;= 5000</code></li>
+	<li><code>prerequisites[i].length == 2</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt; numCourses</code></li>
+	<li><code>prerequisites[i]</code> 中的所有课程对 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">import collections
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -&gt; bool:
+        graph = collections.defaultdict(list)
+        indegree = [0]*numCourses
+        for x, y in prerequisites:
+            graph[y].append(x)       #相当于建立了一个邻接表，存储了每个以y为先修课程的课程x
+            indegree[x] += 1         #x之前有多少门先修课程，即x的入度
+        queue = collections.deque([u for u in range(numCourses) if indegree[u] == 0])#哪些课入度为0
+        while queue:
+            node = queue.popleft()   #每修一门课
+            numCourses -= 1          #待修课数-1
+            for course in graph[node]:  #查看该课程对应的后继课程
+                indegree[course] -= 1   #后继课程入度-1
+                if indegree[course] == 0:  #没有先修课程了，加入queue
+                    queue.append(course) 
+        return numCourses == 0       #是否修完numCourses门课
+        
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了拓扑排序的思想。首先根据题目给定的先修课程关系构建一个有向图，每个课程代表图中的一个节点，如果课程A是课程B的先修课，则在图中添加一条从B指向A的有向边。同时统计每个课程的入度，即每个课程有多少门先修课程。然后将所有入度为0的课程加入队列，代表可以直接修读的课程。接下来进行BFS，每次从队列取出一门课程，将其指向的所有后继课程的入度减1，如果某个后继课程的入度变为0，则将其加入队列。最后判断是否学完了所有的课程，即`numCourses`是否减为0。</p>
+                                <p>时间复杂度: O(V+E)</p>
+                                <p>空间复杂度: O(V)</p>
+                                <pre class="bg-light p-2">```python
+import collections
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -&gt; bool:
+        # 构建有向图的邻接表表示
+        graph = collections.defaultdict(list)
+        # 统计每个课程的入度
+        indegree = [0] * numCourses
+        
+        # 遍历先修课程关系，建图和统计入度
+        for x, y in prerequisites:
+            graph[y].append(x)  # 添加一条从y指向x的有向边
+            indegree[x] += 1    # x的入度加1
+        
+        # 将所有入度为0的课程加入队列
+        queue = collections.deque([u for u in range(numCourses) if indegree[u] == 0])
+        
+        # BFS拓扑排序
+        while queue:
+            node = queue.popleft()  # 取出一门可以修读的课程
+            numCourses -= 1         # 待修课程数减1
+            # 遍历该课程的所有后继课程
+            for course in graph[node]:
+                indegree[course] -= 1   # 后继课程的入度减1
+                # 如果入度变为0，则加入队列
+                if indegree[course] == 0:
+                    queue.append(course)
+        
+        # 判断是否学完所有课程
+        return numCourses == 0
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建有向图时，选择从课程bi指向课程ai，而不是从ai指向bi？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建有向图时，选择从课程bi指向课程ai是为了反映课程ai必须在课程bi之前完成的关系。这样的表示方法使得入度（每个节点的入边数）直接对应于每个课程的先修课数量，方便在拓扑排序中直接使用入度为0的课程作为起始点。如果从ai指向bi，则需要额外的步骤或转换来识别哪些课程可以最先开始学习，增加了算法的复杂性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在算法中，如何处理存在循环依赖的课程结构，例如示例中的[[1,0],[0,1]]？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在存在循环依赖的课程结构中，如[[1,0],[0,1]]，表示课程1依赖课程0，同时课程0又依赖课程1，形成了一个循环。在这种情况下，拓扑排序会发现没有任何课程的入度为0，因此初始队列为空。在BFS执行过程中，队列始终为空，没有课程的入度会被减至0。算法最终会返回false，表示无法完成所有课程的学习。这正是拓扑排序处理循环依赖的方式，即通过检测是否能遍历所有节点来判断是否存在循环依赖。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中提到使用BFS进行拓扑排序，为何不使用DFS，两者在这种场景下有什么优劣势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种场景下，使用BFS进行拓扑排序的优势在于其直观性和易于实现，特别是处理入度和队列的操作直接映射到课程的解锁过程。BFS能够逐层处理，每次都处理当前无依赖（或已解决依赖的）课程，这使得算法的执行逻辑清晰。而DFS虽然也可以用来进行拓扑排序，但其递归性质和后序遍历的特点使得实现相对复杂，尤其是在处理大规模数据时更容易遇到栈溢出的问题。此外，DFS在遇到循环依赖时需要额外的机制（如访问标记）来检测并处理循环，而BFS则通过简单的入度计数自然避免了这一问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在拓扑排序的过程中，如果队列为空但还有未处理的课程，这种情况如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果在拓扑排序的过程中队列变为空，但仍有未处理的课程（即仍有课程的入度不为0），这通常意味着存在循环依赖，导致某些课程无法被解锁。在这种情况下，算法应该判断为无法完成所有课程的学习，返回false。这种情况下的空队列表明没有更多的课程可以无先修课程的限制下开始学习，进一步揭示了课程间的依赖关系存在闭环，阻止了某些课程的正常学习顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/course-schedule-ii" class="list-group-item list-group-item-action">
+                                课程表 II
+                            </a>
+                        
+                            <a href="/problem/graph-valid-tree" class="list-group-item list-group-item-action">
+                                以图判树
+                            </a>
+                        
+                            <a href="/problem/minimum-height-trees" class="list-group-item list-group-item-action">
+                                最小高度树
+                            </a>
+                        
+                            <a href="/problem/course-schedule-iii" class="list-group-item list-group-item-action">
+                                课程表 III
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/course-schedule')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/course-schedule/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

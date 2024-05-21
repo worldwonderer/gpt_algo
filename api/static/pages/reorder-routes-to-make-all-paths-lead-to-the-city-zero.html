@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>重新规划路线</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>重新规划路线</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><code>n</code> 座城市，从 <code>0</code> 到 <code>n-1</code> 编号，其间共有 <code>n-1</code> 条路线。因此，要想在两座不同城市之间旅行只有唯一一条路线可供选择（路线网形成一颗树）。去年，交通运输部决定重新规划路线，以改变交通拥堵的状况。</p>
+
+<p>路线用 <code>connections</code> 表示，其中 <code>connections[i] = [a, b]</code> 表示从城市 <code>a</code> 到 <code>b</code> 的一条有向路线。</p>
+
+<p>今年，城市 0 将会举办一场大型比赛，很多游客都想前往城市 0 。</p>
+
+<p>请你帮助重新规划路线方向，使每个城市都可以访问城市 0 。返回需要变更方向的最小路线数。</p>
+
+<p>题目数据 <strong>保证</strong> 每个城市在重新规划路线方向后都能到达城市 0 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/05/30/sample_1_1819.png" style="height: 150px; width: 240px;"></strong></p>
+
+<pre><strong>输入：</strong>n = 6, connections = [[0,1],[1,3],[2,3],[4,0],[4,5]]
+<strong>输出：</strong>3
+<strong>解释：</strong>更改以红色显示的路线的方向，使每个城市都可以到达城市 0 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/05/30/sample_2_1819.png" style="height: 60px; width: 380px;"></strong></p>
+
+<pre><strong>输入：</strong>n = 5, connections = [[1,0],[1,2],[3,2],[3,4]]
+<strong>输出：</strong>2
+<strong>解释：</strong>更改以红色显示的路线的方向，使每个城市都可以到达城市 0 。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>n = 3, connections = [[1,0],[2,0]]
+<strong>输出：</strong>0
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 5 * 10^4</code></li>
+	<li><code>connections.length == n-1</code></li>
+	<li><code>connections[i].length == 2</code></li>
+	<li><code>0 &lt;= connections[i][0], connections[i][1] &lt;= n-1</code></li>
+	<li><code>connections[i][0] != connections[i][1]</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 74 ms</p>
+                    <p>内存: 35.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minReorder(self, n: int, connections: List[List[int]]) -&gt; int:
+        # 建图的时候，指向的城市为正，被指向的为负
+        map_ = [[] for _ in range(n)]
+        for from_, to in connections:
+            map_[from_].append(to)
+            map_[to].append(-from_)
+        ans = 0
+        # 从0开始广搜，遇到正数答案就+1，遍历过的改为False
+        not_visit = [True] * n
+        not_visit[0] = False
+        q = deque([0])
+        while q:
+            for j in map_[q.popleft()]:
+                if not_visit[i := abs(j)]:
+                    q.append(i)
+                    if j &gt; 0:
+                        ans += 1
+                    not_visit[i] = False
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的核心思路是将问题转换成一个有向图的遍历问题。首先，构建一个图来表示这些城市和它们之间的路线。在此图中，正向表示原始方向（从 a 到 b），负向表示反向（从 b 到 a）。使用广度优先搜索（BFS）从城市0开始遍历，记录并修改那些需要改变方向以到达城市0的路线。每次从队列中取出一个城市时，检查与它相连的城市，如果遇到的是正向连接（即原始方向是从当前城市指向另一城市），则计数器增加，因为我们需要改变这条路线的方向来确保所有城市都能到达城市0。通过这种方式，我们能够计算出需要改变方向的路线数量，以保证每个城市都能到达城市0。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minReorder(self, n: int, connections: List[List[int]]) -&gt; int:
+        # 建立一个大小为n的邻接表，用于图的表示
+        map_ = [[] for _ in range(n)]
+        # 构建有向图，正表示正向连接，负表示反向连接
+        for from_, to in connections:
+            map_[from_].append(to)  # 正向连接
+            map_[to].append(-from_)  # 反向连接
+        ans = 0  # 用于统计需要改变方向的路线数
+        # 记录节点访问状态，初始化所有节点为未访问
+        not_visit = [True] * n
+        not_visit[0] = False  # 城市0作为起点，标记为已访问
+        # 使用队列进行BFS
+        q = deque([0])
+        while q:
+            # 从队列中取出一个元素
+            for j in map_[q.popleft()]:
+                if not_visit[i := abs(j)]:  # 检查当前连接的城市是否未访问
+                    q.append(i)  # 将未访问的城市加入队列
+                    if j &gt; 0:  # 如果是正向连接，需要改变方向
+                        ans += 1
+                    not_visit[i] = False  # 标记城市为已访问
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建邻接表时，为什么要同时记录正向连接和反向连接，并且用正负符号来区分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此问题中，我们需要确定从任何城市到城市0的可达性，并且可能需要改变某些路线的方向。使用正负符号来表示连接的方向（正向为原始方向，负向为反向）可以帮助我们在遍历图时快速判断当前遍历到的路线是否需要改变方向以达到城市0。正值表示需要改变方向的路线，负值则表示不需要改变方向。这种表示方法简化了逻辑并减少了额外的存储需求，因为我们只需在遍历时检查符号即可决定是否增加变更方向的计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在广度优先搜索过程中，对于已访问过的节点，为什么选择直接跳过而不是重新考虑？可能会有哪些影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在广度优先搜索（BFS）中，一旦节点被访问，就表示我们已经找到了从起点（城市0）到该节点的最短路径（在无权图中）。重新考虑已访问的节点不仅是不必要的，而且会导致不必要的重复计算和可能的无限循环，增加时间复杂度。因此，跳过已访问的节点可以保证每个节点只被处理一次，确保算法效率。如果不跳过，算法可能会陷入无效操作和增加执行时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在处理节点时要使用`abs(j)`来获取当前城市的索引？这里的逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题的解法中，图的邻接表使用正值表示从当前节点出发到另一节点的有向边，使用负值表示从另一节点到当前节点的反向边。因此，当从队列中取出一个城市j时，我们需要确定与之相连的其他城市的索引，无论这个连接是正向还是反向。使用`abs(j)`能够从正负j中统一提取出城市索引，这简化了处理逻辑，使得我们可以在不区分正向还是反向连接的情况下，统一处理所有连接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/reorder-routes-to-make-all-paths-lead-to-the-city-zero')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/reorder-routes-to-make-all-paths-lead-to-the-city-zero/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

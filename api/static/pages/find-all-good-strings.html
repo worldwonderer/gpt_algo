@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找到所有好字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找到所有好字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=string-matching" class="badge bg-secondary tag-link">字符串匹配</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个长度为 <code>n</code>&nbsp;的字符串&nbsp;<code>s1</code> 和&nbsp;<code>s2</code>&nbsp;，以及一个字符串&nbsp;<code>evil</code>&nbsp;。请你返回 <strong>好字符串&nbsp;</strong>的数目。</p>
+
+<p><strong>好字符串</strong>&nbsp;的定义为：它的长度为&nbsp;<code>n</code>&nbsp;，字典序大于等于&nbsp;<code>s1</code>&nbsp;，字典序小于等于&nbsp;<code>s2</code>&nbsp;，且不包含&nbsp;<code>evil</code>&nbsp;为子字符串。</p>
+
+<p>由于答案可能很大，请你返回答案对 10^9 + 7 取余的结果。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>n = 2, s1 = &quot;aa&quot;, s2 = &quot;da&quot;, evil = &quot;b&quot;
+<strong>输出：</strong>51 
+<strong>解释：</strong>总共有 25 个以 &#39;a&#39; 开头的好字符串：&quot;aa&quot;，&quot;ac&quot;，&quot;ad&quot;，...，&quot;az&quot;。还有 25 个以 &#39;c&#39; 开头的好字符串：&quot;ca&quot;，&quot;cc&quot;，&quot;cd&quot;，...，&quot;cz&quot;。最后，还有一个以 &#39;d&#39; 开头的好字符串：&quot;da&quot;。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>n = 8, s1 = &quot;leetcode&quot;, s2 = &quot;leetgoes&quot;, evil = &quot;leet&quot;
+<strong>输出：</strong>0 
+<strong>解释：</strong>所有字典序大于等于 s1 且小于等于 s2 的字符串都以 evil 字符串 &quot;leet&quot; 开头。所以没有好字符串。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>n = 2, s1 = &quot;gx&quot;, s2 = &quot;gz&quot;, evil = &quot;x&quot;
+<strong>输出：</strong>2
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>s1.length == n</code></li>
+	<li><code>s2.length == n</code></li>
+	<li><code>s1 &lt;= s2</code></li>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>1 &lt;= evil.length &lt;= 50</code></li>
+	<li>所有字符串都只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 206 ms</p>
+                    <p>内存: 21.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findGoodStrings(self, n: int, s1: str, s2: str, evil: str) -&gt; int:
+        def prefix_function(pattern: str) -&gt; []:
+            n = len(pattern)
+            pi = [0] * n
+            for i in range(1, n):
+                j = pi[i - 1]
+                while j != 0 and pattern[i] != pattern[j]:
+                    j = pi[j - 1]
+                if pattern[i] == pattern[j]:
+                    j += 1
+                pi[i] = j
+            return pi
+
+        def match_char(pattern: str) -&gt; []:
+            n = len(pattern)
+            pi = prefix_function(pattern)
+            dp = [[0 for j in range(26)] for i in range(n)]
+            dp[0][ord(pattern[0]) - 97] = 1
+            for i in range(1, n):
+                for cur in range(0, 26):
+                    ch = chr(cur + 97)
+                    if ch == pattern[i]:
+                        dp[i][cur] = i + 1
+                    else:
+                        j = pi[i - 1]
+                        dp[i][cur] = dp[j][cur]
+            return dp
+
+        n = len(s2)
+        pn = len(evil)
+        dp = match_char(evil)
+
+        @lru_cache(None)
+        def dfs(i:int, match:int, limit_low:bool, limit_high:bool) -&gt; int:
+            if i == n:
+                return match &lt; pn
+            if match &gt;= pn:
+                return 0
+            lo = ord(s1[i]) if limit_low else ord(&#39;a&#39;)
+            hi = ord(s2[i]) if limit_high else ord(&#39;z&#39;)
+            res = 0
+            for cur in range(lo, hi + 1):
+                res += dfs(i+1, dp[match][cur - 97], limit_low and cur == lo, limit_high and cur == hi)
+            res %= (10 ** 9 + 7)
+            return res
+        return dfs(0, 0, True, True)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的解法使用了动态规划和KMP算法的思想。首先通过KMP算法的前缀函数计算出evil字符串的前缀函数，然后基于前缀函数构建一个dp数组，dp[i][j]表示evil字符串的前i个字符与某个字符串匹配，且当前匹配到字符j时，evil字符串的最大匹配长度。接下来使用记忆化搜索，枚举满足条件的字符串，搜索过程中维护当前枚举到的位置i，当前匹配的evil字符串的长度match，以及是否受到s1和s2的字典序限制。搜索到字符串末尾时，如果match小于evil字符串的长度，说明当前字符串是好字符串，累加答案。</p>
+                                <p>时间复杂度: O(n × m × 26)</p>
+                                <p>空间复杂度: O(n × m + m × 26)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findGoodStrings(self, n: int, s1: str, s2: str, evil: str) -&gt; int:
+        def prefix_function(pattern: str) -&gt; []:
+            # 计算字符串pattern的前缀函数
+            n = len(pattern)
+            pi = [0] * n
+            for i in range(1, n):
+                j = pi[i - 1]
+                while j != 0 and pattern[i] != pattern[j]:
+                    j = pi[j - 1]
+                if pattern[i] == pattern[j]:
+                    j += 1
+                pi[i] = j
+            return pi
+
+        def match_char(pattern: str) -&gt; []:
+            # 构建dp数组，dp[i][j]表示pattern的前i个字符与某个字符串匹配，且当前匹配到字符j时，pattern的最大匹配长度
+            n = len(pattern)
+            pi = prefix_function(pattern)
+            dp = [[0 for j in range(26)] for i in range(n)]
+            dp[0][ord(pattern[0]) - 97] = 1
+            for i in range(1, n):
+                for cur in range(0, 26):
+                    ch = chr(cur + 97)
+                    if ch == pattern[i]:
+                        dp[i][cur] = i + 1
+                    else:
+                        j = pi[i - 1]
+                        dp[i][cur] = dp[j][cur]
+            return dp
+
+        n = len(s2)
+        pn = len(evil)
+        dp = match_char(evil)
+
+        @lru_cache(None)
+        def dfs(i:int, match:int, limit_low:bool, limit_high:bool) -&gt; int:
+            # 记忆化搜索，枚举满足条件的字符串
+            if i == n:
+                return match &lt; pn
+            if match &gt;= pn:
+                return 0
+            lo = ord(s1[i]) if limit_low else ord(&#39;a&#39;)
+            hi = ord(s2[i]) if limit_high else ord(&#39;z&#39;)
+            res = 0
+            for cur in range(lo, hi + 1):
+                res += dfs(i+1, dp[match][cur - 97], limit_low and cur == lo, limit_high and cur == hi)
+            res %= (10 ** 9 + 7)
+            return res
+        return dfs(0, 0, True, True)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算KMP算法的前缀函数时，为什么需要检查当前字符与j指向的字符不相同时，将j更新为pi[j - 1]？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在KMP算法中，前缀函数被用来表示字符串的最长相同前后缀的长度。当计算前缀函数时，如果当前字符与j指向的字符不匹配，这意味着当前的匹配失败。因此，我们需要找到一个更短的有效匹配，这可以通过跳转到pi[j - 1]来实现，即跳到当前已匹配前缀的下一个最长相同前后缀的末尾。这样做可以避免重复检查已知不匹配的字符，从而提高匹配效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            dp数组中dp[i][j]的定义是基于匹配到字符j时evil字符串的最大匹配长度，那么dp数组的初始状态如何确定，尤其是除了dp[0][ord(pattern[0]) - 97] = 1之外的其他值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp数组的每个元素dp[i][j]表示在字符串pattern中，以i结尾的子串能够匹配的最大长度，当下一个字符为j（ASCII码减去97得到字符&#39;a&#39;到&#39;z&#39;的索引）时的情况。对于dp[0][ord(pattern[0]) - 97] = 1是因为第一个字符匹配时，匹配长度为1。对于其他值，当字符不匹配时，我们需要回溯到前一个匹配的状态，这由前缀函数pi给出。因此，对于dp数组中的其他元素，我们根据前缀函数计算得到的最长可匹配后缀的继续位置来填充，这保证了在非直接匹配的情况下，能找到最长的可能的匹配状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            dfs函数中的limit_low和limit_high参数是如何控制字符串的字典序界限的？具体是如何通过这两个参数确保生成的字符串在s1和s2的字典序范围内？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在dfs函数中，参数limit_low和limit_high用于控制生成字符串的字典序边界以确保其在s1和s2的范围内。当limit_low为true时，表示当前位置的字符不能小于s1在同一位置的字符。类似地，当limit_high为true时，表示当前位置的字符不能大于s2在同一位置的字符。这两个参数在递归过程中动态更新：如果当前字符恰好等于s1（或s2）的对应字符，相应的限制参数保持为true，否则设为false。这种机制确保了生成的字符串在给定的字典序范围内递归搜索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在dfs递归函数中，如果当前的match已经等于或超过了evil字符串的长度，为什么直接返回0，这是基于什么样的考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在dfs函数中，如果match等于或超过evil字符串的长度，这意味着在生成的字符串中已经完全包含了evil字符串作为子串。题目要求找到不包含evil字符串的好字符串。因此，一旦发现evil字符串已经被完全匹配，当前分支的搜索可以终止，直接返回0，表示这条路径不产生任何有效的好字符串，这是为了满足问题的约束条件而进行的优化处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-all-good-strings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-all-good-strings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

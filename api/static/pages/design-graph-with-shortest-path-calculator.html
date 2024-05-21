@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>设计可以求最短路径的图类</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>设计可以求最短路径的图类</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个有&nbsp;<code>n</code>&nbsp;个节点的&nbsp;<strong>有向带权</strong>&nbsp;图，节点编号为&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;。图中的初始边用数组&nbsp;<code>edges</code>&nbsp;表示，其中&nbsp;<code>edges[i] = [from<sub>i</sub>, to<sub>i</sub>, edgeCost<sub>i</sub>]</code>&nbsp;表示从&nbsp;<code>from<sub>i</sub></code>&nbsp;到&nbsp;<code>to<sub>i</sub></code>&nbsp;有一条代价为&nbsp;<code>edgeCost<sub>i</sub></code>&nbsp;的边。</p>
+
+<p>请你实现一个&nbsp;<code>Graph</code>&nbsp;类：</p>
+
+<ul>
+	<li><code>Graph(int n, int[][] edges)</code>&nbsp;初始化图有&nbsp;<code>n</code>&nbsp;个节点，并输入初始边。</li>
+	<li><code>addEdge(int[] edge)</code>&nbsp;向边集中添加一条边，其中<strong>&nbsp;</strong><code>edge = [from, to, edgeCost]</code>&nbsp;。数据保证添加这条边之前对应的两个节点之间没有有向边。</li>
+	<li><code>int shortestPath(int node1, int node2)</code>&nbsp;返回从节点&nbsp;<code>node1</code>&nbsp;到&nbsp;<code>node2</code>&nbsp;的路径<strong>&nbsp;最小</strong>&nbsp;代价。如果路径不存在，返回&nbsp;<code>-1</code>&nbsp;。一条路径的代价是路径中所有边代价之和。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/01/11/graph3drawio-2.png" style="width: 621px; height: 191px;"></p>
+
+<pre><strong>输入：</strong>
+["Graph", "shortestPath", "shortestPath", "addEdge", "shortestPath"]
+[[4, [[0, 2, 5], [0, 1, 2], [1, 2, 1], [3, 0, 3]]], [3, 2], [0, 3], [[1, 3, 4]], [0, 3]]
+<b>输出：</b>
+[null, 6, -1, null, 6]
+
+<strong>解释：</strong>
+Graph g = new Graph(4, [[0, 2, 5], [0, 1, 2], [1, 2, 1], [3, 0, 3]]);
+g.shortestPath(3, 2); // 返回 6 。从 3 到 2 的最短路径如第一幅图所示：3 -&gt; 0 -&gt; 1 -&gt; 2 ，总代价为 3 + 2 + 1 = 6 。
+g.shortestPath(0, 3); // 返回 -1 。没有从 0 到 3 的路径。
+g.addEdge([1, 3, 4]); // 添加一条节点 1 到节点 3 的边，得到第二幅图。
+g.shortestPath(0, 3); // 返回 6 。从 0 到 3 的最短路径为 0 -&gt; 1 -&gt; 3 ，总代价为 2 + 4 = 6 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 100</code></li>
+	<li><code>0 &lt;= edges.length &lt;= n * (n - 1)</code></li>
+	<li><code>edges[i].length == edge.length == 3</code></li>
+	<li><code>0 &lt;= from<sub>i</sub>, to<sub>i</sub>, from, to, node1, node2 &lt;= n - 1</code></li>
+	<li><code>1 &lt;= edgeCost<sub>i</sub>, edgeCost &lt;= 10<sup>6</sup></code></li>
+	<li>图中任何时候都不会有重边和自环。</li>
+	<li>调用 <code>addEdge</code>&nbsp;至多&nbsp;<code>100</code>&nbsp;次。</li>
+	<li>调用 <code>shortestPath</code>&nbsp;至多&nbsp;<code>100</code>&nbsp;次。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 237 ms</p>
+                    <p>内存: 19.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Graph:
+    def __init__(self, n: int, edges: List[List[int]]):
+        self.g = [[] * n for _ in range(n)] 
+        for x, y, w in edges:
+            self.g[x].append((y,w))
+
+    def addEdge(self, e: List[int]) -&gt; None:
+        self.g[e[0]].append([e[1],e[2]])
+
+    def shortestPath(self, start: int, end: int) -&gt; int:
+        n=len(self.g)
+        dist=[inf]*n
+        dist[start]=0
+        heap=[(0,start)]
+
+        while(heap):
+            w0,y0=heappop(heap)
+            if y0==end:return w0
+            if w0&gt;dist[y0]:continue
+            for y,w in self.g[y0]:
+                if dist[y0]+w&lt;dist[y]:
+                    dist[y]=w+dist[y0]
+                    heappush(heap,(dist[y],y)) 
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>The solution implements a graph class with methods to initialize the graph, add edges, and compute the shortest path between two nodes using Dijkstra&#39;s algorithm. The graph is represented as an adjacency list, where each node points to a list of tuples, each containing a connected node and the edge weight. The `addEdge` method appends a new edge to the adjacency list. The `shortestPath` method applies Dijkstra&#39;s algorithm using a priority queue (min-heap) to efficiently find the shortest path by continually expanding the least costly path until the destination is reached or all possible paths are considered.</p>
+                                <p>时间复杂度: O(E log V)</p>
+                                <p>空间复杂度: O(V + E)</p>
+                                <pre class="bg-light p-2">class Graph:
+    def __init__(self, n: int, edges: List[List[int]]):
+        # Initialize an adjacency list for n nodes
+        self.g = [[] for _ in range(n)]
+        # Add existing edges to the graph
+        for x, y, w in edges:
+            self.g[x].append((y,w))
+
+    def addEdge(self, e: List[int]) -&gt; None:
+        # Append a new edge to the adjacency list
+        self.g[e[0]].append((e[1], e[2]))
+
+    def shortestPath(self, start: int, end: int) -&gt; int:
+        n = len(self.g)
+        dist = [float(&#39;inf&#39;)] * n
+        dist[start] = 0
+        heap = [(0, start)]
+        # Dijkstra&#39;s algorithm using a priority queue
+        while heap:
+            w0, y0 = heappop(heap)
+            # If the end node is reached, return the distance
+            if y0 == end: return w0
+            # Skip if a shorter path to y0 has been found
+            if w0 &gt; dist[y0]: continue
+            # Relax edges
+            for y, w in self.g[y0]:
+                if dist[y0] + w &lt; dist[y]:
+                    dist[y] = w + dist[y0]
+                    heappush(heap, (dist[y], y))
+        return -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在实现Dijkstra算法时，你是如何处理图中可能存在的负权边？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Dijkstra算法的标准实现中，不支持负权边。这是因为Dijkstra算法基于贪心策略，假设从源点出发到任何点的最短路径只会随着路径长度的增加而增加。如果存在负权边，就可能出现已经被确定为最短路径的点在未来被更新为更短的路径，这违背了Dijkstra算法的基本假设。若图中存在负权边，应使用其他算法，如Bellman-Ford算法，该算法可以处理负权边并能检测负权环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择使用优先队列（最小堆）来实现Dijkstra算法？使用普通队列会有什么问题或效率差异？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>优先队列（最小堆）是实现Dijkstra算法的理想数据结构，因为它可以保证每次从队列中提取出的都是当前未处理的最短路径的节点。这样可以有效地减少算法的运行时间，尤其是在处理大型图时更显著。如果使用普通队列，每次从队列中提取节点时都必须遍历整个队列以找到最短路径的节点，这会导致算法效率显著降低，使其从O((V+E)logV)增加到O(V^2)，其中V是顶点数，E是边数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            请问在`shortestPath`方法中，`dist[start] = 0`这一初始化操作的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`shortestPath`方法中，`dist[start] = 0`这一操作是初始化起点到自身的最短距离为0。这是因为从任何节点到自身的最短路径长度自然应该是0。这个初始化步骤是Dijkstra算法的一部分，确保算法开始时，起点的距离被正确设置，以便算法能从起点开始逐步计算到图中其他所有节点的最短路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在算法中，当检查到`w0 &gt; dist[y0]`时选择继续循环的逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Dijkstra算法的实现中，`w0 &gt; dist[y0]`的检查用来确定当前从优先队列中取出的路径是否仍然是有效的最短路径。由于算法中某个节点可能被多次添加到优先队列中（每次发现更短的路径时），最终从队列中取出的可能不是最短的那个。检查`w0 &gt; dist[y0]`确保如果已经存在一个更短的路径到达该节点，则当前路径被忽略，这样可以避免不必要的计算和错误的路径更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/design-graph-with-shortest-path-calculator')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/design-graph-with-shortest-path-calculator/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

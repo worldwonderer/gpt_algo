@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>每天绘制新区域的数量</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>每天绘制新区域的数量</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 236 ms</p>
+                    <p>内存: 46.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class UnionFind:
+    def __init__(self, n: int) -&gt; None:
+        self.root_or_size = [-1] * n
+        self.part = n
+        return
+
+    def find(self, x):
+        y = x
+        while self.root_or_size[x] &gt;= 0:
+            # range_merge_to_disjoint to the direct root node after query
+            x = self.root_or_size[x]
+        while y != x:
+            self.root_or_size[y], y = x, self.root_or_size[y]
+        return x
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        if self.root_or_size[root_x] &lt; self.root_or_size[root_y]:
+            root_x, root_y = root_y, root_x
+        self.root_or_size[root_y] += self.root_or_size[root_x]
+        self.root_or_size[root_x] = root_y
+        self.part -= 1
+        return True
+
+    def union_left(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        self.root_or_size[root_x] += self.root_or_size[root_y]
+        self.root_or_size[root_y] = root_x
+        self.part -= 1
+        return True
+
+    def union_right(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        self.root_or_size[root_y] += self.root_or_size[root_x]
+        self.root_or_size[root_x] = root_y
+        self.part -= 1
+        return True
+
+    def is_connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+    def get_node_size(self, x):
+        return -self.root_or_size[self.find(x)]
+
+    def get_root_part(self):
+        # get the nodes list of every root
+        part = defaultdict(list)
+        n = len(self.root_or_size)
+        for i in range(n):
+            part[self.find(i)].append(i)
+        return part
+
+    def get_root_size(self):
+        # get the size of every root
+        size = defaultdict(int)
+        n = len(self.root_or_size)
+        for i in range(n):
+            if self.find(i) == i:
+                size[i] = -self.root_or_size[i]
+        return size
+
+
+class Solution:
+    def amountPainted(self, paint: List[List[int]]) -&gt; List[int]:
+        m = max(ls[1] for ls in paint) + 10
+        uf = UnionFind(m)
+        ans = []
+        for a, b in paint:
+            cnt = 0
+            a = uf.find(a)
+            while a &lt; b:
+                cnt += 1
+                uf.union_right(a, a + 1)
+                a = uf.find(a + 1)
+            ans.append(cnt)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了并查集(Union-Find)来动态管理和合并区间。每次绘制时，从区间的起始点开始，尝试将该点与其右侧相邻点合并，并递归地进行此操作直至区间末端。如果一个点已经被绘制，则此操作会将该点与之前已绘制区域的根节点合并，从而避免重复绘制。这种方法通过并查集高效地处理了区间合并问题，并实时计算每次操作绘制的新区域数量。</p>
+                                <p>时间复杂度: O(n*k)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">class UnionFind:
+    def __init__(self, n: int) -&gt; None:
+        self.root_or_size = [-1] * n  # 初始化n个节点的根为自身且大小为-1
+        self.part = n  # 初始时各节点独立
+        return
+
+    def find(self, x):
+        y = x
+        while self.root_or_size[x] &gt;= 0:
+            x = self.root_or_size[x]
+        while y != x:
+            self.root_or_size[y], y = x, self.root_or_size[y]
+        return x
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        if self.root_or_size[root_x] &lt; self.root_or_size[root_y]:
+            root_x, root_y = root_y, root_x
+        self.root_or_size[root_y] += self.root_or_size[root_x]
+        self.root_or_size[root_x] = root_y
+        self.part -= 1
+        return True
+
+    def union_left(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        self.root_or_size[root_x] += self.root_or_size[root_y]
+        self.root_or_size[root_y] = root_x
+        self.part -= 1
+        return True
+
+    def union_right(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return False
+        self.root_or_size[root_y] += self.root_or_size[root_x]
+        self.root_or_size[root_x] = root_y
+        self.part -= 1
+        return True
+
+    def is_connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+    def get_node_size(self, x):
+        return -self.root_or_size[self.find(x)]
+
+    def get_root_part(self):
+        part = defaultdict(list)
+        n = len(self.root_or_size)
+        for i in range(n):
+            part[self.find(i)].append(i)
+        return part
+
+    def get_root_size(self):
+        size = defaultdict(int)
+        n = len(self.root_or_size)
+        for i in range(n):
+            if self.find(i) == i:
+                size[i] = -self.root_or_size[i]
+        return size
+
+
+class Solution:
+    def amountPainted(self, paint: List[List[int]]) -&gt; List[int]:
+        m = max(ls[1] for ls in paint) + 10  # 计算需要的并查集大小
+        uf = UnionFind(m)
+        ans = []
+        for a, b in paint:
+            cnt = 0
+            a = uf.find(a)
+            while a &lt; b:
+                cnt += 1  # 统计新增绘制的区域数
+                uf.union_right(a, a + 1)  # 将当前点与右侧点合并
+                a = uf.find(a + 1)
+            ans.append(cnt)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解题过程中，如何确保并查集的大小m足够大以覆盖所有可能的绘制位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在确定并查集的大小m时，题解中计算了所有绘制区间的最大结束位置，并对其增加了10作为缓冲。这样做是为了确保即使在最大索引附近还有操作也能被处理。这种方法在实际应用中通常足够安全，尤其是在没有明确的最大值限制时，适当的缓冲可以避免索引越界错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            并查集中的union_right方法与常规union方法有何区别，为什么选择在此题中使用union_right？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>常规的union方法将两个节点合并时，通常基于树的高度或大小来优化，以减少查找的深度。而union_right方法特别设计为将当前节点与其右侧节点合并，这符合绘制区域时从左至右的合并需求。在此题中，使用union_right可以直观地映射绘制过程中的逐点合并操作，同时保证并查集结构的连续性和合理性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，每次绘制都会从区间的起始点开始尝试合并至区间末端。这种方式处理重叠区间的效率如何？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种从起始点向末端尝试合并的方法能有效处理重叠区间。通过并查集的快速合并和查找操作，可以在绘制过程中快速判断哪些部分已被绘制，并避免重复绘制。虽然每次操作都需要从区间的起点开始检查至终点，可能会有一定的性能损耗，但由于路径压缩和按秩合并的优化，整体效率仍然是可接受的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实现并查集的find方法时，为什么要使用路径压缩技术，这对算法的效率有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>路径压缩是一种优化技术，通过在每次查找过程中将查找路径上的所有节点直接连接到根节点，从而压缩路径长度并减少后续操作的时间复杂度。这种技术显著提高了并查集的效率，使得几乎所有操作都能在几乎常数时间内完成，极大地提高了数据结构的性能，尤其是在处理大量元素和查询的情况下非常有效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/amount-of-new-area-painted-each-day')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/amount-of-new-area-painted-each-day/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

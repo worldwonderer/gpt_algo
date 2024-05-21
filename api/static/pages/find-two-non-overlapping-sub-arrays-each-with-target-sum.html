@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找两个和为目标值且不重叠的子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找两个和为目标值且不重叠的子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组&nbsp;<code>arr</code> 和一个整数值&nbsp;<code>target</code>&nbsp;。</p>
+
+<p>请你在 <code>arr</code>&nbsp;中找 <strong>两个互不重叠的子数组</strong>&nbsp;且它们的和都等于&nbsp;<code>target</code>&nbsp;。可能会有多种方案，请你返回满足要求的两个子数组长度和的 <strong>最小值</strong> 。</p>
+
+<p>请返回满足要求的最小长度和，如果无法找到这样的两个子数组，请返回 <strong>-1</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>arr = [3,2,2,4,3], target = 3
+<strong>输出：</strong>2
+<strong>解释：</strong>只有两个子数组和为 3 （[3] 和 [3]）。它们的长度和为 2 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>arr = [7,3,4,7], target = 7
+<strong>输出：</strong>2
+<strong>解释：</strong>尽管我们有 3 个互不重叠的子数组和为 7 （[7], [3,4] 和 [7]），但我们会选择第一个和第三个子数组，因为它们的长度和 2 是最小值。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>arr = [4,3,2,6,2,3,4], target = 6
+<strong>输出：</strong>-1
+<strong>解释：</strong>我们只有一个和为 6 的子数组。
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>arr = [5,5,4,4,5], target = 3
+<strong>输出：</strong>-1
+<strong>解释：</strong>我们无法找到和为 3 的子数组。
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre><strong>输入：</strong>arr = [3,1,1,1,5,1,2,1], target = 3
+<strong>输出：</strong>3
+<strong>解释：</strong>注意子数组 [1,2] 和 [2,1] 不能成为一个方案因为它们重叠了。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length &lt;= 10^5</code></li>
+	<li><code>1 &lt;= arr[i] &lt;= 1000</code></li>
+	<li><code>1 &lt;= target &lt;= 10^8</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 134 ms</p>
+                    <p>内存: 29.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minSumOfLengths(self, arr: List[int], target: int) -&gt; int:
+        q = deque()
+        mn = inf
+        ans = inf
+        left = right = total = 0
+        n = len(arr)
+        while right&lt;n:
+            #移动有边界
+            while right&lt;n and total&lt;target:
+                total+=arr[right]
+                right+=1
+            #移动左边界
+            while total&gt;target:
+                total-=arr[left]
+                left+=1
+            #目标值等于total
+            if total==target:
+                #删除不重复区间 并记录最小长度
+                while q and q[0][1]&lt;=left:
+                    l,r=q.popleft()
+                    mn=min(mn,r-l)
+
+                #如果有不重叠在前 个更新答案
+                if mn!=inf:
+                    ans=min(ans,mn+right-left)
+                # 如果一个区间还不如最小区间短，那就不用加入q
+                if right-left&lt;mn:
+                    q.append((left,right))
+                total-=arr[left]
+                left+=1
+        return -1 if ans== inf else ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了双指针和滑动窗口的方法来找到和为target的子数组。利用left和right指针控制窗口的左右边界。当窗口内元素之和小于target时右移right扩大窗口；当窗口内之和大于target时，右移left缩小窗口。每次窗口内之和等于target时，检查是否存在之前记录的非重叠子数组，如果存在，则更新可能的最小长度。为了记录和跟踪非重叠的子数组，使用deque（双端队列）来存储每个有效的子数组的起始和终止位置，并维护一个最小长度变量。当发现更短的子数组时，更新此最小值。最终，如果有符合条件的两个子数组，返回它们长度之和的最小值；否则返回-1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minSumOfLengths(self, arr: List[int], target: int) -&gt; int:
+        q = deque() # 存储满足条件的子数组的起止位置
+        mn = inf # 记录非重叠子数组中的最小长度
+        ans = inf # 记录最终的最小长度和
+        left = right = total = 0
+        n = len(arr)
+        while right&lt;n:
+            while right&lt;n and total&lt;target:
+                total+=arr[right] # 扩大窗口
+                right+=1
+            while total&gt;target:
+                total-=arr[left] # 缩小窗口
+                left+=1
+            if total==target:
+                while q and q[0][1]&lt;=left:
+                    l,r=q.popleft()
+                    mn=min(mn,r-l) # 更新非重叠子数组的最小长度
+                if mn!=inf:
+                    ans=min(ans,mn+right-left) # 更新最小长度和
+                if right-left&lt;mn:
+                    q.append((left,right)) # 满足条件的子数组加入队列
+                total-=arr[left]
+                left+=1
+        return -1 if ans== inf else ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，如何确保找到的两个子数组确实是互不重叠的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，通过使用双端队列deque来存储满足条件的子数组的起止位置，确保找到的两个子数组互不重叠。当找到一个新的和为target的子数组时，算法会检查deque中的子数组，如果队列中已有的子数组的结束位置小于或等于当前子数组的开始位置left，表明这两个子数组不重叠。这样，通过队列中存储的子数组的起止位置信息，可以有效地筛选并维护不重叠的子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中使用的双端队列是如何帮助寻找最小长度和的？即，队列中存储的子数组信息如何被利用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双端队列在算法中用于存储每个满足条件（和等于target）的子数组的起始和终止位置。这种存储方式方便了快速地添加新的子数组和移除旧的子数组。当发现新的满足条件的子数组时，算法会检查队列中是否有与当前子数组不重叠的子数组。如果有，算法会计算两个子数组长度之和并尝试更新最小长度和。此外，队列通过维护子数组的顺序，帮助快速地找到与当前子数组不重叠的最早的子数组，从而高效更新最小长度和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在发现窗口和等于目标值时，首先要检查并移除队列中所有结束位置小于等于当前左指针的子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这样做是为了确保队列中的子数组与当前考察的子数组不重叠。当窗口和等于目标值时，需要评估这个窗口与队列中已有的子数组是否重叠。移除所有结束位置小于等于当前左指针的子数组是因为这些子数组的有效性已经过时（它们的范围不可能与当前或未来的窗口重叠），清除这些子数组有助于保持队列的有效性和减少不必要的计算，同时确保我们只比较不重叠的子数组，以有效更新最小长度和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新非重叠子数组的最小长度`mn`时，为什么选择从队列中移除元素，而这些元素的结束位置小于等于当前的`left`指针？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>移除结束位置小于等于当前left指针的子数组元素，是因为这些子数组已不可能与当前窗口或任何后续窗口形成不重叠的子数组组合。这种移除操作有助于维护一个干净且高效的队列状态，确保队列中只包含可能与当前或后续窗口组成有效组合的子数组。这样同时也简化了非重叠子数组最小长度mn的更新过程，因为我们只需考虑队列中剩余的有效子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-two-non-overlapping-sub-arrays-each-with-target-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-two-non-overlapping-sub-arrays-each-with-target-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

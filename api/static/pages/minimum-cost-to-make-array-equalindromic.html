@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>使数组成为等数数组的最小代价</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>使数组成为等数数组的最小代价</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code>&nbsp;下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;。</p>
+
+<p>你可以对 <code>nums</code>&nbsp;执行特殊操作 <strong>任意次</strong>&nbsp;（也可以 <strong>0</strong>&nbsp;次）。每一次特殊操作中，你需要 <strong>按顺序</strong>&nbsp;执行以下步骤：</p>
+
+<ul>
+	<li>从范围&nbsp;<code>[0, n - 1]</code>&nbsp;里选择一个下标 <code>i</code>&nbsp;和一个 <strong>正</strong>&nbsp;整数&nbsp;<code>x</code>&nbsp;。</li>
+	<li>将&nbsp;<code>|nums[i] - x|</code>&nbsp;添加到总代价里。</li>
+	<li>将 <code>nums[i]</code>&nbsp;变为&nbsp;<code>x</code>&nbsp;。</li>
+</ul>
+
+<p>如果一个正整数正着读和反着读都相同，那么我们称这个数是<strong>&nbsp;回文数</strong>&nbsp;。比方说，<code>121</code>&nbsp;，<code>2552</code> 和&nbsp;<code>65756</code>&nbsp;都是回文数，但是&nbsp;<code>24</code>&nbsp;，<code>46</code>&nbsp;，<code>235</code>&nbsp;都不是回文数。</p>
+
+<p>如果一个数组中的所有元素都等于一个整数&nbsp;<code>y</code>&nbsp;，且&nbsp;<code>y</code>&nbsp;是一个小于&nbsp;<code>10<sup>9</sup></code>&nbsp;的&nbsp;<strong>回文数</strong>&nbsp;，那么我们称这个数组是一个 <strong>等数数组&nbsp;</strong>。</p>
+
+<p>请你返回一个整数，表示执行任意次特殊操作后使 <code>nums</code>&nbsp;成为 <strong>等数数组</strong>&nbsp;的 <strong>最小</strong>&nbsp;总代价。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,2,3,4,5]
+<b>输出：</b>6
+<b>解释：</b>我们可以将数组中所有元素变为回文数 3 得到等数数组，数组变成 [3,3,3,3,3] 需要执行 4 次特殊操作，代价为 |1 - 3| + |2 - 3| + |4 - 3| + |5 - 3| = 6 。
+将所有元素变为其他回文数的总代价都大于 6 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [10,12,13,14,15]
+<b>输出：</b>11
+<b>解释：</b>我们可以将数组中所有元素变为回文数 11 得到等数数组，数组变成 [11,11,11,11,11] 需要执行 5 次特殊操作，代价为 |10 - 11| + |12 - 11| + |13 - 11| + |14 - 11| + |15 - 11| = 11 。
+将所有元素变为其他回文数的总代价都大于 11 。
+</pre>
+
+<p><strong class="example">示例 3 ：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [22,33,22,33,22]
+<b>输出：</b>22
+<b>解释：</b>我们可以将数组中所有元素变为回文数 22 得到等数数组，数组变为 [22,22,22,22,22] 需要执行 2 次特殊操作，代价为 |33 - 22| + |33 - 22| = 22 。
+将所有元素变为其他回文数的总代价都大于 22 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 87 ms</p>
+                    <p>内存: 30.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumCost(self, nums: List[int]) -&gt; int:
+        nums.sort()
+        l = len(nums)
+
+        def bigger(x):
+            x = str(x)
+            n = len(x)
+            k = n // 2
+
+            if n % 2:
+                y = x[:k + 1] + x[:k][::-1]
+                if y &gt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k+1]) + 1
+                    return int(str(cur) + str(cur)[:-1][::-1]) if len(str(cur)) == k + 1 else int(str(cur) + str(cur)[:-2][::-1])
+            
+            else:
+                y = x[:k] + x[:k][::-1]
+                if y &gt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k]) + 1
+                    return int(str(cur) + str(cur)[::-1]) if len(str(cur)) == k else int(str(cur) + str(cur)[:-1][::-1])
+            
+        def smaller(x):
+            x = str(x)
+            n = len(x)
+            k = n // 2
+
+            if n % 2:
+                y = x[:k + 1] + x[:k][::-1]
+                if y &lt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k+1]) - 1
+                    return int(str(cur) + str(cur)[:-1][::-1]) if len(str(cur)) == k + 1 else int(str(cur) + str(cur)[::-1])
+            
+            else:
+                y = x[:k] + x[:k][::-1]
+                if y &lt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k]) - 1
+                    return int(str(cur) + str(cur)[::-1]) if len(str(cur)) == k and cur else int(str(cur) + &#39;9&#39; + str(cur)[::-1])*(cur!=0)+9*(cur == 0)
+        
+        a = smaller(nums[l//2])        
+        b = bigger(nums[(l - 1)//2])
+        return min(sum(abs(b-x) for x in nums), sum(abs(a-x) for x in nums))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解首先对数组进行排序，从而简化找到最佳回文数目标值的过程。利用中位数或接近中位数的值作为可能的目标回文数是一个高效的策略，因为中位数附近的值在优化总距离和上是很有帮助的。接着，题解定义了两个辅助函数 bigger 和 smaller 来计算给定数值的最近大回文数和最近小回文数。这些函数通过字符串操作检查并构造回文数。最后，题解通过计算将所有数组元素变为这两个回文数（由中位数计算得到）的代价，并返回较小的一个，从而实现了找到最小总代价的目标。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumCost(self, nums: List[int]) -&gt; int:
+        nums.sort()  # 对数组进行排序
+        l = len(nums)
+
+        def bigger(x):
+            x = str(x)
+            n = len(x)
+            k = n // 2
+
+            if n % 2:  # 奇数长度的数处理
+                y = x[:k + 1] + x[:k][::-1]
+                if y &gt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k+1]) + 1
+                    return int(str(cur) + str(cur)[:-1][::-1]) if len(str(cur)) == k + 1 else int(str(cur) + str(cur)[:-2][::-1])
+            else:  # 偶数长度的数处理
+                y = x[:k] + x[:k][::-1]
+                if y &gt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k]) + 1
+                    return int(str(cur) + str(cur)[::-1]) if len(str(cur)) == k else int(str(cur) + str(cur)[:-1][::-1])
+        
+        def smaller(x):
+            x = str(x)
+            n = len(x)
+            k = n // 2
+
+            if n % 2:
+                y = x[:k + 1] + x[:k][::-1]
+                if y &lt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k+1]) - 1
+                    return int(str(cur) + str(cur)[:-1][::-1]) if len(str(cur)) == k + 1 else int(str(cur) + str(cur)[::-1])
+            else:
+                y = x[:k] + x[:k][::-1]
+                if y &lt;= x:
+                    return int(y)
+                else:
+                    cur = int(x[:k]) - 1
+                    return int(str(cur) + str(cur)[::-1]) if len(str(cur)) == k and cur else int(str(cur) + &#39;9&#39; + str(cur)[::-1])*(cur!=0)+9*(cur == 0)
+        
+        a = smaller(nums[l//2])  # 计算最小的回文数
+        b = bigger(nums[(l - 1)//2])  # 计算最大的回文数
+        return min(sum(abs(b-x) for x in nums), sum(abs(a-x) for x in nums))  # 计算最小总代价并返回</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在选择目标回文数时，选择了中位数附近的数值而不是平均数或其他统计值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在优化整体代价的问题中，使用中位数作为目标值可以最小化所有元素与此目标的绝对差值的总和。相对于平均数，中位数对异常值不敏感，因此能更好地表示数据的中心趋势，特别是在需要考虑距离和时。在本题中，我们的目标是将所有数转换为回文数，而选择中位数附近的数作为目标回文数可以有效减少转换的总代价，因为中位数本身就处于数组的中间位置，从而使得总距离最小化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`bigger`和`smaller`函数中，如何确保构造的数字确实是最接近的大回文数或小回文数，而不只是一个简单的回文数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`bigger`和`smaller`函数中，通过构造回文数后，会进行比较以确保生成的回文数是大于或小于原始数字的最接近的回文数。如果构造出的回文数不符合要求（例如，不是最接近的大回文数或小回文数），则调整中间部分的数字（增大或减小），再重新构造回文数进行比较。这种方法通过直接构造并调整来确保结果是最接近的大回文数或小回文数。这种策略确保了构造的回文数既符合大小要求，也是距离最近的有效回文数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于边界情况，例如所有数字都是极小或极大值时，这种基于中位数的方法是否仍然有效？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>即使在所有数值都是极小值或极大值的边界情况下，基于中位数的方法仍然有效。中位数的定义本质上是排序后位于中间的数值，因此无论数组中的数值如何极端，中位数总是有效地反映了数组的中心位置。在这种情况下，将数组中的数转换为基于中位数的回文数可能依然是最优解，因为这样的转换总体上确保了最小的代价。但是，需要注意的是，如果所有数值极端相同，转换成任何一个回文数的成本都会是一样的，因此这种情况下选择哪一个回文数将不会影响总代价。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-make-array-equalindromic')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-make-array-equalindromic/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

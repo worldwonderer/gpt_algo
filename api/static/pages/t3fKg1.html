@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>批量处理任务</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>批量处理任务</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        某实验室计算机待处理任务以 `[start,end,period]` 格式记于二维数组 `tasks`，表示完成该任务的时间范围为起始时间 `start` 至结束时间 `end` 之间，需要计算机投入 `period` 的时长，注意：
+1. `period` 可为不连续时间
+2. 首尾时间均包含在内
+
+处于开机状态的计算机可同时处理任意多个任务，请返回电脑最少开机多久，可处理完所有任务。
+
+**示例 1：**
+>输入：`tasks = [[1,3,2],[2,5,3],[5,6,2]]`
+>
+>输出：`4`
+>
+>解释：
+>tasks[0] 选择时间点 2、3；
+>tasks[1] 选择时间点 2、3、5；
+>tasks[2] 选择时间点 5、6；
+>因此计算机仅需在时间点 2、3、5、6 四个时刻保持开机即可完成任务。
+
+**示例 2：**
+>输入：`tasks = [[2,3,1],[5,5,1],[5,6,2]]`
+>
+>输出：`3`
+>
+>解释：
+>tasks[0] 选择时间点 2 或 3；
+>tasks[1] 选择时间点 5；
+>tasks[2] 选择时间点 5、6；
+>因此计算机仅需在时间点 2、5、6 或 3、5、6 三个时刻保持开机即可完成任务。
+
+**提示：**
+- `2 <= tasks.length <= 10^5`
+- `tasks[i].length == 3`
+- `0 <= tasks[i][0] <= tasks[i][1] <= 10^9`
+- `1 <= tasks[i][2] <= tasks[i][1]-tasks[i][0] + 1`
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 501 ms</p>
+                    <p>内存: 70.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def processTasks(self, tasks: List[List[int]]) -&gt; int:
+        stack = [(-2, -2, 0)]  # (运行时间起点, 运行时间终点, 截止到当前区间的总运行时间)，确保各运行区间不相邻；添加一个哨兵任务
+        for start, end, d in sorted(tasks, key=lambda x: x[1]):  # 根据右端点升序排列
+            # 统计[start, end]中有多少时间已运行
+            l, r, s = stack[bisect_left(stack, (start,)) - 1]  # 最后一个可能与[start, end]相交的区间
+            d -= stack[-1][2] - s  # 减去stack[i]之后的运行时间
+            d -= r - start + 1 if start &lt;= r else 0  # 减去stack[i]中可能的运行时间
+            # 当前任务已完成
+            if d &lt;= 0:
+                continue
+            # 不断用stack[-1][1]和end之间的空当填补剩余运行时间d
+            while end - stack[-1][1] &lt;= d:
+                l, r, s = stack.pop()
+                d += r - l + 1
+            stack.append((end - d + 1, end, stack[-1][2] + d))
+        return stack[-1][2]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解利用了排序和栈的结构来解决问题。首先，将任务按照结束时间进行排序，这样可以按顺序处理每个任务，并尽可能地减少开机时间。使用一个栈来存储已经处理的时间段，栈中的元素形式为(start, end, total)，其中start和end表示当前连续的开机时间段，total是截至当前时间的总开机时间。对每个任务，算法尝试将它的运行时间安排在已有的时间段中，如果现有时间段不足以满足任务的需求，则从任务的结束时间向前扩展新的时间段。通过这样的处理，可以确保每个任务在其允许的时间范围内得到处理，并且总的开机时间是最短的。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def processTasks(self, tasks: List[List[int]]) -&gt; int:
+        stack = [(-2, -2, 0)]  # 使用哨兵元素，避免处理空栈的特殊情况
+        for start, end, d in sorted(tasks, key=lambda x: x[1]):  # 按结束时间升序排序
+            l, r, s = stack[bisect_left(stack, (start,)) - 1]  # 找到最后一个可能与当前任务时间重叠的区间
+            d -= stack[-1][2] - s  # 更新剩余需要的开机时间
+            d -= r - start + 1 if start &lt;= r else 0  # 减去与之前区间重叠的时间
+            if d &lt;= 0:
+                continue  # 如果已满足当前任务所需时间，则继续下一个任务
+            while end - stack[-1][1] &lt;= d:
+                l, r, s = stack.pop()  # 移除不足以满足当前任务的时间段
+                d += r - l + 1
+            stack.append((end - d + 1, end, stack[-1][2] + d))  # 添加新的时间段到栈中
+        return stack[-1][2]  # 返回总的开机时间</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在栈中使用了一个哨兵元素（-2, -2, 0），它在算法中具体起到了什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在栈中使用哨兵元素（-2, -2, 0）主要是为了处理栈为空的情况，避免在执行栈操作时需要额外的条件判断。哨兵元素确保栈至少有一个元素，这样在使用例如`stack[-1]`或在执行`bisect_left`查找时，可以保证始终有元素可参与比较，从而简化代码逻辑。此外，哨兵的值被设定为负数和0，这些值在实际任务时间范围之外，保证它不会影响到任务的处理和时间计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            代码中存在`while end - stack[-1][1] &lt;= d`的循环判断，该循环的目的是什么？在什么情况下会结束循环？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个循环的目的是处理当前任务所需的额外开机时间。循环会检查栈顶的时间段是否足够覆盖当前任务需要的剩余时间。如果栈顶的时间段（从其结束时间`stack[-1][1]`到任务的结束时间`end`）不足以提供所需的时间`d`，则循环会弹出这个时间段，并将其时间加回到`d`中，即继续寻找或扩展更多的时间来满足任务需求。循环会在找到足够的时间覆盖所需的`d`，或是当栈中没有更多可用的时间段时结束。这确保了每个任务都在其允许的时间内被处理，同时尽可能减少开机时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/t3fKg1')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/t3fKg1/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

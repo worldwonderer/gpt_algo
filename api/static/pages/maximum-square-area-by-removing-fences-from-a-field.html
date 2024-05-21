@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>移除栅栏得到的正方形田地的最大面积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>移除栅栏得到的正方形田地的最大面积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个大型的 <code>(m - 1) x (n - 1)</code> 矩形田地，其两个对角分别是 <code>(1, 1)</code> 和 <code>(m, n)</code> ，田地内部有一些水平栅栏和垂直栅栏，分别由数组 <code>hFences</code> 和 <code>vFences</code> 给出。</p>
+
+<p>水平栅栏为坐标 <code>(hFences[i], 1)</code> 到 <code>(hFences[i], n)</code>，垂直栅栏为坐标 <code>(1, vFences[i])</code> 到 <code>(m, vFences[i])</code> 。</p>
+
+<p>返回通过<strong> 移除 </strong>一些栅栏（<strong>可能不移除</strong>）所能形成的最大面积的<strong> 正方形 </strong>田地的面积，或者如果无法形成正方形田地则返回 <code>-1</code>。</p>
+
+<p>由于答案可能很大，所以请返回结果对 <code>10<sup>9</sup> + 7</code> <strong>取余</strong> 后的值。</p>
+
+<p><strong>注意：</strong>田地外围两个水平栅栏（坐标 <code>(1, 1)</code> 到 <code>(1, n)</code> 和坐标 <code>(m, 1)</code> 到 <code>(m, n)</code> ）以及两个垂直栅栏（坐标 <code>(1, 1)</code> 到 <code>(m, 1)</code> 和坐标 <code>(1, n)</code> 到 <code>(m, n)</code> ）所包围。这些栅栏<strong> 不能</strong> 被移除。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/11/05/screenshot-from-2023-11-05-22-40-25.png" /></p>
+
+<pre>
+<strong>输入：</strong>m = 4, n = 3, hFences = [2,3], vFences = [2]
+<strong>输出：</strong>4
+<strong>解释：</strong>移除位于 2 的水平栅栏和位于 2 的垂直栅栏将得到一个面积为 4 的正方形田地。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/11/22/maxsquareareaexample1.png" style="width: 285px; height: 242px;" /></p>
+
+<pre>
+<strong>输入：</strong>m = 6, n = 7, hFences = [2], vFences = [4]
+<strong>输出：</strong>-1
+<strong>解释：</strong>可以证明无法通过移除栅栏形成正方形田地。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= m, n &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= hFences.length, vFences.length &lt;= 600</code></li>
+	<li><code>1 &lt; hFences[i] &lt; m</code></li>
+	<li><code>1 &lt; vFences[i] &lt; n</code></li>
+	<li><code>hFences</code> 和 <code>vFences</code> 中的元素是唯一的。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 644 ms</p>
+                    <p>内存: 36.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">HYX_MOD_HYX = 1000000007
+
+
+class Solution:
+    def maximizeSquareArea(self, m: int, n: int, hFences: List[int], vFences: List[int]) -&gt; int:
+        hFences.append(1)
+        vFences.append(1)
+        hFences.append(m)
+        vFences.append(n)
+        hFences.sort()
+        vFences.sort()
+
+        # @functools.cache
+        # def helper(l: int) -&gt; bool:
+        #     for i in range(len(vFences) - 1):
+        #         j = len(vFences) - 1
+        #         if vFences[j] - vFences[i] &lt; l:
+        #             return False
+        #         left, right = i + 1, len(vFences)
+        #         # while j &gt; i and l &lt; vFences[j] - vFences[i]:
+        #         #     j -= 1
+        #         while left &lt; right:
+        #             mid = (left + right) // 2
+        #             tl = vFences[mid] - vFences[i]
+        #             if tl &gt; l:
+        #                 right = mid
+        #             elif tl == l:
+        #                 return True
+        #             else:
+        #                 left = mid + 1
+        # 
+        #         if vFences[left] - vFences[i] == l:
+        #             return True
+        #     return False
+
+        dic = set()
+        for i in range(len(vFences) - 1):
+            for j in range(i + 1, len(vFences)):
+                dic.add(vFences[j] - vFences[i])
+
+        max_len = min(m, n) - 1
+        ans_l = -1
+        for i in range(len(hFences) - 1):
+            j = len(hFences) - 1
+            if hFences[j] - hFences[i] &lt;= ans_l:
+                break
+            while hFences[j] - hFences[i] &gt; max_len:
+                j -= 1
+            while j &gt; i:
+                l = hFences[j] - hFences[i]
+                if l &lt;= ans_l:
+                    break
+                if l in dic:
+                    ans_l = l
+                else:
+                    j -= 1
+        return (ans_l * ans_l) % HYX_MOD_HYX if ans_l != -1 else -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的思路是首先对水平栅栏和垂直栅栏的坐标进行排序，并在两个数组的开始和结尾分别添加边界栅栏的坐标。然后，通过双重循环遍历所有可能的正方形的大小，对于每个大小，检查是否存在对应的水平栅栏和垂直栅栏组合来形成一个正方形。这是通过在一个集合中存储所有垂直栅栏间距的唯一值，并在遍历水平栅栏时检查该集合中是否存在与当前水平栅栏间距相等的值来实现的。如果找到这样的组合，则更新最大正方形的边长。最后，返回最大正方形的面积。</p>
+                                <p>时间复杂度: O(h log h + v log v + v^2 + h^2)</p>
+                                <p>空间复杂度: O(h + v + v^2)</p>
+                                <pre class="bg-light p-2">HYX_MOD_HYX = 1000000007
+
+
+class Solution:
+    def maximizeSquareArea(self, m: int, n: int, hFences: List[int], vFences: List[int]) -&gt; int:
+        hFences.append(1)
+        vFences.append(1)
+        hFences.append(m)
+        vFences.append(n)
+        hFences.sort()
+        vFences.sort()
+
+        dic = set()
+        for i in range(len(vFences) - 1):
+            for j in range(i + 1, len(vFences)):
+                dic.add(vFences[j] - vFences[i])
+
+        max_len = min(m, n) - 1
+        ans_l = -1
+        for i in range(len(hFences) - 1):
+            j = len(hFences) - 1
+            if hFences[j] - hFences[i] &lt;= ans_l:
+                break
+            while hFences[j] - hFences[i] &gt; max_len:
+                j -= 1
+            while j &gt; i:
+                l = hFences[j] - hFences[i]
+                if l &lt;= ans_l:
+                    break
+                if l in dic:
+                    ans_l = l
+                else:
+                    j -= 1
+        return (ans_l * ans_l) % HYX_MOD_HYX if ans_l != -1 else -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么题解中选用集合存储垂直栅栏的间距，而不是使用其他数据结构如列表或字典？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>集合（Set）被用来存储垂直栅栏的间距，因为集合具有唯一性和快速查找的特性。使用集合可以自动去除重复的间距值，并且在后续判断是否存在某个特定的间距时，集合能够提供平均常数时间复杂度的查找效率（O(1)时间复杂度）。若使用列表，查找一个元素的平均时间复杂度是O(n)，如果使用字典虽然也可以实现类似集合的效率，但其存储和管理键值对的额外结构在这里并不必要，因为我们只关心间距值的存在性，而不是它们的频率或其他属性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在检查水平栅栏时，为什么需要同时从最大间距开始向内逐步减小间距进行检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在检查水平栅栏时从最大间距开始向内逐步减小间距进行检查的原因是，我们目标是找到最大的可能正方形边长。从最大可能间距开始并逐渐减小可以尽快地找到最大的合法边长。一旦发现一个合法的边长，由于边长是递减检查的，可以保证这是当前遍历过的最大合法边长，从而可以及时终止进一步的无效检查，提高算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的`如果找到这样的组合，则更新最大正方形的边长`，具体是如何确定找到一个有效的正方形的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，一个有效的正方形是通过检查水平栅栏和垂直栅栏的间距是否相等来确认的。具体地，对于每一个考虑的水平栅栏间距，代码检查是否存在一个相同长度的垂直栅栏间距。如果这样的垂直间距存在于之前存储的集合中，那么说明可以构成一个边长为该间距的正方形。这时，如果这个边长比当前记录的最大边长还要大，就会更新最大边长的记录。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算最大正方形面积时，为什么要取结果对`109 + 7`取余？这个数字有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算结果时对`109 + 7`取余是常见的做法，尤其是在编程竞赛或算法实现中，主要是为了防止计算结果过大导致的整数溢出，并可以保持结果的稳定性。`1000000007`（10^9 + 7）是一个大质数，质数的使用在模运算中有良好的数学性质，可以减少潜在的哈希冲突，同时也是为了符合一些编程比赛的标准输出要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-square-area-by-removing-fences-from-a-field')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-square-area-by-removing-fences-from-a-field/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

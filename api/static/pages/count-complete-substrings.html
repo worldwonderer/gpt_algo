@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计完全子字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计完全子字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>word</code>&nbsp;和一个整数 <code>k</code>&nbsp;。</p>
+
+<p>如果&nbsp;<code>word</code>&nbsp;的一个子字符串 <code>s</code>&nbsp;满足以下条件，我们称它是 <strong>完全字符串：</strong></p>
+
+<ul>
+	<li><code>s</code>&nbsp;中每个字符 <strong>恰好</strong>&nbsp;出现 <code>k</code>&nbsp;次。</li>
+	<li>相邻字符在字母表中的顺序 <strong>至多</strong>&nbsp;相差&nbsp;<code>2</code>&nbsp;。也就是说，<code>s</code>&nbsp;中两个相邻字符&nbsp;<code>c1</code> 和&nbsp;<code>c2</code>&nbsp;，它们在字母表中的位置相差<strong>&nbsp;至多</strong>&nbsp;为 <code>2</code> 。</li>
+</ul>
+
+<p>请你返回 <code>word</code>&nbsp;中 <strong>完全</strong>&nbsp;子字符串的数目。</p>
+
+<p><strong>子字符串</strong>&nbsp;指的是一个字符串中一段连续 <strong>非空</strong>&nbsp;的字符序列。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>word = "igigee", k = 2
+<b>输出：</b>3
+<b>解释：</b>完全子字符串需要满足每个字符恰好出现 2 次，且相邻字符相差至多为 2 ：<em><strong>igig</strong></em>ee, igig<strong style="font-style: italic;">ee</strong>, <em><strong>igigee</strong>&nbsp;。</em>
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>word = "aaabbbccc", k = 3
+<b>输出：</b>6
+<b>解释：</b>完全子字符串需要满足每个字符恰好出现 3 次，且相邻字符相差至多为 2 ：<em><strong>aaa</strong></em>bbbccc, aaa<em><strong>bbb</strong></em>ccc, aaabbb<em><strong>ccc</strong></em>, <em><strong>aaabbb</strong></em>ccc, aaa<em><strong>bbbccc</strong></em>, <em><strong>aaabbbccc </strong></em>。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= word.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>word</code>&nbsp;只包含小写英文字母。</li>
+	<li><code>1 &lt;= k &lt;= word.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 665 ms</p>
+                    <p>内存: 21.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def __init__(self):
+        self.char_positions = [[] for _ in range(26)]  # 存储每个字符的出现位置
+        self.word = &#34;&#34;
+        self.k = 0
+
+    def check(self, left):
+        # 检查从left到right的子字符串是否满足每个字符恰好出现k次的条件
+        new_left = left
+        for i in range(26):
+            if self.char_positions[i]:
+                # 如果当前字符在[left, right]范围内出现
+                if self.char_positions[i][-1] &gt;= left:
+                    # 如果当前字符出现次数不足k或超过k
+                    n = len(self.char_positions[i])
+                    if n &lt; self.k:
+                        return -1
+                    if n &gt; self.k:
+                        if new_left &lt;= self.char_positions[i][n - self.k - 1]:
+                            return -1
+                    new_left = min(new_left,self.char_positions[i][n - self.k])
+        return new_left
+
+    def countCompleteSubstrings(self, word, k):
+        self.word = word
+        self.k = k
+        cut = 0  # 初始化切割点
+        ans = 0  # 初始化答案
+        for i in range(len(self.word)):
+            char_index = ord(self.word[i]) - ord(&#34;a&#34;)  # 当前字符的索引
+            self.char_positions[char_index].append(i)  # 更新字符位置
+
+            # 如果相邻字符字母表顺序相差超过2，则更新切割点
+            if i and abs(char_index - (ord(self.word[i - 1]) - ord(&#34;a&#34;))) &gt; 2:
+                cut = i
+
+            # 如果当前字符出现次数小于k，则继续
+            if len(self.char_positions[char_index]) &lt; self.k:
+                continue
+
+            pre = self.char_positions[char_index][
+                len(self.char_positions[char_index]) - self.k
+            ]
+            while pre &gt;= cut:
+                new_pre = self.check(pre)
+                if new_pre == -1:
+                    break
+                if new_pre == pre:
+                    ans += 1
+                    pre -= 1
+                else:
+                    pre = new_pre
+        return ans
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了双指针法和哈希表来统计完全子字符串。首先，初始化一个长度为26的列表char_positions，用于存储每个字符在word中的出现位置。接着，遍历word中的每个字符，更新char_positions，并检查当前字符是否与前一个字符在字母表中的顺序相差超过2，如果是，则更新切割点cut。然后，检查当前字符出现的次数是否达到k次，如果达到，则调用check函数检查从pre（当前字符第k次出现的位置）到i（当前位置）的子字符串是否满足每个字符恰好出现k次的条件。如果满足，则增加答案计数器ans，并更新pre的位置，继续检查。最后，返回答案计数器ans。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def __init__(self):
+        self.char_positions = [[] for _ in range(26)]  # 存储每个字符的出现位置
+        self.word = \&#34;\&#34;
+        self.k = 0
+
+    def check(self, left):
+        # 检查从left到right的子字符串是否满足每个字符恰好出现k次的条件
+        new_left = left
+        for i in range(26):
+            if self.char_positions[i]:
+                # 如果当前字符在[left, right]范围内出现
+                if self.char_positions[i][-1] &gt;= left:
+                    # 如果当前字符出现次数不足k或超过k
+                    n = len(self.char_positions[i])
+                    if n &lt; self.k:
+                        return -1
+                    if n &gt; self.k:
+                        if new_left &lt;= self.char_positions[i][n - self.k - 1]:
+                            return -1
+                    new_left = min(new_left,self.char_positions[i][n - self.k])
+        return new_left
+
+    def countCompleteSubstrings(self, word, k):
+        self.word = word
+        self.k = k
+        cut = 0  # 初始化切割点
+        ans = 0  # 初始化答案
+        for i in range(len(self.word)):
+            char_index = ord(self.word[i]) - ord(\&#34;a\&#34;)  # 当前字符的索引
+            self.char_positions[char_index].append(i)  # 更新字符位置
+
+            # 如果相邻字符字母表顺序相差超过2，则更新切割点
+            if i and abs(char_index - (ord(self.word[i - 1]) - ord(\&#34;a\&#34;))) &gt; 2:
+                cut = i
+
+            # 如果当前字符出现次数小于k，则继续
+            if len(self.char_positions[char_index]) &lt; self.k:
+                continue
+
+            pre = self.char_positions[char_index][
+                len(self.char_positions[char_index]) - self.k
+            ]
+            while pre &gt;= cut:
+                new_pre = self.check(pre)
+                if new_pre == -1:
+                    break
+                if new_pre == pre:
+                    ans += 1
+                    pre -= 1
+                else:
+                    pre = new_pre
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在函数`check`中，为什么要单独处理当前字符出现次数不足k或超过k的情况，这与算法的哪些核心逻辑相关？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`check`函数中，处理当前字符出现次数不足k或超过k的情况是为了确保每个字符在考虑的子字符串中正好出现k次。这是算法的核心要求之一，因为我们的目标是找到所有的完全子字符串，即每个字符都恰好出现k次的子字符串。如果某个字符出现次数不足k，则该子字符串显然不满足条件。如果出现次数超过k，我们需要进一步检查这些额外的出现是否影响子字符串的边界，即可能需要调整子字符串的起始位置。这些逻辑确保了每次计数时，子字符串严格符合完全子字符串的定义。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            请问为什么需要在相邻字符的字母表顺序相差超过2时更新切割点cut，这样做的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在相邻字符的字母表顺序相差超过2时更新切割点cut的目的是为了优化算法性能，并减少不必要的检查。这种更新基于一个观察：如果两个连续字符在字母表中的位置差距较大，这很可能意味着它们在字符串中不会形成一个频繁出现的模式，因此可以从新的位置开始考虑新的完全子字符串的开始。这样做可以避免在不可能形成完全子字符串的区间内进行不必要的检查，从而提高整体的算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`countCompleteSubstrings`函数中，如何判断一个子字符串从pre到i是否满足每个字符恰好出现k次，具体是通过哪些步骤实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`countCompleteSubstrings`函数中，判断一个子字符串从pre到i是否每个字符恰好出现k次的判断是通过调用`check`函数实现的。具体步骤如下：
+1. 从给定的起点pre开始，逐个检查26个字母的出现情况。
+2. 对于每个字符，检查其在`char_positions`列表中记录的位置。如果该字符在考虑的范围内[left, right]出现次数不足k或超过k，则直接返回-1，表示该子字符串不满足条件。
+3. 如果字符出现次数恰好为k，检查这些位置是否在当前考虑的子字符串范围内，并可能根据情况调整子字符串的起始位置new_left。
+4. 如果所有字符都满足恰好出现k次的条件，最终返回调整后的起始位置new_left，这个位置即是验证通过的新的起始点。如果从任一位置开始的子字符串都不满足条件，则返回-1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-complete-substrings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-complete-substrings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

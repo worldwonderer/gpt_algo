@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>寻宝</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>寻宝</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>我们得到了一副藏宝图，藏宝图显示，在一个迷宫中存在着未被世人发现的宝藏。</p>
+
+<p>迷宫是一个二维矩阵，用一个字符串数组表示。它标识了唯一的入口（用 &#39;S&#39; 表示），和唯一的宝藏地点（用 &#39;T&#39; 表示）。但是，宝藏被一些隐蔽的机关保护了起来。在地图上有若干个机关点（用 &#39;M&#39; 表示），<strong>只有所有机关均被触发，才可以拿到宝藏。</strong></p>
+
+<p>要保持机关的触发，需要把一个重石放在上面。迷宫中有若干个石堆（用 &#39;O&#39; 表示），每个石堆都有<strong>无限</strong>个足够触发机关的重石。但是由于石头太重，我们一次只能搬<strong>一个</strong>石头到指定地点。</p>
+
+<p>迷宫中同样有一些墙壁（用 &#39;#&#39; 表示），我们不能走入墙壁。剩余的都是可随意通行的点（用 &#39;.&#39; 表示）。石堆、机关、起点和终点（无论是否能拿到宝藏）也是可以通行的。</p>
+
+<p>我们每步可以选择向上/向下/向左/向右移动一格，并且不能移出迷宫。搬起石头和放下石头不算步数。那么，从起点开始，我们最少需要多少步才能最后拿到宝藏呢？如果无法拿到宝藏，返回 -1 。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<blockquote>
+<p>输入： [&quot;S#O&quot;, &quot;M..&quot;, &quot;M.T&quot;]</p>
+
+<p>输出：16</p>
+
+<p>解释：最优路线为： S-&gt;O, cost = 4, 去搬石头 O-&gt;第二行的M, cost = 3, M机关触发 第二行的M-&gt;O, cost = 3, 我们需要继续回去 O 搬石头。 O-&gt;第三行的M, cost = 4, 此时所有机关均触发 第三行的M-&gt;T, cost = 2，去T点拿宝藏。 总步数为16。 <img alt="图片.gif" src="https://pic.leetcode-cn.com/6bfff669ad65d494cdc237bcedfec10a2b1ac2f2593c2bf97e9aecb41dc8a08b-%E5%9B%BE%E7%89%87.gif" /></p>
+</blockquote>
+
+<p><strong>示例 2：</strong></p>
+
+<blockquote>
+<p>输入： [&quot;S#O&quot;, &quot;M.#&quot;, &quot;M.T&quot;]</p>
+
+<p>输出：-1</p>
+
+<p>解释：我们无法搬到石头触发机关</p>
+</blockquote>
+
+<p><strong>示例 3：</strong></p>
+
+<blockquote>
+<p>输入： [&quot;S#O&quot;, &quot;M.T&quot;, &quot;M..&quot;]</p>
+
+<p>输出：17</p>
+
+<p>解释：注意终点也是可以通行的。</p>
+</blockquote>
+
+<p><strong>限制：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= maze.length&nbsp;&lt;= 100</code></li>
+	<li><code>1 &lt;= maze[i].length&nbsp;&lt;= 100</code></li>
+	<li><code>maze[i].length == maze[j].length</code></li>
+	<li>S 和 T 有且只有一个</li>
+	<li>0 &lt;= M的数量 &lt;= 16</li>
+	<li>0 &lt;= O的数量 &lt;= 40，题目保证当迷宫中存在 M 时，一定存在至少一个 O 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1592 ms</p>
+                    <p>内存: 46.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimalSteps(self, maze: List[str]) -&gt; int:
+        # 先广度优先搜索找到所有能遇到的机关，石头，记录下标
+        # 如果达不到终点或者机关，返回-1
+        m, n = len(maze), len(maze[0])
+        st,en,mm,oo = None,None, [],[]  # 起始 结束 机关 石头
+        for i,row in enumerate(maze):
+            for j,v in enumerate(row):
+                if v == &#39;O&#39;: oo.append((i,j))
+                elif v == &#39;M&#39;: mm.append((i,j))
+                elif v == &#39;S&#39;: st = (i,j)
+                elif v == &#39;T&#39;: en = (i,j)
+        mm = [st]+mm  # 1.编码：起点+机关点的节点列表，两两之间必须经过石堆
+        size = len(mm)
+        dis = [[inf]*size for _ in range(size)]  # 2.计算两两之间步数：邻接矩阵，代表两两之间经过石堆的最短路
+        def bfs(x,y):  # 以x,y为起点到其它所有点的最短路
+            d = [[inf]*n for _ in range(m)]
+            d[x][y] = 0 
+            cur = [(x,y)]
+            while cur:
+                pre = cur
+                cur = []
+                for x, y in pre:
+                    c = d[x][y] + 1
+                    for a,b in (x-1,y),(x+1,y),(x,y-1),(x,y+1):
+                        if 0&lt;=a&lt;m and 0&lt;=b&lt;n and maze[a][b] != &#39;#&#39; and c &lt;d[a][b]:
+                            d[a][b] = c 
+                            cur.append((a,b))
+            return d
+        for x,y in oo:  # 枚举每个石堆为中间点，连接两个节点，找出每两个节点之间的最短路
+            d = bfs(x,y)
+            for i,(x,y) in enumerate(mm):
+                for j,(a,b) in enumerate(mm):                    
+                    dis[i][j] = min(dis[i][j],d[x][y]+d[a][b])
+
+        mask = 1&lt;&lt;size 
+        f = [[inf]*mask for _ in range(size)]  # 3.状压DP：f[i][j]表示状态j下，最后到达i的最短步数
+        f[0][1] = 0
+        for i in range(mask):  # 用刷表法转移
+            if not i &amp; 1:continue  # 不含起始点的状态不用讨论
+            ones,zeros = [],[]  # 从所有1转移所有0
+            for j in range(size):
+                if i&gt;&gt;j&amp;1: ones.append(j)
+                else: zeros.append(j)
+            for j in ones:  # 枚举从j
+                if f[j][i] &lt; inf:  # 可达状态才需要向后转移
+                    for k in zeros:  # 转移到k
+                        f[k][i|(1&lt;&lt;k)] = min(f[k][i|(1&lt;&lt;k)],f[j][i]+dis[j][k])
+        
+        x,y = en 
+        d = bfs(x,y)  # 终点到每个位置的最短路，它和每个节点都是通的
+        ans = min(f[i][-1] + d[x][y] for i,(x,y) in enumerate(mm)) # 4.转移到终点：尝试从每个节点直接到达终点的最短路
+        return ans if ans &lt; inf else -1
+
+
+
+
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了广度优先搜索（BFS）、动态规划以及状态压缩的策略。首先，通过广度优先搜索确定地图中起点、石头堆、机关和终点的位置。其次，使用 BFS 确定石头堆到每个点的最短路径，并据此建立起点和所有机关点的距离矩阵。然后，使用状态压缩的动态规划策略，记录在达到所有机关的各种状态下，到达每个机关的最小步数。最后，通过另一次 BFS 计算从终点到其他所有点的最短距离，并结合动态规划的结果确定能否拿到宝藏，并计算最小步数。</p>
+                                <p>时间复杂度: O(O*M*N + 2^M * M^2 + M)</p>
+                                <p>空间复杂度: O(M*N + M*2^M)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimalSteps(self, maze: List[str]) -&gt; int:
+        m, n = len(maze), len(maze[0])
+        st, en, mm, oo = None, None, [], []  # 初始化起点、终点、机关和石头堆
+        for i, row in enumerate(maze):
+            for j, v in enumerate(row):
+                if v == &#39;O&#39;: oo.append((i, j))
+                elif v == &#39;M&#39;: mm.append((i, j))
+                elif v == &#39;S&#39;: st = (i, j)
+                elif v == &#39;T&#39;: en = (i, j)
+        mm = [st] + mm  # 加入起点到机关列表
+        size = len(mm)
+        dis = [[inf] * size for _ in range(size)]  # 初始化距离矩阵
+        def bfs(x, y):  # BFS 函数定义
+            d = [[inf] * n for _ in range(m)]
+            d[x][y] = 0
+            cur = [(x, y)]
+            while cur:
+                pre = cur
+                cur = []
+                for x, y in pre:
+                    c = d[x][y] + 1
+                    for a, b in ((x-1, y), (x+1, y), (x, y-1), (x, y+1)):
+                        if 0 &lt;= a &lt; m and 0 &lt;= b &lt; n and maze[a][b] != &#39;#&#39; and c &lt; d[a][b]:
+                            d[a][b] = c
+                            cur.append((a, b))
+            return d
+        for x, y in oo:  # 通过石堆优化距离矩阵
+            d = bfs(x, y)
+            for i, (x, y) in enumerate(mm):
+                for j, (a, b) in enumerate(mm):
+                    dis[i][j] = min(dis[i][j], d[x][y] + d[a][b])
+        mask = 1 &lt;&lt; size
+        f = [[inf] * mask for _ in range(size)]  # 初始化动态规划表
+        f[0][1] = 0
+        for i in range(mask):  # 状态压缩DP
+            if not i &amp; 1: continue  # 忽略不包含起点的状态
+            ones, zeros = [], []
+            for j in range(size):
+                if i &gt;&gt; j &amp; 1: ones.append(j)
+                else: zeros.append(j)
+            for j in ones:
+                if f[j][i] &lt; inf:
+                    for k in zeros:
+                        f[k][i | (1 &lt;&lt; k)] = min(f[k][i | (1 &lt;&lt; k)], f[j][i] + dis[j][k])
+        x, y = en
+        d = bfs(x, y)  # 终点的BFS
+        ans = min(f[i][-1] + d[x][y] for i, (x, y) in enumerate(mm))  # 计算最终结果
+        return ans if ans &lt; inf else -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建机关点列表时需要将起点加入到机关列表中？这样的操作有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将起点加入到机关列表中是为了便于处理和简化算法的编程实现。在计算从起点到其他机关的最短路径时，如果起点本身就被视为一个机关的话，可以使用统一的方法来处理所有的点到点的路径计算，这样就不需要单独为起点编写特殊的代码。此外，这也方便了后面状态压缩动态规划的实现，因为起点在动态规划中作为初始状态，需要有一个明确的位置在状态数组中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在使用BFS构建距离矩阵时，为什么要通过每个石堆计算并更新距离，直接从机关到机关计算不行吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接从机关到机关计算最短路径可能会遇到障碍物的问题，而通过石堆计算并更新距离可以有效地绕开这些障碍。石堆通常位于可以通过的关键路径上，利用石堆作为中转点，可以优化从一个机关到另一个机关的路径计算。这种方法可以在多个机关间找到较短的通道，尤其是在复杂的迷宫中，直接的机关到机关的路径可能并不是最优的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            动态规划中的状态压缩是如何定义的？每个位代表什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题的动态规划解法中，状态压缩是通过一个整数的二进制表示来实现的。每个二进制位代表一个机关点是否已经被触发或到达。例如，如果有三个机关点，那么一个如&#39;010&#39;的二进制数表示中间的机关点已被触发或到达，而其他两个尚未处理。这样的状态压缩可以有效地表示所有机关的触发状态，使得状态转移可以通过位操作简洁地进行，极大地减少了状态的存储量和处理时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/xun-bao')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/xun-bao/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

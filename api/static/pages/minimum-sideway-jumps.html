@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最少侧跳次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最少侧跳次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code> 的 <strong>3 跑道道路</strong> ，它总共包含 <code>n + 1</code> 个 <strong>点</strong> ，编号为 <code>0</code> 到 <code>n</code> 。一只青蛙从 <code>0</code> 号点第二条跑道 <strong>出发</strong> ，它想要跳到点 <code>n</code> 处。然而道路上可能有一些障碍。</p>
+
+<p>给你一个长度为 <code>n + 1</code> 的数组 <code>obstacles</code> ，其中 <code>obstacles[i]</code> （<b>取值范围从 0 到 3</b>）表示在点 <code>i</code> 处的 <code>obstacles[i]</code> 跑道上有一个障碍。如果 <code>obstacles[i] == 0</code> ，那么点 <code>i</code> 处没有障碍。任何一个点的三条跑道中 <strong>最多有一个</strong> 障碍。</p>
+
+<ul>
+	<li>比方说，如果 <code>obstacles[2] == 1</code> ，那么说明在点 2 处跑道 1 有障碍。</li>
+</ul>
+
+<p>这只青蛙从点 <code>i</code> 跳到点 <code>i + 1</code> 且跑道不变的前提是点 <code>i + 1</code> 的同一跑道上没有障碍。为了躲避障碍，这只青蛙也可以在 <strong>同一个</strong> 点处 <strong>侧跳</strong> 到 <strong>另外一条</strong> 跑道（这两条跑道可以不相邻），但前提是跳过去的跑道该点处没有障碍。</p>
+
+<ul>
+	<li>比方说，这只青蛙可以从点 3 处的跑道 3 跳到点 3 处的跑道 1 。</li>
+</ul>
+
+<p>这只青蛙从点 0 处跑道 <code>2</code> 出发，并想到达点 <code>n</code> 处的 <strong>任一跑道</strong> ，请你返回 <strong>最少侧跳次数</strong> 。</p>
+
+<p><strong>注意</strong>：点 <code>0</code> 处和点 <code>n</code> 处的任一跑道都不会有障碍。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex1.png" style="width: 500px; height: 244px;" />
+<pre>
+<b>输入：</b>obstacles = [0,1,2,3,0]
+<b>输出：</b>2 
+<b>解释：</b>最优方案如上图箭头所示。总共有 2 次侧跳（红色箭头）。
+注意，这只青蛙只有当侧跳时才可以跳过障碍（如上图点 2 处所示）。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex2.png" style="width: 500px; height: 196px;" />
+<pre>
+<b>输入：</b>obstacles = [0,1,1,3,3,0]
+<b>输出：</b>0
+<b>解释：</b>跑道 2 没有任何障碍，所以不需要任何侧跳。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex3.png" style="width: 500px; height: 196px;" />
+<pre>
+<b>输入：</b>obstacles = [0,2,1,0,3,0]
+<b>输出：</b>2
+<b>解释：</b>最优方案如上图所示。总共有 2 次侧跳。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>obstacles.length == n + 1</code></li>
+	<li><code>1 <= n <= 5 * 10<sup>5</sup></code></li>
+	<li><code>0 <= obstacles[i] <= 3</code></li>
+	<li><code>obstacles[0] == obstacles[n] == 0</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 191 ms</p>
+                    <p>内存: 37.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minSideJumps(self, obstacles: List[int]) -&gt; int:
+        w = 2
+        l = 0
+        r = 1
+        n = len(obstacles)
+        ans = 0
+        while l &lt; n - 1:
+            if obstacles[l + 1] == w:
+                ans += 1
+                r = l + 1
+                if obstacles[l]:
+                    w = 6 -(w + obstacles[l])
+                else:
+                    while r &lt; n and (obstacles[r] == w or obstacles[r] == 0):
+                        r += 1
+                    if r != n:
+                        w = 6 - (w + obstacles[r])
+                    else:
+                        break
+            l += 1
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了贪心和模拟的策略。青蛙从第二条跑道开始，使用变量 w 来表示当前所在的跑道。变量 l 用来表示当前位置，而 r 代表可以前进到的最远位置。策略是在每一步尝试前进，当遇到障碍时进行侧跳。青蛙前进到下一个位置时，如果该位置有障碍，那么需要进行侧跳。侧跳的选择是基于当前跑道和障碍的位置，使用公式 &#39;6 - (w + obstacles[l])&#39; 来确定最优的跳跃目标跑道。在没有障碍的情况下，尽量在当前跑道上前进直到遇到障碍或到达终点。这个过程通过 while 循环进行模拟。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minSideJumps(self, obstacles: List[int]) -&gt; int:
+        w = 2  # 当前所在跑道，起始为第二条跑道
+        l = 0  # 当前所在位置的索引
+        r = 1  # 可以前进到的最远位置（初始值不重要，因为立即更新）
+        n = len(obstacles)  # 道路的总长度
+        ans = 0  # 侧跳的次数
+        while l &lt; n - 1:  # 直到达到最后一个位置前
+            if obstacles[l + 1] == w:  # 如果下一个位置有障碍
+                ans += 1  # 需要侧跳
+                r = l + 1  # 更新可以前进到的位置
+                if obstacles[l]:  # 当前位置有障碍
+                    w = 6 - (w + obstacles[l])  # 计算新的跑道
+                else:  # 当前位置没有障碍
+                    while r &lt; n and (obstacles[r] == w or obstacles[r] == 0):  # 寻找下一个有障碍的位置
+                        r += 1
+                    if r != n:  # 如果找到了障碍
+                        w = 6 - (w + obstacles[r])  # 计算新的跑道
+                    else:  # 如果没有找到障碍，即达到终点
+                        break
+            l += 1  # 前进到下一个位置
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，使用了&#39;6 - (w + obstacles[l])&#39;公式来确定侧跳的目标跑道。这个公式如何确保总是选到一个没有障碍的跑道？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的公式 &#39;6 - (w + obstacles[l])&#39; 用于计算侧跳后的跑道，其设计基于跑道编号的特性（通常是1, 2, 3）。此公式在理论上并不总能确保侧跳到没有障碍的跑道，因为它没有检查侧跳目标跑道上是否存在障碍。它仅仅通过数学运算试图找到一个不同于当前跑道和当前位置障碍所在跑道的新跑道。在实际应用中，此公式需要结合对目标跑道障碍情况的检查，以确保侧跳的有效性。如果未进行这样的检查，可能会导致错误的跑道选择，从而需要额外的侧跳来纠正。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，当在当前位置(l)有障碍时，会尝试侧跳。为什么在l位置有障碍时仍然使用obstacles[l]来计算新跑道？是否应该使用l+1处的障碍情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，当当前位置（l）有障碍时使用 &#39;6 - (w + obstacles[l])&#39; 来计算新跑道，似乎是一种简化处理，它假设必须立即离开当前跑道至一个安全的跑道。实际上，这种处理可能并不总是最优，因为它没有考虑l+1处的障碍情况。理论上，应该考虑从当前位置到下一个位置（l到l+1）的整体情况，选择一个既能避开当前位置也能避开下一个位置障碍的跑道。这样的处理更能符合实际情况，降低不必要的跳跃次数，提高算法的效率和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解采用的贪心策略中，在遇到障碍时侧跳，但是如果当前位置和下一个位置都有障碍，这种情况下如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果当前位置和下一个位置都有障碍，题解中的策略需要更加详细的处理。在实际应用中，应该评估所有可用的跑道，在当前位置和下一个位置的障碍情况下选择一个可行的跑道。这可能涉及到不只一次的侧跳，特别是当三个跑道中的两个都被障碍占据时。理想的处理方式是，通过检查所有跑道上接下来几个位置的障碍分布，选择一个最优的跑道，这样可以最小化总的侧跳次数，确保青蛙能够继续向前进。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-sideway-jumps')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-sideway-jumps/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

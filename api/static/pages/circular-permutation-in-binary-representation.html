@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>循环码排列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>循环码排列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数&nbsp;<code>n</code> 和 <code>start</code>。你的任务是返回任意 <code>(0,1,2,,...,2^n-1)</code> 的排列 <code>p</code>，并且满足：</p>
+
+<ul>
+	<li><code>p[0] = start</code></li>
+	<li><code>p[i]</code> 和 <code>p[i+1]</code>&nbsp;的二进制表示形式只有一位不同</li>
+	<li><code>p[0]</code> 和 <code>p[2^n -1]</code>&nbsp;的二进制表示形式也只有一位不同</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 2, start = 3
+<strong>输出：</strong>[3,2,0,1]
+<strong>解释：</strong>这个排列的二进制表示是 (11,10,00,01)
+     所有的相邻元素都有一位是不同的，另一个有效的排列是 [3,1,0,2]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 3, start = 2
+<strong>输出：</strong>[2,6,7,5,4,0,1,3]
+<strong>解释：</strong>这个排列的二进制表示是 (010,110,111,101,100,000,001,011)
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 16</code></li>
+	<li><code>0 &lt;= start&nbsp;&lt;&nbsp;2^n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 108 ms</p>
+                    <p>内存: 25.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">ans = [[] for _ in range(17)]
+ans[1] = [0,1]
+for i in range(2,17):
+    l = []
+    for j in range(2**(i-1)-1,-1,-1):
+        l.append(ans[i-1][j]+2**(i-1))
+    ans[i] = ans[i-1] + l
+class Solution:
+    def circularPermutation(self, n: int, start: int) -&gt; List[int]:
+        l =  ans[n]
+        i = l.index(start)
+        return l[i:] + l[:i]
+
+
+
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了格雷码（Gray code）的性质来构造循环码排列。格雷码是一种二进制数系统，其中两个连续的数只有一位二进制位不同。首先，构造长度为 2^n 的格雷码序列。然后，找到序列中值为 start 的元素，并将这个序列从这个元素开始重新排列，使得首元素为 start。这样就得到了符合条件的循环码排列。</p>
+                                <p>时间复杂度: O(2^n)</p>
+                                <p>空间复杂度: O(2^n)</p>
+                                <pre class="bg-light p-2">ans = [[] for _ in range(17)]
+ans[1] = [0,1]
+for i in range(2,17):
+    l = []
+    for j in range(2**(i-1)-1,-1,-1):
+        l.append(ans[i-1][j]+2**(i-1))  # 将前一半的格雷码反向遍历，并加上 2^(i-1)
+    ans[i] = ans[i-1] + l  # 合并前一半和后一半的格雷码
+class Solution:
+    def circularPermutation(self, n: int, start: int) -&gt; List[int]:
+        l =  ans[n]
+        i = l.index(start)  # 找到起始位置
+        return l[i:] + l[:i]  # 重新排列序列，使得首元素为 start</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用格雷码来构造序列，能否解释一下什么是格雷码，以及它如何保证每两个连续的数只有一位二进制位不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>格雷码（Gray code）是一种二进制编码方式，其中任意两个连续的数在二进制形式下只有一位不同。这种编码的设计使得每次转换只涉及到一个二进制位的改变，减少了错误和复杂性。它在硬件设计中特别有用，因为在多位同时改变时可能引起错误的风险更高。格雷码的构造可以通过递归方法实现。基本的构造方法是：先取一个较小的格雷码序列，然后创建一个新序列，它是原序列的反向并在每个数前加上一个高位的1。这样确保了新生成的序列的前半部分和后半部分只在新加的最高位上有差异，而在拼接点处的两个数（前半部分的最后一个数和后半部分的第一个数）也保证只有一位不同。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中使用的方法是将格雷码序列分成两部分后重新组合，这种分割和重组的步骤是如何保证结果序列的循环性质的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的方法通过首先生成一个完整的格雷码序列，然后找到序列中的某个特定起始值&#39;start&#39;，并以此值为起点重新排列格雷码序列，从而生成一个循环序列。具体来说，从&#39;start&#39;开始的元素到序列末尾的元素先被取出，然后将序列开始到&#39;start&#39;之前的元素接在后面。这种重组方法利用了格雷码本身连续元素只改变一位的特性，保证了即使在新序列的末尾到开头的过渡也仅涉及一位的变化，从而维持了循环序列的连续性和一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在构造格雷码时，通过反向遍历前一半的格雷码并加上2^(i-1)，这一操作的目的是什么，它是如何确保新生成的数字依旧满足格雷码的性质的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在格雷码的构造过程中，反向遍历前一半的格雷码并在每个数前加上2^(i-1)（即添加一个更高位的1），这一步骤的目的是生成一组新的数，它们与原来的序列在新的最高位上有所区别，从而实现长度翻倍的新格雷码序列。这样做的关键在于，反向遍历保证了新添加的部分（后半部分）的第一个元素与原序列（前半部分）的最后一个元素只在新加的这一位上有差异，确保了格雷码的连续性。此外，由于原序列已经满足格雷码的条件，反向遍历并添加相同的高位不会破坏原有序列内部的每两个连续数字只改变一位的性质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/circular-permutation-in-binary-representation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/circular-permutation-in-binary-representation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

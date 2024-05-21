@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>DI 序列的有效排列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>DI 序列的有效排列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个长度为 <code>n</code> 的字符串 <code>s</code> ，其中 <code>s[i]</code> 是:</p>
+
+<ul>
+	<li><code>“D”</code> 意味着减少，或者</li>
+	<li><code>“I”</code> 意味着增加</li>
+</ul>
+
+<p><strong>有效排列</strong>&nbsp;是对有&nbsp;<code>n + 1</code>&nbsp;个在&nbsp;<code>[0, n]</code>&nbsp; 范围内的整数的一个排列&nbsp;<code>perm</code>&nbsp;，使得对所有的&nbsp;<code>i</code>：</p>
+
+<ul>
+	<li>如果 <code>s[i] == 'D'</code>，那么&nbsp;<code>perm[i] &gt; perm[i+1]</code>，以及；</li>
+	<li>如果 <code>s[i] == 'I'</code>，那么 <code>perm[i] &lt; perm[i+1]</code>。</li>
+</ul>
+
+<p>返回 <em><strong>有效排列 </strong>&nbsp;</em><code>perm</code><em>的数量 </em>。因为答案可能很大，所以请<strong>返回你的答案对</strong>&nbsp;<code>10<sup>9</sup>&nbsp;+ 7</code><strong>&nbsp;取余</strong>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "DID"
+<strong>输出：</strong>5
+<strong>解释：</strong>
+(0, 1, 2, 3) 的五个有效排列是：
+(1, 0, 3, 2)
+(2, 0, 3, 1)
+(2, 1, 3, 0)
+(3, 0, 2, 1)
+(3, 1, 2, 0)
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> s = "D"
+<strong>输出:</strong> 1
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>n == s.length</code></li>
+	<li><code>1 &lt;= n &lt;= 200</code></li>
+	<li><code>s[i]</code>&nbsp;不是&nbsp;<code>'I'</code>&nbsp;就是&nbsp;<code>'D'</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numPermsDISequence(self, s: str) -&gt; int:
+        mod = 10**9 + 7
+        n = len(s)
+        f = [1] + [0] * n
+        for i, c in enumerate(s, 1):
+            pre = 0
+            g = [0] * (n + 1)
+            if c == &#34;D&#34;:
+                for j in range(i, -1, -1):
+                    pre = (pre + f[j]) % mod
+                    g[j] = pre
+            else:
+                for j in range(i + 1):
+                    g[j] = pre
+                    pre = (pre + f[j]) % mod
+            f = g
+        return sum(f) % mod
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用动态规划的方法。定义 f[i][j] 表示前 i 个字符构成的子序列中，以 j 结尾的有效排列数量。为了简化空间复杂度，使用一维数组 f[j] 不断更新来表示当前的状态，并用辅助数组 g[j] 来计算更新。对于每一个字符，根据是 &#39;D&#39; 还是 &#39;I&#39;，决定填充的方向和方式。如果是 &#39;D&#39;，从后向前更新 g[j]，累积前面的 f[j] 值确保递减；如果是 &#39;I&#39;，从前向后更新 g[j]，累积前面的 f[j] 值以保证递增。最后，将 g 赋值回 f 进行下一轮的计算。计算结束后，f 数组的累加和就是所求的答案。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">
+
+class Solution:
+    def numPermsDISequence(self, s: str) -&gt; int:
+        mod = 10**9 + 7  # 定义模数
+        n = len(s)  # 输入字符串的长度
+        f = [1] + [0] * n  # 初始化 f 数组，f[0] 设为 1，其余为 0
+        for i, c in enumerate(s, 1):  # 遍历字符串 s 的每个字符
+            pre = 0  # 初始化前缀和
+            g = [0] * (n + 1)  # 初始化 g 数组
+            if c == &#34;D&#34;:  # 如果当前字符是 &#39;D&#39;
+                for j in range(i, -1, -1):  # 从 i 到 0 更新 g
+                    pre = (pre + f[j]) % mod  # 更新前缀和
+                    g[j] = pre  # 设置 g[j] 为当前的前缀和
+            else:  # 如果当前字符是 &#39;I&#39;
+                for j in range(i + 1):  # 从 0 到 i 更新 g
+                    g[j] = pre  # 设置 g[j] 为当前的前缀和
+                    pre = (pre + f[j]) % mod  # 更新前缀和
+            f = g  # 把 g 赋值给 f，为下一轮做准备
+        return sum(f) % mod  # 返回 f 数组的元素之和模 10^9+7
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划的解法中，一维数组f的初始设置为[1] + [0] * n的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，数组f用于记录各种排列的数量。初始设置为[1] + [0] * n的目的是为了表示在序列开始之前，存在一个虚拟的起点，且这个起点唯一确定无其他选择。因此，f[0]设置为1表示只有一个方式填充到序列的第一个位置，而其他位置f[1]到f[n]初始化为0，因为在没有任何输入字符处理前，这些位置无法形成任何有效的排列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理字符&#39;D&#39;和&#39;I&#39;时更新g数组的迭代方向不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理字符&#39;D&#39;时，要求序列递减，因此需要从后向前更新g数组，这样可以确保在填充时，每个位置的值都是基于之前所有可能的较大值的累加，从而满足递减的条件。相反，在处理字符&#39;I&#39;时，要求序列递增，因此需要从前向后更新g数组，这样可以确保在填充时，每个位置的值都是基于之前所有可能的较小值的累加，从而满足递增的条件。这种迭代方向的选择是为了正确地反映&#39;D&#39;和&#39;I&#39;对序列增长方向的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划中，前缀和pre的作用具体是什么，它如何帮助计算g数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，前缀和pre用于累积f数组中的值，以便于计算g数组。对于字符&#39;D&#39;，pre累积从当前位置往前的所有f[j]的值，确保当填充到任何一个位置j时，g[j]能反映所有可能的、比j大的位置的排列数之和。对于字符&#39;I&#39;，则反之，pre累积到当前位置之前所有的f[j]的值，确保每个位置j的g[j]能包含所有可能的、比j小的位置的排列数之和。这样，pre帮助在保持状态转移的连续性和正确性的同时，高效地更新g数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在遍历完成所有字符后，为何可以通过返回f数组的元素之和模10^9+7得到最终答案？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在遍历完所有字符后，f数组中的每个元素f[j]代表以数字j结尾的所有有效排列的数量。因此，将f数组中所有元素求和，就得到了满足给定DI序列的所有可能排列的总数。由于结果可能非常大，为了防止溢出并满足题目要求，我们需要对结果取模10^9+7，这是一个常用的大素数，用于保持计算在安全的整数范围内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/valid-permutations-for-di-sequence')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/valid-permutations-for-di-sequence/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

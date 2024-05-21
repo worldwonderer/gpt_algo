@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两个回文子序列长度的最大乘积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两个回文子序列长度的最大乘积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>s</code>&nbsp;，请你找到&nbsp;<code>s</code>&nbsp;中两个&nbsp;<strong>不相交回文子序列</strong>&nbsp;，使得它们长度的&nbsp;<strong>乘积最大</strong>&nbsp;。两个子序列在原字符串中如果没有任何相同下标的字符，则它们是&nbsp;<strong>不相交</strong>&nbsp;的。</p>
+
+<p>请你返回两个回文子序列长度可以达到的<strong>&nbsp;最大乘积</strong>&nbsp;。</p>
+
+<p><strong>子序列</strong>&nbsp;指的是从原字符串中删除若干个字符（可以一个也不删除）后，剩余字符不改变顺序而得到的结果。如果一个字符串从前往后读和从后往前读一模一样，那么这个字符串是一个 <strong>回文字符串</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="example-1" src="https://assets.leetcode.com/uploads/2021/08/24/two-palindromic-subsequences.png" style="width: 550px; height: 124px;"></p>
+
+<pre><b>输入：</b>s = "leetcodecom"
+<b>输出：</b>9
+<b>解释：</b>最优方案是选择 "ete" 作为第一个子序列，"cdc" 作为第二个子序列。
+它们的乘积为 3 * 3 = 9 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>s = "bb"
+<b>输出：</b>1
+<b>解释：</b>最优方案为选择 "b" （第一个字符）作为第一个子序列，"b" （第二个字符）作为第二个子序列。
+它们的乘积为 1 * 1 = 1 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>s = "accbcaxxcxx"
+<b>输出：</b>25
+<b>解释：</b>最优方案为选择 "accca" 作为第一个子序列，"xxcxx" 作为第二个子序列。
+它们的乘积为 5 * 5 = 25 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= s.length &lt;= 12</code></li>
+	<li><code>s</code>&nbsp;只含有小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 84 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxProduct(self, s: str) -&gt; int:
+        N = len(s)
+        ALL = (1 &lt;&lt; N)-1
+        dp = [0]*(1 &lt;&lt; N)  # max pal len of masked s
+        pals = []
+        for mask in range(1, len(dp)):
+            lsb = (1 + (mask ^ (mask-1))) &gt;&gt; 1
+            i = lsb.bit_length()-1  # lsb pos
+            j = mask.bit_length()-1  # msb pos. msb is 1&lt;&lt;j
+            if i == j:
+                dp[mask] = 1
+            else:
+                if s[i] == s[j]:
+                    dp[mask] = dp[mask ^ lsb ^ (1 &lt;&lt; j)]+2
+                else:
+                    dp[mask] = max(dp[mask ^ lsb], dp[mask ^ (1 &lt;&lt; j)])
+            if dp[mask] == mask.bit_count():  # masked str is pal
+                pals.append(mask)
+
+        return max(dp[mask]*dp[mask ^ ALL] for mask in pals)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了位掩码和动态规划的方法来解决问题。每个位掩码代表一个字符串的子集，其中掩码的二进制位如果是1，则表示该位置的字符被包含在子序列中。算法首先计算了所有可能的子序列的最长回文长度，这是通过动态规划实现的。动态规划数组 `dp[mask]` 存储的是对于掩码 `mask` 表示的子序列的最长回文长度。在填充 `dp` 数组的过程中，同时收集所有的回文子序列掩码到列表 `pals` 中。最后，算法通过遍历所有回文子序列掩码，并计算两个不相交的回文子序列的长度乘积的最大值。这是通过对每个回文子序列掩码 `mask` 使用其补码 `mask ^ ALL` 来获得不相交的子序列，然后计算乘积 `dp[mask] * dp[mask ^ ALL]` 来实现的。</p>
+                                <p>时间复杂度: O(2^N)</p>
+                                <p>空间复杂度: O(2^N)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxProduct(self, s: str) -&gt; int:
+        N = len(s)
+        ALL = (1 &lt;&lt; N)-1  # 所有位都是1的掩码
+        dp = [0]*(1 &lt;&lt; N)  # max pal len of masked s
+        pals = []
+        for mask in range(1, len(dp)):
+            lsb = (1 + (mask ^ (mask-1))) &gt;&gt; 1  # 最低位的1
+            i = lsb.bit_length()-1  # 最低位1的位置
+            j = mask.bit_length()-1  # 最高位1的位置. msb is 1&lt;&lt;j
+            if i == j:
+                dp[mask] = 1  # 单字符回文
+            else:
+                if s[i] == s[j]:
+                    dp[mask] = dp[mask ^ lsb ^ (1 &lt;&lt; j)]+2  # 如果两端字符相同，中间部分的最长回文长度+2
+                else:
+                    dp[mask] = max(dp[mask ^ lsb], dp[mask ^ (1 &lt;&lt; j)])  # 选择两端中的最大值
+            if dp[mask] == mask.bit_count():  # 如果该掩码表示的子序列是回文
+                pals.append(mask)
+        return max(dp[mask]*dp[mask ^ ALL] for mask in pals) # 计算两个不相交的回文子序列的最大乘积</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到了位掩码用于表示字符串的子序列，这种方法的主要优势是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位掩码在表示字符串子序列时的主要优势是其高效的数据表示和操作能力。每个位掩码都是一个二进制数，其中每一位的0或1代表对应位置的字符是否被包含在子序列中。这种表示方式使得子序列的选择和修改（如添加或移除字符）可以通过简单的位运算（如AND, OR, XOR）来实现，大大提高了算法的效率。此外，使用位掩码可以方便地枚举字符串的所有可能的子序列，因为每个掩码直接对应于一个子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在计算最长回文子序列长度时，需要考虑最高位和最低位的字符是否相等？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算最长回文子序列的长度时，考虑最高位和最低位的字符是否相等是因为回文序列的定义是从前向后读和从后向前读都相同。因此，如果一个子序列的最高位和最低位字符相等，这两个字符可以作为回文序列的两端，然后可以继续考察去掉这两个字符后的子序列是否为回文，从而递归地构建更长的回文序列。如果最高位和最低位的字符不相等，则这两个字符不能同时出现在同一个回文序列的两端，需要分别考虑包含其中一个字符的子序列的最长回文长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的动态规划部分，dp数组是如何更新的？能否详细解释`dp[mask] = dp[mask ^ lsb ^ (1 &lt;&lt; j)] + 2`这一步骤的含义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划部分，`dp[mask]`表示为掩码`mask`对应的子序列的最长回文长度。更新`dp[mask]`的过程涉及到判断子序列的首尾字符（即最高位和最低位字符）。如果这两个字符相等，表示它们可以成为回文序列的两端。`mask ^ lsb ^ (1 &lt;&lt; j)`是将`mask`中最低位和最高位的1翻转成0，即移除子序列中的首尾字符，因此`dp[mask ^ lsb ^ (1 &lt;&lt; j)]`代表去掉首尾字符后的子序列的最长回文长度。因此，`dp[mask] = dp[mask ^ lsb ^ (1 &lt;&lt; j)] + 2`这一步骤的含义是，如果当前掩码对应的子序列的首尾字符相等，其最长回文长度可以通过去掉首尾字符后的最长回文长度加2来得到。这里加2是因为首尾两个相等的字符各自增加了1的长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-product-of-the-length-of-two-palindromic-subsequences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-product-of-the-length-of-two-palindromic-subsequences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

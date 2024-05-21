@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>心算挑战</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>心算挑战</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        「力扣挑战赛」心算项目的挑战比赛中，要求选手从 `N` 张卡牌中选出 `cnt` 张卡牌，若这 `cnt` 张卡牌数字总和为偶数，则选手成绩「有效」且得分为 `cnt` 张卡牌数字总和。
+给定数组 `cards` 和 `cnt`，其中 `cards[i]` 表示第 `i` 张卡牌上的数字。 请帮参赛选手计算最大的有效得分。若不存在获取有效得分的卡牌方案，则返回 0。
+
+**示例 1：**
+>输入：`cards = [1,2,8,9], cnt = 3`
+>
+>输出：`18`
+>
+>解释：选择数字为 1、8、9 的这三张卡牌，此时可获得最大的有效得分 1+8+9=18。
+
+**示例 2：**
+>输入：`cards = [3,3,1], cnt = 1`
+>
+>输出：`0`
+>
+>解释：不存在获取有效得分的卡牌方案。
+
+**提示：**
+- `1 <= cnt <= cards.length <= 10^5`
+- `1 <= cards[i] <= 1000`
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 276 ms</p>
+                    <p>内存: 26.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxmiumScore(self, cards: List[int], cnt: int) -&gt; int:
+    
+
+        a, b, c,d =  1001, 1001, 0, 0
+        cards = sorted(cards, reverse = True)
+        pcards, bcards, rcards = cards[:cnt], cards[cnt:], sorted(cards[:cnt])
+        scards = sum(pcards)
+
+
+        if scards % 2 and not bcards:
+            return 0
+    
+        for i in bcards:
+            if i % 2 == 0:
+                c = max(i, c)
+            else:
+                d = max(i, d)
+
+            if c and d:
+                break
+
+        for j in rcards:
+            if j % 2 == 0:
+                a = min(j, a)
+            else:
+                b = min(j, b)
+            
+            if a != 1001 and b != 1001:
+                break
+    
+        if scards % 2:
+           return max(scards - a + d, scards - b + c)
+        else:
+           return sum(pcards)
+                
+
+
+
+
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的思路是首先对卡牌进行降序排序，然后选择前cnt张卡牌作为初始方案。如果这些卡牌的总和是偶数，那么这就是最大有效得分。如果总和是奇数，需要找到一种方式将其转换为偶数。这可以通过替换一张卡片来实现，具体方法是：在已选择的卡牌中找到最小的偶数卡和最小的奇数卡，在未选择的卡牌中找到最大的偶数卡和最大的奇数卡。然后比较替换这些卡牌后的总和，选择一个更大的有效得分。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxmiumScore(self, cards: List[int], cnt: int) -&gt; int:
+        a, b, c, d = 1001, 1001, 0, 0  # 初始化最小的偶数卡a、最小的奇数卡b、最大的偶数卡c和最大的奇数卡d
+        cards = sorted(cards, reverse=True)  # 降序排序卡牌
+        pcards, bcards, rcards = cards[:cnt], cards[cnt:], sorted(cards[:cnt])  # 分别获取已选择的卡牌、未选择的卡牌和已选择卡牌的升序列表
+        scards = sum(pcards)  # 计算已选择卡牌的总和
+
+        if scards % 2 and not bcards:  # 如果总和为奇数且没有未选择的卡牌，则无法获得有效得分
+            return 0
+
+        for i in bcards:  # 遍历未选择的卡牌
+            if i % 2 == 0:
+                c = max(i, c)  # 更新最大的偶数卡
+            else:
+                d = max(i, d)  # 更新最大的奇数卡
+
+            if c and d:
+                break
+
+        for j in rcards:  # 遍历已选择的卡牌的升序列表
+            if j % 2 == 0:
+                a = min(j, a)  # 更新最小的偶数卡
+            else:
+                b = min(j, b)  # 更新最小的奇数卡
+
+            if a != 1001 and b != 1001:
+                break
+
+        if scards % 2:  # 如果总和为奇数，则通过替换卡牌使其变为偶数
+            return max(scards - a + d, scards - b + c)
+        else:
+            return sum(pcards)  # 如果总和已经是偶数，则直接返回</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么首先选择对卡牌进行降序排序？这对于找到最大有效得分有什么具体的帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>降序排序卡牌是为了确保在选择前cnt张卡牌时，我们能够拿到最大可能的数值总和。这种策略的目的是最大化初始选择的卡牌的分数，因为较大的数值卡牌通常对总得分的贡献更高。选择较大的数值可以最大化初始的总和，从而为后续可能的调整（例如通过替换卡牌来调整总和的奇偶性）提供一个较高的起点，增加达到或超过其他方案的可能性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在没有未选择的卡牌的情况下，如果已选择的卡牌总和为奇数，为什么直接返回0而不考虑其他可能的替换方案？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果所有卡牌都已被选择，且没有剩余的卡牌可以用于替换，那么已选择的卡牌总和若为奇数，则无法通过任何替换来改变其奇偶性。题目的要求是找到最大有效得分，而有效得分必须是偶数。由于没有额外的卡牌可以用于调整总和的奇偶性，因此这种情况下无法达成有效得分，只能返回得分为0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在进行卡牌替换时，选择最小的偶数卡和最小的奇数卡进行替换的逻辑是基于什么考虑？是否有可能通过不同的替换策略获得更高的得分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择最小的偶数卡和最小的奇数卡进行替换的逻辑是基于最小化损失的原则。在需要将总和从奇数转变为偶数的情况下，替换最小的偶数卡和最小的奇数卡可以尽量减少对已有总得分的负面影响。理论上，如果有更大的偶数卡或奇数卡可用于替换，那么可能会有更优的替换策略，从而实现更高的得分。但这需要在保持总和为偶数的前提下，对所有可能的替换组合进行详细的评估，以找出能够产生最高总得分的替换方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/uOAnQW')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/uOAnQW/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

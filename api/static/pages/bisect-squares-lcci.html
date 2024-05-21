@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>平分正方形</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>平分正方形</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定两个正方形及一个二维平面。请找出将这两个正方形分割成两半的一条直线。假设正方形顶边和底边与 x 轴平行。</p>
+
+<p>每个正方形的数据<code>square</code>包含3个数值，正方形的左下顶点坐标<code>[X,Y] = [square[0],square[1]]</code>，以及正方形的边长<code>square[2]</code>。所求直线穿过两个正方形会形成4个交点，请返回4个交点形成线段的两端点坐标（两个端点即为4个交点中距离最远的2个点，这2个点所连成的线段一定会穿过另外2个交点）。2个端点坐标<code>[X<sub>1</sub>,Y<sub>1</sub>]</code>和<code>[X<sub>2</sub>,Y<sub>2</sub>]</code>的返回格式为<code>{X<sub>1</sub>,Y<sub>1</sub>,X<sub>2</sub>,Y<sub>2</sub>}</code>，要求若<code>X<sub>1</sub> != X<sub>2</sub></code>，需保证<code>X<sub>1</sub> &lt; X<sub>2</sub></code>，否则需保证<code>Y<sub>1</sub> &lt;= Y<sub>2</sub></code>。</p>
+
+<p>若同时有多条直线满足要求，则选择斜率最大的一条计算并返回（与Y轴平行的直线视为斜率无穷大）。</p>
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>
+square1 = {-1, -1, 2}
+square2 = {0, -1, 2}
+<strong>输出：</strong> {-1,0,2,0}
+<strong>解释：</strong> 直线 y = 0 能将两个正方形同时分为等面积的两部分，返回的两线段端点为[-1,0]和[2,0]
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>square.length == 3</code></li>
+	<li><code>square[2] &gt; 0</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 20 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def cutSquares(self, square1: List[int], square2: List[int]) -&gt; List[float]:
+        get_x = lambda y: (y - b) / k
+        get_y = lambda x: k * x + b
+        
+        (x1, y1, l1), (x2, y2, l2) = square1, square2
+        c1 = (x1 + l1 / 2, y1 + l1 / 2)
+        c2 = (x2 + l2 / 2, y2 + l2 / 2)
+        dy, dx = c2[1] - c1[1], c2[0] - c1[0]
+        points = []
+        if dx == 0:
+            points = [(c1[0], y1), (c1[0], y1 + l1), (c1[0], y2), (c1[0], y2 + l2)]
+        else:
+            k = dy / dx
+            b = c1[1] - c1[0] * k
+            if -1 &lt;= k &lt;= 1:
+                points = [(x1, get_y(x1)), (x1 + l1, get_y(x1 + l1)), 
+                          (x2, get_y(x2)), (x2 + l2, get_y(x2 + l2))]
+            else:
+                points = [(get_x(y1), y1), (get_x(y1 + l1), y1 + l1),
+                          (get_x(y2), y2), (get_x(y2 + l2), y2 + l2)]
+        points = sorted(points)
+        return [*points[0], *points[-1]]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>首先，计算出每个正方形的中心点坐标。使用这两个中心点来确定一条直线，这条直线将通过两个正方形的中心，从而将每个正方形分割为面积相等的两部分。计算直线的斜率 k = (y2中心 - y1中心) / (x2中心 - x1中心) 和截距 b。使用这个直线方程来计算四个交点：两个交点在第一个正方形的边界上，另外两个在第二个正方形的边界上。这些交点取决于直线的斜率。如果斜率的绝对值在-1到1之间（包括），则交点在水平边界上；如果斜率的绝对值大于1，则交点在垂直边界上。最后，从这四个交点中选出最远的两个点作为最终的答案。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def cutSquares(self, square1: List[int], square2: List[int]) -&gt; List[float]:
+        # 计算直线方程 y = kx + b 的 k 和 b
+        get_x = lambda y: (y - b) / k
+        get_y = lambda x: k * x + b
+        
+        (x1, y1, l1), (x2, y2, l2) = square1, square2
+        # 计算每个正方形的中心
+        c1 = (x1 + l1 / 2, y1 + l1 / 2)
+        c2 = (x2 + l2 / 2, y2 + l2 / 2)
+        dy, dx = c2[1] - c1[1], c2[0] - c1[0]
+        points = []
+        if dx == 0:  # 处理垂直直线情况
+            points = [(c1[0], y1), (c1[0], y1 + l1), (c1[0], y2), (c1[0], y2 + l2)]
+        else:
+            k = dy / dx
+            b = c1[1] - c1[0] * k
+            if -1 &lt;= k &lt;= 1:  # 根据斜率决定使用 x 或 y 的边界计算交点
+                points = [(x1, get_y(x1)), (x1 + l1, get_y(x1 + l1)), 
+                          (x2, get_y(x2)), (x2 + l2, get_y(x2 + l2))]
+            else:
+                points = [(get_x(y1), y1), (get_x(y1 + l1), y1 + l1),
+                          (get_x(y2), y2), (get_x(y2 + l2), y2 + l2)]
+        points = sorted(points)  # 排序找到最远的两个点
+        return [*points[0], *points[-1]]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算直线方程时，当两个正方形中心点的横坐标相同时，你是怎样处理垂直直线情况的？为什么选择这种方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个正方形中心点的横坐标相同时，这意味着直线是垂直的，斜率是无限大。在这种情况下，无法使用常规的斜率和截距公式来描述这条直线。因此，我选择了直接使用中心点的横坐标作为直线的定义，即 x = 常数。这样，直线方程简化为 x = c1[0]，其中 c1[0] 是第一个正方形中心的横坐标。这种处理方式是直接且易于理解的，它能有效地表示垂直直线并且完美地解决了横坐标相同的特殊情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你提到如果斜率的绝对值大于1，则交点在垂直边界上，这种处理方式是基于什么数学原理或逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式基于直线的斜率特性。斜率的绝对值表示直线倾斜的程度。当斜率的绝对值大于1时，这意味着直线在y轴方向上的变化比x轴方向上的变化更快。因此，在每个单位x的变化中，直线在y方向上变化超过1单位。在这种情况下，直线更有可能与正方形的垂直边界（即上下边界）相交，而不是水平边界（即左右边界）。因此，当斜率的绝对值大于1时，计算交点主要集中于垂直边界，这是为了确保正确地捕捉到直线与正方形边界的交点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何确保在计算交点时不会出现计算误差，特别是在使用浮点数进行斜率和截距计算时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用浮点数计算斜率和截距时，确实可能会出现精度误差。为了尽可能减少这种误差，可以采取以下几种方法：1. 使用高精度的浮点数类型（如Python中的`decimal.Decimal`），这可以提供比标准浮点数更精确的计算。2. 在计算过程中尽量避免除法操作，因为除法是引入浮点误差的常见源头。例如，可以直接使用两点式（点斜式）来定义直线，而不是先计算斜率再计算截距。3. 在最终结果输出前，对计算得到的浮点数进行适当的四舍五入，以减少对最终结果的影响。4. 使用图形学中的算法来直接从几何角度计算交点，这样可以绕开对斜率和截距的直接计算，从而减少误差。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bisect-squares-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bisect-squares-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>设置交集大小至少为2</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>设置交集大小至少为2</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维整数数组 <code>intervals</code> ，其中 <code>intervals[i] = [start<sub>i</sub>, end<sub>i</sub>]</code> 表示从 <code>start<sub>i</sub></code> 到 <code>end<sub>i</sub></code> 的所有整数，包括 <code>start<sub>i</sub></code> 和 <code>end<sub>i</sub></code> 。</p>
+
+<p><strong>包含集合</strong> 是一个名为 <code>nums</code> 的数组，并满足 <code>intervals</code> 中的每个区间都 <strong>至少</strong> 有 <strong>两个</strong> 整数在 <code>nums</code> 中。</p>
+
+<ul>
+	<li>例如，如果 <code>intervals = [[1,3], [3,7], [8,9]]</code> ，那么 <code>[1,2,4,7,8,9]</code> 和 <code>[2,3,4,8,9]</code> 都符合 <strong>包含集合</strong> 的定义。</li>
+</ul>
+
+<p>返回包含集合可能的最小大小。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>intervals = [[1,3],[3,7],[8,9]]
+<strong>输出：</strong>5
+<strong>解释：</strong>nums = [2, 3, 4, 8, 9].
+可以证明不存在元素数量为 4 的包含集合。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>intervals = [[1,3],[1,4],[2,5],[3,5]]
+<strong>输出：</strong>3
+<strong>解释：</strong>nums = [2, 3, 4].
+可以证明不存在元素数量为 2 的包含集合。 
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>intervals = [[1,2],[2,3],[2,4],[4,5]]
+<strong>输出：</strong>5
+<strong>解释：</strong>nums = [1, 2, 3, 4, 5].
+可以证明不存在元素数量为 4 的包含集合。 
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= intervals.length &lt;= 3000</code></li>
+	<li><code>intervals[i].length == 2</code></li>
+	<li><code>0 &lt;= start<sub>i</sub> &lt; end<sub>i</sub> &lt;= 10<sup>8</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 33 ms</p>
+                    <p>内存: 17.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+&#34;&#34;&#34;
+按结束为止排序，当两个结束位置相同时，起始位置大的排前面先处理，这也符合我们先处理小区间的原则
+It is actually much simpler to understand, since once you sort intervals by end-point, 
+you just left with 3 cases to consider:
+1. Next interval does not overlap，这时候我们就需要从当前区间中取出两个数字加入集合S，取哪两个数呢？
+为了尽可能少使用数字，我们取当前区间中的最大两个数字，因为我们区间位置不断变大，
+所以取大的数字有更高的概率能和后面的区间有交集。
+2. Intervals overlap 二者有一个数字的交集，那么这个交集数字一定是区间的起始位置，
+那么我们需要从当前区间中再取一个数字加入集合S，根据上面的分析，我们取最大的那个数，即区间的结束位置
+3. Next interval contains previous one, 二者有两个及两个以上数字的交集，那么不用做任何处理.
+具体算法如下：用个数组v来表示集合S，先给区间排序，然后遍历每个区间，
+case 3: 如果区间的起始位置小于等于数组的倒数第二个数字，说明此时已经有两个相同的数字了，直接跳过当前区间。
+case 1: 否则如果区间的起始位置大于数组的最后一个位置，说明二者没有任何交集，
+我们此时把区间的最小和倒数第二小的数字加入数组v中。
+&#34;&#34;&#34;
+# class Solution:
+#     def intersectionSizeTwo(self, intervals: List[List[int]]) -&gt; int:
+#         # need to sort increasingly by end time and decreasingly by start time.
+#         # why decreasingly by start time? run an example: [[16,18],[11,18],[18,20],[10,11]]
+#         # 我们总是优先处理小区间，如果先处理大空间的话会造成混乱
+#         intervals.sort(key = lambda x: (x[1], -x[0]))      
+#         v = []
+#         for start, end in intervals:
+#             if not v or v[-1] &lt; start:  # case 1: 没有任何交集
+#                 v.append(end - 1)       # 就需要加入两个数来形成长度至少为2的intersection
+#                 v.append(end)           # greedily, v是一小段一小段不连续的长度为二的区间[1,2,  5,6]
+                
+#             elif start &lt;= v[-2]:        # case 3: 已经有两个相同的数字的交集了  
+#                 continue                # 就不需要加入任何数字了，因为已经有至少为2的intersection了
+                
+#             else:                       # case 2: 有一个数字的交集
+#                 v.append(end)           # 就只需要加入一个数字来形成长度至少为2的intersection
+                
+#         return len(v)
+
+
+class Solution:
+    def intersectionSizeTwo(self, intervals):
+        # 根据区间的结束点升序排序；如果结束点相同，则根据开始点降序排序
+        intervals.sort(key=lambda x: (x[1], -x[0]))
+
+        # 初始化一个列表，用于记录选择的点，开始时添加一个哨兵值-1以处理边界情况
+        points = [-1]
+
+        # # 贪心思路：每次都选最右边的点
+        count = 0
+        for interval in intervals:
+            # 遍历每个区间
+            if interval[0] &gt; points[-1]:
+                # 如果当前区间的开始点大于points中最后一个点，
+                # 表明没有点能覆盖当前区间，需要添加两个新点
+                # 添加当前区间的最后两个点确保至少有两个点可以覆盖该区间
+                points.append(interval[1] - 1)
+                points.append(interval[1])
+                count += 2  # 更新计数
+            elif interval[0] &gt; points[-2]:
+                # 如果当前区间的开始点大于points中倒数第二个点，
+                # 但小于或等于最后一个点，说明只有一个点覆盖当前区间
+                # 此时只需要添加当前区间的最后一个点
+                points.append(interval[1])
+                count += 1  # 更新计数
+
+        # 返回满足条件的点的总数，即至少有两个点覆盖每个区间
+        return count
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题采用贪心算法，按区间结束位置排序，当结束位置相同时按起始位置降序排序。遍历区间，根据当前选择的点和区间的起始位置，分为三种情况：1.当前区间与已选点无交集，需要添加该区间的最后两个点；2.当前区间与已选点有一个交集，只需添加该区间的最后一个点；3.当前区间与已选点有至少两个交集，不需要添加任何点。最终返回选择的点的总数。</p>
+                                <p>时间复杂度: O(nlogn)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def intersectionSizeTwo(self, intervals):
+        # 根据区间的结束点升序排序；如果结束点相同，则根据开始点降序排序
+        intervals.sort(key=lambda x: (x[1], -x[0]))
+
+        # 初始化一个列表，用于记录选择的点，开始时添加一个哨兵值-1以处理边界情况
+        points = [-1]
+
+        # 贪心思路：每次都选最右边的点
+        count = 0
+        for interval in intervals:
+            # 遍历每个区间
+            if interval[0] &gt; points[-1]:
+                # 如果当前区间的开始点大于points中最后一个点，
+                # 表明没有点能覆盖当前区间，需要添加两个新点
+                # 添加当前区间的最后两个点确保至少有两个点可以覆盖该区间
+                points.append(interval[1] - 1)
+                points.append(interval[1])
+                count += 2  # 更新计数
+            elif interval[0] &gt; points[-2]:
+                # 如果当前区间的开始点大于points中倒数第二个点，
+                # 但小于或等于最后一个点，说明只有一个点覆盖当前区间
+                # 此时只需要添加当前区间的最后一个点
+                points.append(interval[1])
+                count += 1  # 更新计数
+
+        # 返回满足条件的点的总数，即至少有两个点覆盖每个区间
+        return count
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在对区间进行排序时，要首先根据结束位置升序排序，紧接着对起始位置进行降序排序？这样的排序策略有什么特别的优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种排序策略主要是为了简化后续的贪心选择过程。首先，根据区间的结束位置升序排序，确保在处理当前区间时，之前的区间都已被处理，可以有效地使用已选择的点来尽可能覆盖多个区间。其次，当多个区间有相同的结束位置时，按照起始位置降序排序使得起始位置较晚的区间先被处理，这样可以更容易地使用已经选择的点来覆盖这些区间，减少额外点的添加。这种排序方法有助于我们从左到右处理区间，并尽可能利用已选择的点，避免不必要的重叠和点的浪费。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在贪心算法的执行过程中，你是如何确保每个区间至少有两个整数在`nums`中的？具体的判断逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法执行过程中，通过对每个遍历到的区间，基于已选择点的情况（存在于列表`points`中），进行判断和处理。具体逻辑如下：1. 如果区间的起始点大于`points`中最后一个点，说明当前区间与已选点无交集，此时需添加该区间的最后两个点，即`interval[1]-1`和`interval[1]`，确保此区间被至少两个点覆盖。2. 如果区间的起始点大于`points`中倒数第二个点但小于或等于最后一个点，说明当前区间与已选点正好有一个交集，此时只需添加`interval[1]`，以确保区间被两个点覆盖。这样的处理确保了每个区间至少被两个点覆盖。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果一个区间的开始点恰好等于`points`中最后一个点，这种情况下的处理策略是什么？题解中似乎没有明确说明。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果区间的开始点恰好等于`points`中最后一个点，这意味着当前区间与已选的点集有恰好一个交集点（即`points`中最后一个点）。在这种情况下，根据贪心算法的逻辑，我们仅需要再添加一个点，即区间的结束点`interval[1]`，以满足题目要求的至少有两个点覆盖每个区间的条件。这样不仅确保了覆盖，还保持了选择点数的最小化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/set-intersection-size-at-least-two')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/set-intersection-size-at-least-two/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

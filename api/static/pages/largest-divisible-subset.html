@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大整除子集</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大整除子集</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        给你一个由 <strong>无重复</strong> 正整数组成的集合 <code>nums</code> ，请你找出并返回其中最大的整除子集 <code>answer</code> ，子集中每一元素对 <code>(answer[i], answer[j])</code> 都应当满足：
+<ul>
+	<li><code>answer[i] % answer[j] == 0</code> ，或</li>
+	<li><code>answer[j] % answer[i] == 0</code></li>
+</ul>
+
+<p>如果存在多个有效解子集，返回其中任何一个均可。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,3]
+<strong>输出：</strong>[1,2]
+<strong>解释：</strong>[1,3] 也会被视为正确答案。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,4,8]
+<strong>输出：</strong>[1,2,4,8]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= nums.length <= 1000</code></li>
+	<li><code>1 <= nums[i] <= 2 * 10<sup>9</sup></code></li>
+	<li><code>nums</code> 中的所有整数 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 171 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -&gt; List[int]:
+        topo, route = defaultdict(list), {}
+        for n in sorted(nums):
+            i = len(topo)
+            while (i := i - 1) &gt;= 0:
+                for m in topo[i]:
+                    if n % m == 0:
+                        topo[i + 1].append(n)
+                        route[n], i = m, 0
+                        break
+            if n not in route:
+                topo[0].append(n)
+                route[n] = None
+
+        ret, n = [], topo[len(topo) - 1][0]
+        while n:
+            ret.append(n)
+            n = route[n]
+        return ret</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了拓扑排序的思想。首先将数组按照升序排序，然后遍历排序后的数组，对于每个元素，找到满足整除条件的前驱元素，并将当前元素添加到相应的拓扑层级中。同时，使用一个字典 route 记录每个元素的前驱元素。最后，从拓扑层级的最后一层开始，通过 route 字典回溯得到最大整除子集。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -&gt; List[int]:
+        # 使用字典 topo 存储拓扑层级，字典 route 记录每个元素的前驱元素
+        topo, route = defaultdict(list), {}
+        # 将数组按照升序排序
+        for n in sorted(nums):
+            i = len(topo)
+            while (i := i - 1) &gt;= 0:
+                # 遍历已处理的元素，找到满足整除条件的前驱元素
+                for m in topo[i]:
+                    if n % m == 0:
+                        topo[i + 1].append(n)
+                        route[n], i = m, 0
+                        break
+            # 如果当前元素没有找到前驱元素，将其添加到拓扑层级的第 0 层
+            if n not in route:
+                topo[0].append(n)
+                route[n] = None
+        
+        # 从拓扑层级的最后一层开始回溯，得到最大整除子集
+        ret, n = [], topo[len(topo) - 1][0]
+        while n:
+            ret.append(n)
+            n = route[n]
+        return ret</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解决最大整除子集问题时，选择先对数组进行排序？排序的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对数组进行排序的目的是为了方便找到元素的前驱元素，保证子集中的每个元素都可以被后面的元素整除。因为如果一个较小的数不能整除当前的数，那么比它大的数也不可能整除当前的数。排序使得算法可以顺序检查每个元素，并尝试将其添加到已存在的符合条件的子集中，这样可以有效地构建出满足条件的最大子集。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中提到的拓扑排序思想，具体是如何应用在这个问题上的？拓扑排序通常用于解决什么类型的问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中所说的拓扑排序思想主要体现在通过层级结构组织数据，每个元素根据其前驱元素的条件（整除关系）被分配到不同的层级。这里的“层级”概念类似于拓扑排序中处理依赖关系的层次。拓扑排序通常用于解决具有依赖关系的任务安排问题，如项目中的任务执行顺序，编译依赖等，确保每个任务只在其依赖的任务完成后才开始。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了两个字典`topo`和`route`，能否详细解释这两个字典各自的作用及其在算法中的重要性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`topo`字典用于存储不同层级的元素，其中每个层级包含能被该层级之前所有元素整除的所有元素。`route`字典记录每个元素的直接前驱元素，这是为了在构建完所有层级后能够回溯找到形成最大整除子集的路径。这两个字典对算法至关重要，`topo`确保了元素可以按照依赖关系（整除条件）正确分层，而`route`使得最终能够从结果集中恢复出最大的整除子集。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在构建拓扑层级时，如果当前元素n没有找到任何满足整除条件的前驱元素，为何选择将其添加到拓扑层级的第0层？这样做有什么特别的意义或优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将没有找到满足整除条件的前驱元素的当前元素n添加到第0层，意味着它不能被之前的任何元素整除，因此它本身可以作为一个新的子集的开始。这样做的优势在于，它保证了算法可以捕捉到所有可能的开始点，从而不遗漏任何潜在的最大整除子集。这也有助于在没有任何其他元素可以整除某个元素时，仍然能够将其考虑进最终的解集中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/largest-divisible-subset')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/largest-divisible-subset/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

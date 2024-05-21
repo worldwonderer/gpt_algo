@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>寻找两个正序数组的中位数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>寻找两个正序数组的中位数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定两个大小分别为 <code>m</code> 和 <code>n</code> 的正序（从小到大）数组&nbsp;<code>nums1</code> 和&nbsp;<code>nums2</code>。请你找出并返回这两个正序数组的 <strong>中位数</strong> 。</p>
+
+<p>算法的时间复杂度应该为 <code>O(log (m+n))</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = [1,3], nums2 = [2]
+<strong>输出：</strong>2.00000
+<strong>解释：</strong>合并数组 = [1,2,3] ，中位数 2
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = [1,2], nums2 = [3,4]
+<strong>输出：</strong>2.50000
+<strong>解释：</strong>合并数组 = [1,2,3,4] ，中位数 (2 + 3) / 2 = 2.5
+</pre>
+
+
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>nums1.length == m</code></li>
+	<li><code>nums2.length == n</code></li>
+	<li><code>0 &lt;= m &lt;= 1000</code></li>
+	<li><code>0 &lt;= n &lt;= 1000</code></li>
+	<li><code>1 &lt;= m + n &lt;= 2000</code></li>
+	<li><code>-10<sup>6</sup> &lt;= nums1[i], nums2[i] &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 15 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -&gt; float:
+        m = len(nums1)
+        n = len(nums2)
+        if m &gt; n:
+            return self.findMedianSortedArrays(nums2, nums1)
+        
+        total_left = (m + n + 1) // 2
+        l = 0
+        r = m
+        while l &lt; r:
+            i = l + (r - l + 1) // 2
+            j = total_left - i
+            if nums1[i-1] &lt;= nums2[j]:
+                l = i
+            else:
+                r = i - 1
+        
+        i = l
+        j = total_left - i
+        left_nums1_max = float(&#39;-inf&#39;) if i == 0 else nums1[i-1]
+        left_nums2_max = float(&#39;-inf&#39;) if j == 0 else nums2[j-1]
+        right_nums1_min = float(&#39;inf&#39;) if i == m else nums1[i]
+        right_nums2_min = float(&#39;inf&#39;) if j == n else nums2[j]
+
+        if (m + n) % 2 == 1:
+            return max(left_nums1_max, left_nums2_max)
+        else:
+            return (max(left_nums1_max, left_nums2_max) + min(right_nums1_min, right_nums2_min)) / 2
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了二分查找的思想。首先确保较短的数组为 nums1，如果不是就交换。然后使用二分查找在 nums1 中找到一个分割点 i，使得 nums1[0...i-1] 和 nums2[0...j-1]（j = (m+n+1)//2 - i）的元素个数之和等于 (m+n+1)//2。这样就可以保证左半部分的元素个数等于右半部分或者多一个。最后，根据总元素个数的奇偶性，返回左半部分的最大值或左右部分的最大最小值的平均数作为中位数。</p>
+                                <p>时间复杂度: O(log min(m, n))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -&gt; float:
+        m = len(nums1)
+        n = len(nums2)
+        if m &gt; n:
+            # 确保 nums1 是较短的数组
+            return self.findMedianSortedArrays(nums2, nums1)
+        
+        total_left = (m + n + 1) // 2
+        l = 0
+        r = m
+        while l &lt; r:
+            # 在 nums1 中二分查找分割点 i
+            i = l + (r - l + 1) // 2
+            j = total_left - i
+            if nums1[i-1] &lt;= nums2[j]:
+                l = i
+            else:
+                r = i - 1
+        
+        i = l
+        j = total_left - i
+        # 获取左半部分的最大值
+        left_nums1_max = float(&#39;-inf&#39;) if i == 0 else nums1[i-1]
+        left_nums2_max = float(&#39;-inf&#39;) if j == 0 else nums2[j-1]
+        # 获取右半部分的最小值
+        right_nums1_min = float(&#39;inf&#39;) if i == m else nums1[i]
+        right_nums2_min = float(&#39;inf&#39;) if j == n else nums2[j]
+
+        if (m + n) % 2 == 1:
+            # 如果总长度为奇数，中位数就是左半部分的最大值
+            return max(left_nums1_max, left_nums2_max)
+        else:
+            # 如果总长度为偶数，中位数就是左半部分最大值和右半部分最小值的平均值
+            return (max(left_nums1_max, left_nums2_max) + min(right_nums1_min, right_nums2_min)) / 2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到，首先确保较短的数组为 `nums1`，这样做的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确保较短的数组为 `nums1` 的主要目的是为了优化二分查找的效率和简化边界条件处理。当 `nums1` 较短时，我们在它上进行二分查找的次数会减少，因为其长度 `m` 较小，从而使得二分查找的最大可能次数为 `log(m)`。此外，处理边界情况（如 `i` 达到0或`m`）也会更简单，因为较短的数组中分割点的变动范围小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在二分查找时，`i` 的更新方式是 `i = l + (r - l + 1) // 2` 而不是 `i = (l + r) // 2`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用 `i = l + (r - l + 1) // 2` 是为了确保 `i` 在两个候选区间的更靠右侧，这有助于防止在某些情况下出现死循环或过早收敛。这种写法确保在 `l` 和 `r` 相邻的情况下，选择的是靠右的位置，避免了可能的无限循环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在比较 `nums1[i-1]` 和 `nums2[j]` 时，为什么使用的是 `nums1[i-1] &lt;= nums2[j]` 而不是 `nums1[i] &lt;= nums2[j-1]`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的比较方式 `nums1[i-1] &lt;= nums2[j]` 是为了确保左半部分的最大值不大于右半部分的最小值。因为 `i` 和 `j` 是根据总元素数的一半来计算的，所以 `nums1[i-1]` 是左半部分的最大值，而 `nums2[j]` 是右半部分的最小值。通过确保左半部最大值不大于右半部最小值，我们可以保持元素的正确分割。使用 `nums1[i] &lt;= nums2[j-1]` 这种比较方式则可能会错过正确的分割点，因为它关注的是左半部分的最小值和右半部分的最大值，而不是我们所需要的左半部分的最大值和右半部分的最小值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到，返回的中位数是根据总元素个数的奇偶性来确定的。这种做法的原理是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>总元素个数的奇偶性决定了中位数是单一元素还是两个元素的平均。如果总长度为奇数，则中间的元素直接是中位数；如果总长度为偶数，则中位数是中间两个元素的平均值。通过计算左半部分最大值和右半部分最小值，我们可以根据总元素的奇偶性来决定是直接取这个最大值，还是取这两个值的平均，以此来正确地计算中位数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/median-of-two-sorted-arrays')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/median-of-two-sorted-arrays/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

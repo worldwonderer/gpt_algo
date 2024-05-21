@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计定界子数组的数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计定界子数组的数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=monotonic-queue" class="badge bg-secondary tag-link">单调队列</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> 和两个整数 <code>minK</code> 以及 <code>maxK</code> 。</p>
+
+<p><code>nums</code> 的定界子数组是满足下述条件的一个子数组：</p>
+
+<ul>
+	<li>子数组中的 <strong>最小值</strong> 等于 <code>minK</code> 。</li>
+	<li>子数组中的 <strong>最大值</strong> 等于 <code>maxK</code> 。</li>
+</ul>
+
+<p>返回定界子数组的数目。</p>
+
+<p>子数组是数组中的一个连续部分。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1,3,5,2,7,5], minK = 1, maxK = 5
+<strong>输出：</strong>2
+<strong>解释：</strong>定界子数组是 [1,3,5] 和 [1,3,5,2] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1,1,1,1], minK = 1, maxK = 1
+<strong>输出：</strong>10
+<strong>解释：</strong>nums 的每个子数组都是一个定界子数组。共有 10 个子数组。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i], minK, maxK &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 108 ms</p>
+                    <p>内存: 26.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countSubarrays(self, nums: List[int], minK: int, maxK: int) -&gt; int:
+        premin, premax = -1, -1
+        l = 0
+        ans = 0
+        for r, x in enumerate(nums):
+            if x &lt; minK or x &gt; maxK:
+                premin, premax = -1, -1
+                l = r + 1
+                continue
+            if x == minK:
+                premin = r
+            if x == maxK:
+                premax = r
+            if premin != -1 and premax != -1:
+                ans += (premin if premin &lt; premax else premax) - l + 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用滑动窗口的策略，通过一次遍历来统计符合条件的子数组。对于数组中的每一个元素，我们维护两个变量 premin 和 premax 来记录满足条件 minK 和 maxK 的最近的索引位置。当遍历到的元素值小于 minK 或大于 maxK 时，说明当前元素不能被包含在任何有效的子数组中，此时需要重置 premin、premax，并将左指针 l 移动到当前右指针的下一个位置。如果当前元素等于 minK 或 maxK，则更新 premin 或 premax 的值。只有当 premin 和 premax 都被有效更新后，才计算当前的右指针 r 到左指针 l 之间的符合条件的子数组数量，增加的数量为 min(premin, premax) - l + 1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countSubarrays(self, nums: List[int], minK: int, maxK: int) -&gt; int:
+        premin, premax = -1, -1  # 初始化 premin 和 premax
+        l = 0  # 初始化左指针
+        ans = 0  # 存储定界子数组的数量
+        for r, x in enumerate(nums):  # 遍历数组元素及其索引
+            if x &lt; minK or x &gt; maxK:  # 元素不在[minK, maxK]范围内
+                premin, premax = -1, -1  # 重置 premin 和 premax
+                l = r + 1  # 移动左指针
+                continue
+            if x == minK:  # 更新 minK 的最新位置
+                premin = r
+            if x == maxK:  # 更新 maxK 的最新位置
+                premax = r
+            if premin != -1 and premax != -1:  # premin 和 premax 都有效时
+                ans += (premin if premin &lt; premax else premax) - l + 1  # 计算定界子数组的数量
+        return ans  # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么滑动窗口的方法适用于这个问题，而不是使用其他算法如动态规划或分治算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口方法适用于这个问题因为它能有效地在单次遍历中处理和更新子数组的边界条件。这个问题要求找到所有包含特定最小值和最大值的子数组，而滑动窗口可以灵活地调整窗口的大小来直接应对数组中值的变化，尤其是当数组元素不符合[minK, maxK]范围时快速调整。动态规划通常适用于求解最优子结构问题，而这里需要连续跟踪最小和最大索引的更新，分治算法则适用于可以被分解为独立子问题的情况，但本题中子数组的界定高度依赖于全局的元素分布，因此滑动窗口在此更为高效且直接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            滑动窗口中，当遇到元素值不在[minK, maxK]范围内时，需要重置premin和premax，这种重置的操作是否会导致一些潜在的子数组被遗漏？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>不会导致子数组被遗漏。当元素值不在[minK, maxK]范围内时，任何包含该元素的子数组都不能满足题目要求。因此，重置premin和premax是必要的，因为它们记录的是有效子数组的潜在起点。重置操作后，左指针l移至当前元素的下一个位置，这意味着所有之前可能的、但现在已无效的子数组界定被清除，新的搜索从一个清洁的状态开始，确保所有有效的子数组都能被正确统计，而无效的不会被错误地包含。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到当premin和premax都被有效更新后，则计算子数组数量。这种方法是否保证了在所有情况下都能正确计算出定界子数组的数量，特别是在数组元素重复或极端分布的情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，该方法可以在所有情况下正确计算定界子数组的数量。这是因为只有当premin和premax都有效时（即都已经遇到了至少一次minK和maxK），才开始计算子数组的数量。这种计算方式确保只有包含了至少一个minK和一个maxK的子数组才被计算。此外，通过计算min(premin, premax) - l + 1，确保了即使在元素重复或极端分布的情况下，所有可能的子数组都能被考虑。这种方法准确地反映了从当前左指针到有效的最小/最大值索引之间的所有子数组，无论数组元素如何分布。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-subarrays-with-fixed-bounds')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-subarrays-with-fixed-bounds/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>安卓系统手势解锁</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>安卓系统手势解锁</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">block = {(0, 2): 1, (2, 0): 1, (2, 8): 5, (8, 2): 5, (6, 8): 7, (8, 6): 7, (6, 0): 3, (0, 6): 3,
+         (3, 5): 4, (5, 3): 4, (1, 7): 4, (7, 1): 4, (8, 0): 4, (0, 8): 4, (2, 6): 4, (6, 2): 4}
+dp = {(0, (1 &lt;&lt; 9) - 1, None): 1}
+res = [0] * 10
+
+for i in range(1, 10):
+    tdp = collections.defaultdict(int)
+    for (used, unuse, now), v in dp.items():
+        # print(dp.items(),i)
+        for ni in range(9):
+            if unuse &amp; (1 &lt;&lt; ni) == 0: continue
+            if (now, ni) in block and (1 &lt;&lt; block[now, ni]) &amp; unuse: continue
+            tdp[used | (1 &lt;&lt; ni), unuse ^ (1 &lt;&lt; ni), ni] += v
+    res[i] = sum(tdp.values())
+    dp = tdp
+
+class Solution:
+    def numberOfPatterns(self, m: int, n: int) -&gt; int:
+        return sum(res[m: n + 1])
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用动态规划来解决安卓手势解锁问题，其中利用了位运算来高效地表示点的使用状态。定义block字典来存储需要跳过的中间点，比如从点0到点2需要经过点1。dp字典用来记录从起始状态到所有可能的手势的路径数量，其中键是一个三元组：已使用点的集合、未使用点的集合、当前点。解法先初始化dp为起始条件，即没有任何点被使用，然后通过9次迭代逐渐增加路径长度，每次迭代更新dp字典，记录所有可能的路径和路径出现的次数。结果数组res用来存储每种长度手势的总数。最后，numberOfPatterns函数直接根据m到n的手势长度范围返回对应的路径总数。</p>
+                                <p>时间复杂度: O(9*3^9)</p>
+                                <p>空间复杂度: O(3^9)</p>
+                                <pre class="bg-light p-2">
+block = {(0, 2): 1, (2, 0): 1, (2, 8): 5, (8, 2): 5, (6, 8): 7, (8, 6): 7, (6, 0): 3, (0, 6): 3,
+         (3, 5): 4, (5, 3): 4, (1, 7): 4, (7, 1): 4, (8, 0): 4, (0, 8): 4, (2, 6): 4, (6, 2): 4}
+dp = {(0, (1 &lt;&lt; 9) - 1, None): 1} # 初始化DP表，表示没有点被使用的情况
+res = [0] * 10 # 结果数组，记录每种路径长度的路径总数
+
+for i in range(1, 10): # 对于每种路径长度
+    tdp = collections.defaultdict(int) # 临时DP表
+    for (used, unuse, now), v in dp.items(): # 遍历当前所有可能状态
+        for ni in range(9): # 尝试每个点作为下一个步骤
+            if unuse &amp; (1 &lt;&lt; ni) == 0: continue # 如果该点已经使用，跳过
+            if (now, ni) in block and (1 &lt;&lt; block[now, ni]) &amp; unuse: continue # 如果当前到ni需要跳过中间点且中间点未被使用，跳过
+            tdp[used | (1 &lt;&lt; ni), unuse ^ (1 &lt;&lt; ni), ni] += v # 更新临时DP表
+    res[i] = sum(tdp.values()) # 将所有路径数累加到结果数组
+    dp = tdp # 更新DP表
+
+class Solution:
+    def numberOfPatterns(self, m: int, n: int) -&gt; int:
+        return sum(res[m: n + 1]) # 根据长度范围求和返回
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划解法中，为什么选择用位运算来表示点的使用状态，而不是使用其他数据结构如列表或集合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>位运算用来表示点的使用状态可以提供空间效率和时间效率的优势。使用位运算，可以用一个整数的各个位来表示每个点是否被使用（例如，第i位为1表示第i个点被使用），这样只需要一个整数空间就可以存储所有点的状态，比使用列表或集合的空间消耗要小。此外，位运算（如位与、位或和位异或）执行速度快，适合于快速检查和更新点的使用状态，这对于动态规划中频繁的状态转移尤为重要。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何确保动态规划的状态转移是正确的，特别是在涉及需要跳过中间点的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了确保动态规划的状态转移正确，特别是在需要跳过中间点的情况，我们在状态转移时加入了额外的条件检查。具体地，如果从当前点到目标点存在需要跳过的中间点，我们会检查这个中间点是否已经被使用。这是通过查找`block`字典来实现的，如果从当前点到目标点需要经过中间点，并且这个中间点还未被使用（即中间点对应的位在未使用状态的位集中为1），则这种状态转移是不合法的，应该跳过。这种方法确保了每次状态转移都是符合手势解锁的规则的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于block字典中的条目，你是如何决定哪些点之间需要中间点，这是否与安卓解锁图形的实际布局相关？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>block字典中的条目是基于安卓解锁图形的实际布局来决定的。安卓解锁使用一个3x3的点阵布局，某些点之间的直线跨越了中间的点。例如，从左上角点到右上角点的直线经过顶部中间的点。因此，如果直接从一个点到另一个点的连线在图形上直接跨越了中间的点，我们就在block字典中记录这种关系。这样的设计确保了解锁模式必须按照实际的物理布局来进行，增加了解锁图案的复杂度和安全性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在迭代更新dp字典时，为什么要使用一个临时的dp（tdp）来存储更新，而不直接在原dp上进行修改？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在迭代更新dp字典时使用临时的dp (tdp) 来存储更新是为了避免在迭代过程中修改正在被遍历的数据结构，这可以防止更新干扰正在进行的状态遍历和计算。如果直接在原dp上进行修改，可能会导致一些状态被提前更新，这可能会影响到当前迭代步骤中其他状态的正确计算。使用临时的dp确保了在整个迭代过程中，所有状态的转移都是基于同一时间点的状态快照，从而保证了算法的正确性和稳定性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/android-unlock-patterns')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/android-unlock-patterns/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

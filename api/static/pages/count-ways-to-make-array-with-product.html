@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>生成乘积数组的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>生成乘积数组的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=combinatorics" class="badge bg-secondary tag-link">组合数学</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维整数数组 <code>queries</code> ，其中 <code>queries[i] = [n<sub>i</sub>, k<sub>i</sub>]</code> 。第 <code>i</code> 个查询 <code>queries[i]</code> 要求构造长度为 <code>n<sub>i</sub></code> 、每个元素都是正整数的数组，且满足所有元素的乘积为 <code>k<sub>i</sub></code><sub> </sub>，请你找出有多少种可行的方案。由于答案可能会很大，方案数需要对 <code>10<sup>9</sup> + 7</code> <strong>取余</strong> 。</p>
+
+<p>请你返回一个整数数组<em> </em><code>answer</code>，满足<em> </em><code>answer.length == queries.length</code> ，其中<em> </em><code>answer[i]</code>是第<em> </em><code>i</code> 个查询的结果。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>queries = [[2,6],[5,1],[73,660]]
+<b>输出：</b>[4,1,50734910]
+<b>解释：</b>每个查询之间彼此独立。
+[2,6]：总共有 4 种方案得到长度为 2 且乘积为 6 的数组：[1,6]，[2,3]，[3,2]，[6,1]。
+[5,1]：总共有 1 种方案得到长度为 5 且乘积为 1 的数组：[1,1,1,1,1]。
+[73,660]：总共有 1050734917 种方案得到长度为 73 且乘积为 660 的数组。1050734917 对 10<sup>9</sup> + 7 取余得到 50734910 。
+</pre>
+
+<p><strong>示例 2 ：</strong></p>
+
+<pre>
+<b>输入：</b>queries = [[1,1],[2,2],[3,3],[4,4],[5,5]]
+<b>输出：</b>[1,2,3,10,5]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= queries.length <= 10<sup>4</sup> </code></li>
+	<li><code>1 <= n<sub>i</sub>, k<sub>i</sub> <= 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 69 ms</p>
+                    <p>内存: 21.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">import math
+import collections
+
+max_range = 10 ** 4 + 1
+st = [1] * max_range
+p = []
+for i in range(2, max_range):
+    if st[i] == 1:
+        p.append(i)
+        st[i] = i
+    for val in p:
+        if val * i &gt;= max_range:
+            break
+        st[i * val] = val
+        if i % val == 0:
+            break
+d = {}
+for index in range(1, max_range):
+    num = index
+    now_d = collections.defaultdict(int)
+    while num &gt; 1:
+        now_d[st[num]] += 1
+        num = num // st[num]
+    a_set = tuple(now_d.values())
+    d[index] = a_set
+
+class Solution(object):
+    def waysToFillArray(self, queries):
+        ans = []
+        base = 10 ** 9 + 7
+        for n, k in queries:
+            value = 1
+            a_set = d[k]
+            for item in a_set:
+                value = value * math.comb(n + item - 1, n - 1) % base
+            ans.append(value)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>首先，题解使用了埃拉托斯特尼筛法来找出10^4范围内的所有质数，并标记每个数的最小质因数。然后，对于每个1到10^4的数，使用最小质因数将其分解，记录其质因数的幂次形成一个元组，存储于字典d中。对于每个查询[ni, ki]，基于ki的质因数分解（从字典d中获取），使用组合数学计算将k分解为n个因子的方法数。具体计算方式是使用多项式定理中的多重集合公式来处理每个质因子的分配，其中涉及到的组合数可以通过math.comb函数高效计算。结果对10^9+7取余确保结果在规定范围内。</p>
+                                <p>时间复杂度: O(m * f)</p>
+                                <p>空间复杂度: O(n + m)</p>
+                                <pre class="bg-light p-2">import math
+import collections
+
+# 最大范围设置为10^4 + 1
+max_range = 10 ** 4 + 1
+st = [1] * max_range  # 存储每个数的最小质因数
+p = []  # 质数列表
+# 使用埃拉托斯特尼筛法标记质数和最小质因数
+for i in range(2, max_range):
+    if st[i] == 1:  # 如果是质数
+        p.append(i)
+        st[i] = i
+    for val in p:
+        if val * i &gt;= max_range:
+            break
+        st[i * val] = val
+        if i % val == 0:
+            break
+d = {}  # 存储每个数的质因数分解
+for index in range(1, max_range):
+    num = index
+    now_d = collections.defaultdict(int)  # 当前数的质因数计数
+    while num &gt; 1:  # 质因数分解
+        now_d[st[num]] += 1
+        num = num // st[num]
+    a_set = tuple(now_d.values())  # 将幂次转为不可变元组以用作键
+    d[index] = a_set  # 记录当前数的质因数分解
+
+class Solution(object):
+    def waysToFillArray(self, queries):
+        ans = []  # 结果列表
+        base = 10 ** 9 + 7  # 结果取余的基数
+        for n, k in queries:
+            value = 1
+            a_set = d[k]  # 获取k的质因数分解
+            for item in a_set:  # 对于每个质因数的幂次
+                value = value * math.comb(n + item - 1, n - 1) % base  # 计算组合数并取余
+            ans.append(value)
+        return ans  # 返回结果列表
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到使用埃拉托斯特尼筛法来找出10^4范围内的所有质数，这个范围是如何确定的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个范围的确定是基于问题的需求，即处理的数值范围是1到10^4的数。使用埃拉托斯特尼筛法可以高效地筛选出10^4范围内的所有质数，并在这个过程中标记每个数的最小质因数。这样的范围保证了不仅可以获取所有需要的质数，还能够对1到10^4中的每个数进行快速的质因数分解，因为每个数的最小质因数已经在筛选过程中被记录。这个范围是针对题目给定的最大输入范围来选取的，以确保算法的应用面和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理质因数分解的过程中，题解说明使用了collections.defaultdict(int)来计数，为什么选择这种数据结构，而不是使用普通的字典或其他数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在质因数分解的过程中，使用collections.defaultdict(int)可以自动处理不存在的键的情况，即当一个新的质因数被发现时，不需要额外的代码来检查和初始化字典键。如果使用普通字典，每次添加一个新的质因数时都需要先检查键是否存在，然后进行初始化，这会增加代码的复杂性和运行时的键查找成本。defaultdict通过自动为未知键提供一个默认的整数值（0），简化了计数的过程，并提高了代码的可读性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在计算组合数时选择使用math.comb函数，并且在计算过程中立即取余，这样做的优点是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用math.comb函数计算组合数是因为它直接提供了一个高效且准确的方式来计算大数的组合数，避免了复杂的自实现和可能的错误。在计算过程中立即取余是因为组合数的结果可能非常大，直接操作这些大数会导致性能下降和可能的整数溢出。通过在每一步计算后立即取余，结果保持在一个可管理的范围内，同时也符合题目要求的模10^9+7的结果，这有助于防止溢出并保持计算的高效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算组合数时，如果n或k的数值非常大，是否会影响math.comb函数的性能或结果的精度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>math.comb函数是设计来高效并准确计算组合数的，它可以处理相对较大的数值。然而，如果n或k的值非常大，计算的复杂度和所需的处理时间会增加，这可能影响性能。但在本题中，由于n和k的大小受到10^4的限制，使用math.comb不会引起性能问题。关于精度，math.comb利用Python的内置长整型进行计算，可以确保结果的正确性，不会有精度损失。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-ways-to-make-array-with-product')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-ways-to-make-array-with-product/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

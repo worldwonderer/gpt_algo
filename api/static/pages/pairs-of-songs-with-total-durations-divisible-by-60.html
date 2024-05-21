@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>总持续时间可被 60 整除的歌曲</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>总持续时间可被 60 整除的歌曲</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在歌曲列表中，第 <code>i</code> 首歌曲的持续时间为 <code>time[i]</code> 秒。</p>
+
+<p>返回其总持续时间（以秒为单位）可被 <code>60</code> 整除的歌曲对的数量。形式上，我们希望下标数字 <code>i</code> 和 <code>j</code> 满足&nbsp; <code>i &lt; j</code> 且有&nbsp;<code>(time[i] + time[j]) % 60 == 0</code>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>time = [30,20,150,100,40]
+<strong>输出：</strong>3
+<strong>解释：</strong>这三对的总持续时间可被 60 整除：
+(time[0] = 30, time[2] = 150): 总持续时间 180
+(time[1] = 20, time[3] = 100): 总持续时间 120
+(time[1] = 20, time[4] = 40): 总持续时间 60
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>time = [60,60,60]
+<strong>输出：</strong>3
+<strong>解释：</strong>所有三对的总持续时间都是 120，可以被 60 整除。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= time.length &lt;= 6 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= time[i] &lt;= 500</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 20.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numPairsDivisibleBy60(self, time: List[int]) -&gt; int:
+        li = range(60)
+        d = dict(zip(li, [0] * 60))
+        for i in time:
+            m = i % 60
+            d[m] += 1
+        ret = 0
+        for j in range(1, 30):
+            m = d[j]
+            n = d[60-j]
+            ret += m*n
+        ret += int(d[0]*(d[0]-1)/2)
+        ret += int(d[30]*(d[30]-1)/2)
+        return ret
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了哈希表来统计每个时间模60的结果的频率。接着，对于每种模数结果，寻找与其配对的模数结果，使得两者之和为60。特别地，对于模数0和30的情况（即自身加自身能被60整除的情况），使用组合数公式计算配对方式。这种方法避免了直接的双层循环暴力检查，从而提高了效率。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numPairsDivisibleBy60(self, time: List[int]) -&gt; int:
+        # 创建一个大小为60的字典来存储时间模60的结果的频率
+        li = range(60)
+        d = dict(zip(li, [0] * 60))
+        # 填充字典
+        for i in time:
+            m = i % 60
+            d[m] += 1
+        # 初始化结果变量
+        ret = 0
+        # 计算模数1到29及其与60的补数的配对数
+        for j in range(1, 30):
+            m = d[j]
+            n = d[60-j]
+            ret += m*n
+        # 单独计算模数0和30的配对数
+        ret += int(d[0]*(d[0]-1)/2)
+        ret += int(d[30]*(d[30]-1)/2)
+        # 返回结果
+        return ret
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在哈希表中为什么选择使用60个槽来存储模数结果，而不是使用其它数字或数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择使用60个槽来存储模数结果是因为题目要求找出两首歌的总持续时间可以被60整除。通过计算每首歌持续时间对60的余数（模数），我们可以简化问题为查找两个数的模数之和是否等于60。哈希表（或字典）以余数作为键，以该余数出现的次数作为值，非常适合于快速查找和更新操作。使用60个槽正好覆盖了所有可能的余数结果（0到59），这是因为任何数除以60的余数必定在这个范围内，因此这样的数据结构和大小选择是最合适的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在计算模数0和30的配对数时采用了组合数公式，这种计算方式在什么情况下是正确的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算模数0和30的配对数时使用组合数公式是因为这两个特殊的模数与自身配对仍然能保持总和被60整除（0+0=0，30+30=60）。组合数公式 C(n, 2) = n*(n-1)/2 是用来计算从n个相同项中任选两项的组合方式的数量。这种计算方式在模数相同且至少出现两次时是正确的，因为每对组合都是一个有效配对。例如，如果某个模数出现了3次，那么这三项之间可以形成3*(3-1)/2 = 3种配对方式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中提到了对于模数1到29及其与60的补数进行配对，为什么没有包括模数30以上的数字？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中对于模数1到29及其与60的补数进行配对，没有包括模数30以上的数字是因为这些情况在计算模数1到29时已经考虑过了。由于模数和其补数的和必须为60，模数1的补数是59，模数2的补数是58，依此类推。当我们考虑到模数29（其补数是31）时，已经包含了所有可能的组合情况，除了模数30（与自身配对），这种情况单独处理。因此，模数30到59的配对在前面已经被算过一次，无需重复计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/pairs-of-songs-with-total-durations-divisible-by-60')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/pairs-of-songs-with-total-durations-divisible-by-60/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

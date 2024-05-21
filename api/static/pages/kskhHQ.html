@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>集水器</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>集水器</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        字符串数组 `shape` 描述了一个二维平面中的矩阵形式的集水器，`shape[i][j]` 表示集水器的第 `i` 行 `j` 列为：
+- `'l'`表示向左倾斜的隔板（即从左上到右下）；
+- `'r'`表示向右倾斜的隔板（即从左下到右上）；
+- `'.'` 表示此位置没有隔板
+![image.png](https://pic.leetcode-cn.com/1664424667-wMnPja-image.png){:width=200px}
+
+已知当隔板构成存储容器可以存水，每个方格代表的蓄水量为 `2`。集水器初始浸泡在水中，除内部密闭空间外，所有位置均被水填满。
+现将其从水中竖直向上取出，请返回集水器最终的蓄水量。
+
+**注意：**
+- 隔板具有良好的透气性，因此空气可以穿过隔板，但水无法穿过
+
+**示例 1：**
+> 输入：
+> `shape = ["....rl","l.lr.r",".l..r.","..lr.."]`
+>
+> 输出：`18`
+>
+> 解释：如下图所示，由于空气会穿过隔板，因此红框区域没有水
+![image.png](https://pic.leetcode-cn.com/1664436239-eyYxeP-image.png){:width="280px"}
+
+
+**示例 2：**
+> 输入：
+> `shape = [".rlrlrlrl","ll..rl..r",".llrrllrr","..lr..lr."]`
+> 输出：`18`
+>
+> 解释：如图所示。由于红框右侧未闭合，因此多余的水会从该处流走。
+![image.png](https://pic.leetcode-cn.com/1664436082-SibVMv-image.png){:width="400px"}
+
+
+**示例 3：**
+> 输入：
+> `shape = ["rlrr","llrl","llr."]`
+> 输出：`6`
+>
+> 解释：如图所示。
+![image.png](https://pic.leetcode-cn.com/1664424855-dwpUHO-image.png){:width="230px"}
+
+
+
+
+**示例 4：**
+> 输入：
+> `shape = ["...rl...","..r..l..",".r.rl.l.","r.r..l.l","l.l..rl.",".l.lr.r.","..l..r..","...lr..."]`
+>
+> 输出：`30`
+>
+> 解释：如下图所示。由于中间为内部密闭空间，无法蓄水。
+![image.png](https://pic.leetcode-cn.com/1664424894-mClEXh-image.png){:width="350px"}
+
+
+**提示**：
+- `1 <= shape.length <= 50`
+- `1 <= shape[i].length <= 50`
+- `shape[i][j]` 仅为 `'l'`、`'r'` 或 `'.'`
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 147 ms</p>
+                    <p>内存: 17.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def reservoir(self, shape: List[str]) -&gt; int:
+        n, m = len(shape), len(shape[0])
+        # 每个格子分成四个区域（上下左右），标上序号，方便用并查集连通
+        # 假设左右下还有一圈格子，直接连到超级汇点 0
+        u = [[0] * (m + 2) for _ in range(n + 1)]
+        d = [[0] * (m + 2) for _ in range(n + 1)]
+        l = [[0] * (m + 2) for _ in range(n + 1)]
+        r = [[0] * (m + 2) for _ in range(n + 1)]
+        c = 1
+        for i in range(n):
+            for j in range(1, m + 1):  # 假设格子的列号从 1 开始，这样方便表示左右边界
+                u[i][j] = c; c += 1
+                d[i][j] = c; c += 1
+                l[i][j] = c; c += 1
+                r[i][j] = c; c += 1
+
+        # 并查集模板
+        fa = list(range(c))
+        def find(x: int) -&gt; int:
+            if fa[x] != x:
+                fa[x] = find(fa[x])
+            return fa[x]
+        def merge(x: int, y: int):
+            fa[find(x)] = find(y)
+
+        ok = [False] * c  # 能否容纳水
+        # 倒着判断每一行，寻找可能有水的区域
+        for i in range(n - 1, -1, -1):
+            for j in range(m + 1):
+                merge(r[i][j], l[i][j + 1])  # 连通左右
+            for j, type in enumerate(shape[i], 1):
+                merge(d[i][j], u[i + 1][j])  # 连通下
+                # 根据格子的类型连接格子内部四个区域
+                if type == &#39;.&#39;:
+                    merge(l[i][j], u[i][j])
+                    merge(l[i][j], d[i][j])
+                    merge(l[i][j], r[i][j])
+                elif type == &#39;l&#39;:
+                    merge(l[i][j], d[i][j])
+                    merge(r[i][j], u[i][j])
+                else:
+                    merge(l[i][j], u[i][j])
+                    merge(r[i][j], d[i][j])
+            for j in range(1, m + 1):
+                # 在没有连接第 i-1 行的情况下，无法到达左右下边界 =&gt; 能容纳水
+                ok[l[i][j]] = find(l[i][j]) != find(0)
+                ok[r[i][j]] = find(r[i][j]) != find(0)
+                ok[u[i][j]] = find(u[i][j]) != find(0)
+                ok[d[i][j]] = find(d[i][j]) != find(0)
+
+        # 第一行连上超级汇点，方便后面统一判断是否在闭合区域里面
+        for j in range(1, m + 1):
+            merge(u[0][j], 0)
+
+        ans = 0
+        for i, b in enumerate(ok):
+            if b and find(i) == find(0):  # 能容纳水，且不在闭合区域里面
+                ans += 1
+        return ans // 2
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解通过模拟和并查集技术解决集水器问题。每个格子被划分为四个部分（上下左右），用于表示格子中的不同隔板区域。题解策略是通过并查集维护这些部分之间的连通性。首先，题解为每个格子的四个部分分配了唯一的标识符，然后根据格子的隔板类型（&#39;l&#39;, &#39;r&#39;, 或 &#39;.&#39;），在相应的部分之间建立连接。此外，所有格子的左右边界部分被连接到一个超级汇点，以表示外部空间。然后通过逐行逆向遍历，并查集来判断每个部分是否可以容纳水（即检查该部分是否与外部空间连通）。最后，统计所有可以容纳水的部分，每部分记为2单位水量，然后求出总水量。</p>
+                                <p>时间复杂度: O(n * m)</p>
+                                <p>空间复杂度: O(n * m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def reservoir(self, shape: List[str]) -&gt; int:
+        n, m = len(shape), len(shape[0])
+        # Initialize part identifiers for each grid cell
+        u, d, l, r = [[[0] * (m + 2) for _ in range(n + 1)] for _ in range(4)]
+        c = 1
+        for i in range(n):
+            for j in range(1, m + 1):
+                u[i][j], d[i][j], l[i][j], r[i][j] = c, c+1, c+2, c+3
+                c += 4
+
+        # Union-find setup
+        fa = list(range(c))
+        def find(x):
+            if fa[x] != x:
+                fa[x] = find(fa[x])
+            return fa[x]
+        def merge(x, y):
+            fa[find(x)] = find(y)
+
+        # Check connections and water-holding capability
+        ok = [False] * c
+        for i in range(n - 1, -1, -1):
+            for j in range(m + 1):
+                merge(r[i][j], l[i][j + 1])
+            for j, type in enumerate(shape[i], 1):
+                if type == &#39;.&#39;:
+                    merge(l[i][j], u[i][j])
+                    merge(l[i][j], d[i][j])
+                    merge(l[i][j], r[i][j])
+                elif type == &#39;l&#39;:
+                    merge(l[i][j], d[i][j])
+                    merge(r[i][j], u[i][j])
+                else:  # type == &#39;r&#39;
+                    merge(l[i][j], u[i][j])
+                    merge(r[i][j], d[i][j])
+            for j in range(1, m + 1):
+                ok[l[i][j]] = find(l[i][j]) != find(0)
+                ok[r[i][j]] = find(r[i][j]) != find(0)
+                ok[u[i][j]] = find(u[i][j]) != find(0)
+                ok[d[i][j]] = find(d[i][j]) != find(0)
+
+        # Connect the top row to the super sink
+        for j in range(1, m + 1):
+            merge(u[0][j], 0)
+
+        # Calculate the total amount of water that can be held
+        ans = 0
+        for i, b in enumerate(ok):
+            if b and find(i) == find(0):
+                ans += 1
+        return ans // 2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在并查集中，如何处理超级汇点与格子边界部分的连接，以及这种连接方式对算法结果的影响是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，超级汇点被用作一个虚拟的节点，其主要目的是为了模拟格子外部空间的概念。所有的左右边界部分被连接到这个超级汇点。这样的设置主要是为了便捷地处理格子的边界条件，即任何连接到超级汇点的格子部分都认为是与外部空间相连，因此不会积水。这种连接方式简化了边界处理，使得算法只需要关注如何通过内部格子的连接来判断能否积水。结果上，这确保了所有边界格子部分不会误计入积水量，从而提高了算法的准确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的逆向遍历格子的原因是什么？直接正向遍历有什么潜在的问题或不足？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中选择逆向遍历（从下向上遍历格子）的主要原因是为了有效地处理水的流动性和积存。水通常受到重力作用，从上往下流动，因此从底部开始向上处理可以更自然地模拟这一物理过程。如果采用正向遍历（从上向下），则在处理时需要额外考虑下方格子的状态，这会增加算法的复杂度和处理难度。逆向遍历使得每个格子在处理时，其上方的状态已经确定，可以更直接地判断该格子的水积存情况，从而简化了实现和逻辑判断。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            并查集中的`merge`操作是如何确保隔板类型正确影响到格子部分的连通性的？具体是如何根据隔板的类型`&#39;l&#39;`, `&#39;r&#39;`, `&#39;.&#39;`来决定合并哪些部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，`merge`操作用于将格子的不同部分（上下左右）根据隔板类型连接起来。具体规则如下：当隔板类型为`.`时，表示没有隔板阻碍，因此左、上、下、右四个部分全部相连。当隔板类型为`&#39;l&#39;`时，表示左侧有隔板，因此左侧部分与下方部分连通，右侧部分与上方部分连通。当隔板类型为`&#39;r&#39;`时，表示右侧有隔板，因此左侧部分与上方部分连通，右侧部分与下方部分连通。这种根据隔板类型设定的连接策略确保了隔板的存在正确地影响了格子部分的连通性，从而准确模拟了水的积存情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/kskhHQ')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/kskhHQ/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

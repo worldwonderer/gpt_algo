@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计值等于子树平均值的节点数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计值等于子树平均值的节点数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵二叉树的根节点 <code>root</code> ，找出并返回满足要求的节点数，要求节点的值等于其 <strong>子树</strong> 中值的 <strong>平均值</strong> 。</p>
+
+<p><strong>注意：</strong></p>
+
+<ul>
+	<li><code>n</code> 个元素的平均值可以由 <code>n</code> 个元素 <strong>求和</strong> 然后再除以 <code>n</code> ，并 <strong>向下舍入</strong> 到最近的整数。</li>
+	<li><code>root</code> 的 <strong>子树</strong> 由 <code>root</code> 和它的所有后代组成。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img src="https://assets.leetcode.com/uploads/2022/03/15/image-20220315203925-1.png" style="width: 300px; height: 212px;">
+<pre><strong>输入：</strong>root = [4,8,5,0,1,null,6]
+<strong>输出：</strong>5
+<strong>解释：</strong>
+对值为 4 的节点：子树的平均值 (4 + 8 + 5 + 0 + 1 + 6) / 6 = 24 / 6 = 4 。
+对值为 5 的节点：子树的平均值 (5 + 6) / 2 = 11 / 2 = 5 。
+对值为 0 的节点：子树的平均值 0 / 1 = 0 。
+对值为 1 的节点：子树的平均值 1 / 1 = 1 。
+对值为 6 的节点：子树的平均值 6 / 1 = 6 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img src="https://assets.leetcode.com/uploads/2022/03/26/image-20220326133920-1.png" style="width: 80px; height: 76px;">
+<pre><strong>输入：</strong>root = [1]
+<strong>输出：</strong>1
+<strong>解释：</strong>对值为 1 的节点：子树的平均值 1 / 1 = 1。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树中节点数目在范围 <code>[1, 1000]</code> 内</li>
+	<li><code>0 &lt;= Node.val &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 16.9 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def averageOfSubtree(self, root: TreeNode) -&gt; int:
+        res = 0
+        def search(node):
+            if not node:
+                return 0, 0
+            
+            cnt, sums = 1, node.val
+            if node.left:
+                t1, t2 = search(node.left)
+                cnt += t1
+                sums += t2
+            if node.right:
+                t1, t2 = search(node.right)
+                cnt += t1
+                sums += t2
+            
+            if (sums // cnt) == node.val:
+                nonlocal res
+                res += 1
+            return cnt, sums
+        search(root)
+
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了递归的方式进行深度优先搜索(DFS)。对于每个节点，首先递归计算其左右子树内所有节点的值的和以及节点个数。然后，将当前节点的值加到子树的和中，并将节点个数加一，从而获取包括当前节点在内的整个子树的总和和节点个数。接着，计算子树的平均值并向下取整，如果这个值等于当前节点的值，则结果计数器增加。最后，函数返回当前子树的节点数量和值的总和，以供上层节点的计算。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n) in the worst case, O(log(n)) in average case for balanced trees</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def averageOfSubtree(self, root: TreeNode) -&gt; int:
+        res = 0 # 初始化满足条件的节点数量为0
+        def search(node):
+            if not node:
+                return 0, 0 # 如果节点为空，返回节点数和总和都为0
+            
+            cnt, sums = 1, node.val # 初始化当前节点的计数和总和
+            if node.left: # 如果有左子节点
+                t1, t2 = search(node.left) # 递归计算左子树
+                cnt += t1 # 更新节点总数
+                sums += t2 # 更新值的总和
+            if node.right: # 如果有右子节点
+                t1, t2 = search(node.right) # 递归计算右子树
+                cnt += t1 # 更新节点总数
+                sums += t2 # 更新值的总和
+            
+            if (sums // cnt) == node.val: # 如果当前节点值等于其子树的平均值
+                nonlocal res
+                res += 1 # 结果计数器增加
+            return cnt, sums # 返回当前子树的节点数和总和
+        search(root) # 从根节点开始搜索
+
+        return res # 返回满足条件的节点总数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算节点平均值时，你是如何确保结果总是正确向下舍入的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算节点平均值时，使用了整数除法（使用`//`操作符），这种除法操作自动将结果向下舍入到最接近的整数。在Python中，当使用整数除法时，即使结果是负数，也会向下舍入，这是Python整数除法的内置行为。因此，在这种情况下，不需要额外的逻辑来确保结果的正确舍入。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你的解决方案在遇到一个节点值非常大，可能导致整数溢出时，有什么应对策略吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Python中，整数类型可以自动处理非常大的数值，因为Python的整数类型是动态大小的，可以根据需要自动扩展到更大的位数。因此，在标准的Python实现中，整数溢出是不会发生的。但是，如果这段代码需要在其他可能存在整数溢出的编程语言中实现，可以考虑使用更大的数值类型（如长整型），或者对每次操作后的结果进行检查，确保没有溢出发生。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在递归函数中，当节点为空时直接返回(0, 0)，这种设计是否考虑了所有可能的边界情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数中，当节点为空时返回(0, 0)，是一种处理树遍历中空节点的常见方法。这种设计确保了递归在遇到空的子节点时能正确地处理，并且在求和或计数时不会对结果产生影响。这样可以避免在调用递归函数时进行额外的空检查，简化代码逻辑。但是，这种设计假设了树中不会有节点的值为负数或零，这些情况也需要在实际应用中进行考虑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中使用了非局部变量`res`，这种设计方式有什么优点和潜在的缺点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用非局部变量`res`允许在嵌套的递归函数中更新计数器，而不需要将计数结果作为函数的返回值。这种设计简化了函数的返回值结构，使得函数可以专注于计算必要的节点总和和计数。然而，这种设计的缺点是它降低了函数的可重用性和测试性，因为`res`的状态依赖于外部环境，这可能会在并发环境或在需要重新入口递归调用的情况下引发问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-nodes-equal-to-average-of-subtree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-nodes-equal-to-average-of-subtree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>查询最大基因差</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>查询最大基因差</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵 <code>n</code> 个节点的有根树，节点编号从 <code>0</code> 到 <code>n - 1</code> 。每个节点的编号表示这个节点的 <strong>独一无二的基因值</strong> （也就是说节点 <code>x</code> 的基因值为 <code>x</code>）。两个基因值的 <strong>基因差</strong> 是两者的 <strong>异或和</strong> 。给你整数数组 <code>parents</code> ，其中 <code>parents[i]</code> 是节点 <code>i</code> 的父节点。如果节点 <code>x</code> 是树的 <strong>根</strong> ，那么 <code>parents[x] == -1</code> 。</p>
+
+<p>给你查询数组 <code>queries</code> ，其中 <code>queries[i] = [node<sub>i</sub>, val<sub>i</sub>]</code> 。对于查询 <code>i</code> ，请你找到 <code>val<sub>i</sub></code> 和 <code>p<sub>i</sub></code> 的 <strong>最大基因差</strong> ，其中 <code>p<sub>i</sub></code> 是节点 <code>node<sub>i</sub></code> 到根之间的任意节点（包含 <code>node<sub>i</sub></code> 和根节点）。更正式的，你想要最大化 <code>val<sub>i</sub> XOR p<sub>i</sub></code><sub> </sub>。</p>
+
+<p>请你返回数组<em> </em><code>ans</code> ，其中 <code>ans[i]</code> 是第 <code>i</code> 个查询的答案。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/06/29/c1.png" style="width: 118px; height: 163px;">
+<pre><b>输入：</b>parents = [-1,0,1,1], queries = [[0,2],[3,2],[2,5]]
+<b>输出：</b>[2,3,7]
+<strong>解释：</strong>查询数组处理如下：
+- [0,2]：最大基因差的对应节点为 0 ，基因差为 2 XOR 0 = 2 。
+- [3,2]：最大基因差的对应节点为 1 ，基因差为 2 XOR 1 = 3 。
+- [2,5]：最大基因差的对应节点为 2 ，基因差为 5 XOR 2 = 7 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/06/29/c2.png" style="width: 256px; height: 221px;">
+<pre><b>输入：</b>parents = [3,7,-1,2,0,7,0,2], queries = [[4,6],[1,15],[0,5]]
+<b>输出：</b>[6,14,7]
+<strong>解释：</strong>查询数组处理如下：
+- [4,6]：最大基因差的对应节点为 0 ，基因差为 6 XOR 0 = 6 。
+- [1,15]：最大基因差的对应节点为 1 ，基因差为 15 XOR 1 = 14 。
+- [0,5]：最大基因差的对应节点为 2 ，基因差为 5 XOR 2 = 7 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= parents.length &lt;= 10<sup>5</sup></code></li>
+	<li>对于每个 <strong>不是</strong> 根节点的 <code>i</code> ，有 <code>0 &lt;= parents[i] &lt;= parents.length - 1</code> 。</li>
+	<li><code>parents[root] == -1</code></li>
+	<li><code>1 &lt;= queries.length &lt;= 3 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= node<sub>i</sub> &lt;= parents.length - 1</code></li>
+	<li><code>0 &lt;= val<sub>i</sub> &lt;= 2 * 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 2845 ms</p>
+                    <p>内存: 107.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Trie:
+    left: &#34;Trie&#34; = None
+    right: &#34;Trie&#34; = None
+    # 由于我们的字典树需要支持删除数的操作
+    # 因此这里使用 cnt 变量进行记录该节点对应的数的个数
+    cnt: int = 0
+
+class Solution:
+
+    # 最大的数的二进制表示不会超过 18 位
+    # 那么二进制位的下标范围为 [0, 17]
+    MAXD = 17
+
+    def maxGeneticDifference(self, parents: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(parents)
+
+        # 将 parents 存储为树的形式，方便进行深度优先遍历
+        edges = defaultdict(list)
+        # 找出根节点
+        root = -1
+        for i, parent in enumerate(parents):
+            if parent == -1:
+                root = i
+            else:
+                edges[parent].append(i)
+
+        q = len(queries)
+        # 使用离线的思想，stored[i] 存储了所有节点 i 对应的询问
+        stored = defaultdict(list)
+        ans = [0] * q
+        for i, (node, val) in enumerate(queries):
+            stored[node].append((i, val))
+
+        r = Trie()
+
+        # 向字典树添加一个数
+        def trie_insert(x: int) -&gt; None:
+            cur = r
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    if not cur.right:
+                        cur.right = Trie()
+                    cur = cur.right
+                else:
+                    if not cur.left:
+                        cur.left = Trie()
+                    cur = cur.left
+                cur.cnt += 1
+
+        # 对于给定的 x，返回字典树中包含的数与 x 进行异或运算可以达到的最大值
+        def trie_query(x: int) -&gt; int:
+            cur, ret = r, 0
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    if cur.left and cur.left.cnt:
+                        ret |= (1 &lt;&lt; i)
+                        cur = cur.left
+                    else:
+                        cur = cur.right
+                else:
+                    if cur.right and cur.right.cnt:
+                        ret |= (1 &lt;&lt; i)
+                        cur = cur.right
+                    else:
+                        cur = cur.left
+            return ret
+
+        # 从字典树中删除一个数
+        def trie_erase(x: int) -&gt; None:
+            cur = r
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    cur = cur.right
+                else:
+                    cur = cur.left
+                cur.cnt -= 1
+
+        # 深度优先遍历
+        def dfs(u: int) -&gt; None:
+            trie_insert(u)
+            for idx, num in stored[u]:
+                ans[idx] = trie_query(num)
+            for v in edges[u]:
+                dfs(v)
+            trie_erase(u)
+
+        dfs(root)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解利用字典树（Trie）结合深度优先搜索（DFS）来解决最大基因差问题。首先，根据输入的parents数组，构建一棵树并找出根节点。对每个节点，记录所有相关的查询。然后通过DFS遍历树，同时使用字典树动态地记录当前路径上的节点值。每次访问一个节点时，将其值加入字典树中，并对所有在该节点上的查询执行查询操作，即使用字典树寻找与查询值的最大异或结果。遍历完子节点后，从字典树中删除当前节点值以防止对其他路径的影响。这样可以确保每次查询都只与从当前节点到根节点的路径相关联。</p>
+                                <p>时间复杂度: O((n + q) * logM)</p>
+                                <p>空间复杂度: O(n + q + M*2^M)</p>
+                                <pre class="bg-light p-2">class Trie:
+    left: &#39;Trie&#39; = None  # 左子树表示0
+    right: &#39;Trie&#39; = None  # 右子树表示1
+    cnt: int = 0  # 记录当前节点的访问计数
+
+class Solution:
+    MAXD = 17  # 最大的数的二进制表示位数
+
+    def maxGeneticDifference(self, parents: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(parents)
+        edges = defaultdict(list)  # 建立树的边关系
+        root = -1  # 根节点初始化
+        for i, parent in enumerate(parents):
+            if parent == -1:
+                root = i
+            else:
+                edges[parent].append(i)
+        q = len(queries)
+        stored = defaultdict(list)  # 存储每个节点的查询
+        ans = [0] * q  # 初始化答案数组
+        for i, (node, val) in enumerate(queries):
+            stored[node].append((i, val))
+        r = Trie()  # 字典树的根节点
+
+        def trie_insert(x: int) -&gt; None:
+            cur = r
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    if not cur.right:
+                        cur.right = Trie()
+                    cur = cur.right
+                else:
+                    if not cur.left:
+                        cur.left = Trie()
+                    cur = cur.left
+                cur.cnt += 1  # 更新当前路径的计数
+
+        def trie_query(x: int) -&gt; int:
+            cur, ret = r, 0
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    if cur.left and cur.left.cnt:
+                        ret |= (1 &lt;&lt; i)
+                        cur = cur.left
+                    else:
+                        cur = cur.right
+                else:
+                    if cur.right and cur.right.cnt:
+                        ret |= (1 &lt;&lt; i)
+                        cur = cur.right
+                    else:
+                        cur = cur.left
+            return ret
+
+        def trie_erase(x: int) -&gt; None:
+            cur = r
+            for i in range(Solution.MAXD, -1, -1):
+                if x &amp; (1 &lt;&lt; i):
+                    cur = cur.right
+                else:
+                    cur = cur.left
+                cur.cnt -= 1  # 删除时减少计数
+
+        def dfs(u: int) -&gt; None:
+            trie_insert(u)  # 插入当前节点
+            for idx, num in stored[u]:
+                ans[idx] = trie_query(num)  # 执行查询
+            for v in edges[u]:
+                dfs(v)  # 遍历子节点
+            trie_erase(u)  # 退出时从字典树中删除当前节点
+
+        dfs(root)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何保证在删除字典树中的节点时，不会影响到其他分支的查询结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在字典树中，每个节点的`cnt`属性记录了该节点在当前路径中出现的次数。当一个节点值被插入或删除时，只有与该节点值相关的路径上的`cnt`会被增加或减少。因此，即使某个节点值从字典树中删除，只要其他路径上还有相同的节点值，这些节点的`cnt`不会变为零，它们仍然存在于字典树中。这样可以确保删除操作不会影响到那些不在当前DFS路径但共享相同节点值的其他分支的查询结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在字典树中查询最大异或值时，为何优先选择与当前位异或结果为1的分支？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>异或运算的性质是，相同的数异或结果为0，不同的数异或结果为1。在字典树中查询最大异或值时，目标是最大化最终得到的异或结果的数值。因此，如果当前位是1，我们会优先选择与之异或后能得到0的分支（即选择0分支），反之如果当前位是0，优先选择1分支，因为这样可以使得当前位的异或结果为1，从而使整个数值更大。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            字典树的结构如何确保能够有效地存储和查询各个节点的基因值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>字典树（Trie）是一种树形结构，非常适合用于处理和查询字符串或二进制数据集合中的键。在处理基因值时，每个基因值可以被视为一个二进制数。字典树的每个节点代表一个二进制位（0或1），从根到某一节点的路径代表树中保存的一个完整的基因值。通过逐位插入基因值到字典树，并在每个节点记录经过该节点的路径数量（通过`cnt`属性），可以高效地查询和管理基因值。这种结构使得查询特定基因值或与其他基因值的最大异或结果都变得快速和直接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            DFS遍历时，字典树中节点的计数是如何帮助管理路径上的节点的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS遍历过程中，字典树中每个节点的`cnt`计数器记录了该节点被当前路径上有多少个实际节点值引用。这种计数允许我们在遍历过程中动态地管理和跟踪每个节点值的存在性。当遍历到一个新节点时，我们将其值加入字典树并将相应路径上的节点的`cnt`增加。当从一个节点回溯时，相应的节点值从字典树中删除，即将其`cnt`减少。这确保了字典树中始终只包含从当前节点到根节点的路径上的节点值，从而使得查询操作能够正确地反映出从任一节点到根节点的路径状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-genetic-difference-query')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-genetic-difference-query/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

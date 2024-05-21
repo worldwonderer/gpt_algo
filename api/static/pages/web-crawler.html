@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>网络爬虫</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>网络爬虫</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=interactive" class="badge bg-secondary tag-link">交互</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 172 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># &#34;&#34;&#34;
+# This is HtmlParser&#39;s API interface.
+# You should not implement it, or speculate about its implementation
+# &#34;&#34;&#34;
+#class HtmlParser(object):
+#    def getUrls(self, url):
+#        &#34;&#34;&#34;
+#        :type url: str
+#        :rtype List[str]
+#        &#34;&#34;&#34;
+import queue
+
+Queue = queue.Queue
+
+def get_domain_name(url):
+    # url = url[len(&#39;http://&#39;):]
+    # hostname = url.split(&#39;/&#39;)[0]
+    # return f&#39;http://{hostname}&#39;
+    return url.split(&#39;/&#39;)[2]
+
+
+class Solution:
+    def crawl(self, startUrl: str, htmlParser: &#39;HtmlParser&#39;) -&gt; List[str]:
+        q = Queue()
+        q.put(startUrl)
+
+        seen = set()
+        seen.add(startUrl)
+
+        #res = [startUrl]
+
+        target_domain_name = get_domain_name(startUrl)
+        while(not q.empty()):
+            url = q.get()
+
+            candidate_urls = htmlParser.getUrls(url)
+            for c in candidate_urls:
+                if c not in seen and target_domain_name == get_domain_name(c):
+                    q.put(c)
+                    seen.add(c)
+                    #res.append(c)
+        return list(seen)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用广度优先搜索（BFS）策略来遍历所有与起始URL具有相同域名的网页。首先，定义一个队列来存储待访问的URL，并将起始URL加入队列和已访问集合。然后，从队列中逐个取出URL，利用HtmlParser的getUrls方法获取该URL页面上的所有链接。对于每个链接，如果它未被访问过且域名与起始URL相同，就将其加入队列和已访问集合。最终，返回已访问集合中的所有URL，即为所有可达的同域名URL。</p>
+                                <p>时间复杂度: O(N*M)</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2"># 解析HtmlParser API的接口定义
+# class HtmlParser(object):
+#     def getUrls(self, url):
+#         \&#34;\&#34;\&#34;
+#         :type url: str
+#         :rtype List[str]
+#         \&#34;\&#34;\&#34;
+import queue
+
+Queue = queue.Queue
+
+def get_domain_name(url):
+    # 提取URL的域名部分
+    return url.split(&#39;/&#39;)[2]
+
+
+class Solution:
+    def crawl(self, startUrl: str, htmlParser: &#39;HtmlParser&#39;) -&gt; List[str]:
+        q = Queue()
+        q.put(startUrl)
+
+        seen = set()
+        seen.add(startUrl)
+
+        target_domain_name = get_domain_name(startUrl)
+        while(not q.empty()):
+            url = q.get()
+
+            candidate_urls = htmlParser.getUrls(url)
+            for c in candidate_urls:
+                if c not in seen and target_domain_name == get_domain_name(c):
+                    q.put(c)
+                    seen.add(c)
+        return list(seen)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在广度优先搜索中，如何确保不会访问到与起始URL域名不同的网页？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在广度优先搜索（BFS）的实现中，我们通过对每个新发现的URL进行域名检查来确保只访问与起始URL域名相同的网页。具体方法是，定义一个辅助函数 `get_domain_name` 用于从URL中提取域名，然后在将URL添加到队列之前，比较其域名与起始URL的域名是否相同。只有当域名相同时，该URL才会被加入队列和已访问集合。这样可以有效防止访问到不同域名的网页。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于HtmlParser的getUrls方法，它是否能保证总是返回所有有效的链接，或者有可能返回无效或不可访问的链接？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>HtmlParser的getUrls方法的行为依赖于其具体实现。一般而言，我们假设它返回页面上的所有链接（包括相对链接和绝对链接），但不必然保证这些链接都是有效或可访问的。在实际应用中，返回的URL列表可能包含已经失效或无法访问的链接，因此在实际使用中可能需要额外的错误处理或验证机制来确保链接的有效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在解析URL以获取域名时，如果URL格式不标准（如缺少协议头或以非标准形式出现），get_domain_name函数的行为如何？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果URL格式不标准，如缺少协议头（例如，&#39;http://&#39;或&#39;https://&#39;），`get_domain_name`函数可能无法正确解析域名。在当前的实现中，函数通过分割URL字符串来获取域名，如果URL不符合预期的格式，这种简单的分割方法可能会导致错误或异常。因此，对于不标准或异常的URL格式，可能需要更健壮的解析策略，如使用正则表达式或专门的URL解析库来处理这种情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在BFS的实现中，有没有可能出现队列操作（如put和get）的性能瓶颈，特别是在处理大量URL时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理大量的URL时，队列操作（如put和get）确实可能成为性能瓶颈。队列的大小可能迅速增长，尤其是在网页链接密集的情况下，这可能导致内存消耗大量增加。此外，频繁的队列操作可能影响总体性能。为了优化，可以考虑使用更高效的队列实现，例如使用并发队列（在多线程环境中），或者对URL进行批处理以减少队列操作次数。另外，使用更高效的数据结构（如双端队列）可能也有助于提升性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/web-crawler')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/web-crawler/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

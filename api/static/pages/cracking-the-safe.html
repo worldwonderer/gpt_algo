@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>破解保险箱</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>破解保险箱</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=eulerian-circuit" class="badge bg-secondary tag-link">欧拉回路</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个需要密码才能打开的保险箱。密码是&nbsp;<code>n</code> 位数, 密码的每一位都是范围&nbsp;<code>[0, k - 1]</code>&nbsp;中的一个数字。</p>
+
+<p>保险箱有一种特殊的密码校验方法，你可以随意输入密码序列，保险箱会自动记住 <strong>最后&nbsp;<code>n</code>&nbsp;位输入</strong> ，如果匹配，则能够打开保险箱。</p>
+
+<ul>
+	<li>例如，正确的密码是 <code>"345"</code> ，并且你输入的是 <code>"012345"</code> ：
+
+	<ul>
+		<li>输入 <code>0</code> 之后，最后 <code>3</code> 位输入是 <code>"0"</code> ，不正确。</li>
+		<li>输入 <code>1</code> 之后，最后 <code>3</code> 位输入是 <code>"01"</code> ，不正确。</li>
+		<li>输入 <code>2</code> 之后，最后 <code>3</code> 位输入是 <code>"012"</code> ，不正确。</li>
+		<li>输入 <code>3</code> 之后，最后 <code>3</code> 位输入是 <code>"123"</code> ，不正确。</li>
+		<li>输入 <code>4</code> 之后，最后 <code>3</code> 位输入是 <code>"234"</code> ，不正确。</li>
+		<li>输入 <code>5</code> 之后，最后 <code>3</code> 位输入是 <code>"345"</code> ，正确，打开保险箱。</li>
+	</ul>
+	</li>
+</ul>
+
+<p>在只知道密码位数 <code>n</code> 和范围边界 <code>k</code> 的前提下，请你找出并返回确保在输入的 <strong>某个时刻</strong> 能够打开保险箱的任一 <strong>最短</strong> 密码序列 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 1, k = 2
+<strong>输出：</strong>"10"
+<strong>解释：</strong>密码只有 1 位，所以输入每一位就可以。"01" 也能够确保打开保险箱。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 2, k = 2
+<strong>输出：</strong>"01100"
+<strong>解释：</strong>对于每种可能的密码：
+- "00" 从第 4 位开始输入。
+- "01" 从第 1 位开始输入。
+- "10" 从第 3 位开始输入。
+- "11" 从第 2 位开始输入。
+因此 "01100" 可以确保打开保险箱。"01100"、"10011" 和 "11001" 也可以确保打开保险箱。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 4</code></li>
+	<li><code>1 &lt;= k &lt;= 10</code></li>
+	<li><code>1 &lt;= k<sup>n</sup> &lt;= 4096</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 30 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def crackSafe(self, n: int, k: int) -&gt; str:
+        if n == 1:
+            return &#39;&#39;.join(str(i) for i in range(k))
+
+        m = k ** (n - 1)
+        adj = [[] for _ in range(m)]
+        for i in range(m):
+            x = i * k % m
+            adj[i] = [j for j in range(x, x + k)]
+        a = [0]
+        stack = []
+        while a:
+            u = a[-1]
+            if adj[u]:
+                a.append(adj[u].pop())
+            else:
+                stack.append(a.pop())
+        ss = [&#39;0&#39; * (n - 2)]
+        for x in reversed(stack):
+            ss.append(str(x % k))
+        return &#39;&#39;.join(ss)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目可以使用Hierholzer算法来找到Euler路径，即一条通过图中每条边恰好一次的路径。图中的节点表示密码的前n-1位，而边则表示可能的n位密码。算法的核心是构建一个有向图，图的节点表示长度为n-1的序列，每个节点会有k条出边，这些出边对应在该序列后添加一个数字形成的n位序列。解题过程首先构建图的邻接表，然后使用深度优先搜索遍历图来寻找Euler回路，最后将这个回路转换成对应的密码序列。</p>
+                                <p>时间复杂度: O(k^n)</p>
+                                <p>空间复杂度: O(k^n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def crackSafe(self, n: int, k: int) -&gt; str:
+        if n == 1:
+            # 当密码长度为1时，简单返回0到k-1的所有可能
+            return &#39;&#39;.join(str(i) for i in range(k))
+
+        # 计算前缀为n-1的所有可能状态数量
+        m = k ** (n - 1)
+        # 创建邻接表
+        adj = [[] for _ in range(m)]
+        for i in range(m):
+            # 计算每个状态的出边
+            x = i * k % m
+            adj[i] = [j for j in range(x, x + k)]
+        a = [0]
+        stack = []
+        # 使用DFS找到Euler回路
+        while a:
+            u = a[-1]
+            if adj[u]:
+                a.append(adj[u].pop())
+            else:
+                stack.append(a.pop())
+        # 构建最终的密码序列
+        ss = [&#39;0&#39; * (n - 2)]
+        for x in reversed(stack):
+            ss.append(str(x % k))
+        return &#39;&#39;.join(ss)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解题过程中，你是如何确定使用Hierholzer算法来寻找Euler路径的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Hierholzer算法是用于寻找Euler路径的经典算法，它特别适用于需要遍历图中每条边恰好一次的问题。在破解保险箱的场景中，我们需要找到一个密码序列，该序列通过所有可能的n位密码恰好一次，这可以被抽象为在一个有向图中找到一个Euler回路。因此，考虑到题目需求和Hierholzer算法的适用性，我决定采用此算法来解决问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            Hierholzer算法适用于哪些类型的图，即什么条件下图中存在欧拉回路或路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Hierholzer算法适用于有向图和无向图，但它要求图中至少存在一个欧拉路径或欧拉回路。对于无向图，欧拉回路存在的条件是所有顶点的度数都是偶数；欧拉路径存在的条件是恰有两个顶点的度数是奇数，其他顶点的度数都是偶数。对于有向图，欧拉回路存在的条件是每个顶点的入度和出度相等；欧拉路径存在的条件是恰有一个顶点的出度比入度大1，恰有一个顶点的入度比出度大1，其他顶点的入度和出度相等。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在算法中，你如何构建图的节点和边？特别是如何从节点表示长度为n-1的序列到节点有k条边的过程是如何实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中，图的节点代表长度为n-1的序列。假设使用数字0到k-1，那么有k^(n-1)种可能的序列，这些序列作为图的节点。为了构建边，对于每个节点（即每个序列），我们通过在序列末尾添加一个从0到k-1的数字来生成新的n位序列。这样，从每个节点出发都会有k条边，对应于添加不同数字得到的序列。我们通过计算来确定每个新序列对应的节点，确保边的正确连接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在深度优先搜索（DFS）过程中，如何确保每条边只被访问一次，从而满足Euler路径的要求？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用DFS进行欧拉回路的搜索过程中，我们维护一个栈来记录访问的路径，并且对每个节点维护一个邻接表来记录其可达的节点。当访问一个节点时，我们将其从当前节点的邻接表中移除，这样每条边只会被访问一次。一旦一个节点没有更多可访问的边，我们就将其加入到最终的路径中。这种方法确保了每条边在整个过程中仅被访问一次，符合欧拉路径的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/cracking-the-safe')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/cracking-the-safe/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

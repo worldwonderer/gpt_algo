@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大加号标志</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大加号标志</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在一个 <code>n x n</code> 的矩阵&nbsp;<code>grid</code>&nbsp;中，除了在数组&nbsp;<code>mines</code>&nbsp;中给出的元素为&nbsp;<code>0</code>，其他每个元素都为&nbsp;<code>1</code>。<code>mines[i] = [x<sub>i</sub>, y<sub>i</sub>]</code>表示&nbsp;<code>grid[x<sub>i</sub>][y<sub>i</sub>] == 0</code></p>
+
+<p>返回 <em>&nbsp;</em><code>grid</code><em> 中包含&nbsp;<code>1</code>&nbsp;的最大的 <strong>轴对齐</strong> 加号标志的阶数</em> 。如果未找到加号标志，则返回 <code>0</code> 。</p>
+
+<p>一个&nbsp;<code>k</code>&nbsp;阶由&nbsp;<em><code>1</code></em>&nbsp;组成的 <strong>“轴对称”加号标志</strong> 具有中心网格&nbsp;<code>grid[r][c] == 1</code>&nbsp;，以及4个从中心向上、向下、向左、向右延伸，长度为&nbsp;<code>k-1</code>，由&nbsp;<code>1</code>&nbsp;组成的臂。注意，只有加号标志的所有网格要求为 <code>1</code> ，别的网格可能为 <code>0</code> 也可能为 <code>1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/06/13/plus1-grid.jpg" /></p>
+
+<pre>
+<strong>输入:</strong> n = 5, mines = [[4, 2]]
+<strong>输出:</strong> 2
+<strong>解释: </strong>在上面的网格中，最大加号标志的阶只能是2。一个标志已在图中标出。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/06/13/plus2-grid.jpg" /></p>
+
+<pre>
+<strong>输入:</strong> n = 1, mines = [[0, 0]]
+<strong>输出:</strong> 0
+<strong>解释: </strong>没有加号标志，返回 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>1 &lt;= mines.length &lt;= 5000</code></li>
+	<li><code>0 &lt;= x<sub>i</sub>, y<sub>i</sub>&nbsp;&lt; n</code></li>
+	<li>每一对&nbsp;<code>(x<sub>i</sub>, y<sub>i</sub>)</code>&nbsp;都 <strong>不重复</strong>​​​​​​​</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 632 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -&gt; int:
+        if len(mines) == n * n: return 0
+
+        xs, ys = [[-1, n] for _ in range(n)], [[-1, n] for _ in range(n)]
+        for r, c in mines:
+            heappush(xs[r], c)
+            heappush(ys[c], r)
+
+        res = 0
+        up, down = [heappop(col) for col in ys], [heappop(col) for col in ys]
+        for r in range(n):
+            right = heappop(xs[r])
+            while len(xs[r]) &gt; 0:
+                left, right = right, heappop(xs[r])
+                for c in range(left + res + 1, right - res):
+                    while down[c] &lt;= r:
+                        up[c], down[c] = down[c], heappop(ys[c])
+                    res = max(res, min(c - left, right - c, r - up[c], down[c] - r))
+
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是先将所有的mines位置存储在两个数组xs和ys中，xs[i]表示第i行中mines的列坐标，ys[i]表示第i列中mines的行坐标，并且都按升序排列。然后从左到右遍历每一行，对于每个可能的中心位置(r,c)，通过xs数组找到其左右两侧最近的mines位置left和right，通过ys数组找到其上下两侧最近的mines位置up[c]和down[c]，然后计算以(r,c)为中心的最大加号标志的阶数，并更新全局最大值res。</p>
+                                <p>时间复杂度: O(n^2 log m)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">```python
+class Solution:
+    def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -&gt; int:
+        if len(mines) == n * n: return 0
+
+        # 初始化xs和ys数组，xs[i]表示第i行中mines的列坐标，ys[i]表示第i列中mines的行坐标
+        xs, ys = [[-1, n] for _ in range(n)], [[-1, n] for _ in range(n)]
+        for r, c in mines:
+            heappush(xs[r], c)
+            heappush(ys[c], r)
+
+        res = 0
+        # 初始化up和down数组，up[i]表示第i列中最靠上的mines行坐标，down[i]表示第i列中最靠下的mines行坐标
+        up, down = [heappop(col) for col in ys], [heappop(col) for col in ys]
+        for r in range(n):
+            right = heappop(xs[r])
+            while len(xs[r]) &gt; 0:
+                left, right = right, heappop(xs[r]) # left为左侧最近的mines列坐标，right为右侧最近的mines列坐标
+                for c in range(left + res + 1, right - res):
+                    while down[c] &lt;= r:
+                        up[c], down[c] = down[c], heappop(ys[c]) # 更新up和down数组
+                    res = max(res, min(c - left, right - c, r - up[c], down[c] - r)) # 计算以(r,c)为中心的最大加号标志阶数
+
+        return res
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在预处理步骤中，你是如何保证xs和ys数组能有效地存储mines的位置信息？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，预处理步骤涉及将所有矿的位置（mines）存储在xs和ys数组中。这里，xs和ys是列表的列表，其中xs[i]存储第i行中所有矿的列坐标，ys[i]存储第i列中所有矿的行坐标。通过遍历所有矿的位置，使用heappush函数将每个矿的列坐标加入到对应行的xs列表中，将每个矿的行坐标加入到对应列的ys列表中。此外，每个列表初始包含-1和n，这表示边界外的虚拟矿的位置，以便于后续处理。这种方法确保了xs和ys能够准确且有效地反映每行每列矿的位置，为计算最大加号标志提供了必要的信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于xs和ys数组中使用的heappush和heappop操作，为什么选择使用堆结构，其性能如何影响整体算法效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，使用堆结构（具体是最小堆）进行heappush和heappop操作，是为了高效地管理和访问每行和每列中矿的位置信息。使用堆结构允许我们以对数时间复杂度O(log n)插入新元素（heappush操作），同时也能以常数时间O(1)获得最小元素（heappop操作来获取堆顶元素），这在算法中用于快速定位每个位置左右和上下的最近矿。这种数据结构的选择，特别是对于频繁的插入和获取最小元素的操作，相比其他如数组或链表结构，在性能上有显著优势，尤其是在处理较大规模数据时。这有助于提高整体算法效率，尤其是在动态更新矿位置信息时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中提到的up和down数组，具体是如何初始化和更新的？这种更新机制是否足以处理所有边界情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的up和down数组分别用于存储每列中最靠上和最靠下的矿的行坐标。这两个数组的初始化是通过遍历ys数组，使用heappop操作从每个列的最小堆中弹出最小元素（即最上方的矿位置）来完成的。初始化后，up数组存储的是每列中最上方的矿的位置，而down数组存储的是对应列的下一个矿的位置。在算法执行过程中，当我们遍历到某个列的某个行时，如果当前行号大于down数组中存储的行号，我们会更新up数组为当前down的值，然后从ys的对应堆中继续pop出新的down值。这种更新机制保证了每次计算可能的加号标志大小时，我们都可以快速准确地知道每个位置的上下最近的矿的位置。这种机制足够处理所有的边界情况，因为它考虑了所有可能的矿的位置，并且动态更新以适应不同位置的查询，确保每次计算都基于最新的矿位置信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/maximal-square" class="list-group-item list-group-item-action">
+                                最大正方形
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/largest-plus-sign')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/largest-plus-sign/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>校园自行车分配 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>校园自行车分配 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 56 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class DinicMaxflowMinCost:
+    def __init__(self, n):
+        self.n = n
+        self.vis = [0] * (self.n + 1)
+        self.point_head = [0] * (self.n + 1)
+        self.edge_capacity = [0] * 2
+        self.edge_cost = [0] * 2
+        self.edge_to = [0] * 2
+        self.edge_next = [0] * 2
+        self.h = [inf] * (self.n + 1)
+        self.dis = [inf] * (self.n + 1)
+        self.max_flow = 0
+        self.min_cost = 0
+        self.edge_id = 2
+        self.pre_edge = [0] * (self.n + 1)
+        self.pre_point = [0] * (self.n + 1)
+
+    def add_single_edge(self, u, v, cap, c):
+        self.edge_capacity.append(cap)
+        self.edge_cost.append(c)
+        self.edge_to.append(v)
+        self.edge_next.append(self.point_head[u])
+        self.point_head[u] = self.edge_id
+        self.edge_id += 1
+        return
+
+    def add_edge(self, u, v, cap, c):
+        self.add_single_edge(u, v, cap, c)
+        self.add_single_edge(v, u, 0, -c)
+        return
+
+    def spfa(self, s):
+        self.h[s] = 0
+        q = deque([s])
+        self.vis[s] = 1
+        while q:
+            u = q.popleft()
+            self.vis[u] = 0
+            i = self.point_head[u]
+            while i:
+                v = self.edge_to[i]
+                if self.edge_capacity[i] &gt; 0 and self.h[v] &gt; self.h[u] + self.edge_cost[i]:
+                    self.h[v] = self.h[u] + self.edge_cost[i]
+                    if not self.vis[v]:
+                        q.append(v)
+                        self.vis[v] = 1
+                i = self.edge_next[i]
+        return
+
+    def dijkstra(self, s, t):
+        for i in range(1, self.n + 1):
+            self.dis[i] = inf
+            self.vis[i] = 0
+        self.dis[s] = 0
+        q = [(0, s)]
+        while q:
+            d, u = heapq.heappop(q)
+            if self.vis[u]:
+                continue
+            self.vis[u] = 1
+            i = self.point_head[u]
+            while i:
+                v = self.edge_to[i]
+                nc = self.h[u] - self.h[v] + self.edge_cost[i]
+                if self.edge_capacity[i] &gt; 0 and self.dis[v] &gt; self.dis[u] + nc:
+                    self.dis[v] = self.dis[u] + nc
+                    self.pre_edge[v] = i
+                    self.pre_point[v] = u
+                    if not self.vis[v]:
+                        heapq.heappush(q, (self.dis[v], v))
+                i = self.edge_next[i]
+        return self.dis[t] &lt; inf
+
+    def max_flow_min_cost(self, s, t):
+        self.spfa(s)
+        while self.dijkstra(s, t):
+            for i in range(1, self.n + 1):
+                self.h[i] += self.dis[i]
+
+            cur_flow = inf
+            v = t
+            while v != s:
+                i = self.pre_edge[v]
+                c = self.edge_capacity[i]
+                cur_flow = cur_flow if cur_flow &lt; c else c
+                v = self.pre_point[v]
+
+            v = t
+            while v != s:
+                i = self.pre_edge[v]
+                self.edge_capacity[i] -= cur_flow
+                self.edge_capacity[i ^ 1] += cur_flow
+                v = self.pre_point[v]
+
+            self.max_flow += cur_flow
+            self.min_cost += cur_flow * self.h[t]
+
+        return self.max_flow, self.min_cost
+
+
+class Solution:
+    def assignBikes(self, workers: List[List[int]], bikes: List[List[int]]) -&gt; int:
+        m, n = len(workers), len(bikes)
+        flow = DinicMaxflowMinCost(2 * m + 2 * n + 2)
+        for i in range(1, m + 1):
+            flow.add_edge(2 * i - 1, 2 * i, 1, 0)
+            flow.add_edge(2 * m + 2 * n + 1, 2 * i - 1, 1, 0)
+        for i in range(1, n + 1):
+            flow.add_edge(2 * m + 2 * i - 1, 2 * m + 2 * i, 1, 0)
+            flow.add_edge(2 * m + 2 * i, 2 * m + 2 * n + 2, 1, 0)
+        for i in range(m):
+            for j in range(n):
+                score = abs(workers[i][0] - bikes[j][0]) + abs(workers[i][1] - bikes[j][1])
+                flow.add_edge(2 * (i + 1), 2 * m + 2 * (j + 1) - 1, 1, score)
+        ans = flow.max_flow_min_cost(2 * m + 2 * n + 1, 2 * m + 2 * n + 2)
+        return ans[1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解通过使用最小费用最大流算法来解决校园自行车分配问题。具体地，算法创建了一个流网络，其中包括源点、汇点、工人节点和自行车节点。每个工人和自行车都分为两个节点，中间连接一条容量为1，费用为0的边，以确保每个工人和每辆自行车最多只能匹配一次。所有工人的起始点连接到源点，所有自行车的终点连接到汇点。工人到自行车的连接边的容量为1，费用为工人到自行车的曼哈顿距离。通过求解该网络的最小费用最大流，可以得到工人和自行车之间的最优分配方案。</p>
+                                <p>时间复杂度: O((m+n)^2)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class DinicMaxflowMinCost:
+    def __init__(self, n):
+        # 初始化，n为图中节点总数
+        self.n = n
+        self.vis = [0] * (self.n + 1)
+        self.point_head = [0] * (self.n + 1)
+        self.edge_capacity = [0] * 2
+        self.edge_cost = [0] * 2
+        self.edge_to = [0] * 2
+        self.edge_next = [0] * 2
+        self.h = [inf] * (self.n + 1)
+        self.dis = [inf] * (self.n + 1)
+        self.max_flow = 0
+        self.min_cost = 0
+        self.edge_id = 2
+        self.pre_edge = [0] * (self.n + 1)
+        self.pre_point = [0] * (self.n + 1)
+
+    def add_single_edge(self, u, v, cap, c):
+        # 添加单向边
+        self.edge_capacity.append(cap)
+        self.edge_cost.append(c)
+        self.edge_to.append(v)
+        self.edge_next.append(self.point_head[u])
+        self.point_head[u] = self.edge_id
+        self.edge_id += 1
+        return
+
+    def add_edge(self, u, v, cap, c):
+        # 添加双向边
+        self.add_single_edge(u, v, cap, c)
+        self.add_single_edge(v, u, 0, -c)
+        return
+
+    def spfa(self, s):
+        # 使用SPFA算法计算最短路径
+        self.h[s] = 0
+        q = deque([s])
+        self.vis[s] = 1
+        while q:
+            u = q.popleft()
+            self.vis[u] = 0
+            i = self.point_head[u]
+            while i:
+                v = self.edge_to[i]
+                if self.edge_capacity[i] &gt; 0 and self.h[v] &gt; self.h[u] + self.edge_cost[i]:
+                    self.h[v] = self.h[u] + self.edge_cost[i]
+                    if not self.vis[v]:
+                        q.append(v)
+                        self.vis[v] = 1
+                i = self.edge_next[i]
+        return
+
+    def dijkstra(self, s, t):
+        # 使用Dijkstra算法进行路径优化
+        for i in range(1, self.n + 1):
+            self.dis[i] = inf
+            self.vis[i] = 0
+        self.dis[s] = 0
+        q = [(0, s)]
+        while q:
+            d, u = heapq.heappop(q)
+            if self.vis[u]:
+                continue
+            self.vis[u] = 1
+            i = self.point_head[u]
+            while i:
+                v = self.edge_to[i]
+                nc = self.h[u] - self.h[v] + self.edge_cost[i]
+                if self.edge_capacity[i] &gt; 0 and self.dis[v] &gt; self.dis[u] + nc:
+                    self.dis[v] = self.dis[u] + nc
+                    self.pre_edge[v] = i
+                    self.pre_point[v] = u
+                    if not self.vis[v]:
+                        heapq.heappush(q, (self.dis[v], v))
+                i = self.edge_next[i]
+        return self.dis[t] &lt; inf
+
+    def max_flow_min_cost(self, s, t):
+        # 主算法流程
+        self.spfa(s)
+        while self.dijkstra(s, t):
+            for i in range(1, self.n + 1):
+                self.h[i] += self.dis[i]
+
+            cur_flow = inf
+            v = t
+            while v != s:
+                i = self.pre_edge[v]
+                c = self.edge_capacity[i]
+                cur_flow = cur_flow if cur_flow &lt; c else c
+                v = self.pre_point[v]
+
+            v = t
+            while v != s:
+                i = self.pre_edge[v]
+                self.edge_capacity[i] -= cur_flow
+                self.edge_capacity[i ^ 1] += cur_flow
+                v = self.pre_point[v]
+
+            self.max_flow += cur_flow
+            self.min_cost += cur_flow * self.h[t]
+
+        return self.max_flow, self.min_cost
+
+class Solution:
+    def assignBikes(self, workers: List[List[int]], bikes: List[List[int]]) -&gt; int:
+        m, n = len(workers), len(bikes)
+        flow = DinicMaxflowMinCost(2 * m + 2 * n + 2)
+        for i in range(1, m + 1):
+            flow.add_edge(2 * i - 1, 2 * i, 1, 0)
+            flow.add_edge(2 * m + 2 * n + 1, 2 * i - 1, 1, 0)
+        for i in range(1, n + 1):
+            flow.add_edge(2 * m + 2 * i - 1, 2 * m + 2 * i, 1, 0)
+            flow.add_edge(2 * m + 2 * i, 2 * m + 2 * n + 2, 1, 0)
+        for i in range(m):
+            for j in range(n):
+                score = abs(workers[i][0] - bikes[j][0]) + abs(workers[i][1] - bikes[j][1])
+                flow.add_edge(2 * (i + 1), 2 * m + 2 * (j + 1) - 1, 1, score)
+        ans = flow.max_flow_min_cost(2 * m + 2 * n + 1, 2 * m + 2 * n + 2)
+        return ans[1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建流网络时，每个工人和每辆自行车都被分为两个节点，并通过一条容量为1，费用为0的边相连接？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建流网络的过程中，将每个工人和每辆自行车分为两个节点并通过一条容量为1，费用为0的边相连接，这是为了确保每个工人和每辆自行车在最终的匹配中最多只能被分配一次。这样的设计允许流网络模拟“选择”过程，其中从工人的第一个节点流向第二个节点的流量表示对该工人进行了一次匹配，同样的逻辑也适用于自行车。这样可以简化流量控制，确保每个工人和自行车在匹配中的唯一性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中没有详细解释`self.h`和`self.dis`数组在算法中的具体作用，它们分别代表什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`self.h`数组用于存储每个节点的势能，这在计算调整后的边权重时非常关键，用以保证在每次迭代中的费用都是非负的，从而允许使用最短路径算法如Dijkstra算法。而`self.dis`数组则用于在执行Dijkstra算法时存储从源点到每个点的最短距离（考虑了势能调整后的边权重）。这两个数组是在算法寻找最小费用流的过程中，实现距离和费用更新的重要数据结构。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解提到使用SPFA算法初始化势能`self.h`，请问在最小费用流问题中，势能的引入是为了解决什么问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在最小费用流问题中，势能的引入主要是为了将原本可能包含负权重的图转换为一个仅含有非负权重的图，从而使得可以有效地应用Dijkstra算法来找到最短路径。通过势能的调整，可以保证每一次迭代过程中，所有的边权重都被调整为非负值，这是通过增加两节点间势能差与原权重的和来实现的。这种办法有效避免了在含有负权边的图中使用Dijkstra算法可能引起的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中的Dijkstra算法中使用了势能调整后的费用`nc`，这种调整的目的是什么，它如何影响算法找到最小费用的路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>势能调整后的费用`nc`的计算通过在原始费用基础上加上起点的势能并减去终点的势能来进行。这种调整的主要目的是保证所有的边权重在算法运行过程中都是非负的，从而允许使用Dijkstra算法高效地找到最短路径。通过这种势能调整，即便原始的边权重中有负值，整个算法流程仍可确保每一步都基于非负权重进行，有助于快速准确地找到成本最低的流路径。此外，这也有助于算法在每次迭代后通过更新势能，持续优化到达每个节点的最小费用，从而保证整体解决方案的最优性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/campus-bikes" class="list-group-item list-group-item-action">
+                                校园自行车分配
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/campus-bikes-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/campus-bikes-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

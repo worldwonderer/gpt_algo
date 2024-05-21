@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计没有收到请求的服务器数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计没有收到请求的服务器数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数&nbsp;<code>n</code>&nbsp;，表示服务器的总数目，再给你一个下标从 <strong>0</strong>&nbsp;开始的 <strong>二维</strong>&nbsp;整数数组&nbsp;<code>logs</code>&nbsp;，其中&nbsp;<code>logs[i] = [server_id, time]</code>&nbsp;表示 id 为&nbsp;<code>server_id</code>&nbsp;的服务器在&nbsp;<code>time</code>&nbsp;时收到了一个请求。</p>
+
+<p>同时给你一个整数&nbsp;<code>x</code>&nbsp;和一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>queries</code>&nbsp; 。</p>
+
+<p>请你返回一个长度等于&nbsp;<code>queries.length</code>&nbsp;的数组&nbsp;<code>arr</code>&nbsp;，其中&nbsp;<code>arr[i]</code>&nbsp;表示在时间区间&nbsp;<code>[queries[i] - x, queries[i]]</code>&nbsp;内没有收到请求的服务器数目。</p>
+
+<p>注意时间区间是个闭区间。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>n = 3, logs = [[1,3],[2,6],[1,5]], x = 5, queries = [10,11]
+<b>输出：</b>[1,2]
+<b>解释：</b>
+对于 queries[0]：id 为 1 和 2 的服务器在区间 [5, 10] 内收到了请求，所以只有服务器 3 没有收到请求。
+对于 queries[1]：id 为 2 的服务器在区间 [6,11] 内收到了请求，所以 id 为 1 和 3 的服务器在这个时间段内没有收到请求。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>n = 3, logs = [[2,4],[2,1],[1,2],[3,1]], x = 2, queries = [3,4]
+<b>输出：</b>[0,1]
+<b>解释：</b>
+对于 queries[0]：区间 [1, 3] 内所有服务器都收到了请求。
+对于 queries[1]：只有 id 为 3 的服务器在区间 [2,4] 内没有收到请求。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= logs.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= queries.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>logs[i].length == 2</code></li>
+	<li><code>1 &lt;= logs[i][0] &lt;= n</code></li>
+	<li><code>1 &lt;= logs[i][1] &lt;= 10<sup>6</sup></code></li>
+	<li><code>1 &lt;= x &lt;= 10<sup>5</sup></code></li>
+	<li><code>x &lt;&nbsp;queries[i]&nbsp;&lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 214 ms</p>
+                    <p>内存: 64.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countServers(self, n: int, logs: List[List[int]], x: int, queries: List[int]) -&gt; List[int]:
+        logs.sort(key=lambda p: p[1])  # 按照 time 排序
+        ans = [0] * len(queries)
+        cnt = [0] * (n + 1)
+        out_of_range = n
+        left = right = 0
+        m = len(logs)
+        for qi, q in sorted(enumerate(queries), key=lambda p: p[1]):
+            while right &lt; m and logs[right][1] &lt;= q:  # 进入窗口
+                i = logs[right][0]
+                if cnt[i] == 0: out_of_range -= 1
+                cnt[i] += 1
+                right += 1
+            while left &lt; m and logs[left][1] &lt; q - x:  # 离开窗口
+                i = logs[left][0]
+                cnt[i] -= 1
+                if cnt[i] == 0: out_of_range += 1
+                left += 1
+            ans[qi] = out_of_range
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用滑动窗口方法配合双指针技术，对日志进行分析以找出没有收到请求的服务器数。首先，日志按时间进行排序，以便使用双指针滑动窗口来维护时间区间。然后，对查询也进行排序，以便同步处理。在处理过程中，我们维护一个数组cnt，记录每个服务器在当前查询时间窗口内的请求数。同时，用out_of_range记录当前时间窗口内没有收到请求的服务器数量。通过逐步移动两个指针（left和right）来更新这些统计数据——当右指针向右移动时，扩展窗口；当左指针向右移动时，缩小窗口。最终，每次查询的结果即为out_of_range的值。</p>
+                                <p>时间复杂度: O(m log m + q log q + m)</p>
+                                <p>空间复杂度: O(n + q)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countServers(self, n: int, logs: List[List[int]], x: int, queries: List[int]) -&gt; List[int]:
+        logs.sort(key=lambda p: p[1])  # 按照时间排序日志
+        ans = [0] * len(queries)
+        cnt = [0] * (n + 1)
+        out_of_range = n
+        left = right = 0
+        m = len(logs)
+        for qi, q in sorted(enumerate(queries), key=lambda p: p[1]):
+            while right &lt; m and logs[right][1] &lt;= q:  # 将右指针移至不超过当前查询时间的最远位置
+                i = logs[right][0]
+                if cnt[i] == 0: out_of_range -= 1 # 如果该服务器之前未收到请求，更新未收到请求的服务器数量
+                cnt[i] += 1
+                right += 1
+            while left &lt; m and logs[left][1] &lt; q - x:  # 将左指针移至小于当前查询时间窗口的最远位置
+                i = logs[left][0]
+                cnt[i] -= 1
+                if cnt[i] == 0: out_of_range += 1 # 如果该服务器现在未收到请求，更新未收到请求的服务器数量
+                left += 1
+            ans[qi] = out_of_range # 记录结果
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            双指针技术在这个问题中是如何具体应用的？能否详细解释左右指针各自的移动条件和移动时对问题解决的贡献？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题中，双指针技术用于维护一个时间窗口，该窗口内的日志表示在当前查询时间内服务器接收到的请求。左指针和右指针分别表示窗口的开始和结束。右指针向右移动时，扩展窗口以包括所有不超过当前查询时间的请求，增加相应服务器的请求计数，并适当调整没有收到请求的服务器数量。当服务器从未收到请求到收到请求时，该服务器不再被计入未收到请求的服务器数，因此需要减少out_of_range的值。左指针向右移动时，缩小窗口以排除早于当前查询时间窗口的请求，减少相应服务器的请求计数，并适当调整没有收到请求的服务器数量。当服务器的请求计数重新变为零时，意味着它在当前查询窗口内没有任何请求，因此需要增加out_of_range的值。这种双指针的运用确保了我们能够有效地根据时间窗口更新每个服务器的请求状态，从而在每次查询时都能准确计算出未收到请求的服务器数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新服务器的请求计数（cnt数组）时，为什么在cnt[i]为0时减少out_of_range，而在cnt[i]变回0时又增加out_of_range？这种处理方式有什么特别的意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>数组cnt用于记录每个服务器在当前查询时间窗口内的请求计数。当cnt[i]为0时表示该服务器在当前窗口内尚未收到任何请求，因此是计入out_of_range的一个。如果此时这个服务器接收到了一个请求，其cnt[i]从0变为1，因此需要从out_of_range中减去这个服务器，因为它不再是未收到请求的服务器。相反，当一个服务器在时间窗口调整后（左指针移动）其请求计数重新变为0，说明它在新的时间窗口内没有收到任何请求，因此需要重新将这个服务器计入out_of_range。这种处理确保out_of_range始终准确反映当前查询时间窗口内未收到请求的服务器总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果在查询期间日志数据非常密集，这种双指针滑动窗口方法的效率如何？会不会有性能瓶颈？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当日志数据非常密集时，右指针可能频繁向右移动，而每次移动都需要更新服务器的请求计数和out_of_range值。虽然这种情况下双指针方法可能会有较高的运算量，但整体效率仍然相对较高，因为每个日志只被处理两次（一次由右指针处理，一次由左指针处理），因此时间复杂度为O(m + q)，其中m是日志条数，q是查询次数。然而，在极端情况下，例如日志非常密集且服务器数量很大时，频繁更新cnt数组和计算out_of_range可能会导致性能瓶颈。在这种情况下，可能需要考虑更高效的数据结构或优化算法来进一步提升性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-zero-request-servers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-zero-request-servers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

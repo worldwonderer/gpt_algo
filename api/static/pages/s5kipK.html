@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>夺回据点</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>夺回据点</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=biconnected-component" class="badge bg-secondary tag-link">双连通分量</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        欢迎各位勇者来到力扣城，本次试炼主题为「夺回据点」。
+
+魔物了占领若干据点，这些据点被若干条道路相连接，`roads[i] = [x, y]` 表示编号 `x`、`y` 的两个据点通过一条道路连接。
+
+现在勇者要将按照以下原则将这些据点逐一夺回：
+
+- 在开始的时候，勇者可以花费资源先夺回一些据点，初始夺回第 `j` 个据点所需消耗的资源数量为 `cost[j]` 
+
+- 接下来，勇者在不消耗资源情况下，每次可以夺回**一个**和「已夺回据点」相连接的魔物据点，并对其进行夺回
+
+> 注：为了防止魔物暴动，勇者在每一次夺回据点后（包括花费资源夺回据点后），需要保证剩余的所有魔物据点之间是相连通的（不经过「已夺回据点」）。
+
+请返回勇者夺回所有据点需要消耗的最少资源数量。
+
+**注意：**
+- 输入保证初始所有据点都是连通的，且不存在重边和自环
+
+**示例 1：**
+>输入：
+>`cost = [1,2,3,4,5,6]`
+>`roads = [[0,1],[0,2],[1,3],[2,3],[1,2],[2,4],[2,5]]`
+>
+>输出：`6`
+>
+>解释：
+>勇者消耗资源 `6` 夺回据点 `0` 和 `4`，魔物据点 `1、2、3、5` 相连通；
+>第一次夺回据点 `1`，魔物据点 `2、3、5` 相连通；
+>第二次夺回据点 `3`，魔物据点 `2、5` 相连通；
+>第三次夺回据点 `2`，剩余魔物据点 `5`；
+>第四次夺回据点 `5`，无剩余魔物据点；
+>因此最少需要消耗资源为 `6`，可占领所有据点。
+![image.png](https://pic.leetcode-cn.com/1648706944-KJstUN-image.png){:height=170px}
+
+
+**示例 2：**
+>输入：
+>`cost = [3,2,1,4]`
+>`roads = [[0,2],[2,3],[3,1]]`
+>
+>输出：`2`
+>
+>解释：
+>勇者消耗资源 `2` 夺回据点 `1`，魔物据点 `0、2、3` 相连通；
+>第一次夺回据点 `3`，魔物据点 `2、0` 相连通；
+>第二次夺回据点 `2`，剩余魔物据点 `0`；
+>第三次夺回据点 `0`，无剩余魔物据点；
+>因此最少需要消耗资源为 `2`，可占领所有据点。
+![image.png](https://pic.leetcode-cn.com/1648707186-LJRwzU-image.png){:height=60px}
+
+
+**提示：**
+- `1 <= roads.length, cost.length <= 10^5`
+- `0 <= roads[i][0], roads[i][1] < cost.length`
+- `1 <= cost[i] <= 10^9`
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 577 ms</p>
+                    <p>内存: 67.6 MB</p>
+                    <pre class="bg-light p-2 code-pre"># vbcc 点双连通
+class Solution:
+    def minimumCost(self, c: List[int], e: List[List[int]]) -&gt; int:
+        n = len(c)
+        g = [[] for _ in range(n)]
+        for x, y in e:
+            g[x].append(y)
+            g[y].append(x)
+        t = 0 
+        dfn = [0]*n
+        low = [0]*n 
+        cut = [0]*n 
+        root = 0 
+        vbcc = defaultdict(list)
+        cnt = 0 
+        stack = []
+        def dfs(u, fa):
+            nonlocal t 
+            t += 1 
+            dfn[u] = t 
+            low[u] = t 
+            flag = 0 
+            stack.append(u)
+            for v in g[u]:
+                if not dfn[v]:
+                    dfs(v, u)
+                    low[u] = min(low[u], low[v]) 
+                    if dfn[u]&lt;=low[v]:
+                        flag += 1
+                        if (u!=root) or (flag&gt;1):
+                            cut[u] = 1 
+                        nonlocal cnt 
+                        vbcc[cnt].append(u)
+                        while 1:
+                            z = stack.pop()
+                            vbcc[cnt].append(z)
+                            if z==v:
+                                break 
+                        cnt += 1 
+
+                else:
+                    low[u] = min(low[u], dfn[v]) 
+        dfs(0, -1) # dfs(0, 0)
+        ans = []
+        for j in vbcc:
+            num = 0 
+            tmp = []
+            for k in vbcc[j]:
+                if cut[k]==0:
+                    tmp.append(c[k])
+                if cut[k]:
+                    num += 1 
+            if num==1:
+                ans.append(min(tmp)) 
+        # print(ans)
+        if not ans:
+            return  min(c)
+        if len(ans)==1:
+            return ans[0]
+        else:
+            ans.sort()
+            return sum(ans[:-1]) </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了基于深度优先搜索（DFS）的点双连通分量（Biconnected Components）的算法来解决问题。每个点双连通分量是一个最大的子图，其中任何两个顶点都有两条不相交的路径相连，这样即使去掉任何一个节点，其余节点依然连通。算法的主要步骤如下：1. 使用DFS遍历图，同时记录每个节点的访问序号dfn和最小可回溯到的祖先节点序号low。2. 利用dfn和low值，判断并记录割点（关键节点，其移除会导致图的不连通）。3. 构建每个点双连通分量，每遇到一个新的割点或遍历完一个连通分量时，将该分量的节点记录下来。4. 对每个点双连通分量，找到非割点的最小成本，以此计算最小的资源消耗。5. 特殊处理单个割点和非割点情况下的最小成本计算。整体思路是通过图的深度优先遍历确定关键节点和连通分量，然后基于每个连通分量的成本最小化总资源消耗。</p>
+                                <p>时间复杂度: O(V + E)</p>
+                                <p>空间复杂度: O(V + E)</p>
+                                <pre class="bg-light p-2"># vbcc 点双连通
+ class Solution:
+ def minimumCost(self, c: List[int], e: List[List[int]]) -&gt; int:
+ n = len(c) # 节点数量
+ g = [[] for _ in range(n)] # 邻接表
+ for x, y in e: # 构建无向图
+ g[x].append(y)
+ g[y].append(x)
+ t = 0 # 时间戳
+ dfn = [0]*n # 节点u的访问时间戳
+ low = [0]*n # 节点u通过反向边能访问到的最早访问节点的时间戳
+ cut = [0]*n # 标记是否为割点
+ root = 0 # 根节点
+ vbcc = defaultdict(list) # 存储点双连通分量
+ cnt = 0 # 点双连通分量的计数
+ stack = [] # 栈用于存储路径
+ def dfs(u, fa): # 深度优先搜索
+ nonlocal t
+ t += 1
+ dfn[u] = t
+ low[u] = t
+ flag = 0
+ stack.append(u)
+ for v in g[u]:
+ if not dfn[v]: # 如果v未被访问过
+ dfs(v, u)
+ low[u] = min(low[u], low[v])
+ if dfn[u]&lt;=low[v]: # 判断u是否为割点
+ flag += 1
+ if (u!=root) or (flag&gt;1):
+ cut[u] = 1
+ nonlocal cnt
+ vbcc[cnt].append(u)
+ while 1:
+ z = stack.pop()
+ vbcc[cnt].append(z)
+ if z==v:
+ break
+ cnt += 1
+ else:
+ low[u] = min(low[u], dfn[v])
+ dfs(0, -1) # 从节点0开始DFS
+ ans = []
+ for j in vbcc: # 处理每个点双连通分量
+ num = 0
+ tmp = []
+ for k in vbcc[j]:
+ if cut[k]==0: # 如果不是割点
+ tmp.append(c[k])
+ if cut[k]:
+ num += 1
+ if num==1: # 只有一个割点
+ ans.append(min(tmp))
+ if not ans:
+ return min(c)
+ if len(ans)==1:
+ return ans[0]
+ else:
+ ans.sort()
+ return sum(ans[:-1])</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS过程中，`dfn[u] &lt;= low[v]`条件是如何确定节点u是否为割点的？请解释其背后的逻辑。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在深度优先搜索（DFS）中，`dfn[u]`表示节点u被访问的时间戳，而`low[v]`表示从节点v出发，通过一条或多条后向边能够到达的最早被访问的节点的时间戳。如果`dfn[u] &lt;= low[v]`成立，说明从u到v的子树中没有后向边指向u的祖先，即u是v的子树和其它部分之间的桥梁。如果去掉u，v的子树将与图的其它部分断开，因此u是一个割点。特别地，对于根节点，如果它有两个以上的子节点满足该条件，也将其视为割点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理点双连通分量时，为什么只考虑非割点的最小成本？割点的成本是否应该也考虑在内？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理点双连通分量时，只考虑非割点的最小成本是因为割点可能属于多个点双连通分量，因此它的成本可能会被重复计算。为了避免重复计算和可能导致的过高成本，算法只从每个分量的非割点中选择最小成本。这样，每个分量的最小成本可以给出维持该分量连通性所需的最小资源。割点的成本在最终成本计算中将按需考虑，以确保所有连接的最优性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中提到，如果一个点双连通分量中只有一个割点，就使用那个分量的最小成本。这种方法是否能确保总成本最小？存在没有割点的分量该如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果一个点双连通分量中只有一个割点，使用该分量的最小成本是为了确保在不影响整体连通性的前提下，尽可能减少该分量的资源消耗。这种方法在大多数情况下可以帮助接近总成本的最小化，但不一定总是最优，因为它可能没有考虑割点在多个分量中的共享成本影响。对于没有割点的分量，即该分量内部完全连通且独立于其他部分，应计算该分量所有非割点的成本总和，因为这些点都是必需的，以保持分量的内部连通性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/s5kipK')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/s5kipK/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

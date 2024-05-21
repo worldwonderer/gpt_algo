@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>有界数组中指定下标处的最大值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>有界数组中指定下标处的最大值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你三个正整数 <code>n</code>、<code>index</code> 和 <code>maxSum</code> 。你需要构造一个同时满足下述所有条件的数组 <code>nums</code>（下标 <strong>从 0 开始</strong> 计数）：</p>
+
+<ul>
+	<li><code>nums.length == n</code></li>
+	<li><code>nums[i]</code> 是 <strong>正整数</strong> ，其中 <code>0 &lt;= i &lt; n</code></li>
+	<li><code>abs(nums[i] - nums[i+1]) &lt;= 1</code> ，其中 <code>0 &lt;= i &lt; n-1</code></li>
+	<li><code>nums</code> 中所有元素之和不超过 <code>maxSum</code></li>
+	<li><code>nums[index]</code> 的值被 <strong>最大化</strong></li>
+</ul>
+
+<p>返回你所构造的数组中的 <code>nums[index]</code> 。</p>
+
+<p>注意：<code>abs(x)</code> 等于 <code>x</code> 的前提是 <code>x &gt;= 0</code> ；否则，<code>abs(x)</code> 等于 <code>-x</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>n = 4, index = 2,  maxSum = 6
+<strong>输出：</strong>2
+<strong>解释：</strong>数组 [1,1,<strong>2</strong>,1] 和 [1,2,<strong>2</strong>,1] 满足所有条件。不存在其他在指定下标处具有更大值的有效数组。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>n = 6, index = 1,  maxSum = 10
+<strong>输出：</strong>3
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= maxSum &lt;= 10<sup>9</sup></code></li>
+	<li><code>0 &lt;= index &lt; n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxValue(self, n: int, index: int, maxSum: int) -&gt; int:
+        maxSum -= n              # remove the contributions from all the 1 in each element.
+		                         # We will add 1 back to the final height later
+        if index &lt; n // 2:       # make the index closer to the right boundary
+            index = n - index - 1
+        n_left = index           # number of element to the left of the index
+        n_right = n - 1 - index  # number of element to the right of the index
+        tri_left = (n_left * (n_left + 1)) // 2     # the triangle area for the left side if not hitting the boundary
+        tri_right = (n_right * (n_right + 1)) // 2  # the triangle area for the right side if not hitting the boundary
+		# case 1: perfect pyramid
+        if maxSum &lt;= (tri_right * 2 + n_right + 1):
+            return int(math.sqrt(maxSum)) + 1
+		# case 2: right side hits the boundary
+        if maxSum &lt;= (tri_left + tri_right + (n_left - n_right) * n_right + n_left + 1):
+            b = 3 + 2 * n_right
+            return int((-b + math.sqrt(b * b - 8 * (tri_right + 1 - n_right * n_right - maxSum))) / 2) + 1 + 1
+		# case 3: both sides hit boundaries
+        maxSum -= (tri_left + tri_right + (n_left - n_right) * n_right + n_left + 1)
+        return n_left + 1 + 1 + (maxSum // n)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解利用数学方法和几何思想来求解问题。首先，它调整 index 位置，确保 index 靠近右边界，这样可以简化问题的对称性。接下来，它计算左右两侧的三角形区域的和，这些区域代表了如果中心点逐渐增加，周围元素需要按照最大差1的规则增加所需的最小总和。题解主要分为三种情况处理：1) 完美金字塔型，其中中心元素到两边的差值可以自由变化而不受边界限制；2) 右边界受限，左侧可以自由增加；3) 两侧都受到边界的限制。每种情况下，都通过数学公式来计算可能的最大中心值，同时注意到总和的限制。最后，根据计算得到的额外可用和分配给数组元素，来确定最终的最大值。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxValue(self, n: int, index: int, maxSum: int) -&gt; int:
+        maxSum -= n              # 将所有元素初始化为1，减去这些基础值
+        if index &lt; n // 2:       # 如果index在左半边，则转到右半边以简化问题
+            index = n - index - 1
+        n_left = index           # index左边的元素数
+        n_right = n - 1 - index  # index右边的元素数
+        tri_left = (n_left * (n_left + 1)) // 2     # 左侧最大增长和，不触及边界
+        tri_right = (n_right * (n_right + 1)) // 2  # 右侧最大增长和，不触及边界
+        # 情况1：理想金字塔形
+        if maxSum &lt;= (tri_right * 2 + n_right + 1):
+            return int(math.sqrt(maxSum)) + 1
+        # 情况2：右侧触及边界
+        if maxSum &lt;= (tri_left + tri_right + (n_left - n_right) * n_right + n_left + 1):
+            b = 3 + 2 * n_right
+            return int((-b + math.sqrt(b * b - 8 * (tri_right + 1 - n_right * n_right - maxSum))) / 2) + 1 + 1
+        # 情况3：两侧都触边界
+        maxSum -= (tri_left + tri_right + (n_left - n_right) * n_right + n_left + 1)
+        return n_left + 1 + 1 + (maxSum // n)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理问题时需要将index调整至数组的右半部，这样做的目的和效果是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中调整index至数组的右半部是为了简化问题的对称性和计算复杂性。由于数组左右两侧的处理逻辑是对称的，如果index位于左半部，我们可以通过将其映射到右半部（即计算 `n - index - 1`），这样只需要考虑一种情况即可。这种映射使得算法的设计更为统一和简单，避免了重复编写处理左侧和右侧的代码，提高了代码的可读性和可维护性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在解题思路中提到的三种情况（完美金字塔型、右边界受限、两侧都受到边界的限制），能否详细解释每种情况的适用条件和具体的数学处理方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>1) 完美金字塔型：适用条件是maxSum足够小，使得index处的值增加不会使任何一侧的元素超过边界。此时，maxSum主要用于构造以index为顶点的对称金字塔。通过求平方根来估算顶点高度，因为金字塔的总和可以近似表示为平方函数。
+
+2) 右边界受限：适用条件是右侧元素因为边界限制而不能达到理想的金字塔形状，而左侧可以自由增加。这种情况下，需要计算左侧的自由增长和右侧达到边界时的总和，然后解一元二次方程来找到index处的最大值。
+
+3) 两侧都受到边界的限制：当maxSum较大，两侧元素都达到边界后还有剩余的总和。此时，需要计算两侧的总和之后剩余的部分平均分配给每个元素，从而得到index处的最大可能值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的`tri_left`和`tri_right`计算公式代表什么意义，它们如何影响到最终的`nums[index]`的最大可能值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`tri_left`和`tri_right`分别代表如果中心元素逐步增加，不触及边界时，左侧和右侧可以达到的最大增长和。这两个值是通过等差数列求和公式计算得到的，表示从index向左或向右，每个元素最多可以比前一个元素多1的增长总和。在计算nums[index]的最大可能值时，这两个值帮助我们估算在不超过边界的情况下，可以向左右两侧分配的总和。如果总和超过这个值，就意味着必须考虑边界影响，或者需要重新分配多出的部分。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-value-at-a-given-index-in-a-bounded-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-value-at-a-given-index-in-a-bounded-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

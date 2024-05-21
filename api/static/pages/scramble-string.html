@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>扰乱字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>扰乱字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        使用下面描述的算法可以扰乱字符串 <code>s</code> 得到字符串 <code>t</code> ：
+<ol>
+	<li>如果字符串的长度为 1 ，算法停止</li>
+	<li>如果字符串的长度 > 1 ，执行下述步骤：
+	<ul>
+		<li>在一个随机下标处将字符串分割成两个非空的子字符串。即，如果已知字符串 <code>s</code> ，则可以将其分成两个子字符串 <code>x</code> 和 <code>y</code> ，且满足 <code>s = x + y</code> 。</li>
+		<li><strong>随机</strong> 决定是要「交换两个子字符串」还是要「保持这两个子字符串的顺序不变」。即，在执行这一步骤之后，<code>s</code> 可能是 <code>s = x + y</code> 或者 <code>s = y + x</code> 。</li>
+		<li>在 <code>x</code> 和 <code>y</code> 这两个子字符串上继续从步骤 1 开始递归执行此算法。</li>
+	</ul>
+	</li>
+</ol>
+
+<p>给你两个 <strong>长度相等</strong> 的字符串 <code>s1</code><em> </em>和 <code>s2</code>，判断 <code>s2</code><em> </em>是否是 <code>s1</code><em> </em>的扰乱字符串。如果是，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "great", s2 = "rgeat"
+<strong>输出：</strong>true
+<strong>解释：</strong>s1 上可能发生的一种情形是：
+"great" --> "gr/eat" // 在一个随机下标处分割得到两个子字符串
+"gr/eat" --> "gr/eat" // 随机决定：「保持这两个子字符串的顺序不变」
+"gr/eat" --> "g/r / e/at" // 在子字符串上递归执行此算法。两个子字符串分别在随机下标处进行一轮分割
+"g/r / e/at" --> "r/g / e/at" // 随机决定：第一组「交换两个子字符串」，第二组「保持这两个子字符串的顺序不变」
+"r/g / e/at" --> "r/g / e/ a/t" // 继续递归执行此算法，将 "at" 分割得到 "a/t"
+"r/g / e/ a/t" --> "r/g / e/ a/t" // 随机决定：「保持这两个子字符串的顺序不变」
+算法终止，结果字符串和 s2 相同，都是 "rgeat"
+这是一种能够扰乱 s1 得到 s2 的情形，可以认为 s2 是 s1 的扰乱字符串，返回 true
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "abcde", s2 = "caebd"
+<strong>输出：</strong>false
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "a", s2 = "a"
+<strong>输出：</strong>true
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>s1.length == s2.length</code></li>
+	<li><code>1 <= s1.length <= 30</code></li>
+	<li><code>s1</code> 和 <code>s2</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 32 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def save(self,s1,s2,flag):
+        self.compare[s1+&#34;_&#34;+s2]=flag
+
+    def check(self,s1,s2):
+        answer=list()
+        in_s1_notin_s2=list()
+        in_s2_notin_s1=list()
+        for idx in range(len(s1)):
+            if s1[idx]!=s2[idx]:
+                if s1[idx]in in_s2_notin_s1:
+                    in_s2_notin_s1.remove(s1[idx])
+                else:
+                    in_s1_notin_s2.append(s1[idx])
+                if s2[idx]in in_s1_notin_s2:
+                    in_s1_notin_s2.remove(s2[idx])
+                else:
+                    in_s2_notin_s1.append(s2[idx])
+            if len(in_s1_notin_s2)==0 and len(in_s2_notin_s1)==0:
+                answer.append(idx+1)
+        if len(answer)!=0 and answer[-1]!=len(s1):
+            return []
+        return answer[:-1]
+
+    def go(self,s1,s2):
+        key=s1+&#34;_&#34;+s2
+        if key in self.compare:
+            return self.compare[key]
+        if len(s1)==1:
+            self.save(s1,s2,True)
+            return s1==s2
+        mids=self.check(s1,s2)
+        if mids!=[]:
+            if len(s1)==2 and mids==[1]:
+                self.save(s1,s2,True)
+                return True
+            for mid in mids:
+                if self.go(s1[:mid],s2[:mid])and self.go(s1[mid:],s2[mid:]):
+                    self.save(s1,s2,True)
+                    return True
+        s2=s2[::-1]
+        mids=self.check(s1,s2)
+        if mids!=[]: 
+            for mid in mids:
+                if self.go(s1[:mid],s2[:mid])and self.go(s1[mid:],s2[mid:]):
+                    self.save(s1,s2,True)
+                    return True
+        self.save(s1,s2,False)
+        self.save(s1,s2[::-1],False)
+        return False
+
+    def isScramble(self, s1: str, s2: str) -&gt; bool:
+        self.compare=dict()
+        return self.go(s1,s2)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了记忆化搜索的方法。首先判断两个字符串是否相等，如果相等直接返回True。然后通过check函数找出所有可能的分割点，即两个字符串在该位置之前的部分所包含的字符相同。接着对于每个分割点，递归判断两个字符串分割后的左右两部分是否分别满足扰乱字符串的定义。在递归过程中，使用一个字典self.compare存储已经计算过的子问题的结果，避免重复计算。如果按顺序分割的情况不满足，就再尝试将s2反转后再进行分割判断。最后如果所有分割点都无法满足条件，则返回False。</p>
+                                <p>时间复杂度: O(n^3)，但实际运行时间低于O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">```python
+class Solution:
+    def save(self, s1, s2, flag):
+        # 将子问题的结果存入字典
+        self.compare[s1 + &#34;_&#34; + s2] = flag
+
+    def check(self, s1, s2):
+        # 检查两个字符串在每个位置上是否包含相同的字符
+        answer = list()
+        in_s1_notin_s2 = list()
+        in_s2_notin_s1 = list()
+        for idx in range(len(s1)):
+            if s1[idx] != s2[idx]:
+                if s1[idx] in in_s2_notin_s1:
+                    in_s2_notin_s1.remove(s1[idx])
+                else:
+                    in_s1_notin_s2.append(s1[idx])
+                if s2[idx] in in_s1_notin_s2:
+                    in_s1_notin_s2.remove(s2[idx])
+                else:
+                    in_s2_notin_s1.append(s2[idx])
+            if len(in_s1_notin_s2) == 0 and len(in_s2_notin_s1) == 0:
+                answer.append(idx + 1)
+        if len(answer) != 0 and answer[-1] != len(s1):
+            return []
+        return answer[:-1]
+
+    def go(self, s1, s2):
+        # 记忆化搜索
+        key = s1 + &#34;_&#34; + s2
+        if key in self.compare:
+            return self.compare[key]
+        if len(s1) == 1:
+            self.save(s1, s2, True)
+            return s1 == s2
+        mids = self.check(s1, s2)
+        if mids != []:
+            if len(s1) == 2 and mids == [1]:
+                self.save(s1, s2, True)
+                return True
+            for mid in mids:
+                if self.go(s1[:mid], s2[:mid]) and self.go(s1[mid:], s2[mid:]):
+                    self.save(s1, s2, True)
+                    return True
+        s2 = s2[::-1]
+        mids = self.check(s1, s2)
+        if mids != []:
+            for mid in mids:
+                if self.go(s1[:mid], s2[:mid]) and self.go(s1[mid:], s2[mid:]):
+                    self.save(s1, s2, True)
+                    return True
+        self.save(s1, s2, False)
+        self.save(s1, s2[::-1], False)
+        return False
+
+    def isScramble(self, s1: str, s2: str) -&gt; bool:
+        self.compare = dict()
+        return self.go(s1, s2)
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在函数`check`中，你是如何决定哪些位置可以作为分割点的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`check`函数中，通过逐个比较`s1`和`s2`中对应位置的字符，并维护两个列表`in_s1_notin_s2`和`in_s2_notin_s1`来记录当前位置前`s1`中有而`s2`中没有的字符，以及`s2`中有而`s1`中没有的字符。每次当这两个列表都为空时，说明到当前位置为止，`s1`和`s2`包含相同的字符集合，因此这个位置就可以作为一个潜在的分割点。分割点的选择是基于两个字符串在该位置之前的部分包含相同的字符。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在决定无法通过当前分割点继续判断后，需要将`s2`反转再进行一次检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>因为扰乱字符串的定义允许在任何位置将一个字符串分成两部分并交换这两部分的顺序。所以，即使按原始顺序的分割未能证明两个字符串是扰乱字符串，交换`s2`的任意两部分后的新顺序可能会满足条件。因此，当按顺序分割的所有可能都被尝试且失败后，我们将`s2`反转，这相当于在递归过程中尝试了另一种分割方式，即交换了`s2`的左右两部分，然后再次使用`check`函数寻找新的分割点进行判断。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            记忆化搜索中使用的字典`self.compare`的键值对是如何构建的？键和值分别代表什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>记忆化搜索中使用的字典`self.compare`的键是由`s1`和`s2`两个字符串通过下划线连接构成的字符串（例如`s1_s2`），代表一个特定的子问题。值是一个布尔值，表示这个子问题的结果，即字符串`s1`是否可以通过扰乱字符串的规则转换成字符串`s2`。这种方式存储每个子问题的结果可以避免重复计算相同的问题，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果`s1`和`s2`的长度为1时，为什么直接比较它们是否相等就足够了？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`s1`和`s2`的长度为1时，两个字符串都只包含一个字符。由于扰乱字符串的定义涉及字符的重新排列，如果两个字符串只有一个字符，那么唯一的排列方式就是字符本身。因此，这种情况下，直接比较这两个字符是否相等即可确定它们是否是扰乱字符串的关系。这是最基本的边界条件，为递归提供了停止点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/scramble-string')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/scramble-string/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

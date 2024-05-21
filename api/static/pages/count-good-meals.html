@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>大餐计数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>大餐计数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><strong>大餐</strong> 是指 <strong>恰好包含两道不同餐品</strong> 的一餐，其美味程度之和等于 2 的幂。</p>
+
+<p>你可以搭配 <strong>任意</strong> 两道餐品做一顿大餐。</p>
+
+<p>给你一个整数数组 <code>deliciousness</code> ，其中 <code>deliciousness[i]</code> 是第 <code>i<sup>​​​​​​</sup>​​​​</code>​​​​ 道餐品的美味程度，返回你可以用数组中的餐品做出的不同 <strong>大餐</strong> 的数量。结果需要对 <code>10<sup>9</sup> + 7</code> 取余。</p>
+
+<p>注意，只要餐品下标不同，就可以认为是不同的餐品，即便它们的美味程度相同。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>deliciousness = [1,3,5,7,9]
+<strong>输出：</strong>4
+<strong>解释：</strong>大餐的美味程度组合为 (1,3) 、(1,7) 、(3,5) 和 (7,9) 。
+它们各自的美味程度之和分别为 4 、8 、8 和 16 ，都是 2 的幂。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>deliciousness = [1,1,1,3,3,3,7]
+<strong>输出：</strong>15
+<strong>解释：</strong>大餐的美味程度组合为 3 种 (1,1) ，9 种 (1,3) ，和 3 种 (1,7) 。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= deliciousness.length <= 10<sup>5</sup></code></li>
+	<li><code>0 <= deliciousness[i] <= 2<sup>20</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 96 ms</p>
+                    <p>内存: 23.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countPairs(self, deliciousness: List[int]) -&gt; int:
+        MOD = 1000000007
+        count = Counter(deliciousness)
+
+        target, res = 1, 0
+        for x in sorted(count):
+            if x == 0:
+                continue
+            while target &lt; x:
+                target += target
+            res += count[x] * count[target - x]
+            if x == target:
+                res += comb(count[x], 2)
+        return res % MOD</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用哈希表记录每个美味程度的出现次数，然后针对每个可能的美味程度组合，计算它们的和是否是2的幂。为了快速判断和是否是2的幂，算法首先对美味程度进行排序，然后使用一个循环，其中外层循环遍历每个不同的美味程度，内层循环则尝试匹配使得两个美味程度之和达到下一个2的幂。如果当前的美味程度与其匹配的美味程度相同，则需要使用组合数计算方式计算配对数目。这种方法利用了数学的组合逻辑以及哈希表的高效性能来解决问题。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countPairs(self, deliciousness: List[int]) -&gt; int:
+        MOD = 1000000007
+        count = Counter(deliciousness) # 计数每个美味程度出现的次数
+
+        target, res = 1, 0
+        for x in sorted(count): # 对美味程度进行排序
+            if x == 0: # 0的情况单独处理
+                continue
+            while target &lt; x: # 寻找下一个2的幂
+                target += target
+            res += count[x] * count[target - x] # 计算当前程度与目标程度的组合数
+            if x == target: # 如果当前程度等于目标2的幂，计算组合数
+                res += comb(count[x], 2)
+        return res % MOD # 返回结果需要取模</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到使用哈希表来计数每个美味程度的出现次数，请问这种方法在处理大量重复值时的效率如何？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用哈希表来计数每个美味程度的出现次数在处理大量重复值时非常高效。哈希表（通常在Python中实现为字典）提供了平均O(1)时间复杂度的插入和查找操作。因此，当输入数据中存在大量重复项时，哈希表可以快速统计每个项的出现次数，不需要多次遍历整个数据集来计数，这大大提高了数据处理的速度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解提到了对美味程度进行排序，然后使用双循环来找到和为2的幂的美味程度组合，为什么选择排序这一步是必要的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对美味程度进行排序是必要的，因为这样可以更高效地寻找和为2的幂的组合。排序后，可以使用双指针或者二分搜索的方法来查找目标和，而不必对每个可能的组合进行遍历。此外，排序后的美味程度数组可以帮助算法快速跳过那些不可能满足条件的组合，从而减少不必要的计算和比较。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，当两个美味程度相同时，使用组合数计算方式来计算配对数目。能否详细解释这是如何实现的，以及在什么情况下需要这样处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个美味程度相同的时候，我们需要计算这个程度值的项与自身配对的组合数。组合数可以通过数学公式C(n, 2) = n*(n-1)/2来计算，其中n是该美味程度的出现次数。这是因为每对不同的项都可以形成一个有效的配对。例如，如果一个美味程度出现了3次，那么可以形成3*(3-1)/2 = 3种不同的配对。这种情况通常出现在美味程度的值与目标2的幂相等时，因为只有美味程度相等的情况下，两者之和才会等于一个2的幂。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中没有详细说明如何快速计算组合数，并对结果进行模运算（MOD = 1000000007）。在实现这一点时应注意哪些编程细节？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算组合数并进行模运算时，应注意以下几点编程细节：首先，当计算组合数C(n, 2) = n*(n-1)/2时，为了避免在乘法操作中产生溢出，应该先对n和(n-1)中的至少一个数进行MOD运算。其次，由于MOD是一个很大的质数，可以使用费马小定理来计算除法的模逆元，以便在模运算的环境下执行除法。此外，在实际编程实现中，还应当注意整数除法可能引入的舍入误差，确保所有的运算都在整数域中进行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-good-meals')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-good-meals/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

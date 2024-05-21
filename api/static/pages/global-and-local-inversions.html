@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>全局倒置与局部倒置</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>全局倒置与局部倒置</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code> 的整数数组 <code>nums</code> ，表示由范围 <code>[0, n - 1]</code> 内所有整数组成的一个排列。</p>
+
+<p><strong>全局倒置</strong> 的数目等于满足下述条件不同下标对 <code>(i, j)</code> 的数目：</p>
+
+<ul>
+	<li><code>0 &lt;= i &lt; j &lt; n</code></li>
+	<li><code>nums[i] &gt; nums[j]</code></li>
+</ul>
+
+<p><strong>局部倒置</strong> 的数目等于满足下述条件的下标 <code>i</code> 的数目：</p>
+
+<ul>
+	<li><code>0 &lt;= i &lt; n - 1</code></li>
+	<li><code>nums[i] &gt; nums[i + 1]</code></li>
+</ul>
+
+<p>当数组 <code>nums</code> 中 <strong>全局倒置</strong> 的数量等于 <strong>局部倒置</strong> 的数量时，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,0,2]
+<strong>输出：</strong>true
+<strong>解释：</strong>有 1 个全局倒置，和 1 个局部倒置。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,0]
+<strong>输出：</strong>false
+<strong>解释：</strong>有 2 个全局倒置，和 1 个局部倒置。
+</pre>
+&nbsp;
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= nums[i] &lt; n</code></li>
+	<li><code>nums</code> 中的所有整数 <strong>互不相同</strong></li>
+	<li><code>nums</code> 是范围 <code>[0, n - 1]</code> 内所有数字组成的一个排列</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 42 ms</p>
+                    <p>内存: 26.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isIdealPermutation(self, nums: List[int]) -&gt; bool:
+        prev_max = nums[0] # j
+        
+        for i in range(1, len(nums)-1):
+            if prev_max &gt; nums[i+1]:
+                return False
+            prev_max = max(prev_max, nums[i])
+        
+        return True
+# 首先当j = i + 1时，可以看出，一个局部翻转就是一个全局翻转。那么如果要使得局部翻转
+# 和全局翻转的个数相等，那么必须要求全局翻转也是一个局部翻转。所以，对于任意的j &gt; i + 1，
+# 不能存在A[i] &gt; A[j]，即需要满足A[i] &lt;= A[j].
+
+# 从上面的关系可以看出，我们必须使max(A[:i]) &lt;= A[i + 2]。
+
+
+class Solution:
+    def isIdealPermutation(self, nums: List[int]) -&gt; bool:
+        for i, num in enumerate(nums):
+            # 检查数组中是否存在任何非局部的全局倒置, not 
+            if abs(num - i) &gt; 1:
+                return False
+        return True
+# 上面的想法并没有好好的利用题目给出的数字是0-N-1这个条件。所以我们继续思考，
+# 如果原来的顺序是0-N-1，那么如何交换两个数字才能满足局部翻转的个数等于全局翻转呢？
+# 答案当然是只翻转相邻的两个元素。
+# 否则会构造出来一个不是局部翻转的全剧翻转。所以i的位置上只能放A[i-1],A[i],A[i+1]。
+
+
+
+
+
+# 考虑一个简单的例子，数组 nums = [1, 0, 2]。
+
+# 根据 abs(num - i) != 0 这个条件，我们来检查每个元素：
+
+# 对于 i = 0，num = 1，abs(1 - 0) = 1 != 0，条件不满足，应该返回 False。
+# 对于 i = 1，num = 0，abs(0 - 1) = 1 != 0，同样，条件不满足。
+# 然而，这个数组 [1, 0, 2] 实际上是一个理想的排列，因为它的全局倒置数量（1对）
+# 和局部倒置数量（1对）是相等的。全局倒置是 (1, 0)，局部倒置也是 (1, 0)。</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的核心思路基于局部倒置一定是全局倒置的特性。如果要使全局倒置的数量等于局部倒置的数量，那么不能存在非局部的全局倒置（即跨越超过一个元素的倒置）。此题解通过检查每个元素的索引和值之间的差的绝对值是否大于1来判断是否存在非局部的全局倒置。如果所有元素的值与其索引位置差的绝对值都不大于1，则表明所有的全局倒置都是局部倒置，返回True；否则，存在非局部的全局倒置，返回False。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution: 
+    def isIdealPermutation(self, nums: List[int]) -&gt; bool: 
+        for i, num in enumerate(nums): 
+            # 检查数组中是否存在任何非局部的全局倒置 
+            if abs(num - i) &gt; 1: 
+                return False 
+        return True # 如果没有发现非局部全局倒置，则返回True</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            请解释为什么局部倒置一定是全局倒置的特例？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>局部倒置指的是在数组中相邻的两个元素满足倒置条件，即在数组的连续位置i和i+1，满足nums[i] &gt; nums[i + 1]。由于局部倒置的两个元素位置相邻，自然满足全局倒置的条件，即存在一对下标i和j（这里j=i+1），使得nums[i] &gt; nums[j]。因此，所有的局部倒置都是全局倒置的特殊情况，即局部倒置是全局倒置的一个子集。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在给定的算法中，为什么只需要检查每个元素的索引和值之间差的绝对值是否大于1就足以判断是否有非局部倒置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数组nums中，如果一个元素的值与它的索引位置的差的绝对值大于1，这意味着该元素在数组中的实际位置与它应该在的位置相差超过一个位置。这种情况下，它很可能与不相邻的其他元素构成倒置，因此可能存在非局部的全局倒置。而如果每个元素的值与其索引位置的差的绝对值都不大于1，说明每个元素都不会跨越超过一个位置，仅可能与其相邻的元素构成倒置，即所有全局倒置都是局部倒置。因此，此检查足以判断是否存在非局部倒置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            这种方法是否考虑了所有可能的全局倒置情况，还是仅仅针对特定类型的全局倒置进行检测？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法实际上只针对是否存在非局部的全局倒置进行了检测。它基于的思想是如果一个元素与其索引的差的绝对值不超过1，那么它只可能与紧邻的一个元素构成倒置（局部倒置），而不会与更远的元素构成倒置。因此，这种检测主要是为了确认所有的全局倒置是否都是局部倒置。如果满足这一条件，则全局倒置数量等于局部倒置数量，否则，全局倒置数量大于局部倒置数量。这种方法没有直接计算每一种可能的全局倒置，而是通过排除存在非局部倒置的可能性来间接达到目的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/global-and-local-inversions')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/global-and-local-inversions/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

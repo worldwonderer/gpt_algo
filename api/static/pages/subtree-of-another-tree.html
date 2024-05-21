@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>另一棵树的子树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>另一棵树的子树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                        <a href="/problems?tag=string-matching" class="badge bg-secondary tag-link">字符串匹配</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <div class="original__bRMd">
+<div>
+<p>给你两棵二叉树 <code>root</code> 和 <code>subRoot</code> 。检验 <code>root</code> 中是否包含和 <code>subRoot</code> 具有相同结构和节点值的子树。如果存在，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p>
+
+<p>二叉树 <code>tree</code> 的一棵子树包括 <code>tree</code> 的某个节点和这个节点的所有后代节点。<code>tree</code> 也可以看做它自身的一棵子树。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/04/28/subtree1-tree.jpg" style="width: 532px; height: 400px;" />
+<pre>
+<strong>输入：</strong>root = [3,4,5,1,2], subRoot = [4,1,2]
+<strong>输出：</strong>true
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/04/28/subtree2-tree.jpg" style="width: 502px; height: 458px;" />
+<pre>
+<strong>输入：</strong>root = [3,4,5,1,2,null,null,null,null,0], subRoot = [4,1,2]
+<strong>输出：</strong>false
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>root</code> 树上的节点数量范围是 <code>[1, 2000]</code></li>
+	<li><code>subRoot</code> 树上的节点数量范围是 <code>[1, 1000]</code></li>
+	<li><code>-10<sup>4</sup> <= root.val <= 10<sup>4</sup></code></li>
+	<li><code>-10<sup>4</sup> <= subRoot.val <= 10<sup>4</sup></code></li>
+</ul>
+</div>
+</div>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 42 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -&gt; bool:
+        def searchsub(root):
+            if not root:
+                return 0
+            return ((root.val + 1000079) + (searchsub(root.left) * 31 + searchsub(root.right) * 179)) % int(1e10 + 7)
+        num = searchsub(subRoot)
+        ans = [False]
+        def searchmain(root):
+            if not root:
+                return 0
+            val = ((root.val + 1000079) + (searchmain(root.left) * 31 + searchmain(root.right) * 179)) % int(1e10 + 7)
+            if val == num:
+                ans[0] = True
+            return val
+        searchmain(root)
+        return ans[0]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了哈希的思想。首先通过 searchsub 函数计算出子树 subRoot 的哈希值，然后在主树 root 中通过 searchmain 函数查找是否存在一个子树的哈希值与 subRoot 的哈希值相等。如果存在，则说明主树中包含了与 subRoot 结构相同的子树，返回 True；否则返回 False。在计算哈希值时，使用了节点的值、左子树的哈希值和右子树的哈希值，并通过质数相乘的方式组合，以尽量避免哈希冲突。</p>
+                                <p>时间复杂度: O(m + n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -&gt; bool:
+        def searchsub(root):
+            if not root:
+                return 0
+            # 计算子树的哈希值
+            return ((root.val + 1000079) + (searchsub(root.left) * 31 + searchsub(root.right) * 179)) % int(1e10 + 7)
+        
+        # 计算子树 subRoot 的哈希值
+        num = searchsub(subRoot)
+        ans = [False]
+        
+        def searchmain(root):
+            if not root:
+                return 0
+            # 计算主树的哈希值
+            val = ((root.val + 1000079) + (searchmain(root.left) * 31 + searchmain(root.right) * 179)) % int(1e10 + 7)
+            # 比较主树的哈希值与子树的哈希值
+            if val == num:
+                ans[0] = True
+            return val
+        
+        searchmain(root)
+        return ans[0]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用哈希方法来解决这个问题？是因为它比其他方法例如递归比较更高效吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希方法被选择来解决这个问题主要是因为它在某些情况下可以提供比简单递归方法更高的效率。使用哈希方法，我们可以将每个节点的子树转化为一个哈希值，这样就可以通过比较哈希值来快速判断两个子树是否相同，而不需要再进行逐节点的比较。这种方法尤其在树的结构复杂或树的大小较大时，可以显著减少比较次数和运行时间。然而，这种方法可能需要额外的空间来存储每个节点的哈希值，并且还需要处理哈希冲突的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在哈希函数中，使用了特定的质数31和179以及1000079进行计算。这些质数的选择有什么特别的理由或考虑吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在哈希函数中使用特定的质数，如31、179和1000079，是为了减少哈希冲突的概率并尽可能均匀地分布哈希值。质数在哈希函数中常用来这种目的，因为它们在进行模运算时不易产生规律性，从而帮助更随机地分布哈希值。选用不同的质数组合可以根据具体的应用场景调整，以达到最佳的哈希效果。1000079这样的大质数通常用于最终的模运算，以限制哈希值的范围并减少冲突。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            哈希冲突是如何被处理的？在哈希值相同的情况下，是否有额外的步骤来确认两棵子树确实是结构和节点值都相同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，哈希冲突的处理似乎没有被直接提及。理想情况下，如果哈希值相同，我们应该进一步检查两棵树的结构和节点值以确保它们确实相同，因为不同的树可能会有相同的哈希值（尽管这种情况较少）。在实际应用中，当我们发现两个哈希值相同时，可以再通过递归的方式对这两棵子树进行详细比较，确保它们在结构和节点值上完全一致。这一步骤是必要的，以避免因哈希冲突而错误地判断两棵树相同。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/count-univalue-subtrees" class="list-group-item list-group-item-action">
+                                统计同值子树
+                            </a>
+                        
+                            <a href="/problem/most-frequent-subtree-sum" class="list-group-item list-group-item-action">
+                                出现次数最多的子树元素和
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/subtree-of-another-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/subtree-of-another-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

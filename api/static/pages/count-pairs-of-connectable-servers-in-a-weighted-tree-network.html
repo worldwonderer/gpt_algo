@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>在带权树网络中统计可连接服务器对数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>在带权树网络中统计可连接服务器对数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵无根带权树，树中总共有 <code>n</code>&nbsp;个节点，分别表示 <code>n</code>&nbsp;个服务器，服务器从 <code>0</code>&nbsp;到 <code>n - 1</code>&nbsp;编号。同时给你一个数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>, weight<sub>i</sub>]</code>&nbsp;表示节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code>&nbsp;之间有一条双向边，边的权值为&nbsp;<code>weight<sub>i</sub></code>&nbsp;。再给你一个整数&nbsp;<code>signalSpeed</code>&nbsp;。</p>
+
+<p>如果两个服务器 <code>a</code>&nbsp;，<code>b</code>&nbsp;和 <code>c</code>&nbsp;满足以下条件，那么我们称服务器 <code>a</code>&nbsp;和 <code>b</code>&nbsp;是通过服务器 <code>c</code>&nbsp;<strong>可连接的</strong>&nbsp;：</p>
+
+<ul>
+	<li><code>a &lt; b</code>&nbsp;，<code>a != c</code> 且&nbsp;<code>b != c</code>&nbsp;。</li>
+	<li>从&nbsp;<code>c</code>&nbsp;到&nbsp;<code>a</code>&nbsp;的距离是可以被&nbsp;<code>signalSpeed</code>&nbsp;整除的。</li>
+	<li>从&nbsp;<code>c</code>&nbsp;到&nbsp;<code>b</code>&nbsp;的距离是可以被&nbsp;<code>signalSpeed</code>&nbsp;整除的。</li>
+	<li>从&nbsp;<code>c</code>&nbsp;到&nbsp;<code>b</code>&nbsp;的路径与从&nbsp;<code>c</code>&nbsp;到&nbsp;<code>a</code>&nbsp;的路径没有任何公共边。</li>
+</ul>
+
+<p>请你返回一个长度为 <code>n</code>&nbsp;的整数数组&nbsp;<code>count</code>&nbsp;，其中&nbsp;<code>count[i]</code> 表示通过服务器&nbsp;<code>i</code>&nbsp;<strong>可连接</strong>&nbsp;的服务器对的&nbsp;<strong>数目</strong>&nbsp;。</p>
+
+
+
+<p><b>示例 1：</b></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2024/01/21/example22.png" style="width: 438px; height: 243px; padding: 10px; background: #fff; border-radius: .5rem;" /></p>
+
+<pre>
+<b>输入：</b>edges = [[0,1,1],[1,2,5],[2,3,13],[3,4,9],[4,5,2]], signalSpeed = 1
+<b>输出：</b>[0,4,6,6,4,0]
+<b>解释：</b>由于 signalSpeed 等于 1 ，count[c] 等于所有从 c 开始且没有公共边的路径对数目。
+在输入图中，count[c] 等于服务器 c 左边服务器数目乘以右边服务器数目。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2024/01/21/example11.png" style="width: 495px; height: 484px; padding: 10px; background: #fff; border-radius: .5rem;" /></p>
+
+<pre>
+<b>输入：</b>edges = [[0,6,3],[6,5,3],[0,3,1],[3,2,7],[3,1,6],[3,4,2]], signalSpeed = 3
+<b>输出：</b>[2,0,0,0,0,0,2]
+<b>解释：</b>通过服务器 0 ，有 2 个可连接服务器对(4, 5) 和 (4, 6) 。
+通过服务器 6 ，有 2 个可连接服务器对 (4, 5) 和 (0, 5) 。
+所有服务器对都必须通过服务器 0 或 6 才可连接，所以其他服务器对应的可连接服务器对数目都为 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 1000</code></li>
+	<li><code>edges.length == n - 1</code></li>
+	<li><code>edges[i].length == 3</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt; n</code></li>
+	<li><code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>, weight<sub>i</sub>]</code><!-- notionvc: a2623897-1bb1-4c07-84b6-917ffdcd83ec --></li>
+	<li><code>1 &lt;= weight<sub>i</sub> &lt;= 10<sup>6</sup></code></li>
+	<li><code>1 &lt;= signalSpeed &lt;= 10<sup>6</sup></code></li>
+	<li>输入保证&nbsp;<code>edges</code>&nbsp;构成一棵合法的树。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 111 ms</p>
+                    <p>内存: 20.7 MB</p>
+                    <pre class="bg-light p-2 code-pre"># https://leetcode.cn/u/l00/
+
+class Solution:
+    def countPairsOfConnectableServers(self, edges: List[List[int]], sp: int) -&gt; List[int]:
+        n = len(edges) + 1
+        ans = [0 for _ in range(n)]
+        deg = [2] + [0] * (n - 1)
+        mix = [0] * n
+        ws = {}
+        for u, v, w in edges:
+            deg[u] += 1
+            deg[v] += 1
+            mix[u] ^= v
+            mix[v] ^= u
+            ws[(u,v)] = w % sp
+            ws[(v,u)] = w % sp
+
+        queue = []
+        for i, d in enumerate(deg):
+            if d == 1: queue.append(i)
+
+        wakes = []
+        for root in queue:
+            while deg[root] == 1:
+                next = mix[root]
+                mix[next] ^= root
+                deg[next] -= 1
+                wakes.append((next, root, ws[(next,root)]))
+                root = next        
+
+        cntFromSon = [{0:0} for _ in range(n)]
+        for u, v, w in wakes:
+            lastRes = cntFromSon[u][0]
+            cntFromSon[v][0] += 1
+            for k, c in cntFromSon[v].items():
+                newK = (k + w) % sp
+                cntFromSon[u][newK] = cntFromSon[u].get(newK, 0) + c
+            newRes = cntFromSon[u][0]
+            ans[u] += (newRes - lastRes) * lastRes
+
+        cntFromFar = [{} for _ in range(n)]
+        cntFromFar[0][0] = 1
+        for u, v, w in wakes[::-1]:
+            for k, c in cntFromFar[u].items():
+                newK = (k + w) % sp
+                cntFromFar[v][newK] = cntFromFar[v].get(newK, 0) + c
+            for k, c in cntFromSon[u].items():
+                newK = (k + w) % sp
+                cntFromFar[v][newK] = cntFromFar[v].get(newK, 0) + c
+            for k, c in cntFromSon[v].items():
+                newK = (k + w * 2) % sp
+                cntFromFar[v][newK] -= c
+            ans[v] += cntFromFar[v].get(0, 0) * (cntFromSon[v].get(0, 0) - 1)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的思路主要是使用 BFS 来遍历树，并通过动态规划的方法来计算可连接的服务器对数。首先，对于每个节点，我们记录它的度数（连接的边数）和与其相连的节点。然后，从度数为 1 的节点（叶子节点）开始，依次向上遍历，直到到达根节点。在这个过程中，我们记录从每个节点出发，到达其子节点的路径长度对 signalSpeed 的余数，以及通过该节点可以连接的服务器对数。最后，我们再次从根节点向下遍历，更新每个节点的可连接服务器对数，并计算最终结果。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countPairsOfConnectableServers(self, edges: List[List[int]], sp: int) -&gt; List[int]:
+        n = len(edges) + 1
+        ans = [0 for _ in range(n)]
+        deg = [2] + [0] * (n - 1)  # 记录每个节点的度数
+        mix = [0] * n  # 记录每个节点与其相连的节点
+        ws = {}  # 记录每条边的权重对 signalSpeed 的余数
+        for u, v, w in edges:
+            deg[u] += 1
+            deg[v] += 1
+            mix[u] ^= v
+            mix[v] ^= u
+            ws[(u,v)] = w % sp
+            ws[(v,u)] = w % sp
+
+        queue = []
+        for i, d in enumerate(deg):
+            if d == 1: queue.append(i)  # 从叶子节点开始遍历
+
+        wakes = []
+        for root in queue:
+            while deg[root] == 1:
+                next = mix[root]
+                mix[next] ^= root
+                deg[next] -= 1
+                wakes.append((next, root, ws[(next,root)]))
+                root = next        
+
+        cntFromSon = [{0:0} for _ in range(n)]
+        for u, v, w in wakes:
+            lastRes = cntFromSon[u][0]
+            cntFromSon[v][0] += 1
+            for k, c in cntFromSon[v].items():
+                newK = (k + w) % sp
+                cntFromSon[u][newK] = cntFromSon[u].get(newK, 0) + c
+            newRes = cntFromSon[u][0]
+            ans[u] += (newRes - lastRes) * lastRes
+
+        cntFromFar = [{} for _ in range(n)]
+        cntFromFar[0][0] = 1
+        for u, v, w in wakes[::-1]:
+            for k, c in cntFromFar[u].items():
+                newK = (k + w) % sp
+                cntFromFar[v][newK] = cntFromFar[v].get(newK, 0) + c
+            for k, c in cntFromSon[u].items():
+                newK = (k + w) % sp
+                cntFromFar[v][newK] = cntFromFar[v].get(newK, 0) + c
+            for k, c in cntFromSon[v].items():
+                newK = (k + w * 2) % sp
+                cntFromFar[v][newK] -= c
+            ans[v] += cntFromFar[v].get(0, 0) * (cntFromSon[v].get(0, 0) - 1)
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在整个算法中，如何保证`从 c 到 b 的路径与从 c 到 a 的路径没有任何公共边`的条件得到满足？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，我们首先通过 BFS 从叶子节点开始向根节点遍历，确保每次处理的路径是当前叶子节点通过唯一的路径到根的路径。通过这种方式，对于每个节点 c，当我们计算从 c 到其子节点 a 和 b 的路径时，我们是在前一次遍历结束后，分别从 c 独立地向 a 和 b 遍历。这样确保了从 c 到 a 和从 c 到 b 的路径是独立的，不共享任何边。此外，通过动态更新节点的度数和连接关系，确保每个节点作为根时，其子树内的遍历不会回到已经处理过的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用BFS来遍历树，为什么选择BFS而不是DFS？此选择对算法效率有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此题解中选择使用 BFS 而非 DFS 主要是因为 BFS 更适合层级性的从外向内（从叶子节点到根节点）的遍历方式。利用 BFS 可以更自然地按层级处理节点，特别是对于每层的叶子节点进行处理时，更容易管理和维护必要的状态信息，如度数、路径权重等。在效率上，BFS 和 DFS 在树结构中的时间复杂度通常相同，均为 O(n)，但在实际应用中，BFS 在此类问题上可能更直观且易于实现正确的状态转移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到`度数为1的节点（叶子节点）开始遍历`，这样的处理方式是基于哪些考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从度数为1的节点（叶子节点）开始遍历是因为这些节点在树的结构中位于边缘位置，它们没有子节点，因此可以作为遍历的起点。从叶子节点开始向根节点遍历可以简化问题的处理：每个叶子节点只有一个父节点，这样可以避免复杂的回溯操作，直接向上聚合信息直至根节点。此外，这种方式也便于我们从底向上计算和累积各种需要的状态，如路径权重的余数和可连接服务器对数，因为每处理完一个节点，其父节点就成了新的叶子节点，逐渐减少问题的规模。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-pairs-of-connectable-servers-in-a-weighted-tree-network')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-pairs-of-connectable-servers-in-a-weighted-tree-network/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

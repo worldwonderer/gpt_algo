@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>Hello LeetCode!</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>Hello LeetCode!</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        力扣嘉年华同样准备了纪念品展位，参观者只需要集齐 `helloleetcode` 的 `13` 张字母卡片即可获得力扣纪念章。
+
+在展位上有一些由字母卡片拼成的单词，`words[i][j]` 表示第 `i` 个单词的第 `j` 个字母。
+
+你可以从这些单词中取出一些卡片，但每次拿取卡片都需要消耗游戏代币，规则如下：
+
+- 从一个单词中取一个字母所需要的代币数量，为该字母左边和右边字母数量之积
+
+- 可以从一个单词中多次取字母，每个字母仅可被取一次
+
+> 例如：从 `example` 中取出字母 `a`，需要消耗代币 `2*4=8`，字母取出后单词变为 `exmple`；
+再从中取出字母 `m`，需要消耗代币 `2*3=6`，字母取出后单词变为 `exple`；
+
+请返回取得 `helloleetcode` 这些字母需要消耗代币的 **最少** 数量。如果无法取得，返回 `-1`。
+
+**注意：**
+- 取出字母的顺序没有要求
+- 取出的所有字母恰好可以拼成 `helloleetcode` 
+
+**示例 1：**
+>输入：`words = ["hold","engineer","cost","level"]`
+>
+>输出：`5`
+>
+>解释：最优方法为：
+>从 `hold` 依次取出 `h`、`o`、`l`、`d`， 代价均为 `0`
+>从 `engineer` 依次取出第 `1` 个 `e` 与最后一个 `e`， 代价为 `0` 和 `5*1=5`
+>从 `cost` 取出 `c`、`o`、`t`， 代价均为 `0`
+>从 `level` 依次取出 `l`、`l`、`e`、`e`， 代价均为 `0`
+>所有字母恰好可以拼成 `helloleetcode`，因此最小的代价为 `5`
+
+**示例 2：**
+>输入：`words = ["hello","leetcode"]`
+>
+>输出：`0`
+
+**提示：**
++ `n == words.length`
++ `m == words[i].length`
++ `1 <= n <= 24`
++ `1 <= m <= 8`
++ `words[i][j]` 仅为小写字母
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1128 ms</p>
+                    <p>内存: 22.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">value = [[32] * (1 &lt;&lt; ln) for ln in range(9)]
+for ln in range(9):
+    value[ln][0] = 0
+    for mask in range(1, 1 &lt;&lt; ln):
+        left, right, bm = ln - 1, 0, 1
+        while bm &lt;= mask:
+            if mask &amp; bm:
+                pm = ((mask &amp; ~(bm * 2 - 1)) &gt;&gt; 1) | mask &amp; (bm - 1)
+                value[ln][mask] = min(value[ln][mask], value[ln - 1][pm] + left * right)
+            left -= 1; right += 1; bm &lt;&lt;= 1
+
+key = &#34;helloleetcode&#34;
+chset, kln = set(key), len(key)
+next_st = [defaultdict(int) for _ in range(1 &lt;&lt; kln)]
+for mask in range(1 &lt;&lt; kln):
+    for j, c in enumerate(key):
+        if mask &amp; (1 &lt;&lt; j) == 0:
+            next_st[mask][c] = mask | (1 &lt;&lt; j)
+
+M, INF = 1 &lt;&lt; kln, 123456789
+
+class Solution:
+    def Leetcode(self, words: List[str]) -&gt; int:
+        dp = defaultdict(lambda: INF)
+        dp[0] = 0
+        for s in words:
+            ln = len(s)
+            for mask, cost in list(dp.items()):
+                def dfs(at, choice, cur):
+                    if at &gt;= ln:
+                        if dp[cur] &gt; (tr := cost + value[ln][choice]): dp[cur] = tr
+                        return
+                    dfs(at + 1, choice, cur)
+                    nxt = next_st[cur][s[at]]
+                    if nxt &gt; 0:
+                        dfs(at + 1, choice | (1 &lt;&lt; at), nxt)
+                dfs(0, 0, mask)
+        return dp[M - 1] if (M - 1 in dp) else -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了动态规划和状态压缩的策略。首先，创建一个数组 &#39;value&#39; 来存储从给定单词中取出特定字母序列的最小代价。该数组通过动态规划更新，考虑所有可能的字母组合和相应的消耗。对于每个单词，&#39;value&#39; 数组考虑所有子序列（使用位掩码表示）并计算从这些子序列中获取特定字母的代价。接着，对于目标字符串 &#39;helloleetcode&#39;，构造一个转移矩阵 &#39;next_st&#39;，该矩阵记录了在当前状态下添加一个新字符后可能达到的新状态。在主函数 &#39;Leetcode&#39; 中，使用一个字典 &#39;dp&#39; 来动态记录从每个单词中取出特定字母序列以拼成目标字符串的最小总代价。遍历每个单词，并递归地考虑取或不取当前字符的情况，通过比较不同选择的代价来更新 &#39;dp&#39;。最终，&#39;dp&#39; 中的最小值就是答案。</p>
+                                <p>时间复杂度: O((m * 2^m) + (k * 2^k) + (n * m^2 * 2^k))</p>
+                                <p>空间复杂度: O(m * 2^m + k * 2^k + 2^k)</p>
+                                <pre class="bg-light p-2">value = [[32] * (1 &lt;&lt; ln) for ln in range(9)]  # 初始化动态规划数组，用于计算从单词中取出字母的最小代价
+for ln in range(9):  # 遍历每种可能的单词长度
+    value[ln][0] = 0  # 空选择的代价为0
+    for mask in range(1, 1 &lt;&lt; ln):  # 遍历所有可能的字母组合
+        left, right, bm = ln - 1, 0, 1  # 初始化左右指针和位掩码
+        while bm &lt;= mask:  # 遍历所有位
+            if mask &amp; bm:  # 如果当前位在掩码中
+                pm = ((mask &amp; ~(bm * 2 - 1)) &gt;&gt; 1) | mask &amp; (bm - 1)  # 计算取出当前字母后的新掩码
+                value[ln][mask] = min(value[ln][mask], value[ln - 1][pm] + left * right)  # 更新代价
+            left -= 1; right += 1; bm &lt;&lt;= 1  # 更新左右指针和位掩码
+
+key = &#39;helloleetcode&#39;  # 目标字母序列
+chset, kln = set(key), len(key)  # 构造目标字母集合和长度
+next_st = [defaultdict(int) for _ in range(1 &lt;&lt; kln)]  # 初始化状态转移数组
+for mask in range(1 &lt;&lt; kln):  # 遍历所有状态
+    for j, c in enumerate(key):  # 遍历目标字母序列
+        if mask &amp; (1 &lt;&lt; j) == 0:  # 如果当前字母未被选择
+            next_st[mask][c] = mask | (1 &lt;&lt; j)  # 更新状态
+
+M, INF = 1 &lt;&lt; kln, 123456789  # 定义最终状态掩码和无穷大值
+
+class Solution:
+    def Leetcode(self, words: List[str]) -&gt; int:
+        dp = defaultdict(lambda: INF)  # 初始化动态规划字典
+        dp[0] = 0  # 初始状态代价为0
+        for s in words:  # 遍历所有单词
+            ln = len(s)  # 获取单词长度
+            for mask, cost in list(dp.items()):  # 遍历当前所有状态和代价
+                def dfs(at, choice, cur):  # 定义深度优先搜索函数
+                    if at &gt;= ln:  # 如果遍历完单词
+                        if dp[cur] &gt; (tr := cost + value[ln][choice]): dp[cur] = tr  # 更新状态代价
+                        return
+                    dfs(at + 1, choice, cur)  # 不选择当前字母
+                    nxt = next_st[cur][s[at]]  # 获取添加当前字母后的新状态
+                    if nxt &gt; 0:
+                        dfs(at + 1, choice | (1 &lt;&lt; at), nxt)  # 选择当前字母
+                dfs(0, 0, mask)  # 从单词首字母开始搜索
+        return dp[M - 1] if (M - 1 in dp) else -1  # 返回最终状态的最小代价，如果不可能则返回-1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划数组`value`的计算中，为什么要使用位掩码来表示字母的选择？这样做有什么优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中使用位掩码来表示字母的选择，主要是因为位掩码允许我们以非常紧凑和高效的方式来表示和操作字母组合的状态。每个位（bit）可以代表一个字母是否被选择（1表示选中，0表示未选中），这样就可以使用整数的位运算（如位与、位或和位非）来快速处理状态的转移。这种方法的优势在于：1) 存储效率高，一个整数可以表示多个字母的选择状态；2) 计算效率高，位运算通常比其他类型的数据操作更快；3) 易于实现状态转移，可以直接通过位操作实现状态的添加和检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何理解并计算字母取出后的代价，特别是`value[ln][mask]`中的`left * right`这一部分是如何得出的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算`value[ln][mask]`时，每个位掩码`mask`代表了从单词中选择字母的不同组合，而`left * right`代表的是选择当前字母的代价。这里，`left`和`right`分别表示当前字母左侧和右侧未被选择的字母数量。当选择一个字母时，左侧未选择的字母数量和右侧未选择的字母数量的乘积可以被视作这次选择的&#39;代价&#39;，因为它反映了这个字母在单词中的&#39;位置重要性&#39;。具体来说，如果一个字母被选择，那么它左侧和右侧的未选择字母越多，意味着它在原单词中的位置越靠中间，其选择可能导致的组合变化和影响更大，因此代价也就更高。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`next_st`数组中，每个状态如何转移到新状态，具体的转移逻辑是怎样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`next_st`数组的计算中，每个状态代表了目标字符串`helloleetcode`中已经被选择的字母集合。数组的索引使用位掩码表示，每个位对应目标字符串中的一个字符，如果该位为1，则表示相应位置的字符已被选择。转移逻辑是：对于每个当前状态（位掩码），遍历目标字符串中的每个字符。如果当前字符在状态中未被选择（对应位为0），则通过位或运算将该字符的位设为1，从而生成一个新状态。这个新状态表示在当前选择的基础上，又选择了一个新的字符。这样，`next_st`数组通过记录每个状态可以转移到的所有可能的新状态，使得我们可以在动态规划中，根据当前已选择的字符集合，直接查找到添加任一新字符后的新状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/rMeRt2')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/rMeRt2/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

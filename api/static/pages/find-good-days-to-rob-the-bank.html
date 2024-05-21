@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>适合野炊的日子</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>适合野炊的日子</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你和朋友们准备去野炊。给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>security</code>&nbsp;，其中&nbsp;<code>security[i]</code>&nbsp;是第 <code>i</code>&nbsp;天的建议出行指数。日子从 <code>0</code>&nbsp;开始编号。同时给你一个整数&nbsp;<code>time</code>&nbsp;。</p>
+
+<p>如果第 <code>i</code>&nbsp;天满足以下所有条件，我们称它为一个适合野炊的日子：</p>
+
+<ul>
+	<li>第 <code>i</code>&nbsp;天前和后都分别至少有 <code>time</code>&nbsp;天。</li>
+	<li>第 <code>i</code>&nbsp;天前连续 <code>time</code>&nbsp;天建议出行指数都是非递增的。</li>
+	<li>第 <code>i</code>&nbsp;天后连续 <code>time</code>&nbsp;天建议出行指数都是非递减的。</li>
+</ul>
+
+<p>更正式的，第 <code>i</code> 天是一个适合野炊的日子当且仅当：<code>security[i - time] &gt;= security[i - time + 1] &gt;= ... &gt;= security[i] &lt;= ... &lt;= security[i + time - 1] &lt;= security[i + time]</code>.</p>
+
+<p>请你返回一个数组，包含 <strong>所有</strong> 适合野炊的日子（下标从 <strong>0</strong>&nbsp;开始）。返回的日子可以 <strong>任意</strong>&nbsp;顺序排列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>security = [5,3,3,3,5,6,2], time = 2
+<b>输出：</b>[2,3]
+<strong>解释：</strong>
+第 2 天，我们有 security[0] &gt;= security[1] &gt;= security[2] &lt;= security[3] &lt;= security[4] 。
+第 3 天，我们有 security[1] &gt;= security[2] &gt;= security[3] &lt;= security[4] &lt;= security[5] 。
+没有其他日子符合这个条件，所以日子 2 和 3 是适合野炊的日子。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>security = [1,1,1,1,1], time = 0
+<b>输出：</b>[0,1,2,3,4]
+<strong>解释：</strong>
+因为 time 等于 0 ，所以每一天都是适合野炊的日子，所以返回每一天。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>security = [1,2,3,4,5,6], time = 2
+<b>输出：</b>[]
+<strong>解释：</strong>
+没有任何一天的前 2 天建议出行指数是非递增的。
+所以没有适合野炊的日子，返回空数组。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= security.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= security[i], time &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 81 ms</p>
+                    <p>内存: 30.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def goodDaysToRobBank(self, security: List[int], time: int) -&gt; List[int]:
+        #指针加记忆搜索
+        n = len(security)
+        ans = []
+        if time == 0:
+            return [i for i in range(n)]
+        if n &lt; time*2+1:
+            return ans
+        
+        store = [0] * n
+        left_c = 0
+        right_c = 0
+
+        for i in range(1,n):
+            if security[i] &lt; security[i-1]:
+                left_c +=1
+                right_c = 0
+            elif security[i] &gt; security[i-1]:
+                left_c = 0
+                right_c += 1
+            else:
+                left_c += 1
+                right_c += 1
+            store[i] = left_c
+            if right_c &gt;= time and store[i-time] &gt;= time:
+                ans.append(i-time)
+        return ans
+            
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了一种指针加记忆搜索的方法。首先，如果time为0，那么每一天都是适合野炊的日子。接着，如果数组长度小于2*time+1，说明没有足够的天数来满足条件，直接返回空数组。然后，我们使用一个数组store来记录每一天左边连续非递增天数的数量。通过遍历security数组，我们更新left_c和right_c来分别记录当前天数左边和右边连续的非递增或非递减天数。如果当前天数右边的连续非递减天数大于等于time，并且当前天数-time天的左边连续非递增天数也大于等于time，那么这一天就是适合野炊的日子。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def goodDaysToRobBank(self, security: List[int], time: int) -&gt; List[int]:
+        n = len(security)
+        ans = []
+        if time == 0:
+            return [i for i in range(n)]
+        if n &lt; time*2+1:
+            return ans
+        
+        store = [0] * n
+        left_c = 0
+        right_c = 0
+
+        for i in range(1,n):
+            if security[i] &lt; security[i-1]:
+                left_c +=1
+                right_c = 0
+            elif security[i] &gt; security[i-1]:
+                left_c = 0
+                right_c += 1
+            else:
+                left_c += 1
+                right_c += 1
+            store[i] = left_c
+            if right_c &gt;= time and store[i-time] &gt;= time:
+                ans.append(i-time)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么要单独处理time为0的情况，直接将所有天数作为合适的野炊日子返回？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当time为0时，表示不需要任何连续的非递增或非递减天数来判断一个天气是否适合野炊。因此，每一天都自然满足条件，无需任何额外的检查。这是为了简化问题，并直接返回所有可能的日子作为结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用store数组来记录每天左边连续非递增天数的数量，那么为什么不需要一个类似的数组来记录每天右边连续非递减天数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，右侧的连续非递减天数是通过即时计算的方式（使用right_c变量）来管理的，这是因为我们只需要知道从当前天数开始往后的连续非递减天数，而不需要存储每一天的详细计数。这种处理方式减少了空间复杂度，同时保持了算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新left_c和right_c时，如果当前天的安全指数与前一天相同，为什么left_c和right_c都会增加？这是否会影响判断非递增或非递减的准确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当当前天与前一天的安全指数相同时，这意味着这一天既不比前一天更危险（非递增），也不比前一天更安全（非递减）。因此，这一天对于左侧的非递增序列和右侧的非递减序列都是一个延续。这种处理确保连续性的计数是准确的，不会影响判断的准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中判断某一天是否适合野炊时，使用的条件是`right_c &gt;= time`和`store[i-time] &gt;= time`，这里的`store[i-time]`为什么能正确代表从i-time到i的非递增天数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的`store[i-time]`实际上记录的是第i-time天的左侧连续非递增天数。当我们检查第i天时，我们希望确保从第i-time天到第i天这个区间内有足够的非递增天数。由于`store`数组只记录了到每一天为止的左侧非递增天数，因此我们用`store[i-time]`来确保从第i-time天开始，往右至少有time天是符合非递增条件的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-good-days-to-rob-the-bank')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-good-days-to-rob-the-bank/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

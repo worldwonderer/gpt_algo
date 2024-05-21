@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单词搜索 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单词搜索 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个&nbsp;<code>m x n</code> 二维字符网格&nbsp;<code>board</code><strong>&nbsp;</strong>和一个单词（字符串）列表 <code>words</code>，&nbsp;<em>返回所有二维网格上的单词</em>&nbsp;。</p>
+
+<p>单词必须按照字母顺序，通过 <strong>相邻的单元格</strong> 内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母在一个单词中不允许被重复使用。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/11/07/search1.jpg" />
+<pre>
+<strong>输入：</strong>board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+<strong>输出：</strong>["eat","oath"]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/11/07/search2.jpg" />
+<pre>
+<strong>输入：</strong>board = [["a","b"],["c","d"]], words = ["abcb"]
+<strong>输出：</strong>[]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == board.length</code></li>
+	<li><code>n == board[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 12</code></li>
+	<li><code>board[i][j]</code> 是一个小写英文字母</li>
+	<li><code>1 &lt;= words.length &lt;= 3 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= words[i].length &lt;= 10</code></li>
+	<li><code>words[i]</code> 由小写英文字母组成</li>
+	<li><code>words</code> 中的所有字符串互不相同</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 468 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">dirs = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+class TrieNode:
+    def __init__(self):
+        self.children = {} #{letter:trienode of subtree}
+        self.is_word = False
+        self.word = None
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def add(self, word):		#字典树插入单词
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                node.children[c] = TrieNode()   #在此节点申请节点
+            node = node.children[c]     		#继续遍历
+        node.is_word = True
+        node.word = word        #存入单词
+    
+    #def find(self,word):
+     #   node = self.root
+      #  for c in word:
+       #     node = node.children.get(c)
+        #    if node is None:
+         #       return None
+                
+        #return node.is_word
+        
+class Solution:
+    def findWords(self, board: List[List[str]], words: List[str]) -&gt; List[str]:
+        if not board or not board[0] or not words:
+            return []
+        trie = Trie()
+        for w in words:    #建立字典树,将所有dict中word放入字典树
+            trie.add(w)
+        output = []
+        
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                c = board[i][j]
+                #从字典树root开始搜索
+                self.dfs(board,trie.root.children.get(c),i,j,[[i,j]],output)
+        return output
+                
+    def dfs(self,board,node,x,y,visited,output):
+        if not node:
+            return
+        if node.is_word and node.word not in output:
+            output.append(node.word)
+        
+        for d in dirs:
+            new_x = x+d[0]
+            new_y = y+d[1]
+            if new_x&lt;0 or new_x&gt;=len(board) or new_y&lt;0 or new_y&gt;=len(board[0]):
+                continue
+            if [new_x,new_y] in visited:
+                continue
+            
+            visited.append([new_x,new_y])
+            self.dfs(board,node.children.get(board[new_x][new_y]),new_x,new_y,visited,output)
+            visited.pop()</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了字典树（Trie）和深度优先搜索（DFS）的方法来解决单词搜索问题。首先，将所有需要搜索的单词构建成一棵字典树。然后，对于网格中的每个字符，从该字符开始进行DFS搜索。在DFS过程中，沿着字典树匹配字符，同时在网格上向四个方向扩展。如果在字典树的某个节点匹配到完整的单词，就将该单词加入到输出结果中。为了避免重复访问网格上的字符，使用一个visited数组来记录已访问过的位置。</p>
+                                <p>时间复杂度: O(m*n*4^w + k*w)</p>
+                                <p>空间复杂度: O(k*w)</p>
+                                <pre class="bg-light p-2">```python
+dirs = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+class TrieNode:
+    def __init__(self):
+        self.children = {} #{letter:trienode of subtree}
+        self.is_word = False
+        self.word = None
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def add(self, word):  #字典树插入单词
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                node.children[c] = TrieNode()   #在此节点申请节点
+            node = node.children[c]             #继续遍历
+        node.is_word = True
+        node.word = word        #存入单词
+        
+class Solution:
+    def findWords(self, board: List[List[str]], words: List[str]) -&gt; List[str]:
+        if not board or not board[0] or not words:
+            return []
+        trie = Trie()
+        for w in words:    #建立字典树,将所有dict中word放入字典树
+            trie.add(w)
+        output = []
+        
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                c = board[i][j]
+                #从字典树root开始搜索
+                self.dfs(board,trie.root.children.get(c),i,j,[[i,j]],output)
+        return output
+                
+    def dfs(self,board,node,x,y,visited,output):
+        if not node:
+            return
+        if node.is_word and node.word not in output:
+            output.append(node.word)
+        
+        for d in dirs:
+            new_x = x+d[0]
+            new_y = y+d[1]
+            if new_x&lt;0 or new_x&gt;=len(board) or new_y&lt;0 or new_y&gt;=len(board[0]):
+                continue
+            if [new_x,new_y] in visited:
+                continue
+            
+            visited.append([new_x,new_y])
+            self.dfs(board,node.children.get(board[new_x][new_y]),new_x,new_y,visited,output)
+            visited.pop()
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在字典树（Trie）中每个节点需要有一个`is_word`标志和`word`属性，这两者的作用分别是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`is_word`标志用于指示当前节点是否表示一个完整的单词的结束。这对于区分仅是其他单词前缀的字符序列和实际存储在字典树中作为独立单词的字符序列非常重要。例如，&#39;app&#39;和&#39;apple&#39;，在&#39;p&#39;节点上的`is_word`标志表示&#39;app&#39;是一个完整的单词。而`word`属性存储的是从根到当前节点形成的完整单词，这样在找到一个完整单词时可以直接从节点获取，而不需要重新遍历从根到该节点的路径来重建单词。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在DFS搜索过程中，为什么要使用一个`visited`列表来记录已访问的位置，而不是直接修改`board`上的字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`visited`列表可以帮助我们记录哪些位置已经被访问过，从而避免在DFS过程中重复访问相同的格子。这样做的好处是避免破坏原始`board`的内容，因为直接修改`board`的字符可能会丢失原始数据，而使用`visited`列表则可以在DFS完成后保留完整的`board`。此外，使用`visited`列表还可以灵活地添加和删除访问记录，便于控制和回溯访问路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            DFS函数中，在尝试不同方向进行搜索前，为什么需要检查新的坐标`(new_x, new_y)`是否已经在`visited`列表中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS中检查新的坐标是否已在`visited`列表中是防止重复访问同一位置的重要步骤。由于每个位置只应在一个搜索路径中被访问一次，这可以确保搜索不会进入循环或重复覆盖已探索的路径。这种检查帮助维护了搜索的正确性和效率，防止无限递归和路径的重复探索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际操作中，如果`words`列表中的单词非常长，这会如何影响算法的性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果`words`列表中的单词非常长，这将对算法的性能产生几个影响：1. 构建字典树的时间和空间复杂度会增加，因为长单词意味着更多的节点和更深的树结构。2. DFS过程中的搜索深度会增加，这可能导致更高的递归开销和更长的搜索时间。3. 随着单词长度的增加，匹配过程中遍历字典树的路径也变得更长，这可能导致在每一步中检查更多的可能性，从而增加算法的执行时间。因此，单词非常长时，整体的时间和空间需求都会上升，降低算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/word-search" class="list-group-item list-group-item-action">
+                                单词搜索
+                            </a>
+                        
+                            <a href="/problem/unique-paths-iii" class="list-group-item list-group-item-action">
+                                不同路径 III
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/word-search-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/word-search-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

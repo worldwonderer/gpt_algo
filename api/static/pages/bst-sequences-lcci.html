@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉搜索树序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉搜索树序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=binary-search-tree" class="badge bg-secondary tag-link">二叉搜索树</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>从左向右遍历一个数组，通过不断将其中的元素插入树中可以逐步地生成一棵二叉搜索树。</p>
+
+<p>给定一个由<strong>不同节点</strong>组成的二叉搜索树 <code>root</code>，输出所有可能生成此树的数组。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>root = [2,1,3]
+<strong>输出: </strong>[[2,1,3],[2,3,1]]
+解释: 数组 [2,1,3]、[2,3,1] 均可以通过从左向右遍历元素插入树中形成以下二叉搜索树
+&nbsp;      2 
+&nbsp;     / \ 
+&nbsp;    1   3
+</pre>
+
+<p><meta charset="UTF-8" /></p>
+
+<p><strong>示例</strong><strong>&nbsp;2:</strong></p>
+
+<pre>
+<strong>输入: </strong>root = [4,1,null,null,3,2]
+<strong>输出: </strong>[[4,1,3,2]]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>二叉搜索树中的节点数在<meta charset="UTF-8" />&nbsp;<code>[0, 1000]</code>&nbsp;的范围内</li>
+	<li><code>1 &lt;= 节点值&nbsp;&lt;= 10^6</code></li>
+	<li>
+	<p>用例保证符合要求的数组数量不超过 <code>5000</code></p>
+	</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 30 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+&#34;&#34;&#34;
+规律：中间点最先确认，左子和右子的顺序随意
+分治：
+root，左子树任意顺序，右子树任意顺序
+root，右子树任意顺序，左子树任意顺序
+-----错误：对于[2,1,4,null,null,3]，左子1可插入右子树的4和3之间---
+
+实际规律：每个节点都必须排在它的子孙结点前面。
+层序遍历原树，队列中的点无序，回溯取队列中任一点
+&#34;&#34;&#34;
+class Solution:
+    def BSTSequences(self, root: TreeNode) -&gt; List[List[int]]:
+        if root is None:
+            return [[],]
+
+        self.result = []
+        path = []
+        queue = [root,]
+        self.trace(path, queue)
+
+        return self.result
+
+    
+    def trace(self, path, queue):
+        if len(queue)==0: #排列完毕
+            self.result.append(path[:])
+            return 
+
+        i=0
+        end = len(queue) #只遍历当前层队列
+        while i&lt;end:#任取队列中的一个
+            root  = queue.pop(i)
+            path.append(root.val)
+
+            #孩子入队
+            if root.left:
+                queue.append(root.left)
+            if root.right:
+                queue.append(root.right)
+
+            # print(f&#34;当前root={root.val},\tcur={path}, queue={queue}&#34;)
+            self.trace(path, queue)
+
+            #回退
+            queue.insert(i, root)
+            del queue[end:]
+            del path[-1]
+            i +=1
+
+        
+
+
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目要求找到所有可能的数组序列，这些序列能够通过从左到右的插入操作重建给定的二叉搜索树（BST）。解题关键是理解每个节点必须在它的所有子孙节点之前出现。解决这个问题的方法是使用回溯法来模拟这个过程。算法使用一个队列来存储当前可用于插入到序列中的节点，这些节点是已经在序列中的节点的直接子节点。回溯过程中，从队列中选择一个节点，将其添加到当前路径，然后将其子节点添加到队列中，继续递归。每次递归调用后，需要将路径和队列状态回溯到之前的状态，以便尝试其他的选择。</p>
+                                <p>时间复杂度: O(n!)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def BSTSequences(self, root: TreeNode) -&gt; List[List[int]]:
+        if root is None:
+            return [[],]
+
+        self.result = []
+        path = []
+        queue = [root,]
+        self.trace(path, queue)
+
+        return self.result
+
+    def trace(self, path, queue):
+        if len(queue)==0: # 检查是否所有节点都已经被处理
+            self.result.append(path[:])
+            return 
+
+        i=0
+        end = len(queue) # 保存当前队列的长度
+        while i&lt;end:
+            root  = queue.pop(i)
+            path.append(root.val)
+
+            # 添加当前节点的子节点到队列
+            if root.left:
+                queue.append(root.left)
+            if root.right:
+                queue.append(root.right)
+
+            self.trace(path, queue)
+
+            # 回溯，恢复队列和路径的状态
+            queue.insert(i, root)
+            del queue[end:]
+            del path[-1]
+            i +=1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用回溯法来解决这个问题，有没有其他可能的算法可以应用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>回溯法被选择来解决这个问题是因为它能够有效地探索所有可能的节点插入序列，直到找到可以重建原始二叉搜索树的序列。这种方法类似于深度优先搜索，适用于需要遍历多种可能状态的问题。在每一步中，算法都尝试将一个节点添加到序列中，并递归地尝试所有后续可能性，然后撤销这一步骤（回溯），尝试另一种可能性。尽管可以考虑使用动态规划或广度优先搜索等其他算法，但由于解决这个问题需要生成所有可能的序列而不仅仅是计算数量，回溯法因其能够自然地处理这种&#39;生成与测试&#39;的需求而更为适合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在回溯过程中，如何保证每个节点在它的所有子孙节点之前出现在序列中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回溯过程中，每次从队列中选取一个节点作为序列中的下一个节点时，该节点的所有子节点都会被添加到队列中。这确保了在该节点后面的任何选择都只能从这些子节点或者其他已经在队列中的节点中进行选择。由于我们只从队列中移除已经添加到路径中的节点，并将其子节点加入队列，这样设计自然保证了每个节点必须在它的所有子孙节点之前被处理和添加到序列中，符合二叉搜索树的构建规则。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在算法中，你提到了使用队列来维护当前可插入的节点，为什么选择使用队列而不是其他数据结构如栈或优先队列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本算法中，使用队列而不是栈或优先队列的主要原因是队列能够更自然地模拟广度优先的节点处理顺序，这对于本问题是理想的。队列允许我们以几乎与宽度优先搜索（BFS）相似的方式处理节点，但与传统的BFS不同，此处的队列在每次迭代中可能会根据节点的子节点动态变化。使用栈会导致我们以深度优先的顺序处理节点，这不符合题目要求的可能序列生成逻辑。优先队列（基于某种优先级排序的队列）在这里也不适用，因为节点的处理顺序仅由它们在树中的父子关系决定，而不是某种独立的优先级度量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bst-sequences-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bst-sequences-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

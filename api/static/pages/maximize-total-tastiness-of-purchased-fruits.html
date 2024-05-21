@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大限度地提高购买水果的口味</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大限度地提高购买水果的口味</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 196 ms</p>
+                    <p>内存: 17.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxTastiness(self, price: List[int], tastiness: List[int], maxAmount: int, maxCoupons: int) -&gt; int:
+        # dp[i][j]记录使用i张优惠券及j元钱时可以获得的最大甜度值，当记录为-math.inf时说明不存在这样的组合
+        dp = [[-math.inf] * (maxAmount + 1) for _ in range(maxCoupons + 1)]
+        # 一块钱也不花，一张券也不用时显然获得的甜度值为0
+        dp[0][0] = 0
+        # 遍历所有price, tastiness对
+        for p, t in zip(price, tastiness):
+            # 如果当前甜度值为0，那么花钱买该水果无意义
+            if t == 0:
+                continue
+
+            # 如果当前水果的半价都高于总金额，则显然无法买下当前水果
+            p_ = p &gt;&gt; 1
+            if p_ &gt; maxAmount:
+                continue
+
+            # 用上一阶段dp值初始化下一阶段的dp值
+            tmp_dp = [dp[i].copy() for i in range(maxCoupons + 1)]
+
+            # 先考虑dp记录中已经用完了所有优惠券的情况，即dp的最后一行dp[maxCoupons]，或dp[-1]
+            # 遍历所有已经使用的金额j
+            for j in range(maxAmount + 1):
+                # 若当前状态不合法，跳过
+                if dp[-1][j] == -math.inf:
+                    continue
+                # 若已花金额加上当前水果金额超过了总金额，则后续的j也会让j+p超出总金额，可直接break
+                if j + p &gt; maxAmount:
+                    break
+                # 用花费j元钱获得的最大甜度加上当前水果的甜度t，来更新花费j+p元可获得的最大甜度
+                tmp = dp[-1][j] + t
+                if tmp &gt; tmp_dp[-1][j + p]:
+                    tmp_dp[-1][j + p] = tmp
+
+            # 当已用优惠券不到总优惠券数量时，可以考虑对当前水果再用一张代金券，此时遍历所有小于maxCoupons的i
+            for i in range(maxCoupons):
+                # 遍历所有已花费的金额j
+                for j in range(maxAmount + 1):
+                    # 若不存在已用i张优惠券且花费总金额为j的方案，则跳过
+                    if dp[i][j] == -math.inf:
+                        continue
+                    # 若已花金额加上当前水果的半价都超过了总金额，则在已花费金额大于j元的情况下，
+                    # 无论后续是否使用代金券都无法购入当前水果，故可break
+                    if j + p_ &gt; maxAmount:
+                        break
+                    # 用已花i张优惠券和j元可获得的最大甜度加上当前水果的甜度来更新
+                    tmp = dp[i][j] + t
+                    # 若它比当前记录的多花一张优惠券且多花当前水果的半价获得的甜度大，则更新
+                    if tmp &gt; tmp_dp[i + 1][j + p_]:
+                        tmp_dp[i + 1][j + p_] = tmp
+                    # 若j+p未超过总金额，则可在不花费额外优惠券的情况下购入当前水果
+                    if j + p &lt;= maxAmount and tmp &gt; tmp_dp[i][j + p]:
+                        tmp_dp[i][j + p] = tmp
+
+            dp = tmp_dp
+
+        return max(max(rec) for rec in dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目可以通过动态规划来解决。使用二维数组 dp[i][j] 表示使用 i 张优惠券和 j 元钱时所能获得的最大甜度。初始化时，不使用优惠券且不花钱的情况下甜度为 0。接着，按照水果列表遍历，对于每个水果，考虑两种情况：使用优惠券和不使用优惠券。如果使用优惠券，当前水果的价格会减半，如果不使用优惠券，则按照全价购买。对于每种情况，都要检查是否超出预算或者优惠券使用数量，并更新 dp 数组以反映加入当前水果后可能获得的最大甜度。最终，遍历 dp 数组，找出可以获得的最大甜度值。</p>
+                                <p>时间复杂度: O(n * c * m)</p>
+                                <p>空间复杂度: O(c * m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxTastiness(self, price: List[int], tastiness: List[int], maxAmount: int, maxCoupons: int) -&gt; int:
+        # 创建dp数组，初始化为负无穷，表示不可能的状态
+        dp = [[-math.inf] * (maxAmount + 1) for _ in range(maxCoupons + 1)]
+        # 初始化dp[0][0]为0，表示不使用金钱和优惠券的情况
+        dp[0][0] = 0
+        # 遍历每个水果
+        for p, t in zip(price, tastiness):
+            if t == 0:
+                continue
+            p_ = p &gt;&gt; 1 # 计算使用优惠券后的价格
+            if p_ &gt; maxAmount:
+                continue
+            tmp_dp = [dp[i].copy() for i in range(maxCoupons + 1)]
+            for j in range(maxAmount + 1):
+                if dp[-1][j] == -math.inf:
+                    continue
+                if j + p &gt; maxAmount:
+                    break
+                tmp = dp[-1][j] + t
+                if tmp &gt; tmp_dp[-1][j + p]:
+                    tmp_dp[-1][j + p] = tmp
+            for i in range(maxCoupons):
+                for j in range(maxAmount + 1):
+                    if dp[i][j] == -math.inf:
+                        continue
+                    if j + p_ &gt; maxAmount:
+                        break
+                    tmp = dp[i][j] + t
+                    if tmp &gt; tmp_dp[i + 1][j + p_]:
+                        tmp_dp[i + 1][j + p_] = tmp
+                    if j + p &lt;= maxAmount and tmp &gt; tmp_dp[i][j + p]:
+                        tmp_dp[i][j + p] = tmp
+            dp = tmp_dp
+        # 找出dp数组中的最大值作为结果
+        return max(max(rec) for rec in dp)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用动态规划方法，能否详细解释为什么这种问题适合使用动态规划来解决？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划适用于解决具有重叠子问题和最优子结构的问题。在这个题目中，问题可以分解为更小的子问题，即考虑更少的水果、更少的优惠券或更少的金钱时的最大甜度。每增加一种水果的选择，我们可以基于之前的结果来更新新的结果，这些之前的结果就是重叠的子问题。通过保存这些子问题的解决方案，我们避免了重复计算，提高了效率。同时，整体问题的最优解依赖于这些子问题的最优解，这符合最优子结构的特性。因此，动态规划是一种理想的方法来解决这个问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在初始化dp数组时，所有元素被设置为负无穷，除了dp[0][0]。这样的初始化对算法的正确性和效率有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化dp数组中的元素为负无穷，除了dp[0][0]为0，是为了反映在没有使用任何优惠券和任何金钱的情况下，可以获得的甜度是0。设置其他元素为负无穷是为了表示在不满足购买条件的情况下，这种状态是不可达的。这种初始化确保了只有在实际可以购买水果的情况下，才会更新这些值。从效率角度来看，这避免了无效操作，因为算法会跳过那些不可能达到的状态。从正确性角度来看，这确保了dp数组始终反映了到达每个状态的最大甜度，而不是未初始化或错误的值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了临时数组tmp_dp来更新dp值，这种方法的目的是什么？直接在原dp数组上修改会有什么潜在问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用临时数组tmp_dp来更新dp值的目的是为了避免在迭代过程中影响到当前正在处理的状态。如果直接在原dp数组上进行修改，那么后续的操作可能会使用到已经被修改过的值，这会导致错误的结果。使用临时数组可以确保在整个更新过程中，所有的决策都是基于同一轮次的原始数据，从而保证了算法的正确性。这种方法虽然增加了空间复杂度，但是能有效保证动态规划状态的正确转移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理使用优惠券的情况时，有一个条件判断`if p_ &gt; maxAmount then continue`，这里的逻辑是什么？为什么当使用优惠券后的价格超过最大金额就跳过不处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件判断确保了即使使用了优惠券，水果的价格仍然需要在用户的预算范围内。如果使用优惠券后的价格`p_`仍然超过了最大金额`maxAmount`，则即使使用优惠券也无法购买该水果，因此在这种情况下没有必要继续考虑这个水果。这样的判断可以减少无效的计算，并且保持算法的效率和准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-total-tastiness-of-purchased-fruits')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-total-tastiness-of-purchased-fruits/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

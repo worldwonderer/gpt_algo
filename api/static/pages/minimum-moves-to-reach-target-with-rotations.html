@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>穿过迷宫的最少移动次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>穿过迷宫的最少移动次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>你还记得那条风靡全球的贪吃蛇吗？</p>
+
+<p>我们在一个&nbsp;<code>n*n</code>&nbsp;的网格上构建了新的迷宫地图，蛇的长度为 2，也就是说它会占去两个单元格。蛇会从左上角（<code>(0, 0)</code>&nbsp;和&nbsp;<code>(0, 1)</code>）开始移动。我们用 <code>0</code> 表示空单元格，用 1 表示障碍物。蛇需要移动到迷宫的右下角（<code>(n-1, n-2)</code>&nbsp;和&nbsp;<code>(n-1, n-1)</code>）。</p>
+
+<p>每次移动，蛇可以这样走：</p>
+
+<ul>
+	<li>如果没有障碍，则向右移动一个单元格。并仍然保持身体的水平／竖直状态。</li>
+	<li>如果没有障碍，则向下移动一个单元格。并仍然保持身体的水平／竖直状态。</li>
+	<li>如果它处于水平状态并且其下面的两个单元都是空的，就顺时针旋转 90 度。蛇从（<code>(r, c)</code>、<code>(r, c+1)</code>）移动到 （<code>(r, c)</code>、<code>(r+1, c)</code>）。<br>
+	<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/09/28/image-2.png" style="height: 134px; width: 300px;"></li>
+	<li>如果它处于竖直状态并且其右面的两个单元都是空的，就逆时针旋转 90 度。蛇从（<code>(r, c)</code>、<code>(r+1, c)</code>）移动到（<code>(r, c)</code>、<code>(r, c+1)</code>）。<br>
+	<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/09/28/image-1.png" style="height: 121px; width: 300px;"></li>
+</ul>
+
+<p>返回蛇抵达目的地所需的最少移动次数。</p>
+
+<p>如果无法到达目的地，请返回&nbsp;<code>-1</code>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/09/28/image.png" style="height: 439px; width: 400px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[0,0,0,0,0,1],
+               [1,1,0,0,1,0],
+&nbsp;              [0,0,0,0,1,1],
+&nbsp;              [0,0,1,0,1,0],
+&nbsp;              [0,1,1,0,0,0],
+&nbsp;              [0,1,1,0,0,0]]
+<strong>输出：</strong>11
+<strong>解释：
+</strong>一种可能的解决方案是 [右, 右, 顺时针旋转, 右, 下, 下, 下, 下, 逆时针旋转, 右, 下]。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[0,0,1,1,1,1],
+&nbsp;              [0,0,0,0,1,1],
+&nbsp;              [1,1,0,0,0,1],
+&nbsp;              [1,1,1,0,0,1],
+&nbsp;              [1,1,1,0,0,1],
+&nbsp;              [1,1,1,0,0,0]]
+<strong>输出：</strong>9
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 100</code></li>
+	<li><code>0 &lt;= grid[i][j] &lt;= 1</code></li>
+	<li>蛇保证从空单元格开始出发。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 75 ms</p>
+                    <p>内存: 18.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumMoves(self, grid: List[List[int]]) -&gt; int:
+        n=len(grid)
+        q=[(0,0,0,1,0)]
+        visted=set((0,0,1,0))
+        count=0
+        while q:
+            t=q
+            q=[]
+            for i,j,x,y,z in t:
+                if i==n-1 and j==n-2 and x==n-1 and y==n-1:
+                    return count
+                if z==0:
+                    if y+1&lt;n and grid[x][y+1]==0 and (x,y,x,y+1) not in visted:
+                        q.append((x,y,x,y+1,0))
+                        visted.add((x,y,x,y+1))
+                    if x+1&lt;n and grid[i+1][j]==0 and grid[x+1][y] ==0:
+                        if (i,j,i+1,j) not in visted:
+                            q.append((i,j,i+1,j,1))
+                            visted.add(((i,j,i+1,j)))
+                        if (i+1,j,x+1,y) not in visted:
+                            q.append((i+1,j,x+1,y,0))
+                            visted.add((i+1,j,x+1,y))
+                elif z==1:
+                    if x+1&lt;n and grid[x+1][y]==0 and (x,y,x+1,y) not in visted:
+                        q.append((x,y,x+1,y,1))
+                        visted.add((x,y,x+1,y))
+                    if y+1&lt;n and grid[x][y+1]==0 and grid[i][j+1]==0:
+                        if (i,j,i,j+1) not in visted:
+                            q.append((i,j,i,j+1,0))
+                            visted.add((i,j,i,j+1))
+                        if (i,j+1,x,j+1) not in visted:
+                            q.append((i,j+1,x,j+1,1))
+                            visted.add((i,j+1,x,j+1))
+            count+=1
+        print(count)
+        return -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用广度优先搜索（BFS）来寻找蛇从起点到终点的最短路径。每次搜索时，根据蛇的当前状态（水平或竖直）以及周围的障碍物情况，将下一步可能的移动状态加入队列中。同时使用一个集合 visted 来记录已访问过的状态，避免重复搜索。当搜索到达目标位置时，返回移动的次数 count。如果无法到达目标位置，则返回 -1。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumMoves(self, grid: List[List[int]]) -&gt; int:
+        n = len(grid)
+        q = [(0, 0, 0, 1, 0)]  # 初始状态：(蛇头行, 蛇头列, 蛇尾行, 蛇尾列, 方向)
+        visted = set((0, 0, 1, 0))  # 记录已访问过的状态
+        count = 0  # 移动次数
+        
+        while q:
+            t = q
+            q = []
+            for i, j, x, y, z in t:
+                if i == n-1 and j == n-2 and x == n-1 and y == n-1:  # 到达目标位置
+                    return count
+                
+                if z == 0:  # 水平状态
+                    if y+1 &lt; n and grid[x][y+1] == 0 and (x, y, x, y+1) not in visted:  # 向右移动
+                        q.append((x, y, x, y+1, 0))
+                        visted.add((x, y, x, y+1))
+                    if x+1 &lt; n and grid[i+1][j] == 0 and grid[x+1][y] == 0:  # 向下移动或顺时针旋转
+                        if (i, j, i+1, j) not in visted:
+                            q.append((i, j, i+1, j, 1))
+                            visted.add((i, j, i+1, j))
+                        if (i+1, j, x+1, y) not in visted:
+                            q.append((i+1, j, x+1, y, 0))
+                            visted.add((i+1, j, x+1, y))
+                            
+                elif z == 1:  # 竖直状态
+                    if x+1 &lt; n and grid[x+1][y] == 0 and (x, y, x+1, y) not in visted:  # 向下移动
+                        q.append((x, y, x+1, y, 1))
+                        visted.add((x, y, x+1, y))
+                    if y+1 &lt; n and grid[x][y+1] == 0 and grid[i][j+1] == 0:  # 向右移动或逆时针旋转
+                        if (i, j, i, j+1) not in visted:
+                            q.append((i, j, i, j+1, 0))
+                            visted.add((i, j, i, j+1))
+                        if (i, j+1, x, j+1) not in visted:
+                            q.append((i, j+1, x, j+1, 1))
+                            visted.add((i, j+1, x, j+1))
+                            
+            count += 1  # 移动次数加 1
+        
+        return -1  # 无法到达目标位置
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在算法中使用广度优先搜索（BFS）而不是深度优先搜索（DFS）或其他搜索算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种类型的路径搜索问题中，特别是寻找最短路径的场景，广度优先搜索（BFS）通常比深度优先搜索（DFS）更加适用。BFS以层级的方式扩展搜索范围，保证了一旦到达目标位置时，所经历的路径长度是最短的。相对地，DFS可能会沿着一个方向探索到底，即使找到目标位置，也不一定是最短路径。此外，对于大型网格，DFS由于其递归特性可能会遇到栈溢出的问题，而BFS则通常使用队列来实现，更适合处理这类问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在记录已访问状态时，你是如何确定包括方向在内的五元组（i, j, x, y, z）足以唯一标识蛇的状态的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>五元组（i, j, x, y, z）中，i, j表示蛇头的位置，x, y表示蛇尾的位置，而z表示蛇的方向（0代表水平，1代表竖直）。这足以唯一标识蛇的状态，因为蛇的形状和方向完全由其头尾位置和方向决定。在此迷宫问题中，蛇的长度是固定的，且只能是水平或竖直，因此五元组能够准确记录并区分蛇在不同位置和方向的状态，避免重复搜索相同状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中对于蛇的旋转操作是否有特定的条件限制，例如，为什么旋转前需要检查下方或右方两个单元是否为空？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>蛇的旋转操作确实有特定的条件限制。在算法中，蛇只能在没有障碍物阻碍的情况下旋转。例如，当蛇处于水平状态且准备顺时针旋转到竖直状态时，需要确保蛇头下方的格子以及蛇尾下方的格子都是空的（即没有障碍物）。这是因为旋转涉及到蛇头或蛇尾的移动到新位置，如果这些位置有障碍，则旋转不能执行。同样的逻辑适用于蛇从竖直状态旋转到水平状态时对右侧格子的检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果蛇的起始位置或目标位置初始就被障碍物阻碍，这种情况下算法是否能正确返回-1表示无法到达？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，算法能够正确处理起始位置或目标位置被障碍物阻碍的情况并返回-1。在算法开始时，如果蛇的初始位置（头或尾）就被障碍物占据，蛇就无法开始移动，因此算法可以在初始检查阶段确认这一点。同样，如果在搜索过程中没有找到通往目标位置的有效路径，算法将在队列为空时结束循环，并返回-1，表示目标位置不可达。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-moves-to-reach-target-with-rotations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-moves-to-reach-target-with-rotations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

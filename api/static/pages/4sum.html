@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>四数之和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>四数之和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由 <code>n</code> 个整数组成的数组&nbsp;<code>nums</code> ，和一个目标值 <code>target</code> 。请你找出并返回满足下述全部条件且<strong>不重复</strong>的四元组&nbsp;<code>[nums[a], nums[b], nums[c], nums[d]]</code>&nbsp;（若两个四元组元素一一对应，则认为两个四元组重复）：</p>
+
+<ul>
+	<li><code>0 &lt;= a, b, c, d&nbsp;&lt; n</code></li>
+	<li><code>a</code>、<code>b</code>、<code>c</code> 和 <code>d</code> <strong>互不相同</strong></li>
+	<li><code>nums[a] + nums[b] + nums[c] + nums[d] == target</code></li>
+</ul>
+
+<p>你可以按 <strong>任意顺序</strong> 返回答案 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,0,-1,0,-2,2], target = 0
+<strong>输出：</strong>[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [2,2,2,2,2], target = 8
+<strong>输出：</strong>[[2,2,2,2]]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 200</code></li>
+	<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>-10<sup>9</sup> &lt;= target &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1324 ms</p>
+                    <p>内存: 15.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        def nSum(n, start, tar):
+            res = []
+            if n == 2:
+                i = start
+                j = len(nums)-1
+                while i &lt; j:
+                    s = nums[i] + nums[j]
+                    left = nums[i]
+                    right = nums[j]
+                    if s &lt; tar:
+                        while i &lt; j and nums[i] == left:
+                            i += 1
+                    elif s &gt; tar:
+                        while i &lt; j and nums[j] == right:
+                            j -= 1
+                    else:
+                        print(left, right)
+                        res.append([left, right])
+                        while i &lt; j and nums[i] == left:
+                            i += 1
+                        while i &lt; j and nums[j] == right:
+                            j -= 1
+            elif n &gt; 2:
+                i = start
+                while i &lt; len(nums):
+                    tuples = nSum(n-1, i+1, tar-nums[i])
+                    for t in tuples:
+                        t.append(nums[i])
+                        res.append(t)
+                    while i+1 &lt; len(nums) and nums[i+1] == nums[i]:
+                        i += 1
+                    i += 1
+            return res
+
+        nums.sort()
+        return nSum(4, 0, target)
+
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.fourSum([-2,-1,-1,1,1,2,2], 4))
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目使用了nSum的递归思想来解决。首先将数组排序，然后递归地调用nSum函数，将问题不断分解成更小的子问题，直到问题简化为两数之和。在两数之和的处理中，使用双指针技巧来寻找和为目标值的元素对。为了避免重复解，每次找到一个解后，需要跳过相同的元素。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^3)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -&gt; List[List[int]]:
+        def nSum(n, start, tar):
+            res = []
+            if n == 2:
+                i = start
+                j = len(nums)-1
+                while i &lt; j:
+                    s = nums[i] + nums[j]
+                    left = nums[i]
+                    right = nums[j]
+                    if s &lt; tar:
+                        while i &lt; j and nums[i] == left:
+                            i += 1
+                    elif s &gt; tar:
+                        while i &lt; j and nums[j] == right:
+                            j -= 1
+                    else:
+                        res.append([left, right])
+                        while i &lt; j and nums[i] == left:
+                            i += 1
+                        while i &lt; j and nums[j] == right:
+                            j -= 1
+            elif n &gt; 2:
+                i = start
+                while i &lt; len(nums):
+                    tuples = nSum(n-1, i+1, tar-nums[i])
+                    for t in tuples:
+                        t.append(nums[i])
+                        res.append(t)
+                    while i+1 &lt; len(nums) and nums[i+1] == nums[i]:
+                        i += 1
+                    i += 1
+            return res
+
+        nums.sort()
+        return nSum(4, 0, target)
+
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.fourSum([-2,-1,-1,1,1,2,2], 4))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在两数之和的问题中选择使用双指针而不是哈希表的方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在排序数组中，使用双指针方法可以更直观且高效地找到和为目标值的两个数。使用双指针时，可以有效地利用数组的有序性，通过移动左右指针以逼近目标值，从而避免额外的空间复杂度。而使用哈希表虽然能在未排序的情况下快速查找元素，但它需要额外的空间来存储元素和它们的索引，且在处理重复元素和保持结果的有序性方面更加复杂。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在多层递归中如何确保避免重复的四元组出现？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了确保不出现重复的四元组，算法在每次找到有效的子问题解后，会跳过所有与当前元素相同的后续元素。这是通过在递归的每一层中，在处理完当前元素并找到所有相关的子问题解之后，检查后续元素是否与当前元素相同来实现的。如果相同，就继续跳过，直到找到一个不同的元素或者数组结束。这种方法确保每个数字在每个位置只被使用一次，从而避免生成重复的组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当nSum函数中的n大于2时，为什么选择将问题递减至n-1而不是更小的数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>递归地将nSum问题递减至n-1是为了简化问题的复杂性，同时保持问题的结构清晰和可控。通过逐步递减，可以将n数之和的问题逐步分解为更易于解决的子问题，最终简化到两数之和，这是一个直接可以通过双指针高效解决的问题。如果直接跳过n-1到更小的数，比如n-2，虽然理论上可行，但在实践中会使问题的分解和解决变得复杂，需要更多的递归层次和复杂的中间状态管理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/two-sum" class="list-group-item list-group-item-action">
+                                两数之和
+                            </a>
+                        
+                            <a href="/problem/3sum" class="list-group-item list-group-item-action">
+                                三数之和
+                            </a>
+                        
+                            <a href="/problem/4sum-ii" class="list-group-item list-group-item-action">
+                                四数相加 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/4sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/4sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

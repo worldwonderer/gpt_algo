@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>每个小孩最多能分到多少糖果</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>每个小孩最多能分到多少糖果</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <strong>下标从 0 开始</strong> 的整数数组 <code>candies</code> 。数组中的每个元素表示大小为 <code>candies[i]</code> 的一堆糖果。你可以将每堆糖果分成任意数量的 <strong>子堆</strong> ，但 <strong>无法</strong> 再将两堆合并到一起。</p>
+
+<p>另给你一个整数 <code>k</code> 。你需要将这些糖果分配给 <code>k</code> 个小孩，使每个小孩分到 <strong>相同</strong> 数量的糖果。每个小孩可以拿走 <strong>至多一堆</strong> 糖果，有些糖果可能会不被分配。</p>
+
+<p>返回每个小孩可以拿走的 <strong>最大糖果数目</strong><em> </em>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>candies = [5,8,6], k = 3
+<strong>输出：</strong>5
+<strong>解释：</strong>可以将 candies[1] 分成大小分别为 5 和 3 的两堆，然后把 candies[2] 分成大小分别为 5 和 1 的两堆。现在就有五堆大小分别为 5、5、3、5 和 1 的糖果。可以把 3 堆大小为 5 的糖果分给 3 个小孩。可以证明无法让每个小孩得到超过 5 颗糖果。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>candies = [2,5], k = 11
+<strong>输出：</strong>0
+<strong>解释：</strong>总共有 11 个小孩，但只有 7 颗糖果，但如果要分配糖果的话，必须保证每个小孩至少能得到 1 颗糖果。因此，最后每个小孩都没有得到糖果，答案是 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= candies.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= candies[i] &lt;= 10<sup>7</sup></code></li>
+	<li><code>1 &lt;= k &lt;= 10<sup>12</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 164 ms</p>
+                    <p>内存: 28.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximumCandies(self, candies: List[int], k: int) -&gt; int:
+        total = sum(candies)
+        if total &lt; k: return 0
+        left, right = 1, total // k
+        while left &lt;= right:
+            mid = left + (right - left) // 2
+            cnt = sum([i // mid for i in candies])
+            if cnt &gt;= k:
+                left = mid + 1
+            else:
+                right = mid - 1
+        return right
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了二分查找的策略来确定每个小孩能分到的最大糖果数。首先计算所有糖果的总和，如果总和小于小孩的数量k，则无法给每个小孩至少分配一颗糖果，直接返回0。设置二分查找的范围left为1（最小可能的糖果数），right为total // k（平均每个小孩最多能分到的糖果数）。在这个范围内，使用二分查找不断尝试一个中间值mid，计算如果每个小孩分到mid颗糖果，可以满足多少小孩。如果可以满足的小孩数cnt大于等于k，则增大搜索范围的下限left（意味着可能可以分配更多糖果），否则减小搜索范围的上限right。最终，right将会是满足条件的最大糖果数目。</p>
+                                <p>时间复杂度: O(n log(maxCandy))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximumCandies(self, candies: List[int], k: int) -&gt; int:
+        total = sum(candies)  # 计算糖果总数
+        if total &lt; k: return 0  # 如果糖果总数少于小孩数，返回0
+        left, right = 1, total // k  # 设置二分搜索的范围
+        while left &lt;= right:
+            mid = left + (right - left) // 2  # 计算中间值
+            cnt = sum([i // mid for i in candies])  # 计算每个小孩分到mid颗糖果时，可以满足的小孩数
+            if cnt &gt;= k:
+                left = mid + 1  # 如果能满足的小孩数大于等于k，尝试增加糖果数
+            else:
+                right = mid - 1  # 否则减少糖果数
+        return right  # 返回最大可能的糖果数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到的二分查找的左边界设置为1，这种做法是否考虑了如果有k个小孩但是某些糖果数量少于1的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>设置左边界为1是基于假设每个小孩至少能分得一颗糖果开始考虑的。对于题目要求每个小孩至少分到一颗的情况，这是合理的。如果某些糖果数量少于1，即某些糖果堆为空，这并不影响算法的正确性，因为这些堆不会对满足小孩数量的计算产生贡献。因此，左边界为1是一个有效的起始点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在二分查找中，当cnt（满足的小孩数量）大于等于k时，可以增大搜索范围的下限left？这是否意味着mid还有上升的可能性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`cnt`大于等于`k`时，意味着当前的`mid`值是可行的，即至少可以满足`k`个小孩每人得到`mid`颗糖果。因此，为了找到最大可能的糖果分配数量，我们可以尝试增加`mid`的值，即将`left`设置为`mid + 1`，继续探索是否存在更大的满足条件的`mid`值。这是因为我们的目标是最大化每个小孩能得到的糖果数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            二分查找的右边界为 `total // k`，这种设置是否考虑了所有糖果堆中的最大值，以保证不会错过可能的最大糖果数？如果没有，如何改进？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>设置右边界为`total // k`是基于所有糖果平均分配给每个小孩的最大可能数目。这并没有直接考虑单个糖果堆中的最大值。在某些情况下，这可能导致未能利用单堆糖果的大量剩余。一个改进方法是将右边界设置为`min(total // k, max(candies))`，这样可以确保右边界不会低于任何一个糖果堆的最大值，从而不会错过可能的最大糖果数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算满足小孩的数量时，使用了`sum([i // mid for i in candies])`。这种计算方式是否充分有效地利用了每堆糖果可被分割成更小的子堆的特性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`sum([i // mid for i in candies])`的方式确实有效地利用了每堆糖果可以分割的特性，通过计算每堆糖果能提供的至少`mid`数量的糖果的组数来确定总体可以满足的小孩数。这种方法在计算分配糖果时是高效的，因为它直接通过整数除法得到每堆糖果能分出多少组符合条件的糖果数，从而统计总的可满足小孩数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-candies-allocated-to-k-children')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-candies-allocated-to-k-children/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

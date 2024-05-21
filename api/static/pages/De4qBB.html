@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>积木拼接</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>积木拼接</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        欢迎各位勇者来到力扣城，本次试炼主题为「积木拼接」。
+勇者面前有 `6` 片积木（厚度均为 1），每片积木的形状记录于二维字符串数组 `shapes` 中，`shapes[i]` 表示第 `i` 片积木，其中 `1` 表示积木对应位置无空缺，`0` 表示积木对应位置有空缺。
+例如 `["010","111","010"]` 对应积木形状为
+![image.png](https://pic.leetcode-cn.com/1616125620-nXMCxX-image.png)
+
+拼接积木的规则如下：
+- 积木片可以旋转、翻面
+- 积木片边缘必须完全吻合才能拼接在一起
+- **每片积木片 `shapes[i]` 的中心点在拼接时必须处于正方体对应面的中心点**
+
+例如 `3*3`、`4*4` 的积木片的中心点如图所示（红色点）：
+![middle_img_v2_c2d91eb5-9beb-4c06-9726-f7dae149d86g.png](https://pic.leetcode-cn.com/1650509082-wObiEp-middle_img_v2_c2d91eb5-9beb-4c06-9726-f7dae149d86g.png){:height="150px"}
+
+
+请返回这 6 片积木能否拼接成一个**严丝合缝的正方体**且每片积木正好对应正方体的一个面。
+
+**注意：**
+- 输入确保每片积木均无空心情况（即输入数据保证对于大小 `N*N` 的 `shapes[i]`，内部的 `(N-2)*(N-2)` 的区域必然均为 1）
+- 输入确保每片积木的所有 `1` 位置均连通
+
+**示例 1：**
+>输入：`shapes = [["000","110","000"],["110","011","000"],["110","011","110"],["000","010","111"],["011","111","011"],["011","010","000"]]`
+>
+>输出：`true`
+>
+>解释：
+![cube.gif](https://pic.leetcode-cn.com/1616125823-hkXAeN-cube.gif)
+
+**示例 2：**
+>输入：`shapes = [["101","111","000"],["000","010","111"],["010","011","000"],["010","111","010"],["101","111","010"],["000","010","011"]]`
+>
+>输出：`false`
+>
+>解释： 
+>由于每片积木片的中心点在拼接时必须处于正方体对应面的中心点，积木片 `["010","011","000"]` 不能作为 `["100","110","000"]` 使用，因此无法构成正方体
+
+
+**提示：**
+- `shapes.length == 6`
+- `shapes[i].length == shapes[j].length`
+- `shapes[i].length == shapes[i][j].length`
+- `3 <= shapes[i].length <= 10`
+
+
+
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 98 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+def make_shapes(shapes):
+    n = len(shapes[0])
+    mat = [[[0] * n for _ in range(n)] for _ in range(6)]
+    for k in range(6):
+        for i in range(n):
+            for j in range(n):
+                c = shapes[k][i][j]
+                mat[k][i][j] = int(c)
+    return mat
+
+
+# 一片积木的合法性：除了外圈，都必须填满
+def valid_shape(shape):
+    n = len(shape)
+    for i in range(1, n - 1):
+        for j in range(1, n - 1):
+            if shape[i][j] == 0:
+                return False
+    return True
+
+
+def valid_shapes(shapes):
+    # 检查每一片
+    for i in range(6):
+        if not valid_shape(shapes[i]):
+            return False
+    return True
+
+
+class Area:
+    def __init__(self, mat):
+        self.mat = mat
+        self.n = len(mat)
+        self.edges = [None] * 4  # 左上右下4条棱，顺时针方向。
+        self.corners = [None] * 4  # 左上右下4条棱的起点。
+        self.make_edges()
+        self.make_corners()
+
+    def make_edges(self):
+        self.edges[0] = [self.mat[i][0] for i in range(self.n - 1, -1, -1)]
+        self.edges[1] = self.mat[0][::]
+        self.edges[2] = [self.mat[i][-1] for i in range(self.n)]
+        self.edges[3] = self.mat[-1][::-1]
+
+    def make_corners(self):
+        self.corners[0] = self.mat[-1][0]
+        self.corners[1] = self.mat[0][0]
+        self.corners[2] = self.mat[0][-1]
+        self.corners[3] = self.mat[-1][-1]
+
+    def cell_cnt_in_corners(self):
+        return sum(self.corners)
+
+    def cell_cnt_in_edges_without_corners(self):
+        cnt = 0
+        for edge in self.edges:
+            cnt += sum(edge)
+        cnt -= self.cell_cnt_in_corners() * 2
+        return cnt
+
+
+def valid_areas(areas):
+    # 角上砖块数目需要==8
+    corner_cell_cnt = 0
+    for area in areas:
+        cnt = area.cell_cnt_in_corners()
+        corner_cell_cnt += cnt
+    if corner_cell_cnt != 8:
+        return False
+    # 棱上（不包括角）上的砖块数目需要==12*(n-2)
+    n = areas[0].n
+    edge_cell_cnt = 0
+    for area in areas:
+        cnt = area.cell_cnt_in_edges_without_corners()
+        edge_cell_cnt += cnt
+    if edge_cell_cnt != 12 * (n - 2):
+        return False
+    return True
+
+
+# 返回merge_valids.
+# merge_valids[i][di][ri][j][dj][rj] 表示第i块板的di方向ri翻转，和第j块板的dj方向rj翻转，是否可以拼接。
+# i,j取值[0,6)，di,dj取值[0,4), ri,rj取值[0,2)
+def calc_merge_valids(areas):
+    merge_valids = [[[[[[False] * 2 for _ in range(4)] for _ in range(6)] for _ in range(2)] for _ in range(4)] for _ in range(6)]
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            valid = calc_merge_valid(areas[i], di, ri, areas[j], dj, rj)
+                            merge_valids[i][di][ri][j][dj][rj] = valid
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            assert merge_valids[i][di][ri][j][dj][rj] == merge_valids[j][dj][rj][i][di][ri]
+                            assert merge_valids[i][di][1 - ri][j][dj][rj] == merge_valids[j][dj][rj][i][di][1 - ri]
+    return merge_valids
+
+
+def calc_merge_valid(area0, d0, r0, area1, d1, r1):
+    edge0 = area0.edges[d0] if r0 == 0 else area0.edges[d0][::-1]  # 本板不动
+    edge1 = area1.edges[d1] if r1 == 1 else area1.edges[d1][::-1]  # 另板需要反过来对接
+    return can_join(edge0, edge1)
+
+
+def can_join(edge0, edge1):
+    n = len(edge0)
+    if edge0[0] + edge1[0] &gt; 1 or edge0[-1] + edge1[-1] &gt; 1:
+        return False
+    for i in range(1, n - 1):
+        if edge0[i] + edge1[i] != 1:
+            return False
+    return True
+
+
+# 每块积木的每条边至少有一个可以和别人拼
+def valid_merge_valids(merge_valids):
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                valid_cnt = 0
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            valid_cnt += merge_valids[i][di][ri][j][dj][rj]
+                if valid_cnt == 0:
+                    return False
+    return True
+
+
+class Manager:
+    def __init__(self, merge_valids):
+        self.merge_valids = merge_valids
+        # states为最终摆放状态
+        # states[i]为第i个空间，放了什么。[i, di, ri]表示放了第i块板[0,6)，di旋转[0,4)，ri翻转[0,2)。
+        # states[0]为离我最近的正面立板。
+        # states[1]为左立板
+        # states[2]为上盖板
+        # states[3]为右立板
+        # states[4]为下底板
+        # states[5]为对面立板。
+        self.states = [[-1, -1, -1] for _ in range(6)]
+        # 12条棱的状态
+        self.edges = [[] for _ in range(12)]  # 每个棱空间中可以放置0个、1个、2个棱。每个棱以[i, di, ri]来描述。
+        # 面空间和棱空间的对应关系
+        self.space_edge = [[0, 1, 2, 3], [4, 5, 0, 6], [5, 7, 8, 1], [2, 8, 9, 10], [6, 3, 10, 11], [9, 7, 4, 11]]
+        self.space_edge_rev = [[0, 0, 0, 0], [0, 0, 1, 0], [1, 0, 0, 1], [1, 1, 0, 0], [1, 1, 1, 0], [1, 1, 1, 1]]  # 第一次出现，方向为0。第二次出现方向为1。
+
+    def merge_all(self):
+        # 放置第一块板
+        self.place(0, 0, 0, 0)  # 正面立板先确定放法。这个就固定了，不必旋转，也不必翻转。
+        areas = [1, 2, 3, 4, 5]  # 剩余的板
+        ans = self.try_merge(areas, 1)
+        return ans
+
+    # i: 第几块板 di：把板的第几个边对到当前的空间0位置 ri:是否翻转板
+    def place(self, space_id, i, di, ri):
+        edges = self.space_edge[space_id]
+        pos = [(0 + di) % 4, (1 + di) % 4, (2 + di) % 4, (3 + di) % 4]
+        if ri:
+            pos[1], pos[3] = pos[3], pos[1]
+        placed = []
+        for k in range(4):
+            edge_id = edges[k]
+            dk = pos[k]
+            edge = self.edges[edge_id]
+            if len(edge) == 1:
+                if not self.merge_valids[edge[0][0]][edge[0][1]][edge[0][2]][i][dk][ri]:
+                    break
+            placed.append(edge_id)
+            self.edges[edge_id].append((i, dk, ri))
+        return placed
+
+    def try_merge(self, areas, space_id):
+        if space_id == 6:
+            return True
+        for area_id in areas:
+            for d in range(4):
+                for r in range(2):
+                    placed = self.place(space_id, area_id, d, r)
+                    if len(placed) == 4:
+                        new_areas = [x for x in areas if x != area_id]
+                        ans = self.try_merge(new_areas, space_id + 1)
+                        if ans:
+                            return True
+                    for i in placed:
+                        self.edges[i].pop()
+        return False
+
+
+class Solution:
+    def composeCube(self, shapes: List[List[str]]) -&gt; bool:
+        # 数据整理
+        shapes = make_shapes(shapes)
+        # 检验非法积木
+        if not valid_shapes(shapes):
+            return False
+        # 存储积木
+        areas = []
+        for shape in shapes:
+            area = Area(shape)
+            areas.append(area)
+        # 判断积木之间的合法性
+        if not valid_areas(areas):
+            return False
+        # 计算每两块积木之间的拼接可能性
+        merge_valids = calc_merge_valids(areas)
+        # 每块积木的每条边至少有一个可以和别人拼
+        if not valid_merge_valids(merge_valids):
+            return False
+        # 判断能否成功
+        mng = Manager(merge_valids)
+        if not mng.merge_all():
+            return False
+        return True
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解首先通过make_shapes函数将字符串形式的积木转换为整数矩阵。之后使用valid_shapes函数检验每个积木是否满足内部无空缺的条件。接着，使用Area类对每块积木进行详细的边界处理，包括边缘和角落的特征提取。valid_areas函数用于检查所有积木组成的面的角和边是否符合预设的标准。calc_merge_valids函数生成一个六维数组，存储任意两块积木在任意旋转和翻转状态下是否能够相互拼接。valid_merge_valids函数确保每块积木的每个边至少能与一块其他积木拼接。最后，Manager类中的merge_all函数尝试递归地放置所有积木，以确定是否能够完整构建立方体。</p>
+                                <p>时间复杂度: O(6^2 * 4^2 * 2^2)</p>
+                                <p>空间复杂度: O(6^2 * 4^2 * 2^2)</p>
+                                <pre class="bg-light p-2">def make_shapes(shapes):
+    n = len(shapes[0])
+    mat = [[[0] * n for _ in range(n)] for _ in range(6)]
+    for k in range(6):
+        for i in range(n):
+            for j in range(n):
+                c = shapes[k][i][j]
+                mat[k][i][j] = int(c)
+    return mat
+
+def valid_shape(shape):
+    n = len(shape)
+    for i in range(1, n - 1):
+        for j in range(1, n - 1):
+            if shape[i][j] == 0:
+                return False
+    return True
+
+def valid_shapes(shapes):
+    for i in range(6):
+        if not valid_shape(shapes[i]):
+            return False
+    return True
+
+class Area:
+    def __init__(self, mat):
+        self.mat = mat
+        self.n = len(mat)
+        self.edges = [None] * 4
+        self.corners = [None] * 4
+        self.make_edges()
+        self.make_corners()
+    def make_edges(self):
+        self.edges[0] = [self.mat[i][0] for i in range(self.n - 1, -1, -1)]
+        self.edges[1] = self.mat[0][::]
+        self.edges[2] = [self.mat[i][-1] for i in range(self.n)]
+        self.edges[3] = self.mat[-1][::-1]
+    def make_corners(self):
+        self.corners[0] = self.mat[-1][0]
+        self.corners[1] = self.mat[0][0]
+        self.corners[2] = self.mat[0][-1]
+        self.corners[3] = self.mat[-1][-1]
+    def cell_cnt_in_corners(self):
+        return sum(self.corners)
+    def cell_cnt_in_edges_without_corners(self):
+        cnt = 0
+        for edge in self.edges:
+            cnt += sum(edge)
+        cnt -= self.cell_cnt_in_corners() * 2
+        return cnt
+
+def valid_areas(areas):
+    corner_cell_cnt = 0
+    for area in areas:
+        cnt = area.cell_cnt_in_corners()
+        corner_cell_cnt += cnt
+    if corner_cell_cnt != 8:
+        return False
+    n = areas[0].n
+    edge_cell_cnt = 0
+    for area in areas:
+        cnt = area.cell_cnt_in_edges_without_corners()
+        edge_cell_cnt += cnt
+    if edge_cell_cnt != 12 * (n - 2):
+        return False
+    return True
+
+def calc_merge_valids(areas):
+    merge_valids = [[[[[[False] * 2 for _ in range(4)] for _ in range(6)] for _ in range(2)] for _ in range(4)] for _ in range(6)]
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            valid = calc_merge_valid(areas[i], di, ri, areas[j], dj, rj)
+                            merge_valids[i][di][ri][j][dj][rj] = valid
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            assert merge_valids[i][di][ri][j][dj][rj] == merge_valids[j][dj][rj][i][di][ri]
+                            assert merge_valids[i][di][1 - ri][j][dj][rj] == merge_valids[j][dj][rj][i][di][1 - ri]
+    return merge_valids
+
+def calc_merge_valid(area0, d0, r0, area1, d1, r1):
+    edge0 = area0.edges[d0] if r0 == 0 else area0.edges[d0][::-1]
+    edge1 = area1.edges[d1] if r1 == 1 else area1.edges[d1][::-1]
+    return can_join(edge0, edge1)
+
+def can_join(edge0, edge1):
+    n = len(edge0)
+    if edge0[0] + edge1[0] &gt; 1 or edge0[-1] + edge1[-1] &gt; 1:
+        return False
+    for i in range(1, n - 1):
+        if edge0[i] + edge1[i] != 1:
+            return False
+    return True
+
+def valid_merge_valids(merge_valids):
+    for i in range(6):
+        for di in range(4):
+            for ri in range(2):
+                valid_cnt = 0
+                for j in range(6):
+                    if i == j:
+                        continue
+                    for dj in range(4):
+                        for rj in range(2):
+                            valid_cnt += merge_valids[i][di][ri][j][dj][rj]
+                if valid_cnt == 0:
+                    return False
+    return True
+
+class Manager:
+    def __init__(self, merge_valids):
+        self.merge_valids = merge_valids
+        self.states = [[-1, -1, -1] for _ in range(6)]
+        self.edges = [[] for _ in range(12)]
+        self.space_edge = [[0, 1, 2, 3], [4, 5, 0, 6], [5, 7, 8, 1], [2, 8, 9, 10], [6, 3, 10, 11], [9, 7, 4, 11]]
+        self.space_edge_rev = [[0, 0, 0, 0], [0, 0, 1, 0], [1, 0, 0, 1], [1, 1, 0, 0], [1, 1, 1, 0], [1, 1, 1, 1]]
+
+    def merge_all(self):
+        self.place(0, 0, 0, 0)
+        areas = [1, 2, 3, 4, 5]
+        ans = self.try_merge(areas, 1)
+        return ans
+
+    def place(self, space_id, i, di, ri):
+        edges = self.space_edge[space_id]
+        pos = [(0 + di) % 4, (1 + di) % 4, (2 + di) % 4, (3 + di) % 4]
+        if ri:
+            pos[1], pos[3] = pos[3], pos[1]
+        placed = []
+        for k in range(4):
+            edge_id = edges[k]
+            dk = pos[k]
+            edge = self.edges[edge_id]
+            if len(edge) == 1:
+                if not self.merge_valids[edge[0][0]][edge[0][1]][edge[0][2]][i][dk][ri]:
+                    break
+            placed.append(edge_id)
+            self.edges[edge_id].append((i, dk, ri))
+        return placed
+
+    def try_merge(self, areas, space_id):
+        if space_id == 6:
+            return True
+        for area_id in areas:
+            for d in range(4):
+                for r in range(2):
+                    placed = self.place(space_id, area_id, d, r)
+                    if len(placed) == 4:
+                        new_areas = [x for x in areas if x != area_id]
+                        ans = self.try_merge(new_areas, space_id + 1)
+                        if ans:
+                            return True
+                    for i in placed:
+                        self.edges[i].pop()
+        return False
+
+class Solution:
+    def composeCube(self, shapes: List[List[str]]) -&gt; bool:
+        shapes = make_shapes(shapes)
+        if not valid_shapes(shapes):
+            return False
+        areas = []
+        for shape in shapes:
+            area = Area(shape)
+            areas.append(area)
+        if not valid_areas(areas):
+            return False
+        merge_valids = calc_merge_valids(areas)
+        if not valid_merge_valids(merge_valids):
+            return False
+        mng = Manager(merge_valids)
+        if not mng.merge_all():
+            return False
+        return True</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            message <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>由于问题列表中只包含了一个词“message”，它不构成一个具体的问题或指向具体的算法、逻辑或数据结构的细节。因此，无法提供具体的答案或解释。如果需要针对上述题解的具体部分进行讨论或有疑问，请提供更详细的问题描述。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/De4qBB')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/De4qBB/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

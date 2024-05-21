@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最短超串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最短超串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>假设你有两个数组，一个长一个短，短的元素均不相同。找到长数组中包含短数组所有的元素的最短子数组，其出现顺序无关紧要。</p>
+
+<p>返回最短子数组的左端点和右端点，如有多个满足条件的子数组，返回左端点最小的一个。若不存在，返回空数组。</p>
+
+<p><strong>示例 1:</strong></p>
+
+<pre><strong>输入:</strong>
+big = <code>[7,5,9,0,2,1,3,<strong>5,7,9,1</strong>,1,5,8,8,9,7]
+small = [1,5,9]</code>
+<strong>输出: </strong>[7,10]</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre><strong>输入:</strong>
+big = <code>[1,2,3]
+small = [4]</code>
+<strong>输出: </strong>[]</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>big.length&nbsp;&lt;= 100000</code></li>
+	<li><code>1 &lt;= small.length&nbsp;&lt;= 100000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 73 ms</p>
+                    <p>内存: 30.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def shortestSeq(self, big: List[int], small: List[int]) -&gt; List[int]:
+        if len(big) &lt; len(small):   
+            return []
+        
+        cnt = {x: 1 for x in small}
+        n = len(big)
+        need = len(small)
+        min_len = n + 1
+        left = right = 0
+        ans = []
+
+        for right, num in enumerate(big):
+            if num in cnt:
+                if cnt[num] &gt; 0:
+                    need -= 1
+                cnt[num] -= 1
+
+            while left &lt; n and need == 0:
+                if right - left + 1 &lt; min_len:
+                    min_len = right - left + 1
+                    ans = [left, right]
+                
+                if big[left] in cnt:
+                    if cnt[big[left]] &gt;= 0:
+                        need += 1
+                    cnt[big[left]] += 1
+                
+                left += 1
+            
+        return ans
+
+
+
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了滑动窗口的策略来找到包含所有&#39;small&#39;数组元素的最短子数组。首先，使用字典&#39;cnt&#39;来记录&#39;small&#39;中每个元素的计数，此时每个元素的计数初始化为1。接着，定义两个指针&#39;left&#39;和&#39;right&#39;表示当前窗口的左右端点，并使用变量&#39;need&#39;来表示还需包含的&#39;small&#39;数组的元素数。通过移动&#39;right&#39;指针扩展窗口，并在每次移动时更新&#39;cnt&#39;和&#39;need&#39;。当&#39;need&#39;为0时，说明窗口已包含所有&#39;small&#39;的元素，此时尝试通过移动&#39;left&#39;指针缩小窗口以寻找更短的子数组。每次更新窗口时都检查并更新最小长度的子数组。如果在整个过程中找到了符合条件的子数组，则记录其起始和结束位置。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def shortestSeq(self, big: List[int], small: List[int]) -&gt; List[int]:
+        if len(big) &lt; len(small):
+            return []
+        
+        cnt = {x: 1 for x in small}  # 初始化small中元素的计数
+        n = len(big)
+        need = len(small)
+        min_len = n + 1  # 初始化最小长度大于可能的最大长度
+        left = right = 0
+        ans = []
+
+        for right, num in enumerate(big):
+            if num in cnt:
+                if cnt[num] &gt; 0:
+                    need -= 1  # 减少需要的元素数量
+                cnt[num] -= 1  # 更新窗口内元素计数
+
+            while left &lt; n and need == 0:  # 当包含所有small元素时尝试缩小窗口
+                if right - left + 1 &lt; min_len:
+                    min_len = right - left + 1
+                    ans = [left, right]  # 更新最短子数组
+                
+                if big[left] in cnt:
+                    if cnt[big[left]] &gt;= 0:
+                        need += 1  # 重新增加需要的元素数量
+                    cnt[big[left]] += 1  # 更新窗口内元素计数
+                
+                left += 1  # 移动左指针
+            
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在初始化`cnt`字典时，为什么选择将`small`数组中的每个元素计数初始化为1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`cnt`字典中，每个元素的计数初始化为1是为了表示每个元素最初都需要在`big`数组中被找到一次来满足条件。这个计数随着在`big`数组中找到相应元素而递减，直到0表示该元素的需求已经被满足。此外，初始化为1有助于通过`need`变量追踪还需要多少不同的元素才能满足条件，每发现一个新元素，`need`就减1，从而控制何时开始尝试缩小窗口求解最小长度子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果在`big`数组中某个元素的计数已经是负数，为什么仍然减少`need`值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`big`数组中某个元素的计数如果已经是负数，这表示该元素在当前窗口内出现的次数已经超过了`small`数组中的需求次数。在这种情况下，减少`need`值并不是由于找到了未满足需求的新元素，而是在首次遇到该元素时已经减少了`need`，后续即便出现计数为负的情况，也不应再次修改`need`。因此，实际代码中仅在`cnt[num] &gt; 0`时，即这是首次或者是满足需求的情况下才减少`need`。如果计数为负，说明元素已经过量，不影响`need`的值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在缩小窗口的过程中，为什么要检查`cnt[big[left]] &gt;= 0`才增加`need`，而不是直接增加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在缩小窗口时检查`cnt[big[left]] &gt;= 0`是为了确定减少窗口左边界时是否会导致某个在`small`数组中的元素不再满足需求条件。如果`cnt[big[left]] &gt;= 0`，这意味着移除这个元素后，它在窗口中的数量将少于`small`数组中的需求数量，因此需要增加`need`，表示现在需要再次找到这个元素。如果`cnt[big[left]]`小于0，则表示即使减去这个元素，窗口中仍然有足够数量的该元素满足`small`的需求，因此不需要增加`need`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/shortest-supersequence-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/shortest-supersequence-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

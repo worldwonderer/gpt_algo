@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>股票价格跨度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>股票价格跨度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=data-stream" class="badge bg-secondary tag-link">数据流</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>设计一个算法收集某些股票的每日报价，并返回该股票当日价格的 <strong>跨度</strong> 。</p>
+
+<p>当日股票价格的 <strong>跨度</strong> 被定义为股票价格小于或等于今天价格的最大连续日数（从今天开始往回数，包括今天）。</p>
+
+<ul>
+	<li>
+	<p>例如，如果未来 7 天股票的价格是 <code>[100,80,60,70,60,75,85]</code>，那么股票跨度将是 <code>[1,1,1,2,1,4,6]</code> 。</p>
+	</li>
+</ul>
+
+<p>实现 <code>StockSpanner</code> 类：</p>
+
+<ul>
+	<li><code>StockSpanner()</code> 初始化类对象。</li>
+	<li><code>int next(int price)</code> 给出今天的股价 <code>price</code> ，返回该股票当日价格的 <strong>跨度</strong> 。</li>
+</ul>
+
+
+
+<p><strong class="example">示例：</strong></p>
+
+<pre>
+<strong>输入</strong>：
+["StockSpanner", "next", "next", "next", "next", "next", "next", "next"]
+[[], [100], [80], [60], [70], [60], [75], [85]]
+<strong>输出</strong>：
+[null, 1, 1, 1, 2, 1, 4, 6]
+
+<strong>解释：</strong>
+StockSpanner stockSpanner = new StockSpanner();
+stockSpanner.next(100); // 返回 1
+stockSpanner.next(80);  // 返回 1
+stockSpanner.next(60);  // 返回 1
+stockSpanner.next(70);  // 返回 2
+stockSpanner.next(60);  // 返回 1
+stockSpanner.next(75);  // 返回 4 ，因为截至今天的最后 4 个股价 (包括今天的股价 75) 都小于或等于今天的股价。
+stockSpanner.next(85);  // 返回 6
+</pre>
+&nbsp;
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= price &lt;= 10<sup>5</sup></code></li>
+	<li>最多调用 <code>next</code> 方法 <code>10<sup>4</sup></code> 次</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 220 ms</p>
+                    <p>内存: 21.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class StockSpanner:
+
+    def __init__(self):
+        self.stack = []
+
+    def next(self, price: int) -&gt; int:
+        #100 1
+        #80 1
+        # 60 1
+        # 70 2
+        # 60 1
+        # 75 4
+        #85 
+        cnt = 1
+        while self.stack and self.stack[-1][0] &lt;= price:
+            cnt += self.stack.pop()[1]
+        self.stack.append((price, cnt))
+        return cnt
+
+
+
+# https://leetcode.cn/problems/online-stock-span/solutions/1909858/by-lcbin-cfcm/
+        
+
+
+
+
+# Your StockSpanner object will be instantiated and called as such:
+# obj = StockSpanner()
+# param_1 = obj.next(price)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用栈（后进先出）的数据结构来解决问题。栈中存储每个价格及其跨度的元组。当调用next函数时，函数会检查栈顶的价格是否小于或等于当前价格；如果是，则栈顶元素被弹出，其跨度被加到当前的跨度计数上。这个过程会一直持续，直到栈为空或栈顶价格大于当前价格。此方法有效地&#39;跳过&#39;了那些小于当前价格的所有连续日期，从而快速计算跨度。</p>
+                                <p>时间复杂度: O(1) 平均时间复杂度</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class StockSpanner:
+
+    def __init__(self):
+        self.stack = []  # 初始化栈，用于存储价格和对应的跨度
+
+    def next(self, price: int) -&gt; int:
+        cnt = 1  # 当日价格的跨度起始为1（至少包括自己）
+        # 检查栈顶元素，如果栈顶价格小于等于当前价格，则弹出栈顶
+        while self.stack and self.stack[-1][0] &lt;= price:
+            cnt += self.stack.pop()[1]  # 将弹出元素的跨度加到当前跨度计数上
+        self.stack.append((price, cnt))  # 将当前价格与其计算的跨度压入栈中
+        return cnt  # 返回当前价格的跨度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在实现StockSpanner类时，为何选择使用栈这种数据结构而不是其他如列表或队列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>栈结构被选用是因为它支持快速的后进先出（LIFO）操作，非常适合解决股票价格跨度问题中的逆向查找需求。在计算某一天的价格跨度时，我们需要考虑直到遇到一个更高价格的连续日子。使用栈可以使得在遇到更高的价格时，快速地弹出所有小于等于当前价格的元素，这是队列或普通列表无法高效完成的。队列的先进先出特性和列表的线性访问特点，在这种类型的逆序问题中表现不如栈。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在next方法中，栈顶元素弹出的条件是`栈顶价格小于等于当前价格`，这是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件基于股票价格跨度的定义，即计算从当前日向前连续多少天的价格不超过当前日的价格。如果栈顶的价格小于或等于当前价格，这意味着从栈顶日期到当前日期间的所有价格都无法打断当前价格的跨度计算。因此，可以将这些小于或等于当前价格的日期的跨度累加到当前日期的跨度中，并继续向前寻找，直到找到一个更高的价格。这种方式确保了跨度的正确累计，同时保持算法的高效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法实现中提到的&#39;跳过&#39;小于当前价格的连续日期，这种方法的效率如何与直接遍历比较？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过使用栈来&#39;跳过&#39;小于当前价格的连续日期，算法的平均时间复杂度可以达到O(1)。这是因为每个元素最多被压入和弹出栈一次，即使在最坏的情况下，每个元素的操作次数是常数级别的。相比之下，如果使用直接遍历的方法，我们需要从当前日期向前逐一检查，直到找到一个更高的价格或遍历到起始位置。这种方法的时间复杂度为O(n)，在数据量大的情况下效率明显低于使用栈的方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/online-stock-span')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/online-stock-span/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

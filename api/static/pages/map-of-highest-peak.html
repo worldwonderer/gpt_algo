@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>地图中的最高点</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>地图中的最高点</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为&nbsp;<code>m x n</code>&nbsp;的整数矩阵&nbsp;<code>isWater</code>&nbsp;，它代表了一个由 <strong>陆地</strong>&nbsp;和 <strong>水域</strong>&nbsp;单元格组成的地图。</p>
+
+<ul>
+	<li>如果&nbsp;<code>isWater[i][j] == 0</code>&nbsp;，格子&nbsp;<code>(i, j)</code>&nbsp;是一个 <strong>陆地</strong>&nbsp;格子。</li>
+	<li>如果&nbsp;<code>isWater[i][j] == 1</code>&nbsp;，格子&nbsp;<code>(i, j)</code>&nbsp;是一个 <strong>水域</strong>&nbsp;格子。</li>
+</ul>
+
+<p>你需要按照如下规则给每个单元格安排高度：</p>
+
+<ul>
+	<li>每个格子的高度都必须是非负的。</li>
+	<li>如果一个格子是 <strong>水域</strong>&nbsp;，那么它的高度必须为 <code>0</code>&nbsp;。</li>
+	<li>任意相邻的格子高度差 <strong>至多</strong>&nbsp;为 <code>1</code>&nbsp;。当两个格子在正东、南、西、北方向上相互紧挨着，就称它们为相邻的格子。（也就是说它们有一条公共边）</li>
+</ul>
+
+<p>找到一种安排高度的方案，使得矩阵中的最高高度值&nbsp;<strong>最大</strong>&nbsp;。</p>
+
+<p>请你返回一个大小为&nbsp;<code>m x n</code>&nbsp;的整数矩阵 <code>height</code>&nbsp;，其中 <code>height[i][j]</code>&nbsp;是格子 <code>(i, j)</code>&nbsp;的高度。如果有多种解法，请返回&nbsp;<strong>任意一个</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2021/01/10/screenshot-2021-01-11-at-82045-am.png" style="width: 220px; height: 219px;" /></strong></p>
+
+<pre>
+<b>输入：</b>isWater = [[0,1],[0,0]]
+<b>输出：</b>[[1,0],[2,1]]
+<b>解释：</b>上图展示了给各个格子安排的高度。
+蓝色格子是水域格，绿色格子是陆地格。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2021/01/10/screenshot-2021-01-11-at-82050-am.png" style="width: 300px; height: 296px;" /></strong></p>
+
+<pre>
+<b>输入：</b>isWater = [[0,0,1],[1,0,0],[0,0,0]]
+<b>输出：</b>[[1,1,0],[0,1,1],[1,2,2]]
+<b>解释：</b>所有安排方案中，最高可行高度为 2 。
+任意安排方案中，只要最高高度为 2 且符合上述规则的，都为可行方案。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == isWater.length</code></li>
+	<li><code>n == isWater[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 1000</code></li>
+	<li><code>isWater[i][j]</code>&nbsp;要么是&nbsp;<code>0</code>&nbsp;，要么是&nbsp;<code>1</code>&nbsp;。</li>
+	<li>至少有 <strong>1</strong>&nbsp;个水域格子。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 550 ms</p>
+                    <p>内存: 80.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def highestPeak(self, isWater: List[List[int]]) -&gt; List[List[int]]:
+        from collections import deque
+
+        # def BFS(cell,heights):
+        #     q = deque()
+        #     q.append([cell[0],cell[1],0])
+        #     while len(q) &gt; 0:
+        #         ele = q.popleft()
+        #         x,y,level = ele[0],ele[1],ele[2]
+        #         if y&gt;0 and (heights[x][y-1] &lt; 0 or abs(heights[x][y-1]-level) &gt; 1):
+        #             if heights[x][y-1] != 0:
+        #                 heights[x][y-1] = level + 1
+        #                 q.append([x,y-1,level+1])
+        #         if y&lt;n-1 and (heights[x][y+1] &lt; 0 or abs(heights[x][y+1]-level) &gt; 1):
+        #             if heights[x][y+1] != 0:
+        #                 heights[x][y+1] = level + 1
+        #                 q.append([x,y+1,level+1])
+        #         if x&gt;0 and (heights[x-1][y] &lt; 0 or abs(heights[x-1][y]-level) &gt; 1):
+        #             if heights[x-1][y] != 0:
+        #                 heights[x-1][y] = level + 1
+        #                 q.append([x-1,y,level+1])
+        #         if x&lt;m-1 and (heights[x+1][y] &lt; 0 or abs(heights[x+1][y]-level) &gt; 1):
+        #             if heights[x+1][y] != 0:
+        #                 heights[x+1][y] = level + 1
+        #                 q.append([x+1,y,level+1])
+                
+
+        m = len(isWater)
+        n = len(isWater[0])
+        heights = [[-1]*n for i in range(m)]
+        # waterCell = []
+        # for i in range(m):
+        #     for j in range(n):
+        #         if isWater[i][j] == 1:
+        #             heights[i][j] = 0
+        #             waterCell.append([i,j])
+        # for cell in waterCell:
+        #     BFS(cell,heights)
+        # return heights
+
+        q = deque()
+        for i in range(m):
+            for j in range(n):
+                if isWater[i][j] == 1:
+                    q.append([i,j,0])
+                    heights[i][j] = 0
+        while len(q) &gt; 0:
+            ele = q.popleft()
+            x,y,level = ele[0],ele[1],ele[2]
+            if y&gt;0 and heights[x][y-1] == -1:
+                heights[x][y-1] = level+1
+                q.append([x,y-1,level+1])
+            if y&lt;n-1 and heights[x][y+1] == -1:
+                heights[x][y+1] = level+1
+                q.append([x,y+1,level+1])
+            if x&gt;0 and heights[x-1][y] == -1:
+                heights[x-1][y] = level+1
+                q.append([x-1,y,level+1])
+            if x&lt;m-1 and heights[x+1][y] == -1:
+                heights[x+1][y] = level+1
+                q.append([x+1,y,level+1])
+        return heights
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题使用宽度优先搜索（BFS）的方式从每个水域（高度为0的单元格）开始向外扩展，为陆地单元格设置高度。我们使用一个队列来实现BFS，并在过程中记录每个单元格的高度。我们首先初始化所有水域单元格的高度为0并将它们加入队列。接着，对于队列中的每个元素，我们检查它的四个邻居单元格（上下左右）。如果某个邻居单元格的高度尚未被设置（即初始化的-1值），我们将其高度设置为当前单元格的高度加一，并将该邻居单元格加入队列中继续处理。这种方式保证了相邻单元格的高度差不会超过1，并且从水源开始最远的陆地单元格会获得最大的高度值。</p>
+                                <p>时间复杂度: O(m * n)</p>
+                                <p>空间复杂度: O(m * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def highestPeak(self, isWater: List[List[int]]) -&gt; List[List[int]]:
+        from collections import deque
+
+        m = len(isWater)
+        n = len(isWater[0])
+        heights = [[-1]*n for i in range(m)]  # 初始化高度矩阵，未设定的单元格高度为-1
+
+        q = deque()
+        for i in range(m):  # 遍历所有单元格，将水域单元格加入队列
+            for j in range(n):
+                if isWater[i][j] == 1:
+                    q.append([i,j,0])
+                    heights[i][j] = 0  # 水域高度设置为0
+        while len(q) &gt; 0:
+            ele = q.popleft()
+            x, y, level = ele[0], ele[1], ele[2]
+            # 依次检查当前单元格的四个邻居
+            if y &gt; 0 and heights[x][y-1] == -1:  # 检查左邻居
+                heights[x][y-1] = level+1
+                q.append([x, y-1, level+1])
+            if y &lt; n-1 and heights[x][y+1] == -1:  # 检查右邻居
+                heights[x][y+1] = level+1
+                q.append([x, y+1, level+1])
+            if x &gt; 0 and heights[x-1][y] == -1:  # 检查上邻居
+                heights[x-1][y] = level+1
+                q.append([x-1, y, level+1])
+            if x &lt; m-1 and heights[x+1][y] == -1:  # 检查下邻居
+                heights[x+1][y] = level+1
+                q.append([x+1, y, level+1])
+        return heights
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在初始化高度矩阵时，为什么选择使用-1作为未设定高度的标志？是否有更直观的方式表示未设定的高度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化高度矩阵时，使用-1作为未设定高度的标志有几个原因：首先，-1在这种场景中通常不存在自然含义，因此可以清楚地表示该单元格尚未处理。其次，使用负数可以方便地与正常的高度值（从0开始）区分开来。当然，也可以使用其他方式表示未设定的高度，如使用 `None` 或者一个特定的常量。然而，使用-1可以直接在整数数组中操作，简化代码实现，并提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在BFS实现中，队列中的元素包括坐标和当前高度。请问这里的高度信息是否真的必要，考虑到高度可以从heights矩阵中直接获取？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在队列中包括当前高度信息确实有些重复，因为相同的信息可以从 `heights` 矩阵中直接获取。通过只将坐标加入队列，并在需要时从 `heights` 矩阵中查询高度，可以稍微减少每个队列元素所占的内存。然而，将高度信息包含在队列中可以减少从 `heights` 矩阵的重复查询操作，从而可能提升一些运行效率。具体使用哪种方式，需要根据实际情况和优化需求来决定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法检查每个单元格的四个邻居时，是否有重复检查的可能？如果有，这会对性能有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中确实存在重复检查邻居的可能性，因为每个单元格在被处理时都会检查其四个邻居，而每个邻居本身也会作为中心被检查。然而，这种重复检查对性能的影响是有限的，因为一个单元格一旦被设置了高度并被加入队列，就不会再次被加入队列。虽然算法会检查每个邻居是否已被设定高度，但只有未设定的邻居会被加入队列。这种重复检查确保了代码的简洁性和正确性，且额外的检查成本相对较低。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            您提到最坏情况下每个单元格都会被访问一次，但在何种情况下会发生所有单元格都需要被访问？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>最坏情况下所有单元格都需要被访问的情况发生在地图中的水域单元格只有一个，且位于地图的一个角落或边缘，而其余全部是陆地单元格。在这种情况下，BFS需要从这个单一的水域单元格开始，向外逐渐扩展到地图的每一个角落，以确保每个陆地单元格的高度都被正确计算。这意味着每个单元格至少被访问一次以设置其高度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/map-of-highest-peak')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/map-of-highest-peak/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

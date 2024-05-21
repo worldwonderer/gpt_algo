@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>太平洋大西洋水流问题</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>太平洋大西洋水流问题</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个 <code>m × n</code> 的矩形岛屿，与 <strong>太平洋</strong> 和 <strong>大西洋</strong> 相邻。&nbsp;<strong>“太平洋”&nbsp;</strong>处于大陆的左边界和上边界，而 <strong>“大西洋”</strong> 处于大陆的右边界和下边界。</p>
+
+<p>这个岛被分割成一个由若干方形单元格组成的网格。给定一个 <code>m x n</code> 的整数矩阵&nbsp;<code>heights</code>&nbsp;，&nbsp;<code>heights[r][c]</code>&nbsp;表示坐标 <code>(r, c)</code> 上单元格 <strong>高于海平面的高度</strong> 。</p>
+
+<p>岛上雨水较多，如果相邻单元格的高度 <strong>小于或等于</strong> 当前单元格的高度，雨水可以直接向北、南、东、西流向相邻单元格。水可以从海洋附近的任何单元格流入海洋。</p>
+
+<p>返回网格坐标 <code>result</code>&nbsp;的 <strong>2D 列表</strong> ，其中&nbsp;<code>result[i] = [r<sub>i</sub>, c<sub>i</sub>]</code>&nbsp;表示雨水从单元格 <code>(ri, ci)</code> 流动 <strong>既可流向太平洋也可流向大西洋</strong> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2021/06/08/waterflow-grid.jpg" /></p>
+
+<pre>
+<strong>输入:</strong> heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+<strong>输出:</strong> [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入:</strong> heights = [[2,1],[1,2]]
+<strong>输出:</strong> [[0,0],[0,1],[1,0],[1,1]]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == heights.length</code></li>
+	<li><code>n == heights[r].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 200</code></li>
+	<li><code>0 &lt;= heights[r][c] &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 73 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    # 逆向思维 水从高处往低处流  
+    # 那我从太平洋沿岸的点向内搜寻，找比自己高的点，逆流而上(也就是从内部往沿岸顺流而下逆过程)
+    # 最后能标记到的访问的点 也就是能流到太平洋的点
+    # 大西洋同理 最后找两个都标记的，就是满足要求的
+    def pacificAtlantic(self, heights: List[List[int]]) -&gt; List[List[int]]:
+        result = []
+        # 方向
+        self.dirs = [(-1,0),(0,1),(1,0),(0,-1)]
+        row = len(heights)
+        col = len(heights[0])
+        # 能流到太平洋的点
+        pacific_visited = [[0] * col for _ in range(row)]
+        # 能流到大西洋的点
+        altantic_visited = [[0] * col for _ in range(row)]
+        for i in range(row):
+            # 对每一行遍历 太平洋遍历最左侧的列  大西洋遍历最右侧的列
+            self.dfs(pacific_visited, i, 0, heights)
+            self.dfs(altantic_visited, i, col-1, heights)
+        for j in range(col):
+            # 对每一列遍历 太平洋遍历最上侧的行  大西洋遍历最下侧的行
+            self.dfs(pacific_visited, 0, j, heights)
+            self.dfs(altantic_visited, row-1, j, heights)
+        # 然后看看那些点可以流过两个海洋 就是要找的点
+        for i in range(row):
+            for j in range(col):
+                if pacific_visited[i][j] and altantic_visited[i][j]:
+                    result.append([i,j])
+        return result
+
+    
+    def dfs(self, visited, cur_x, cur_y, heights):
+        # 这里可以及时return 因为main函数主动调用时可能存在已访问的 本函数肯定不会
+        if visited[cur_x][cur_y]:
+            return
+        visited[cur_x][cur_y] = 1
+        for d in self.dirs:
+            new_x, new_y = cur_x + d[0], cur_y + d[1]
+            # 合法性检查
+            if new_x &gt;=0 and new_x &lt; len(heights) and new_y &gt;=0 and new_y &lt; len(heights[0]):
+                # 没访问过并且 比本节点高 才是逆流而上
+                if not visited[new_x][new_y] and heights[new_x][new_y] &gt;= heights[cur_x][cur_y]:
+                    self.dfs(visited, new_x, new_y, heights)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用逆向思维的方式。水从高处往低处流，那么可以从太平洋和大西洋的沿岸点开始向内搜寻，找到比自己高的点，逆流而上。对于每个海洋，分别从行和列的边界开始深度优先搜索，标记能够到达该海洋的点。最后找到既能流到太平洋又能流到大西洋的点，即为满足要求的结果。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">class Solution:
+    # 逆向思维 水从高处往低处流  
+    # 那我从太平洋沿岸的点向内搜寻，找比自己高的点，逆流而上(也就是从内部往沿岸顺流而下逆过程)
+    # 最后能标记到的访问的点 也就是能流到太平洋的点
+    # 大西洋同理 最后找两个都标记的，就是满足要求的
+    def pacificAtlantic(self, heights: List[List[int]]) -&gt; List[List[int]]:
+        result = []
+        # 方向
+        self.dirs = [(-1,0),(0,1),(1,0),(0,-1)]
+        row = len(heights)
+        col = len(heights[0])
+        # 能流到太平洋的点
+        pacific_visited = [[0] * col for _ in range(row)]
+        # 能流到大西洋的点
+        altantic_visited = [[0] * col for _ in range(row)]
+        for i in range(row):
+            # 对每一行遍历 太平洋遍历最左侧的列  大西洋遍历最右侧的列
+            self.dfs(pacific_visited, i, 0, heights)
+            self.dfs(altantic_visited, i, col-1, heights)
+        for j in range(col):
+            # 对每一列遍历 太平洋遍历最上侧的行  大西洋遍历最下侧的行
+            self.dfs(pacific_visited, 0, j, heights)
+            self.dfs(altantic_visited, row-1, j, heights)
+        # 然后看看那些点可以流过两个海洋 就是要找的点
+        for i in range(row):
+            for j in range(col):
+                if pacific_visited[i][j] and altantic_visited[i][j]:
+                    result.append([i,j])
+        return result
+
+    
+    def dfs(self, visited, cur_x, cur_y, heights):
+        # 这里可以及时return 因为main函数主动调用时可能存在已访问的 本函数肯定不会
+        if visited[cur_x][cur_y]:
+            return
+        # 标记当前节点已访问
+        visited[cur_x][cur_y] = 1
+        # 向四个方向遍历
+        for d in self.dirs:
+            new_x, new_y = cur_x + d[0], cur_y + d[1]
+            # 合法性检查
+            if new_x &gt;=0 and new_x &lt; len(heights) and new_y &gt;=0 and new_y &lt; len(heights[0]):
+                # 没访问过并且 比本节点高 才是逆流而上
+                if not visited[new_x][new_y] and heights[new_x][new_y] &gt;= heights[cur_x][cur_y]:
+                    self.dfs(visited, new_x, new_y, heights)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在深度优先搜索（DFS）中，选择从海洋边缘的单元格开始搜索而不是从内陆开始？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在太平洋大西洋水流问题中，采用逆向思维策略是因为直接模拟水从高处向低处流动的过程在实现上较为复杂，且难以直接确定流向两个大洋的起点。从海洋边缘单元格开始向内部逆流搜索可以简化问题，因为边缘单元格自然与海洋相连，只需要检查能够逆流到达边缘单元格的内陆单元格。这样可以有效地标记出所有可以流入特定大洋的单元格，从而简化问题解决过程。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在深度优先搜索中，标记过程中为何只考虑与当前单元格高度相等或更高的相邻单元格？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在逆向思维的策略中，从海洋边缘向内部进行搜索时，我们模拟的是水从低处向高处的逆流过程。因此，只有当一个相邻单元格的高度大于或等于当前单元格的高度时，水才可能从该相邻单元格流向当前单元格。这种策略确保了我们正确地模拟了水流的逆流路径，避免了错误地将水流向实际上无法到达的更低的区域。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当在DFS中检查一个单元格是否已访问时，如果已访问单元格的高度小于当前单元格，是否应重新访问以模拟更多的水流路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题策略中，即使已访问的单元格高度小于当前单元格，也无需重新访问。由于我们从海洋边缘向内部逆流搜索，标记过程中已经保证了只有那些能够通过逆流到达边缘单元格的路径被标记。因此，如果一个单元格在之前已被标记为可访问，即意味着已确定它可以流向对应的大洋，无论从哪条路径到达。重复访问已标记的更低单元格并不会提供新的信息，因为水不会从低处自动流向更高处。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解中提到的递归深度是`min(m, n)`，这是怎么得出的？在最坏情况下递归深度是否可能更大？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中提到的递归深度`min(m, n)`可能是基于最优或平均情况的考虑，假设水流从一边缘逐步向另一边缘流动，且每次都能向内延伸一行或一列。然而，实际上在最坏情况下，递归深度可以更大，尤其是当矩阵中的高度配置允许水流在复杂路径中循环移动时。理论上，递归深度可以达到`m * n`，尤其是在一个高度差异极小且布局复杂的矩阵中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/pacific-atlantic-water-flow')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/pacific-atlantic-water-flow/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

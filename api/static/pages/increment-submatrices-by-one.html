@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子矩阵元素加 1</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子矩阵元素加 1</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个正整数 <code>n</code> ，表示最初有一个 <code>n x n</code> 、下标从 <strong>0</strong> 开始的整数矩阵 <code>mat</code> ，矩阵中填满了 0 。</p>
+
+<p>另给你一个二维整数数组 <code>query</code> 。针对每个查询 <code>query[i] = [row1<sub>i</sub>, col1<sub>i</sub>, row2<sub>i</sub>, col2<sub>i</sub>]</code> ，请你执行下述操作：</p>
+
+<ul>
+	<li>找出 <strong>左上角</strong> 为 <code>(row1<sub>i</sub>, col1<sub>i</sub>)</code> 且 <strong>右下角</strong> 为 <code>(row2<sub>i</sub>, col2<sub>i</sub>)</code> 的子矩阵，将子矩阵中的 <strong>每个元素</strong> 加 <code>1</code> 。也就是给所有满足 <code>row1<sub>i</sub> &lt;= x &lt;= row2<sub>i</sub></code> 和 <code>col1<sub>i</sub> &lt;= y &lt;= col2<sub>i</sub></code> 的 <code>mat[x][y]</code> 加 <code>1</code> 。</li>
+</ul>
+
+<p>返回执行完所有操作后得到的矩阵 <code>mat</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/11/24/p2example11.png" style="width: 531px; height: 121px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 3, queries = [[1,1,2,2],[0,0,1,1]]
+<strong>输出：</strong>[[1,1,0],[1,2,1],[0,1,1]]
+<strong>解释：</strong>上图所展示的分别是：初始矩阵、执行完第一个操作后的矩阵、执行完第二个操作后的矩阵。
+- 第一个操作：将左上角为 (1, 1) 且右下角为 (2, 2) 的子矩阵中的每个元素加 1 。 
+- 第二个操作：将左上角为 (0, 0) 且右下角为 (1, 1) 的子矩阵中的每个元素加 1 。 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/11/24/p2example22.png" style="width: 261px; height: 82px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 2, queries = [[0,0,1,1]]
+<strong>输出：</strong>[[1,1],[1,1]]
+<strong>解释：</strong>上图所展示的分别是：初始矩阵、执行完第一个操作后的矩阵。 
+- 第一个操作：将矩阵中的每个元素加 1 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>1 &lt;= queries.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= row1<sub>i</sub> &lt;= row2<sub>i</sub> &lt; n</code></li>
+	<li><code>0 &lt;= col1<sub>i</sub> &lt;= col2<sub>i</sub> &lt; n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 213 ms</p>
+                    <p>内存: 35.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def rangeAddQueries(self, n: int, queries: List[List[int]]) -&gt; List[List[int]]:
+        # 二维差分模板
+        diff = [[0] * (n + 2) for _ in range(n + 2)]
+        for r1, c1, r2, c2 in queries:
+            diff[r1 + 1][c1 + 1] += 1
+            diff[r1 + 1][c2 + 2] -= 1
+            diff[r2 + 2][c1 + 1] -= 1
+            diff[r2 + 2][c2 + 2] += 1
+
+        # 用二维前缀和复原（原地修改）
+        for i in range(1, n + 1):
+            for j in range(1, n + 1):
+                diff[i][j] += diff[i][j - 1] + diff[i - 1][j] - diff[i - 1][j - 1]
+        # 保留中间 n*n 的部分，即为答案
+        diff = diff[1:-1]
+        for i, row in enumerate(diff):
+            diff[i] = row[1:-1]
+        return diff
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用了二维差分数组的方法来高效处理范围加法问题。首先，创建一个 (n+2)x(n+2) 的差分数组 diff，初始化所有值为0。对于每个查询，使用差分数组的性质，通过更新矩阵的四个关键点来表示子矩阵内所有元素增加1的操作。这四个点是：左上角、右上角+1、左下角+1和右下角+1+1。最后，通过计算二维前缀和来还原出最终的矩阵，这样避免了直接对每个子矩阵内的每个元素进行迭代更新，从而提高效率。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2"># 定义解决方案类
+
+class Solution:
+    def rangeAddQueries(self, n: int, queries: List[List[int]]) -&gt; List[List[int]]:
+        # 初始化一个 (n+2)x(n+2) 的差分数组
+        diff = [[0] * (n + 2) for _ in range(n + 2)]
+        # 处理每个查询，更新差分数组的四个关键点
+        for r1, c1, r2, c2 in queries:
+            diff[r1 + 1][c1 + 1] += 1
+            diff[r1 + 1][c2 + 2] -= 1
+            diff[r2 + 2][c1 + 1] -= 1
+            diff[r2 + 2][c2 + 2] += 1
+
+        # 计算二维前缀和还原最终矩阵
+        for i in range(1, n + 1):
+            for j in range(1, n + 1):
+                diff[i][j] += diff[i][j - 1] + diff[i - 1][j] - diff[i - 1][j - 1]
+        # 裁剪多余的边界，得到最终的 n*n 矩阵
+        diff = diff[1:-1]
+        for i, row in enumerate(diff):
+            diff[i] = row[1:-1]
+        return diff</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在二维差分数组中，为什么选择使用(n+2)x(n+2)的数组大小而不是直接使用n x n的尺寸？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用二维差分数组处理范围增加操作时，选择使用(n+2)x(n+2)的数组大小主要是为了方便处理边界情况。当我们需要在子矩阵的右侧或下方增加边界值时，使用n+2的尺寸可以确保即使是在矩阵的最右侧或最下侧的边界也能正确处理。例如，当操作需要在最右列或最下行添加值时，不会越界。这样就避免了额外的边界检查，简化了代码实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何确保在对查询处理时，更新差分数组的四个关键点后不会影响到数组的其他部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二维差分数组中，通过更新四个关键点来表示子矩阵内所有元素增加1的操作。这四个点分别是左上角、右上角右侧一列、左下角下方一行、以及右下角右侧一列和下方一行。这种更新方式是局部的，只影响子矩阵的边界，因此不会影响到数组的其他部分。每次更新是针对特定区域的，且通过前缀和的计算，这些局部的更新最终会累积到对应的子矩阵内，其他区域不受影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算二维前缀和的过程中，为什么要使用`diff[i][j] += diff[i][j - 1] + diff[i - 1][j] - diff[i - 1][j - 1]`这个公式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个公式是二维前缀和的核心，用于计算从矩阵起始点到当前点(i, j)包含的所有值的累积和。这里`diff[i][j - 1]`和`diff[i - 1][j]`分别代表左边和上边的累积前缀和，而`diff[i - 1][j - 1]`则被加了两次（一次在左边累积，一次在上面累积），因此需要减去一次以消除重复计数。这样，每个元素的值都是基于其左上角所有元素的累积效果，确保了正确计算每个点的实际值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如何处理当查询的坐标超出矩阵初始边界时的情况，在代码中有何体现？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题的代码实现中，由于使用了(n+2)x(n+2)的差分数组，实际上已经隐式地处理了查询坐标可能超出矩阵初始边界的情况。即使查询的坐标超出了原始矩阵的边界，由于差分数组的额外边界，这些查询不会引起数组越界错误。此外，代码中没有特别处理这种情况，因为假设查询总是有效的，即在矩阵的合理范围内。如果需要明确处理超出边界的查询，可以在代码中添加条件语句来限制或调整超出边界的坐标值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/increment-submatrices-by-one')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/increment-submatrices-by-one/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

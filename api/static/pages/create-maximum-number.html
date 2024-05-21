@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>拼接最大数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>拼接最大数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数数组 <code>nums1</code> 和 <code>nums2</code>，它们的长度分别为 <code>m</code> 和 <code>n</code>。数组 <code>nums1</code> 和 <code>nums2</code> 分别代表两个数各位上的数字。同时你也会得到一个整数 <code>k</code>。</p>
+
+<p>请你利用这两个数组中的数字中创建一个长度为 <code>k &lt;= m + n</code> 的最大数，在这个必须保留来自同一数组的数字的相对顺序。</p>
+
+<p>返回代表答案的长度为 <code>k</code> 的数组。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = [3,4,6,5], nums2 = [9,1,2,5,8,3], k = 5
+<strong>输出：</strong>[9,8,6,5,3]
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = [6,7], nums2 = [6,0,4], k = 5
+<strong>输出：</strong>[6,7,6,0,4]
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = [3,9], nums2 = [8,9], k = 3
+<strong>输出：</strong>[9,8,9]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == nums1.length</code></li>
+	<li><code>n == nums2.length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 500</code></li>
+	<li><code>0 &lt;= nums1[i], nums2[i] &lt;= 9</code></li>
+	<li><code>1 &lt;= k &lt;= m + n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 72 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxNumber(self, nums1: List[int], nums2: List[int], k: int) -&gt; List[int]:
+        m,n=len(nums1),len(nums2)
+        delete_order1=[]
+        delete_order2=[]
+        stack1=[]
+        stack2=[]
+        for i in range(len(nums1)):
+            if not stack1 or nums1[i]&lt;=nums1[stack1[-1]]:
+                stack1.append(i)
+            else:
+                while stack1 and nums1[i]&gt;nums1[stack1[-1]]:
+                    t=stack1.pop()
+                    delete_order1.append(t)
+                stack1.append(i)
+        for i in stack1[::-1]:
+            delete_order1.append(i)
+        for i in range(len(nums2)):
+            if not stack2 or nums2[i]&lt;=nums2[stack2[-1]]:
+                stack2.append(i)
+            else:
+                while stack2 and nums2[i]&gt;nums2[stack2[-1]]:
+                    t=stack2.pop()
+                    delete_order2.append(t)
+                stack2.append(i)
+        for i in stack2[::-1]:
+            delete_order2.append(i)
+        delete_order1=delete_order1[::-1]
+        delete_order2=delete_order2[::-1]
+        generate1=[]
+        generate2=[]
+        cur=&#39;&#39;
+        lst1=[]
+        lst2=[]
+        for i in delete_order1:
+            t=bisect_left(lst1,i)
+            lst1[t:t]=[i]
+            cur=cur[:t]+str(nums1[i])+cur[t:]
+            generate1.append(cur)
+        cur=&#39;&#39;
+        for i in delete_order2:
+            t=bisect_left(lst2,i)
+            lst2[t:t]=[i]
+            cur=cur[:t]+str(nums2[i])+cur[t:]
+            generate2.append(cur)
+        ans=[]
+        def join_max(s1,s2):
+            i=0
+            j=0
+            ans=&#39;&#39;
+            while i&lt;len(s1) or j&lt;len(s2):
+                if i==len(s1):
+                    ans+=s2[j:]
+                    return ans
+                if j==len(s2):
+                    ans+=s1[i:]
+                    return ans
+                if (s1[i:])&lt;=(s2[j:]):
+                    ans+=s2[j]
+                    j+=1
+                else:
+                    ans+=s1[i]
+                    i+=1
+            return ans
+        cmax=0
+        for i in range(max(0,k-n),min(m,k)+1):
+            if i==0 :
+                cmax=max(cmax,int(generate2[k-1]))
+            elif i==k:
+                cmax=max(cmax,int(generate1[k-1]))
+            else:
+                s1=generate1[i-1]
+                s2=generate2[k-i-1]
+                tmp=join_max(s1,s2)
+                cmax=max(cmax,int(tmp))
+        return list(map(int,list(str(cmax))))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解思路分为几个步骤：
+1. 对于 nums1 和 nums2 分别生成所有可能的子序列（通过删除元素）的非降序排列。
+2. 然后对于每个可能的 i（i 代表从 nums1 中选择的元素数量，k-i 代表从 nums2 中选择的元素数量），将 nums1 中的前 i 个元素和 nums2 中的前 k-i 个元素合并成最大的数。
+3. 比较所有合并后的数，找到最大的那个。</p>
+                                <p>时间复杂度: O(m^2 + n^2 + k*min(m,k))</p>
+                                <p>空间复杂度: O(m^2 + n^2 + k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxNumber(self, nums1: List[int], nums2: List[int], k: int) -&gt; List[int]:
+        m,n=len(nums1),len(nums2)
+        delete_order1=[]
+        delete_order2=[]
+        stack1=[]
+        stack2=[]
+        # 使用单调栈来生成 nums1 的所有可能的子序列的非降序排列
+        for i in range(len(nums1)):
+            if not stack1 or nums1[i]&lt;=nums1[stack1[-1]]:
+                stack1.append(i)
+            else:
+                while stack1 and nums1[i]&gt;nums1[stack1[-1]]:
+                    t=stack1.pop()
+                    delete_order1.append(t)
+                stack1.append(i)
+        for i in stack1[::-1]:
+            delete_order1.append(i)
+        # 使用单调栈来生成 nums2 的所有可能的子序列的非降序排列
+        for i in range(len(nums2)):
+            if not stack2 or nums2[i]&lt;=nums2[stack2[-1]]:
+                stack2.append(i)
+            else:
+                while stack2 and nums2[i]&gt;nums2[stack2[-1]]:
+                    t=stack2.pop()
+                    delete_order2.append(t)
+                stack2.append(i)
+        for i in stack2[::-1]:
+            delete_order2.append(i)
+        delete_order1=delete_order1[::-1]
+        delete_order2=delete_order2[::-1]
+        generate1=[]
+        generate2=[]
+        cur=&#39;&#39;
+        lst1=[]
+        lst2=[]
+        # 将 nums1 的所有可能的子序列的非降序排列按顺序添加到 generate1
+        for i in delete_order1:
+            t=bisect_left(lst1,i)
+            lst1[t:t]=[i]
+            cur=cur[:t]+str(nums1[i])+cur[t:]
+            generate1.append(cur)
+        cur=&#39;&#39;
+        # 将 nums2 的所有可能的子序列的非降序排列按顺序添加到 generate2
+        for i in delete_order2:
+            t=bisect_left(lst2,i)
+            lst2[t:t]=[i]
+            cur=cur[:t]+str(nums2[i])+cur[t:]
+            generate2.append(cur)
+        ans=[]
+        # 合并两个序列成最大的数
+        def join_max(s1,s2):
+            i=0
+            j=0
+            ans=&#39;&#39;
+            while i&lt;len(s1) or j&lt;len(s2):
+                if i==len(s1):
+                    ans+=s2[j:]
+                    return ans
+                if j==len(s2):
+                    ans+=s1[i:]
+                    return ans
+                if (s1[i:])&lt;=(s2[j:]):
+                    ans+=s2[j]
+                    j+=1
+                else:
+                    ans+=s1[i]
+                    i+=1
+            return ans
+        cmax=0
+        for i in range(max(0,k-n),min(m,k)+1):
+            if i==0 :
+                cmax=max(cmax,int(generate2[k-1]))
+            elif i==k:
+                cmax=max(cmax,int(generate1[k-1]))
+            else:
+                s1=generate1[i-1]
+                s2=generate2[k-i-1]
+                tmp=join_max(s1,s2)
+                cmax=max(cmax,int(tmp))
+        return list(map(int,list(str(cmax))))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在生成最大子序列时选择使用单调栈，并且如何确保通过单调栈得到的序列是最大的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈是一种特殊的栈结构，用于在遍历数组时维护一个单调递增或单调递减的序列。在拼接最大数的问题中，我们使用单调递减栈。这是因为我们希望尽可能地让高位的数字大，以此来构造一个最大的数。单调栈可以帮助我们处理当前数字和栈顶数字的关系，如果当前数字比栈顶数字大，则将栈顶数字弹出，这样可以确保在不违反选取数字个数限制的前提下，尽可能地让后续的大数字处于高位，从而构成更大的数。单调栈确保了每次插入操作后栈内元素的单调性，这样生成的序列自然是最大的非降序排列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在合并两个子序列以形成最大数时，如何处理两个序列的前缀相同时的判断逻辑？具体的，当`s1[i:] == s2[j:]`时，应该如何选择下一个数字？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在合并两个子序列时，如果遇到`s1[i:] == s2[j:]`的情况，即从当前位置开始两个子序列的剩余部分完全相等，我们可以选择任意一个序列中的下一个数字，因为它们会给出相同的结果。然而，为了避免在实现中出现不必要的复杂性，通常的做法是按照一定的顺序（例如先取`s1`或先取`s2`）来推进，这可以简化代码逻辑。实际操作中，我们可以基于其他条件（如先到达序列末尾的情况）来调整选择策略，以确保合并后的序列尽可能大。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在实际代码实现中，如何保持从同一数组中取出的数字的相对顺序不变？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在从数组中构造子序列时，我们需要确保取出的数字保持其在原数组中的相对顺序。这可以通过遍历数组的同时使用单调栈来实现。单调栈操作只涉及栈顶元素的比较和可能的弹出，这不会影响未处理的元素的顺序。因此，已经进入栈中的元素（即已经被选择加入到子序列中的元素）的相对顺序是保持不变的。这样，即使在进行删除操作（弹栈操作）时，也只是选择不将某些元素加入子序列，而不会改变已加入元素的顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/remove-k-digits" class="list-group-item list-group-item-action">
+                                移掉 K 位数字
+                            </a>
+                        
+                            <a href="/problem/maximum-swap" class="list-group-item list-group-item-action">
+                                最大交换
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/create-maximum-number')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/create-maximum-number/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

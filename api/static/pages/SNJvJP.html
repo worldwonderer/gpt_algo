@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>乐团站位</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>乐团站位</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        某乐团的演出场地可视作 `num * num` 的二维矩阵 `grid`（左上角坐标为 `[0,0]`)，每个位置站有一位成员。乐团共有 `9` 种乐器，乐器编号为 `1~9`，每位成员持有 `1` 个乐器。
+
+为保证声乐混合效果，成员站位规则为：自 `grid` 左上角开始顺时针螺旋形向内循环以 `1，2，...，9` 循环重复排列。例如当 num = `5` 时，站位如图所示
+
+![image.png](https://pic.leetcode-cn.com/1616125411-WOblWH-image.png)
+
+
+请返回位于场地坐标 [`Xpos`,`Ypos`] 的成员所持乐器编号。
+
+**示例 1：**
+>输入：`num = 3, Xpos = 0, Ypos = 2`
+>
+>输出：`3`
+>
+>解释：
+![image.png](https://pic.leetcode-cn.com/1616125437-WUOwsu-image.png)
+
+
+**示例 2：**
+>输入：`num = 4, Xpos = 1, Ypos = 2`
+>
+>输出：`5`
+>
+>解释：
+![image.png](https://pic.leetcode-cn.com/1616125453-IIDpxg-image.png)
+
+
+**提示：**
+- `1 <= num <= 10^9`
+- `0 <= Xpos, Ypos < num`
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 25 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def orchestraLayout(self, N: int, x: int, y: int) -&gt; int:
+        L = min(x, N - 1 - x, y, N - 1 - y)
+        ans = 4 * (N - L) * L
+        x -= L
+        y -= L
+        N -= 2 * L
+        if x == 0:
+            ans += y + 1
+        elif y == N - 1:
+            ans += N
+            ans += x
+        elif x== N - 1:
+            ans += N + N - 1
+            ans += N - 1 - y
+        else:
+            ans += N + N - 1 + N - 1
+            ans += N - 1 - x
+        return (ans - 1) % 9 + 1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的整体思路是通过计算目标位置[Xpos, Ypos] (即 x, y) 相对于最外层螺旋的层级 L 来简化问题。首先，计算出目标位置所在的层级 L，该层级是到达 x 和 y 最近的边界的最小值。然后计算从外层到第 L 层之前所有层的元素总数。接着，考虑第 L 层的具体位置，根据 x 和 y 的相对位置在该层的不同部分（上、右、下、左）来计算具体的索引。最后，利用该索引值来确定乐器编号，因为编号是循环的，使用取模运算来实现。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def orchestraLayout(self, N: int, x: int, y: int) -&gt; int:
+        # 计算目标位置属于第几层
+        L = min(x, N - 1 - x, y, N - 1 - y)
+        # 计算前L层总共包含的元素个数
+        ans = 4 * (N - L) * L
+        # 计算目标位置在当前层的偏移量
+        x -= L
+        y -= L
+        # 当前层的大小
+        N -= 2 * L
+        # 判断目标位置在当前层的哪一边，并计算相对于当前层起点的偏移
+        if x == 0:
+            ans += y + 1
+        elif y == N - 1:
+            ans += N
+            ans += x
+        elif x== N - 1:
+            ans += N + N - 1
+            ans += N - 1 - y
+        else:
+            ans += N + N - 1 + N - 1
+            ans += N - 1 - x
+        # 将总偏移量转换为乐器编号
+        return (ans - 1) % 9 + 1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在计算层级L时，使用`min(x, N - 1 - x, y, N - 1 - y)`方法可以确定目标位置所在的螺旋层级？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二维矩阵中，螺旋层级是从外围向内逐渐缩小的，每一层都对应矩阵的一个边框。对于任意位置[x, y]，其所在的螺旋层级由其到最外层的距离决定。这里的`min(x, N - 1 - x, y, N - 1 - y)`计算的是[x, y]到最外层上下左右边界的最近距离。这个最小值决定了[x, y]最多是从外部数来的第几层，因此可以用来确定[x, y]所在的螺旋层级。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算前L层总共包含的元素个数时，`4 * (N - L) * L`公式是如何得出的？请解释这个公式背后的逻辑。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>每一层的螺旋可以看作一个边长为`N - 2L`的正方形框架（L是层级，从0开始计数）。该框架的周长（不包括内部的下一层的边）是`4(N - 2L - 1) + 4 = 4(N - 2L) = 4(N - L) - 4L`。对于前L层，每增加一层，其边长减少2（向内缩小），因此第L层的周长就是`4(N - 2L)`。当我们将从0到L-1每一层的周长相加，实际上是在求一个等差数列的和，但我们只需要最外层到第L层之前的总和，所以公式是`4 * (N - L) * L`，这里`(N - L)`表示最外层边长减去层数L的结果，乘以L层每层的周长。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在考虑第L层的具体位置时，为什么需要减去L（`x -= L; y -= L;`），这一步是如何影响后面的偏移量计算的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>减去L的操作是为了将坐标[x, y]从原始的全局坐标转换为当前层级L的局部坐标。这样转换后，[x, y]表示的是在第L层的相对位置，而不是在整个矩阵的绝对位置。这一转换是必要的，因为它简化了在第L层内计算相对位置的过程，从而可以更简单地计算出从当前层的起始点到目标点的距离。局部坐标让我们可以直接使用边界从0开始的索引来计算偏移量，无需关心外层的具体大小和位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/SNJvJP')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/SNJvJP/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

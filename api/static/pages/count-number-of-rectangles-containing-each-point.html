@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计包含每个点的矩形数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计包含每个点的矩形数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维整数数组&nbsp;<code>rectangles</code>&nbsp;，其中&nbsp;<code>rectangles[i] = [l<sub>i</sub>, h<sub>i</sub>]</code>&nbsp;表示第&nbsp;<code>i</code>&nbsp;个矩形长为&nbsp;<code>l<sub>i</sub></code>&nbsp;高为&nbsp;<code>h<sub>i</sub></code>&nbsp;。给你一个二维整数数组&nbsp;<code>points</code>&nbsp;，其中&nbsp;<code>points[j] = [x<sub>j</sub>, y<sub>j</sub>]</code>&nbsp;是坐标为&nbsp;<code>(x<sub>j</sub>, y<sub>j</sub>)</code>&nbsp;的一个点。</p>
+
+<p>第&nbsp;<code>i</code>&nbsp;个矩形的 <strong>左下角</strong>&nbsp;在&nbsp;<code>(0, 0)</code>&nbsp;处，<strong>右上角</strong>&nbsp;在&nbsp;<code>(l<sub>i</sub>, h<sub>i</sub>)</code>&nbsp;。</p>
+
+<p>请你返回一个整数数组<em>&nbsp;</em><code>count</code>&nbsp;，长度为&nbsp;<code>points.length</code>，其中<em>&nbsp;</em><code>count[j]</code>是 <strong>包含</strong> 第<em>&nbsp;</em><code>j</code>&nbsp;个点的矩形数目。</p>
+
+<p>如果&nbsp;<code>0 &lt;= x<sub>j</sub> &lt;= l<sub>i</sub></code> 且&nbsp;<code>0 &lt;= y<sub>j</sub> &lt;= h<sub>i</sub></code>&nbsp;，那么我们说第&nbsp;<code>i</code>&nbsp;个矩形包含第&nbsp;<code>j</code>&nbsp;个点。如果一个点刚好在矩形的 <strong>边上</strong>&nbsp;，这个点也被视为被矩形包含。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/03/02/example1.png" style="width: 300px; height: 509px;"></p>
+
+<pre><b>输入：</b>rectangles = [[1,2],[2,3],[2,5]], points = [[2,1],[1,4]]
+<b>输出：</b>[2,1]
+<b>解释：</b>
+第一个矩形不包含任何点。
+第二个矩形只包含一个点 (2, 1) 。
+第三个矩形包含点 (2, 1) 和 (1, 4) 。
+包含点 (2, 1) 的矩形数目为 2 。
+包含点 (1, 4) 的矩形数目为 1 。
+所以，我们返回 [2, 1] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/03/02/example2.png" style="width: 300px; height: 312px;"></p>
+
+<pre><b>输入：</b>rectangles = [[1,1],[2,2],[3,3]], points = [[1,3],[1,1]]
+<b>输出：</b>[1,3]
+<strong>解释：
+</strong>第一个矩形只包含点 (1, 1) 。
+第二个矩形只包含点 (1, 1) 。
+第三个矩形包含点 (1, 3) 和 (1, 1) 。
+包含点 (1, 3) 的矩形数目为 1 。
+包含点 (1, 1) 的矩形数目为 3 。
+所以，我们返回 [1, 3] 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= rectangles.length, points.length &lt;= 5 * 10<sup>4</sup></code></li>
+	<li><code>rectangles[i].length == points[j].length == 2</code></li>
+	<li><code>1 &lt;= l<sub>i</sub>, x<sub>j</sub> &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= h<sub>i</sub>, y<sub>j</sub> &lt;= 100</code></li>
+	<li>所有&nbsp;<code>rectangles</code>&nbsp;<strong>互不相同</strong>&nbsp;。</li>
+	<li>所有&nbsp;<code>points</code> <strong>互不相同</strong>&nbsp;。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 176 ms</p>
+                    <p>内存: 35.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">&#34;&#34;&#34;
+binary search
+T: O(nmlogC)
+S: O(1)
+the number of rectangles that contain the jth point is a decreasing array w.r.t l and h
+so we can use binary search
+&#34;&#34;&#34;
+class Solution:
+    def countRectangles(self, rectangles: List[List[int]], points: List[List[int]]) -&gt; List[int]:
+        m, n = len(rectangles), len(points)
+        ans = [0] * n 
+
+        # 1. O(mlogm) sort ractangles array by height descendingly
+        rectangles.sort(key=lambda x: -x[1])
+
+        # 2. O(mlogm) sort points array by height descendingly
+        points_indices = sorted(range(n), key=lambda j: -points[j][1])
+
+        # 3. O(n) iterates over sorted points array
+        i = 0   # pointer iterates over sorted ractangles array
+        rect_xs = []    # x-coordinates of all the rectangles with hi &gt;= yj
+        for j in points_indices:
+            x, y = points[j]
+
+            # iterates over sorted ractangles array, store x-coordinates of all the rectangles with hi &gt;= yj
+            start = i 
+            while i &lt; m and rectangles[i][1] &gt;= y:
+                rect_xs.append(rectangles[i][0])
+                i += 1
+
+            # sort rect_xs array ascendingly
+            if i &gt; start:
+                rect_xs.sort()
+
+            # i is length of current rect_xs array
+            ans[j] = i - bisect_left(rect_xs, x)
+        
+        return ans </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用二分查找的方法，首先对矩形数组按照高度从大到小排序，然后对点数组也按照高度从大到小排序。通过维护一个当前高度下所有矩形的宽度列表（按照宽度排序），对于每个点，找出在其高度要求下所有宽度足够的矩形，利用二分查找确定宽度能包含该点的矩形数量。在遍历点的过程中，随着点的高度的降低，逐渐增加满足条件的矩形宽度到列表中，并更新答案。</p>
+                                <p>时间复杂度: O((m+n) log(m+n))</p>
+                                <p>空间复杂度: O(m + n)</p>
+                                <pre class="bg-light p-2">&#34;&#34;&#34;
+二分查找
+时间复杂度: O((m+n) log(m+n))
+空间复杂度: O(m + n)
+矩形包含点的数量随矩形的l和h是递减的，因此可以使用二分查找
+&#34;&#34;&#34;
+class Solution:
+    def countRectangles(self, rectangles: List[List[int]], points: List[List[int]]) -&gt; List[int]:
+        m, n = len(rectangles), len(points)
+        ans = [0] * n 
+
+        # 1. O(mlogm) 对矩形数组按高度降序排序
+        rectangles.sort(key=lambda x: -x[1])
+
+        # 2. O(nlogn) 对点数组按高度降序排序，并保留原索引
+        points_indices = sorted(range(n), key=lambda j: -points[j][1])
+
+        # 3. O(n) 遍历排序后的点数组
+        i = 0   # 指针遍历排序后的矩形数组
+        rect_xs = []    # 存储所有高度大于等于当前点y坐标的矩形的x坐标
+        for j in points_indices:
+            x, y = points[j]
+
+            # 遍历矩形数组，存储所有高度大于等于y的矩形的x坐标
+            start = i 
+            while i &lt; m and rectangles[i][1] &gt;= y:
+                rect_xs.append(rectangles[i][0])
+                i += 1
+
+            # 对rect_xs列表按照x坐标升序排序
+            if i &gt; start:
+                rect_xs.sort()
+
+            # 使用二分查找确定x坐标大于等于点x坐标的矩形数量
+            ans[j] = i - bisect_left(rect_xs, x)
+        
+        return ans 
+&#34;&#34;&#34;
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理过程中需要将矩形和点的数组分别按照高度进行排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>排序的目的是为了有效地处理每个点能被哪些矩形包含的问题。通过按高度降序排列矩形和点，我们可以确保在遍历点时，可以逐步将满足当前点高度条件的矩形宽度添加到考虑的列表中。这样的处理方式保证了每次添加的矩形都是对后续点来说可能有效的，从而避免了对每个点重新计算其上方的矩形，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在排序点数组后，为什么还需要使用一个额外的索引数组`points_indices`来存储排序后的索引？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在原始点数组按高度排序后，我们需要通过索引数组`points_indices`来保持点的原始顺序信息。这样做是因为最终输出的答案需要与输入点的顺序一致。通过使用索引数组，在处理完所有点之后，可以按照原始顺序将结果放置在正确的位置，确保输出的一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在遍历点时，为什么要逐步将满足条件的矩形宽度添加到`rect_xs`列表中，而不是一开始就把所有矩形宽度添加进去？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种逐步添加矩形的策略是为了优化算法效率。如果一开始就将所有矩形宽度添加到列表中，我们需要对每个点重新计算符合高度要求的矩形。而按点的高度顺序逐步加入矩形宽度，可以保证一旦矩形被加入列表，就无需再被移除，因为所有后续的点的高度都不会超过当前点。这样可以减少重复的计算和不必要的操作，优化整体的时间复杂度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在代码中，二分查找使用了`bisect_left(rect_xs, x)`，这个函数的作用是什么，它如何帮助确定包含点的矩形数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`bisect_left`函数在一个已排序的列表中找到第一个不小于给定值x的元素的位置索引。在本题中，这个函数帮助我们快速定位列表`rect_xs`中第一个宽度不小于点x坐标的矩形的位置。由于`rect_xs`是升序的，从这个位置到列表末尾的所有矩形都是宽度大于等于x的，因此这个索引直接帮助我们计算出能包含该点的矩形数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-number-of-rectangles-containing-each-point')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-number-of-rectangles-containing-each-point/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

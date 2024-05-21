@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>俄罗斯套娃信封问题</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>俄罗斯套娃信封问题</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维整数数组 <code>envelopes</code> ，其中 <code>envelopes[i] = [w<sub>i</sub>, h<sub>i</sub>]</code> ，表示第 <code>i</code> 个信封的宽度和高度。</p>
+
+<p>当另一个信封的宽度和高度都比这个信封大的时候，这个信封就可以放进另一个信封里，如同俄罗斯套娃一样。</p>
+
+<p>请计算 <strong>最多能有多少个</strong> 信封能组成一组“俄罗斯套娃”信封（即可以把一个信封放到另一个信封里面）。</p>
+
+<p><strong>注意</strong>：不允许旋转信封。</p>
+&nbsp;
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>envelopes = [[5,4],[6,4],[6,7],[2,3]]
+<strong>输出：</strong>3
+<strong>解释：</strong>最多信封的个数为 <code>3, 组合为: </code>[2,3] =&gt; [5,4] =&gt; [6,7]。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>envelopes = [[1,1],[1,1],[1,1]]
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= envelopes.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>envelopes[i].length == 2</code></li>
+	<li><code>1 &lt;= w<sub>i</sub>, h<sub>i</sub> &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 164 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxEnvelopes(self, envelopes: List[List[int]]) -&gt; int:
+        def LIS(nums):
+            n = len(nums)
+            if n &lt; 2: return 1
+            dp = [0] * n
+            maxL = 0
+            for num in nums:
+                left, right = 0, maxL
+                while left &lt; right:
+                    mid = left + (right - left)//2
+                    if dp[mid] &lt; num:
+                        left = mid + 1
+                    else: right = mid
+                dp[left] = num
+                if left == maxL: maxL += 1
+            return maxL
+        if not envelopes or not len(envelopes): return 0
+        envelopes.sort(key=lambda x: (x[0], -x[1]))
+        weights = [i[1] for i in envelopes]
+        return LIS(weights)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是先按宽度升序和高度降序对信封进行排序，然后对排序后的信封高度数组求最长上升子序列（LIS）。这样做的原因是，对于宽度相同的信封，我们只需保留高度最小的，因为其他的信封都可以套在高度最小的信封外面。排序后，问题就转化为在高度数组上求LIS，而LIS可以通过动态规划和二分查找求解。</p>
+                                <p>时间复杂度: O(nlogn)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxEnvelopes(self, envelopes: List[List[int]]) -&gt; int:
+        def LIS(nums):
+            n = len(nums)
+            if n &lt; 2: return 1
+            dp = [0] * n  # 定义dp数组，dp[i]表示长度为i+1的LIS结尾元素的最小值
+            maxL = 0  # 记录LIS的长度
+            for num in nums:
+                left, right = 0, maxL
+                while left &lt; right:  # 二分查找num在dp数组中的插入位置
+                    mid = left + (right - left)//2
+                    if dp[mid] &lt; num:
+                        left = mid + 1
+                    else: right = mid
+                dp[left] = num  # 将num插入到dp数组合适的位置
+                if left == maxL: maxL += 1  # 如果num大于dp中所有元素，则LIS长度加1
+            return maxL
+        
+        if not envelopes or not len(envelopes): return 0
+        envelopes.sort(key=lambda x: (x[0], -x[1]))  # 按宽度升序和高度降序排序
+        weights = [i[1] for i in envelopes]  # 提取排序后的信封高度数组
+        return LIS(weights)  # 求高度数组的LIS长度作为结果返回
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在排序信封时选择先按宽度升序然后按高度降序排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解决俄罗斯套娃信封问题时，先按宽度升序排序可以确保我们在处理信封时，一定是从宽度较小的信封开始，到宽度较大的信封结束。这样可以保证宽度小的信封有可能被宽度大的信封套住。接着按高度降序排序的原因是，当宽度相同的情况下，我们只能选择最高的信封，因为较低的信封不能套在相同宽度的较高信封里。这种排序方法避免了在求最长上升子序列时将宽度相同但高度较小的信封错误地计入结果中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在宽度相同的情况下，按高度降序排列是否意味着我们在处理宽度相同的信封时只考虑最高的一个？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>不完全是这样。按高度降序排列的目的是确保在处理宽度相同的信封时，不会出现一个低的信封套在高的信封里的情况。实际上，我们在计算最长上升子序列时，仍然会考虑这些宽度相同的信封，但由于高度是降序，所以在此宽度下的信封不会形成有效的上升子序列。这确保了算法的正确性，即在宽度相同的情况下，只有最高的信封有可能被计入最终的最长套娃序列中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            LIS函数中，dp数组的每个元素表示什么？为什么dp数组的更新过程可以保证找到最长上升子序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在LIS函数中，dp数组的每个元素dp[i]表示长度为i+1的最长上升子序列的最小可能结尾值。这种方法有效地记录了不同长度子序列的最优结尾值，使我们能够通过比较和更新来扩展子序列。更新过程中，通过二分查找确定插入位置，能够确保每次插入操作都是优化子序列结尾值的，这样可以维护dp数组的特性，并逐步构建出整个数组的最长上升子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            二分查找在LIS函数中的作用是什么？它如何帮助优化整个求解过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找在LIS函数中的作用是快速确定新元素应该更新dp数组中的哪个位置。通过二分查找，我们可以在对数时间复杂度内找到一个位置，使得在这个位置之前的所有元素都小于当前元素，并且这个位置的元素是大于或等于当前元素的最小值。这允许我们在保持dp数组有序的同时，有效地更新最长上升子序列的潜在结尾值，从而优化整个求解过程，使其更加高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/longest-increasing-subsequence" class="list-group-item list-group-item-action">
+                                最长递增子序列
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/russian-doll-envelopes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/russian-doll-envelopes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

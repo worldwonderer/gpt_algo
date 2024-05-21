@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>守卫城堡</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>守卫城堡</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        城堡守卫游戏的胜利条件为使恶魔无法从出生点到达城堡。游戏地图可视作 `2*N` 的方格图，记作字符串数组 `grid`，其中：
+- `"."` 表示恶魔可随意通行的平地；
+- `"#"` 表示恶魔不可通过的障碍物，玩家可通过在 **平地** 上设置障碍物，即将  `"."` 变为 `"#"` 以阻挡恶魔前进；
+- `"S"` 表示恶魔出生点，将有大量的恶魔该点生成，恶魔可向上/向下/向左/向右移动，且无法移动至地图外；
+- `"P"` 表示瞬移点，移动到 `"P"` 点的恶魔可被传送至任意一个 `"P"` 点，也可选择不传送；
+- `"C"` 表示城堡。
+
+然而在游戏中用于建造障碍物的金钱是有限的，请返回玩家最少需要放置几个障碍物才能获得胜利。若无论怎样放置障碍物均无法获胜，请返回 `-1`。
+
+**注意：**
+- 地图上可能有一个或多个出生点
+- 地图上有且只有一个城堡
+
+**示例 1**
+>输入：`grid = ["S.C.P#P.", ".....#.S"]`
+>
+>输出：`3`
+>
+>解释：至少需要放置三个障碍物
+![image.png](https://pic.leetcode-cn.com/1614828255-uuNdNJ-image.png)
+
+
+**示例 2：**
+>输入：`grid = ["SP#P..P#PC#.S", "..#P..P####.#"]`
+>
+>输出：`-1`
+>
+>解释：无论怎样修筑障碍物，均无法阻挡最左侧出生的恶魔到达城堡位置
+![image.png](https://pic.leetcode-cn.com/1614828208-oFlpVs-image.png)
+
+**示例 3：**
+>输入：`grid = ["SP#.C.#PS", "P.#...#.P"]`
+>
+>输出：`0`
+>
+>解释：无需放置障碍物即可获得胜利
+![image.png](https://pic.leetcode-cn.com/1614828242-oveClu-image.png)
+
+**示例 4：**
+>输入：`grid = ["CP.#.P.", "...S..S"]`
+>
+>输出：`4`
+>
+>解释：至少需要放置 4 个障碍物，示意图为放置方法之一
+![image.png](https://pic.leetcode-cn.com/1614828218-sIAYkb-image.png)
+
+
+**提示：**
+- `grid.length == 2`
+- `2 <= grid[0].length == grid[1].length <= 10^4`
+- `grid[i][j]` 仅包含字符 `"."`、`"#"`、`"C"`、`"P"`、`"S"`
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 812 ms</p>
+                    <p>内存: 17.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def guardCastle(self, grid: List[str]) -&gt; int:
+        # 0 = S, 1 = C, 2 = P
+        INF = 1000000000
+        N = len(grid)
+        M = len(grid[0])
+        ans = INF
+        for P in (&#39;C&#39;, &#39;S&#39;):
+            last_endpoint = None
+            # 00, 01, 10, 11
+            dp = [0, 0, 0, 0]
+            for j in range(M):
+                current = grid[0][j], grid[1][j]
+                current = tuple(P if c == &#39;P&#39; else c for c in current)
+                if &#39;S&#39; in current:
+                    if &#39;C&#39; in current:
+                        dp[3] = INF
+                        break
+                    endpoint = 0
+                    target = &#39;S&#39;
+                elif &#39;C&#39; in current:
+                    endpoint = 1
+                    target = &#39;C&#39;
+                else:
+                    endpoint = None
+                    target = None
+                if current == (target, target):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, INF, INF, dp[0]]
+                    else:
+                        dp = [INF, INF, INF, dp[3]]
+                elif current == (target, &#39;#&#39;):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, INF, dp[1], dp[1]]
+                    else:
+                        dp = [INF, INF, dp[3], dp[3]]
+                elif current == (&#39;#&#39;, target):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, dp[2], INF, dp[2]]
+                    else:
+                        dp = [INF, dp[3], INF, dp[3]]
+                elif current == (target, &#39;.&#39;):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, INF, dp[1] + 1, dp[0]]
+                        dp[3] = min(dp[2], dp[3])
+                    else:
+                        dp = [INF, INF, dp[3] + 1, dp[3]]
+                elif current == (&#39;.&#39;, target):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, dp[2] + 1, INF, dp[0]]
+                        dp[3] = min(dp[1], dp[3])
+                    else:
+                        dp = [INF, dp[3] + 1, INF, dp[3]]
+                elif current == (&#39;.&#39;, &#39;.&#39;):
+                    dp[0] = min(dp[0], dp[1] + 1, dp[2] + 1, dp[3] + 2)
+                    dp[1] = dp[2] = min(dp[0], dp[3] + 1)
+                elif current == (&#39;.&#39;, &#39;#&#39;):
+                    dp[0] = dp[1] = min(dp[1], dp[3] + 1)
+                    dp[2] = dp[3]
+                elif current == (&#39;#&#39;, &#39;.&#39;):
+                    dp[0] = dp[2] = min(dp[2], dp[3] + 1)
+                    dp[1] = dp[3]
+                else:
+                    dp[0] = dp[1] = dp[2] = dp[3]
+                if endpoint is not None:
+                    last_endpoint = endpoint
+            ans = min(ans, dp[3])
+        if ans &gt;= INF:
+            return -1
+        else:
+            return ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划的方法来求解怎样以最少的障碍物阻止恶魔从出生点到达城堡。考虑两种可能的出发点（城堡C和出生点S），每次遍历地图列，更新动态规划表格（dp数组）来存储到当前列为止的最小障碍物数量。dp数组有四种状态，分别代表不同的行连接方式（两行直接连接，或者通过传送P点连接等）。在遍历中，根据当前列的情况更新dp数组，最终dp数组的最小值即为所需的最少障碍物数量。如果无法阻挡，则返回-1。</p>
+                                <p>时间复杂度: O(M)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def guardCastle(self, grid: List[str]) -&gt; int:
+        INF = int(1e9)  # 定义一个足够大的数表示无法到达的情况
+        N = len(grid)
+        M = len(grid[0])
+        ans = INF  # 初始化答案为无穷大
+        for P in (&#39;C&#39;, &#39;S&#39;):  # 分别以城堡C和出生点S作为起点
+            last_endpoint = None
+            dp = [0, 0, 0, 0]  # 初始化dp数组，表示不同的连接状态
+            for j in range(M):  # 遍历每一列
+                current = (grid[0][j], grid[1][j])
+                current = tuple(P if c == &#39;P&#39; else c for c in current)  # 将P点视为当前起点
+                if &#39;S&#39; in current:
+                    if &#39;C&#39; in current:
+                        dp[3] = INF  # 如果S和C在同一位置，设置障碍无效
+                        break
+                    endpoint = 0
+                    target = &#39;S&#39;
+                elif &#39;C&#39; in current:
+                    endpoint = 1
+                    target = &#39;C&#39;
+                else:
+                    endpoint = None
+                    target = None
+                # 根据当前列的状态更新dp数组
+                if current == (target, target):
+                    if last_endpoint == 1 - endpoint:
+                        dp = [INF, INF, INF, dp[0]]
+                    else:
+                        dp = [INF, INF, INF, dp[3]]
+                # 更多状态的更新逻辑省略...
+                if endpoint is not None:
+                    last_endpoint = endpoint
+            ans = min(ans, dp[3])  # 更新全局最小值
+        if ans &gt;= INF:
+            return -1  # 如果答案仍为INF，返回-1
+        else:
+            return ans
+        </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理地图的动态规划过程中，dp数组具体表示哪些状态？每个状态又是如何根据地图的当前列进行更新的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划解法中，dp数组是用来存储不同连接状态下的最小障碍物数量。这个数组有四个状态，每个状态对应不同的行连接方式，例如两行可能直接连接，或者通过特定的点（比如传送点P）连接。每次迭代时，根据地图的当前列的字符（&#39;S&#39;, &#39;C&#39;, 或 &#39;P&#39;）来更新dp数组。具体如何更新取决于当前列的字符组合和前一列的状态。例如，如果当前列的两个位置都是起点（&#39;S&#39;或&#39;C&#39;），则可能需要设置障碍物或考虑不同的连接方式，从而更新dp数组中的值。如果某一列同时出现&#39;S&#39;和&#39;C&#39;，则当前dp状态会设置为无穷大（INF），因为在同一位置设置障碍物无效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到&#39;将P点视为当前起点&#39;，这种处理方式是如何影响dp数组更新的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将P点视为当前起点是一个处理策略，旨在简化动态规划的状态转移。在此题解中，P点代表传送点，可以视为柔性地连接到起点&#39;S&#39;或目标点&#39;C&#39;。这意味着当遇到P点时，可以根据需要将其视为&#39;S&#39;或&#39;C&#39;，从而影响dp数组的更新。这种处理使得动态规划可以在遇到P点时更灵活地调整策略，例如，如果P点被视作起点S，那么dp数组会更新为考虑从P点开始的路径；如果P点被视作目标点C，那么更新会考虑阻止到达P点的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            动态规划解法中如何确保恶魔无法通过设置障碍物到达城堡？题解中是否有考虑到所有可能的路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划的目标是通过合理设置障碍物确保恶魔无法到达城堡。解法通过迭代每一列，并根据每列的具体情况（例如是否含有出生点S、城堡C或传送点P），更新dp数组来尝试阻挡所有可能的路径。如果任意列显示S和C在同一列或通过P点可以直接或间接连接，则该列的dp状态会设置为无穷大（INF），表示此路径无法被阻断。题解中通过考虑从S和C两个不同的起点开始的策略，尽可能覆盖所有路径。如果最终dp数组的最小值仍然是无穷大，表明存在至少一条路径不能被阻断，返回-1表示失败。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/7rLGCR')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/7rLGCR/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

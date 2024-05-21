@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>环形数组是否存在循环</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>环形数组是否存在循环</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>存在一个不含 <code>0</code> 的<strong> 环形 </strong>数组&nbsp;<code>nums</code> ，每个 <code>nums[i]</code> 都表示位于下标 <code>i</code> 的角色应该向前或向后移动的下标个数：</p>
+
+<ul>
+	<li>如果 <code>nums[i]</code> 是正数，<strong>向前</strong>（下标递增方向）移动 <code>|nums[i]|</code> 步</li>
+	<li>如果&nbsp;<code>nums[i]</code> 是负数，<strong>向后</strong>（下标递减方向）移动 <code>|nums[i]|</code> 步</li>
+</ul>
+
+<p>因为数组是 <strong>环形</strong> 的，所以可以假设从最后一个元素向前移动一步会到达第一个元素，而第一个元素向后移动一步会到达最后一个元素。</p>
+
+<p>数组中的 <strong>循环</strong> 由长度为 <code>k</code> 的下标序列 <code>seq</code> 标识：</p>
+
+<ul>
+	<li>遵循上述移动规则将导致一组重复下标序列 <code>seq[0] -&gt; seq[1] -&gt; ... -&gt; seq[k - 1] -&gt; seq[0] -&gt; ...</code></li>
+	<li>所有 <code>nums[seq[j]]</code> 应当不是 <strong>全正</strong> 就是 <strong>全负</strong></li>
+	<li><code>k &gt; 1</code></li>
+</ul>
+
+<p>如果 <code>nums</code> 中存在循环，返回 <code>true</code> ；否则，返回<em> </em><code>false</code><em> </em>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [2,-1,1,2,2]
+<strong>输出：</strong>true
+<strong>解释：</strong>存在循环，按下标 0 -&gt; 2 -&gt; 3 -&gt; 0 。循环长度为 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [-1,2]
+<strong>输出：</strong>false
+<strong>解释：</strong>按下标 1 -&gt; 1 -&gt; 1 ... 的运动无法构成循环，因为循环的长度为 1 。根据定义，循环的长度必须大于 1 。
+</pre>
+
+<p><strong>示例 3:</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [-2,1,-1,-2,-2]
+<strong>输出：</strong>false
+<strong>解释：</strong>按下标 1 -&gt; 2 -&gt; 1 -&gt; ... 的运动无法构成循环，因为 nums[1] 是正数，而 nums[2] 是负数。
+所有 nums[seq[j]] 应当不是全正就是全负。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 5000</code></li>
+	<li><code>-1000 &lt;= nums[i] &lt;= 1000</code></li>
+	<li><code>nums[i] != 0</code></li>
+</ul>
+
+
+
+<p><strong>进阶：</strong>你能设计一个时间复杂度为 <code>O(n)</code> 且额外空间复杂度为 <code>O(1)</code> 的算法吗？</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def circularArrayLoop(self, nums: List[int]) -&gt; bool:
+        # Get the length of the input list
+        length = len(nums)
+
+        # Define a function to find the next index in a circular manner
+        def get_next_index(current_index):
+            # Calculate the next index considering wrapping around
+            return (current_index + nums[current_index]) % length
+
+        # Iterate over all elements in the array
+        for i in range(length):
+            # Skip if the current element is already marked as 0, indicating it&#39;s not part of a loop
+            if nums[i] == 0:
+                continue
+          
+            # Initialize the slow and fast pointers for cycle detection
+            slow_pointer = i
+            fast_pointer = get_next_index(i)
+          
+            # Continue moving pointers while the signs of the elements indicate a potential loop
+            # This also ensures that we are not mixing cycles of different directions
+            while nums[slow_pointer] * nums[fast_pointer] &gt; 0 and nums[slow_pointer] * nums[get_next_index(fast_pointer)] &gt; 0:
+                # If the slow and fast pointers meet, a cycle is detected
+                if slow_pointer == fast_pointer:
+                    # Check to ensure the loop is longer than 1 element
+                    if slow_pointer != get_next_index(slow_pointer):
+                        return True
+                    # If the loop is just one element, break and mark it as non-looping
+                    break
+              
+                # Move slow pointer by one step and fast pointer by two steps
+                slow_pointer = get_next_index(slow_pointer)
+                fast_pointer = get_next_index(get_next_index(fast_pointer))
+          
+            # Mark all visited elements as 0 to avoid revisiting and repeated calculations
+            # This process will also ensure elimination of non-loop elements
+            index = i
+            while nums[index] * nums[get_next_index(index)] &gt; 0:
+                next_index = get_next_index(index)
+                nums[index] = 0
+                index = next_index
+
+        # If no loop is found, return False
+        return False
+
+
+# Intuition
+
+# To address this problem, we need to consider that a cycle can only exist if we&#39;re moving consistently in one direction and eventually end up where we started. This naturally brings the &#34;fast and slow pointers&#34; technique to mind, which is often used for cycle detection in linked lists.
+
+# The fast and slow pointers method involves two pointers moving at different speeds, and if there is a cycle, they will eventually meet. We apply the same principle here:
+
+# The slow pointer moves one step at a time.
+# The fast pointer moves two steps at a time.
+# If slow and fast meet at the same index, and this index is not the same as the next step (to prevent single-element loops, which aren&#39;t considered valid cycles), we have found a cycle.
+
+# At each step, we also verify that the direction does not change. If the product of nums[slow] and nums[fast] is positive, they are either both positive or both negative, thus maintaining a consistent direction. If this product is negative or if we reach an element that is already marked as visited (a value of 0), we do not have a valid cycle from that start point.
+
+# For each element, if it does not lead to a cycle, we mark the visited elements as 0 to avoid re-checking them in the future, thereby optimizing our algorithm. This marking also helps to invalidate any non-cycle paths swiftly.
+
+# Overall, the algorithm is to iterate over each element and use the fast and slow pointer method to detect a cycle. If any cycle is found, return true. After checking all possibilities, if no cycle is found, return false.
+
+# Solution Approach
+# The implementation of the solution for detecting a cycle in the circular array follows these main steps:
+
+# Array Length Extraction: We start by obtaining the length n of the input array nums. This is crucial since we need to calculate the next index correctly within the circular context:
+
+# n = len(nums)
+# Helper Function for Index Calculation: Since the array is circular, we define a function named next() that takes an index i and returns the next index we should move to, according to nums[i], and wraps around the array if necessary:
+
+# def next(i):
+#     return (i + nums[i]) % n
+# We ensure that the result of the movement remains within the bounds of the array indices by taking the modulo with n.
+
+# Main Loop to Check for Cycles: We iterate through each element in the array to check for cycles starting from that index:
+
+# for i in range(n):
+#     if nums[i] == 0:  # Skip already marked elements (no cycle from this point)
+#         continue
+# Fast and Slow Pointers Initialization: For each starting index, we initiate slow and fast pointers, which represent the current position of each pointer:
+
+# slow, fast = i, next(i)
+# Cycle Detection Loop: Next, we loop to detect cycles using the following conditions:
+
+# The product of nums[slow] and nums[fast] must be positive, indicating they move in the same direction.
+# The product of nums[slow] and nums[next(fast)] must also be positive, ensuring that the fast pointer also continues in the same direction after two moves.
+# while nums[slow] * nums[fast] &gt; 0 and nums[slow] * nums[next(fast)] &gt; 0:
+#     if slow == fast:  # Pointers meet, indicating a potential cycle
+#         if slow != next(slow):  # Check to avoid single-length cycle
+#             return True
+#         break
+# Marking Elements: If not a valid cycle, we need to mark elements associated with the failed attempt to find a cycle to prevent re-processing them in future iterations. This is achieved by setting each involved element to 0:
+
+# j = i
+# while nums[j] * nums[next(j)] &gt; 0:
+#     nums[j] = 0  # Marking the element
+#     j = next(j)
+# Final Return: After exhaustively checking all indices, if no cycle is found, the function returns false.
+
+# This solution leverages the cyclical two-pointer technique to identify cycles and uses in-place marking to improve efficiency by reducing redundant checks. The use of the modulo operator ensures proper index wrapping within the circular array boundaries, and thorough condition checks maintain consistency in direction for cycle validation.
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题的解决方案采用了快慢指针的思想。通过快慢两个指针在环形数组中移动，如果存在循环，它们最终会相遇。同时，在移动过程中也要检查移动的方向是否一致，只有方向一致的情况下才可能形成循环。对于非循环的元素，将其标记为0，避免重复访问。最后，如果遍历完整个数组都没有发现循环，则返回 false。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def circularArrayLoop(self, nums: List[int]) -&gt; bool:
+        length = len(nums)
+
+        def get_next_index(current_index):
+            # 计算考虑环形数组的下一个索引
+            return (current_index + nums[current_index]) % length
+
+        for i in range(length):
+            # 如果当前元素已标记为0，说明无法形成循环，跳过
+            if nums[i] == 0:
+                continue
+          
+            # 初始化快慢指针
+            slow_pointer = i
+            fast_pointer = get_next_index(i)
+          
+            # 当快慢指针移动方向一致且未到达已访问过的元素时，继续移动指针
+            while nums[slow_pointer] * nums[fast_pointer] &gt; 0 and nums[slow_pointer] * nums[get_next_index(fast_pointer)] &gt; 0:
+                # 如果快慢指针相遇，说明存在循环
+                if slow_pointer == fast_pointer:
+                    # 进一步检查循环长度是否大于1
+                    if slow_pointer != get_next_index(slow_pointer):
+                        return True
+                    # 如果循环长度为1，跳出循环并标记该元素
+                    break
+              
+                # 慢指针移动一步，快指针移动两步
+                slow_pointer = get_next_index(slow_pointer)
+                fast_pointer = get_next_index(get_next_index(fast_pointer))
+          
+            # 标记所有访问过的非循环元素为0，避免重复访问
+            index = i
+            while nums[index] * nums[get_next_index(index)] &gt; 0:
+                next_index = get_next_index(index)
+                nums[index] = 0
+                index = next_index
+
+        # 如果遍历完数组未发现循环，返回 False
+        return False
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在检查快慢指针相遇时需要检查循环长度是否大于1？循环长度为1的情况具体是如何处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在检查快慢指针相遇时需要检查循环长度是否大于1，因为循环长度为1意味着某个元素指向自己，形成一个自环，而这不符合题目要求的循环定义，题目要求的循环必须包含多个元素。当检测到快慢指针相遇时，我们需要进一步检查是否slow_pointer等于get_next_index(slow_pointer)，如果相等，说明循环长度为1，这种情况下我们会跳出循环并将该元素标记为0，避免后续算法再次访问到它。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在算法中，你是如何确保快慢指针在移动时始终保持方向一致的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，为了确保快慢指针在移动时始终保持方向一致，我们通过检查当前元素与其下一个索引位置的元素的乘积是否大于0来进行判断。具体地，只有当nums[slow_pointer] * nums[fast_pointer] &gt; 0 且 nums[slow_pointer] * nums[get_next_index(fast_pointer)] &gt; 0时，快慢指针才会继续移动。这个条件确保了快慢指针访问的元素始终有相同的正负符号，从而保持了移动的方向一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            标记元素为0的策略是如何帮助提高算法效率的？是否存在可能误标记某些情况导致未能正确识别循环的风险？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>标记元素为0的策略能有效地避免算法重复访问已确定不会形成有效循环的元素，从而提高整体算法的效率。一旦确定某元素所在路径不可能形成题目要求的循环，我们将此路径上的所有元素标记为0。这个策略假设一旦元素被访问过并确定不会形成循环，其后续再被遍历到的可能性也不会形成循环。在实际操作中，只有在确认一条路径不可能形成循环后才会进行标记，因此不存在因误标记而未能正确识别循环的风险。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法中使用了`get_next_index`函数来处理环形数组的索引，能详细说明其计算逻辑和边界处理吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在环形数组中，`get_next_index`函数用于计算当前索引的下一个位置，考虑到数组的环形特性。该函数通过(current_index + nums[current_index]) % length来计算。这里current_index是当前索引，nums[current_index]是当前索引位置的值，表示要向前或向后移动的步数，length是数组的长度。使用取模运算确保得到的结果始终落在数组的有效索引范围内，即使计算结果为负数，取模后也能正确反映环形结构的性质。这种方式有效处理了数组边界的问题，确保索引的环形逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/circular-array-loop')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/circular-array-loop/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

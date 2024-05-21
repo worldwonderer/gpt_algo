@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>扁平化多级双向链表</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>扁平化多级双向链表</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=linked-list" class="badge bg-secondary tag-link">链表</a>
+                    
+                        <a href="/problems?tag=doubly-linked-list" class="badge bg-secondary tag-link">双向链表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>多级双向链表中，除了指向下一个节点和前一个节点指针之外，它还有一个子链表指针，可能指向单独的双向链表。这些子列表也可能会有一个或多个自己的子项，依此类推，生成多级数据结构，如下面的示例所示。</p>
+
+<p>给定位于列表第一级的头节点，请扁平化列表，即将这样的多级双向链表展平成普通的双向链表，使所有结点出现在单级双链表中。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>head = [1,2,3,4,5,6,null,null,null,7,8,9,10,null,null,11,12]
+<strong>输出：</strong>[1,2,3,7,8,11,12,9,10,4,5,6]
+<strong>解释：
+</strong>
+输入的多级列表如下图所示：
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/multilevellinkedlist.png" style="height: 363px; width: 640px;" />
+
+扁平化后的链表如下图：
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/multilevellinkedlistflattened.png" style="height: 80px; width: 1100px;" />
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>head = [1,2,null,3]
+<strong>输出：</strong>[1,3,2]
+<strong>解释：
+
+</strong>输入的多级列表如下图所示：
+
+  1---2---NULL
+  |
+  3---NULL
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>head = []
+<strong>输出：</strong>[]
+</pre>
+
+
+
+<p><strong>如何表示测试用例中的多级链表？</strong></p>
+
+<p>以 <strong>示例 1</strong> 为例：</p>
+
+<pre>
+ 1---2---3---4---5---6--NULL
+         |
+         7---8---9---10--NULL
+             |
+             11--12--NULL</pre>
+
+<p>序列化其中的每一级之后：</p>
+
+<pre>
+[1,2,3,4,5,6,null]
+[7,8,9,10,null]
+[11,12,null]
+</pre>
+
+<p>为了将每一级都序列化到一起，我们需要每一级中添加值为 null 的元素，以表示没有节点连接到上一级的上级节点。</p>
+
+<pre>
+[1,2,3,4,5,6,null]
+[null,null,7,8,9,10,null]
+[null,11,12,null]
+</pre>
+
+<p>合并所有序列化结果，并去除末尾的 null 。</p>
+
+<pre>
+[1,2,3,4,5,6,null,null,null,7,8,9,10,null,null,11,12]</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>节点数目不超过 <code>1000</code></li>
+	<li><code>1 &lt;= Node.val &lt;= 10^5</code></li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 430&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/flatten-a-multilevel-doubly-linked-list/">https://leetcode-cn.com/problems/flatten-a-multilevel-doubly-linked-list/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 25 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">&#34;&#34;&#34;
+# Definition for a Node.
+class Node:
+    def __init__(self, val, prev, next, child):
+        self.val = val
+        self.prev = prev
+        self.next = next
+        self.child = child
+&#34;&#34;&#34;
+
+class Solution:
+    def flatten(self, head: &#39;Node&#39;) -&gt; &#39;Node&#39;:
+        stash = []
+
+        dummy = Node()
+        dummy.next = head
+        prev = dummy
+        while head:
+            if head.child is not None:
+                if head.next is not None:
+                    head.next.prev = None
+                    stash.append(head.next)
+                head.next = head.child
+                head.child.prev = head
+                head.child = None
+                head = head.next
+                prev = prev.next
+            else:
+                if head.next is None:
+                    if len(stash) &gt; 0:
+                        head.next = stash.pop(len(stash)-1)
+                head = head.next
+                prev = prev.next
+                if head is not None and head.prev is None:
+                    head.prev = prev
+        return dummy.next
+                
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用的是深度优先遍历（DFS）的迭代实现，利用栈（在代码中是stash列表）来管理还未完全扁平化的节点。首先创建一个虚拟头节点dummy来简化边界条件处理，然后使用一个循环遍历所有节点。对于每个节点，如果它具有子节点，将其子节点插入到当前节点的下一个位置，并将原来的next节点压入栈中。如果当前节点没有next节点，且栈中还有节点，从栈中弹出一个节点作为next节点。继续这个过程，直到所有节点都被遍历完，从而实现链表的完全扁平化。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">&#34;&#34;&#34;
+# Definition for a Node.
+class Node:
+    def __init__(self, val, prev, next, child):
+        self.val = val
+        self.prev = prev
+        self.next = next
+        self.child = child
+&#34;&#34;&#34;
+
+class Solution:
+    def flatten(self, head: &#39;Node&#39;) -&gt; &#39;Node&#39;:
+        stash = []  # 栈用来保存未处理的next节点
+
+        dummy = Node(0, None, head, None) # 创建虚拟头节点以简化操作
+        prev = dummy
+        while head:
+            if head.child is not None: # 当前节点有子节点
+                if head.next is not None: # 保留当前节点的next节点
+                    head.next.prev = None
+                    stash.append(head.next)
+                head.next = head.child # 将子节点接到当前节点的next上
+                head.child.prev = head
+                head.child = None
+                head = head.next
+                prev = prev.next
+            else:
+                if head.next is None and len(stash) &gt; 0: # 当前节点无next，但栈非空
+                    head.next = stash.pop() # 从栈中取出节点连接为next
+                head = head.next
+                prev = prev.next
+                if head is not None and head.prev is None: # 确保prev节点正确
+                    head.prev = prev
+        return dummy.next
+&#34;&#34;&#34;
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理多级双向链表的扁平化时，为什么选择使用栈（DFS）而不是队列（BFS）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在扁平化多级双向链表时，使用栈（DFS）可以更自然地维护链表的顺序。DFS策略优先深入到最内层的子链表并完成其扁平化，这符合多级链表扁平化的直观顺序，即优先处理当前节点的子节点直到其结束，然后再回到上一级节点的next节点。这种方式确保了处理流程的连续性和顺序性，使得扁平化后的链表能够保持正确的顺序。相比之下，使用队列（BFS）会导致先广泛地处理同一层的所有节点，这不符合直观的顺序要求，可能需要额外的操作来重新调整节点的顺序，从而增加了复杂度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在将子节点连接为当前节点的下一个节点时，原本的next节点是如何处理确保不丢失的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在将子节点接入为当前节点的下一个节点时，题解中首先检查当前节点是否有next节点。如果存在，这个原本的next节点会被保存到栈中。这样做确保了在子节点和它的所有后续节点被完全处理并扁平化后，可以从栈中恢复这个next节点，接在已扁平化部分的末尾。这种方法保证了原本的next节点不会丢失，并且可以在适当的时候重新链接到链表的正确位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            代码中使用了虚拟头节点dummy，这种做法的主要优点是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用虚拟头节点（dummy node）主要优点是简化了链表操作中的边界条件处理。通过引入一个虚拟的头节点，可以避免在处理原始链表头部是空的情况下的特殊判断，同时在链表前端的操作中不需要额外的条件来处理头节点可能变化的情况。虚拟头节点作为一个稳定的前置节点，确保了无论如何操作，返回的始终是dummy.next，从而简化了代码逻辑并提高了代码的可读性和健壮性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/Qv1Da2')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/Qv1Da2/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

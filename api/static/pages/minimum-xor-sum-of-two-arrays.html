@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两个数组最小的异或值之和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两个数组最小的异或值之和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数数组 <code>nums1</code> 和 <code>nums2</code> ，它们长度都为 <code>n</code> 。</p>
+
+<p>两个数组的 <strong>异或值之和</strong> 为 <code>(nums1[0] XOR nums2[0]) + (nums1[1] XOR nums2[1]) + ... + (nums1[n - 1] XOR nums2[n - 1])</code> （<strong>下标从 0 开始</strong>）。</p>
+
+<ul>
+	<li>比方说，<code>[1,2,3]</code> 和 <code>[3,2,1]</code> 的 <strong>异或值之和</strong> 等于 <code>(1 XOR 3) + (2 XOR 2) + (3 XOR 1) = 2 + 0 + 2 = 4</code> 。</li>
+</ul>
+
+<p>请你将 <code>nums2</code> 中的元素重新排列，使得 <strong>异或值之和</strong> <strong>最小</strong> 。</p>
+
+<p>请你返回重新排列之后的 <strong>异或值之和</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums1 = [1,2], nums2 = [2,3]
+<b>输出：</b>2
+<b>解释：</b>将 <code>nums2</code> 重新排列得到 <code>[3,2] 。</code>
+异或值之和为 (1 XOR 3) + (2 XOR 2) = 2 + 0 = 2 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums1 = [1,0,3], nums2 = [5,3,4]
+<b>输出：</b>8
+<b>解释：</b>将 <code>nums2 重新排列得到</code> <code>[5,4,3] 。</code>
+异或值之和为 (1 XOR 5) + (0 XOR 4) + (3 XOR 3) = 4 + 4 + 0 = 8 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums1.length</code></li>
+	<li><code>n == nums2.length</code></li>
+	<li><code>1 &lt;= n &lt;= 14</code></li>
+	<li><code>0 &lt;= nums1[i], nums2[i] &lt;= 10<sup>7</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 53 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">INF = 10**8
+
+class Edge:
+    def __init__(self, from_vertex: int, to_vertex: int, capacity: int, cost: int, flow: int) -&gt; None:
+        self.from_vertex = from_vertex
+        self.to_vertex = to_vertex
+        self.capacity = capacity
+        self.cost = cost
+        self.flow = flow
+
+class MinCostMaxFlow:
+    def __init__(self, total_vertices: int, source: int, sink: int):
+        self.total_vertices = total_vertices
+        self.source = source
+        self.sink = sink
+        self.edges = []
+        self.graph = [[] for _ in range(total_vertices)]
+        self.distances = [INF] * total_vertices
+        self.flow_values = [0] * total_vertices
+        self.previous = [-1] * total_vertices
+
+    def add_edge(self, from_vertex: int, to_vertex: int, capacity: int, cost: int) -&gt; None:
+        self.edges.append(Edge(from_vertex, to_vertex, capacity, cost, 0))
+        self.edges.append(Edge(to_vertex, from_vertex, 0, -cost, 0))
+        self.graph[from_vertex].append(len(self.edges) - 2)
+        self.graph[to_vertex].append(len(self.edges) - 1)
+
+    def find_augmenting_path(self) -&gt; bool:
+        self.flow_values = [0] * self.total_vertices
+        self.previous = [-1] * self.total_vertices
+        self.distances = [INF] * self.total_vertices
+        self.distances[self.source] = 0
+        self.flow_values[self.source] = INF
+
+        priority_queue = [(0, self.source)]  # (distance, vertex)
+
+        while priority_queue:
+            dist_u, u = heappop(priority_queue)
+            if dist_u &gt; self.distances[u]:  # Ignore outdated distances
+                continue
+            for edge_index in self.graph[u]:
+                edge = self.edges[edge_index]
+                v = edge.to_vertex
+                if edge.capacity - edge.flow &gt; 0:
+                    new_distance = self.distances[u] + edge.cost
+                    if new_distance &lt; self.distances[v]:
+                        self.distances[v] = new_distance
+                        self.previous[v] = edge_index
+                        self.flow_values[v] = min(self.flow_values[u], edge.capacity - edge.flow)
+                        heappush(priority_queue, (self.distances[v], v))
+
+        return self.previous[self.sink] != -1
+
+    def compute(self) -&gt; Tuple[int, int]:
+        max_flow, min_cost = 0, 0
+        while self.find_augmenting_path():
+            flow = self.flow_values[self.sink]
+            max_flow += flow
+            min_cost += flow * self.distances[self.sink]
+            current_vertex = self.sink
+            while current_vertex != self.source:
+                edge_index = self.previous[current_vertex]
+                self.edges[edge_index].flow += flow
+                self.edges[edge_index ^ 1].flow -= flow
+                current_vertex = self.edges[edge_index].from_vertex
+        return max_flow, min_cost
+
+class Solution:
+    def minimumXORSum(self, nums1: List[int], nums2: List[int]) -&gt; int:
+        n = len(nums1)
+        source = 2 * n
+        sink = source + 1
+        network = MinCostMaxFlow(2 * n + 2, source, sink)
+        
+        # Connect source to all vertices in nums1
+        for i in range(n):
+            network.add_edge(source, i, 1, 0)
+        
+        # Connect all pairs of vertices between nums1 and nums2 with cost as their XOR value
+        for i in range(n):
+            for j in range(n):
+                cost = nums1[i] ^ nums2[j]
+                network.add_edge(i, j + n, 1, cost)
+        
+        # Connect all vertices in nums2 to sink
+        for i in range(n):
+            network.add_edge(i + n, sink, 1, 0)
+        
+        _, min_cost = network.compute()
+        return min_cost</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了最小费用最大流算法来求解最小的异或值之和。首先，定义一个流网络，其中源节点连接到数组 nums1 的每个节点，每个 nums1 的节点又与 nums2 的每个节点通过一条代表两数异或值的有向边相连，这些节点进一步连接到汇点。通过求解此网络的最小费用最大流，可以得到重新排列 nums2 后的最小异或值之和。</p>
+                                <p>时间复杂度: O(n^2 * n * log n)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">import heapq
+
+class Edge:
+    def __init__(self, from_vertex, to_vertex, capacity, cost, flow):
+        # 初始化边的基本属性
+        self.from_vertex = from_vertex
+        self.to_vertex = to_vertex
+        self.capacity = capacity
+        self.cost = cost
+        self.flow = flow
+
+class MinCostMaxFlow:
+    def __init__(self, total_vertices, source, sink):
+        # 初始化网络流图
+        self.total_vertices = total_vertices
+        self.source = source
+        self.sink = sink
+        self.edges = []
+        self.graph = [[] for _ in range(total_vertices)]
+        self.distances = [float(&#39;inf&#39;)] * total_vertices
+        self.flow_values = [0] * total_vertices
+        self.previous = [-1] * total_vertices
+
+    def add_edge(self, from_vertex, to_vertex, capacity, cost):
+        # 向图中添加边和反向边
+        self.edges.append(Edge(from_vertex, to_vertex, capacity, cost, 0))
+        self.edges.append(Edge(to_vertex, from_vertex, 0, -cost, 0))
+        self.graph[from_vertex].append(len(self.edges) - 2)
+        self.graph[to_vertex].append(len(self.edges) - 1)
+
+    def find_augmenting_path(self):
+        # 使用优先队列实现的 Dijkstra 算法找到增广路径
+        self.flow_values = [0] * self.total_vertices
+        self.previous = [-1] * self.total_vertices
+        self.distances = [float(&#39;inf&#39;)] * self.total_vertices
+        self.distances[self.source] = 0
+        self.flow_values[self.source] = float(&#39;inf&#39;)
+        priority_queue = [(0, self.source)]
+
+        while priority_queue:
+            dist_u, u = heapq.heappop(priority_queue)
+            if dist_u &gt; self.distances[u]:
+                continue
+            for edge_index in self.graph[u]:
+                edge = self.edges[edge_index]
+                v = edge.to_vertex
+                if edge.capacity - edge.flow &gt; 0:
+                    new_distance = self.distances[u] + edge.cost
+                    if new_distance &lt; self.distances[v]:
+                        self.distances[v] = new_distance
+                        self.previous[v] = edge_index
+                        self.flow_values[v] = min(self.flow_values[u], edge.capacity - edge.flow)
+                        heapq.heappush(priority_queue, (self.distances[v], v))
+
+        return self.previous[self.sink] != -1
+
+    def compute(self):
+        # 计算最小费用最大流
+        max_flow, min_cost = 0, 0
+        while self.find_augmenting_path():
+            flow = self.flow_values[self.sink]
+            max_flow += flow
+            min_cost += flow * self.distances[self.sink]
+            current_vertex = self.sink
+            while current_vertex != self.source:
+                edge_index = self.previous[current_vertex]
+                self.edges[edge_index].flow += flow
+                self.edges[edge_index ^ 1].flow -= flow
+                current_vertex = self.edges[edge_index].from_vertex
+        return max_flow, min_cost
+
+class Solution:
+    def minimumXORSum(self, nums1, nums2):
+        n = len(nums1)
+        source = 2 * n
+        sink = source + 1
+        network = MinCostMaxFlow(2 * n + 2, source, sink)
+        # 连接源点到 nums1 的每个顶点
+        for i in range(n):
+            network.add_edge(source, i, 1, 0)
+        # 连接 nums1 和 nums2 的每对顶点，代价为它们的异或值
+        for i in range(n):
+            for j in range(n):
+                cost = nums1[i] ^ nums2[j]
+                network.add_edge(i, j + n, 1, cost)
+        # 连接 nums2 的每个顶点到汇点
+        for i in range(n):
+            network.add_edge(i + n, sink, 1, 0)
+
+        _, min_cost = network.compute()
+        return min_cost</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在这个问题中选择使用最小费用最大流算法来求解？是否有其他算法可以达到相同的目的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>最小费用最大流算法被选用是因为它能有效处理在满足某种容量条件下，寻找费用（代价）最小的流的问题。这个问题可以看作是一个二分图匹配问题，其中每个匹配的代价是两个数的异或值。最小费用最大流算法不仅可以找到完全匹配，还能确保这种匹配下的总异或值最小。确实，存在其他算法如匈牙利算法或KM算法（Kuhn-Munkres），这些算法也可以用于解决二分图的最小权重完美匹配问题，并可能在某些情况下更为高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在这种算法中，如何确保每次找到的增广路径是最短的，从而确保最终的流是最小费用的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现中使用了优先队列来执行 Dijkstra 算法，确保每次从源点开始搜索时，都是按照从最小费用扩展到更高费用的顺序来探索增广路径。每次循环中，队列会弹出当前费用最小的节点，并探索所有可能的出边。如果找到了更便宜的到达某节点的方式，就更新到该节点的最短路径和流量，并将这个更新后的状态重新加入优先队列。这种方法保证了在每次增广时都使用了最小费用的路径，从而使得整个算法计算出的总费用尽可能小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你如何处理 nums1 和 nums2 中存在重复数字的情况？这会对流网络的构建或最小费用流的计算产生什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在 nums1 和 nums2 中存在重复数字并不会影响流网络的构建或最小费用流的计算。在建立网络时，即使某个数字在数组中重复出现，每个数字仍然被视为独立的节点，并且它们各自与对方数组中的每个数字连接。因此，每个节点到对方数组节点的连接是基于它们索引的位置而不是它们的值。算法依然会寻找出总体代价最小的完全匹配，不论数字是否重复。重复数字可能意味着有多种等价的最优匹配方式，但这不会影响最终计算出的最小异或值之和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-xor-sum-of-two-arrays')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-xor-sum-of-two-arrays/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

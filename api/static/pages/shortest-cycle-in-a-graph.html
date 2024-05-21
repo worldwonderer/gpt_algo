@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>图中的最短环</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>图中的最短环</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>现有一个含 <code>n</code> 个顶点的 <strong>双向</strong> 图，每个顶点按从 <code>0</code> 到 <code>n - 1</code> 标记。图中的边由二维整数数组 <code>edges</code> 表示，其中 <code>edges[i] = [u<sub>i</sub>, v<sub>i</sub>]</code> 表示顶点 <code>u<sub>i</sub></code> 和 <code>v<sub>i</sub></code> 之间存在一条边。每对顶点最多通过一条边连接，并且不存在与自身相连的顶点。</p>
+
+<p>返回图中 <strong>最短</strong> 环的长度。如果不存在环，则返回 <code>-1</code> 。</p>
+
+<p><strong>环</strong> 是指以同一节点开始和结束，并且路径中的每条边仅使用一次。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2023/01/04/cropped.png" style="width: 387px; height: 331px;">
+<pre><strong>输入：</strong>n = 7, edges = [[0,1],[1,2],[2,0],[3,4],[4,5],[5,6],[6,3]]
+<strong>输出：</strong>3
+<strong>解释：</strong>长度最小的循环是：0 -&gt; 1 -&gt; 2 -&gt; 0 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2023/01/04/croppedagin.png" style="width: 307px; height: 307px;">
+<pre><strong>输入：</strong>n = 4, edges = [[0,1],[0,2]]
+<strong>输出：</strong>-1
+<strong>解释：</strong>图中不存在循环
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 1000</code></li>
+	<li><code>1 &lt;= edges.length &lt;= 1000</code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>0 &lt;= u<sub>i</sub>, v<sub>i</sub> &lt; n</code></li>
+	<li><code>u<sub>i</sub> != v<sub>i</sub></code></li>
+	<li>不存在重复的边</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 52 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findShortestCycle(self, n: int, edges: List[List[int]]) -&gt; int:
+        # 构建邻接表
+        cnt = defaultdict(set)
+        for i, j in edges:
+            cnt[i].add(j)
+            cnt[j].add(i)
+        
+        # 并查集，用于检测环（逐个添加边，当边上两点属于同一个集合，说明该边是环上边）
+        dp = list(range(n))
+        def find(x):
+            if x != dp[x]:
+                dp[x] = find(dp[x])
+            return dp[x]
+        
+        # 单点出发，检测经过该点的最短伪环（伪环：环或者包含环的图，其长度定义为该点到环的长度*2，再加上环的长度）
+        def bfs(i):
+            dist, res = [0] * n, n + 1
+            deq = deque([(i, -1)]) # 边权重为1，可以通过队列实现广度优先遍历
+            while deq and res == n + 1:
+                cur, pre = deq.popleft()
+                d = dist[cur] + 1
+                for j in cnt[cur]:
+                    if j == pre: continue # 不走回头路
+                    if dist[j]: # 找到伪环s，注意dist[j]只可能是 d 或者 d-1
+                        if dist[j] &lt; d: return dist[j] &lt;&lt; 1 | 1 
+                        res = d &lt;&lt; 1
+                    deq.append((j, cur))
+                    dist[j] = d
+            return res
+
+        meet, res = set(), n + 1
+        for i, j in edges:
+            fi, fj = find(i), find(j)
+            if fi == fj: # 有环。注意：对于一条边，只用检测一个点
+                if i in meet or j in meet: continue
+                res = min(res, bfs(i))
+                meet.add(i)
+                # 经过点i的环都检测过了，断开连接减少其它点的检测时间
+                for k in cnt[i]:
+                    cnt[k].remove(i)
+            else:
+                dp[fi] = fj
+        return res if res != n + 1 else -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解首先利用了邻接表来表示图的结构。使用并查集来检测边的添加是否会形成环。如果在添加一条边时，该边连接的两个顶点已经在同一个集合中，说明添加这条边会形成一个环。然后，题解利用广度优先搜索（BFS）来寻找最短环。搜索从某个顶点开始，尝试找到通过该点的最短环。如果在过程中发现一个顶点已经访问过（即在当前BFS层次中再次访问），则可以计算形成环的长度。题解中逐个处理每条边，检查其是否形成环，并使用BFS确定环的最短长度。对于每个已经检测过的点，为了减少计算，会从图中断开其连接，避免重复计算。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(V + E)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findShortestCycle(self, n: int, edges: List[List[int]]) -&gt; int:
+        # 构建邻接表
+        cnt = defaultdict(set)
+        for i, j in edges:
+            cnt[i].add(j)
+            cnt[j].add(i)
+        
+        # 并查集，用于检测环
+        dp = list(range(n))
+        def find(x):
+            if x != dp[x]:
+                dp[x] = find(dp[x])
+            return dp[x]
+        
+        # 单点出发，检测经过该点的最短伪环
+        def bfs(i):
+            dist, res = [0] * n, n + 1
+            deq = deque([(i, -1)]) # 使用队列实现BFS
+            while deq and res == n + 1:
+                cur, pre = deq.popleft()
+                d = dist[cur] + 1
+                for j in cnt[cur]:
+                    if j == pre: continue # 避免回头路
+                    if dist[j]: # 如果已访问过j
+                        if dist[j] &lt; d: return dist[j] &lt;&lt; 1 | 1
+                        res = d &lt;&lt; 1
+                    deq.append((j, cur))
+                    dist[j] = d
+            return res
+
+        meet, res = set(), n + 1
+        for i, j in edges:
+            fi, fj = find(i), find(j)
+            if fi == fj: # 检测到环
+                if i in meet or j in meet: continue
+                res = min(res, bfs(i))
+                meet.add(i)
+                # 优化：断开已检测点的连接
+                for k in cnt[i]:
+                    cnt[k].remove(i)
+            else:
+                dp[fi] = fj
+        return res if res != n + 1 else -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为何选择使用并查集来检测环的形成，这种方法与通过邻接表直接搜索环的方法相比有什么优势或劣势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>并查集是一种高效的数据结构，用于处理元素分组和组间关系的问题，特别擅长处理动态连通性问题。使用并查集检测环的形成主要是因为其能快速判断两个节点是否属于同一个集合，即快速检测添加边是否会形成环。相比直接使用邻接表进行深度或广度优先搜索找环，这种方法在初始阶段可以更快地拒绝形成环的边，避免不必要的搜索，从而提高效率。然而，劣势在于并查集本身不存储路径信息，因此无法直接用来找到具体的环或计算环的长度，需要配合其他搜索方法使用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解提到在检测到环后会‘断开已检测点的连接’，这样做的目的是什么？是否可能导致某些环被错误地忽略或未能检测到？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>断开已检测点的连接主要是为了优化算法性能，减少不必要的重复计算。这种做法能够确保每个节点作为环的起点最多被考虑一次，从而降低时间复杂度。然而，这种方法确实可能导致某些环未被检测到，特别是如果存在多个通过同一节点的不同环时，断开连接可能会使得后续的搜索无法找到其他环。因此，这种优化是在算法效率和可能遗漏环之间的一种权衡。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用BFS搜索最短环时，为什么要记录每个节点的访问距离，且在再次遇到已访问节点时立即计算环的长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在BFS搜索中，记录每个节点的访问距离可以帮助我们快速判断并计算环的长度。当在BFS过程中遇到一个已经访问过的节点时，这意味着我们找到了一个闭环。通过比较这个节点的距离与当前距离，可以立即计算出环的长度。这种即时计算方法是有效的，因为BFS保证了每次扩展的都是等距离的节点，所以一旦形成环，我们就可以确信找到了从起点出发的最短路径长度，即最短环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中说明，如果dist[j] &lt; d，则返回(dist[j] &lt;&lt; 1 | 1)，这个表达式的意义是什么？如何理解这个计算过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>表达式(dist[j] &lt;&lt; 1 | 1)是位操作的一种用法，其中&#39;dist[j] &lt;&lt; 1&#39;将dist[j]的值左移一位，相当于乘以2，&#39;| 1&#39;则是将结果与1进行按位或操作，实际上是将结果的最低位设置为1。这在某些情况下用来调整偶数长度的环，使其变为奇数，可能是为了区分不同情况下环的长度或类型。然而，具体含义可能依赖于题解的其他部分或上下文，此处没有更多信息，难以给出完全准确的解释。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/shortest-cycle-in-a-graph')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/shortest-cycle-in-a-graph/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

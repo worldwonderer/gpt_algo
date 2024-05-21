@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>绘制直线</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>绘制直线</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>已知一个由像素点组成的单色屏幕，每行均有 <code>w</code> 个像素点，所有像素点初始为 <code>0</code>，左上角位置为 <code>(0,0)</code>。</p>
+
+<p>现将每行的像素点按照「每 <code>32</code> 个像素点」为一组存放在一个 <code>int</code> 中，再依次存入长度为 <code>length</code> 的一维数组中。</p>
+
+<p>我们将在屏幕上绘制一条从点 <code>(x1,y)</code> 到点 <code>(x2,y)</code> 的直线（即像素点修改为 <code>1</code>），请返回绘制过后的数组。</p>
+
+
+
+<p><strong>注意：</strong></p>
+
+<ul>
+	<li>用例保证屏幕宽度 <code>w</code> 可被 32 整除（即一个 <code>int</code> 不会分布在两行上）</li>
+</ul>
+
+
+
+<p><strong>示例1:</strong></p>
+
+<pre>
+<strong> 输入</strong>：length = 1, w = 32, x1 = 30, x2 = 31, y = 0
+<strong> 输出</strong>：[3]
+<strong> 解释</strong>：在第 0 行的第 30 位到第 31 位画一条直线，屏幕二进制形式表示为 [00000000000000000000000000000011]，因此返回 [3]
+</pre>
+
+<p><strong>示例2:</strong></p>
+
+<pre>
+<strong> 输入</strong>：length = 3, w = 96, x1 = 0, x2 = 95, y = 0
+<strong> 输出</strong>：[-1, -1, -1]
+<strong> 解释</strong>：由于二进制 <strong>11111111111111111111111111111111</strong> 的 int 类型代表 -1，因此返回 [-1,-1,-1]</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= length &lt;= 10^5</code></li>
+	<li><code>1 &lt;= w &lt;= 3 * 10^5</code></li>
+	<li><code>0 &lt;= x1 &lt;= x2 &lt; w</code></li>
+	<li><code>0 &lt;= y &lt;= 10</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def drawLine(self, length: int, w: int, x1: int, x2: int, y: int) -&gt; List[int]:
+        bit321 = 0xffffffff  # 32bit1
+        width = w // 32
+        # height = length // width
+
+        res = [0] * length
+        start = width * y + x1 // 32  # res影响index start
+        end = width * y + x2 // 32
+
+        def _to32bit(num):
+            # print(333, num)
+            # num = num &amp; bit321
+            if (num &gt;&gt; 31) &amp; 1:
+                return - ((num ^ bit321) + 1)
+            return num
+
+        for i in range(start+1, end):
+            res[i] = -1  # 32位1 表示-1
+
+        res[start] = bit321 &gt;&gt; (x1 % 32)
+        tmp = (bit321 &lt;&lt; (31-x2%32)) &amp; bit321
+        if start == end:
+            res[end] = tmp &amp; res[start]
+        else:
+            res[end] = tmp
+        res[start] = _to32bit(res[start])
+        res[end] = _to32bit(res[end])
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解通过分段绘制直线来处理问题。首先计算出每行32个像素对应一个整数值，再根据输入的x1和x2计算出要修改的整数范围。题解的主要步骤包括：1. 计算影响到的起始和结束索引。2. 对于起始和结束索引内的所有整数，设置为全1（即-1，因为整数中的32个1表示的二进制数转换为整数是-1）。3. 对于起始和结束索引，根据x1和x2的位置设置相应的位。4. 如果x1和x2在同一个整数内，需要特别处理这一整数的位。5. 使用_to32bit函数处理整数的表示，确保返回的整数值是正确的（处理了整数的符号位）。</p>
+                                <p>时间复杂度: O(length)</p>
+                                <p>空间复杂度: O(length)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def drawLine(self, length: int, w: int, x1: int, x2: int, y: int) -&gt; List[int]:
+        bit321 = 0xffffffff  # 定义一个整数，其32位均为1
+        width = w // 32  # 计算每行的整数数量
+        # height = length // width # 可以用于计算屏幕高度，此处未使用
+
+        res = [0] * length  # 初始化结果数组
+        start = width * y + x1 // 32  # 计算影响的起始整数索引
+        end = width * y + x2 // 32  # 计算影响的结束整数索引
+
+        def _to32bit(num):
+            # 处理32位整数的表示，特别是负数的情况
+            if (num &gt;&gt; 31) &amp; 1:
+                return - ((num ^ bit321) + 1)
+            return num
+
+        for i in range(start+1, end):
+            res[i] = -1  # 直接将整数设置为全1
+
+        res[start] = bit321 &gt;&gt; (x1 % 32)  # 设置起始整数的特定位
+        tmp = (bit321 &lt;&lt; (31-x2%32)) &amp; bit321  # 设置结束整数的特定位
+        if start == end:
+            res[end] = tmp &amp; res[start]  # 特殊处理x1和x2在同一整数内的情况
+        else:
+            res[end] = tmp
+        res[start] = _to32bit(res[start])  # 应用_to32bit确保整数表示正确
+        res[end] = _to32bit(res[end])
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在初始化结果数组时，使用的是长度为`length`的数组，而不是基于屏幕宽度`w`和高度来计算所需数组的大小？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的`length`实际上代表整个屏幕所需的整数数量，而不是像素数量。由于每个整数包含32个像素（即一个整数可以表示一行中的32个像素），因此整个屏幕的像素通过一系列整数来表示。`length`已经是按照整数计算的总量，可能由调用者根据屏幕的宽度`w`和高度计算得到，并传入函数中。这样直接使用`length`可以简化计算过程，避免在函数内部重复计算屏幕所需的整数数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算起始和结束索引时，为什么要加上`width * y`，这里的`y`是如何影响整个索引的计算的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`width * y`是计算从屏幕顶部开始到指定行`y`为止所需跳过的整数总数。因为每一行占据`width`个整数，所以`y`行之前的所有像素占据的整数总数就是`width * y`。这样，当我们在第`y`行绘制从`x1`到`x2`的直线时，可以通过这个计算直接定位到这一行的起始和结束整数索引，从而正确设置这些整数的对应位。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            函数`_to32bit`用于处理负数情况，但是这里的例子是否真的会出现整数值为负数的情况？如果会，是在什么情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，负数的情况确实可能发生，特别是当整数全部位被设置为1时。在二进制表示中，如果一个整数的所有32位都被设置为1，它将被解释为`-1`，因为这在补码表示中代表-1。这种情况发生在我们将整数中的所有位直接设置为1（如使用`-1`或`0xffffffff`）以表示连续的32个像素被标记。因此，`_to32bit`函数确保转换后的整数值正确处理了符号位，避免错误地解释这些整数值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/draw-line-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/draw-line-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

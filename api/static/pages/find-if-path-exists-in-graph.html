@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>寻找图中是否存在路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>寻找图中是否存在路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个具有 <code>n</code> 个顶点的 <strong>双向</strong> 图，其中每个顶点标记从 <code>0</code> 到 <code>n - 1</code>（包含 <code>0</code> 和 <code>n - 1</code>）。图中的边用一个二维整数数组 <code>edges</code> 表示，其中 <code>edges[i] = [u<sub>i</sub>, v<sub>i</sub>]</code> 表示顶点 <code>ui</code> 和顶点 <code>vi</code> 之间的双向边。 每个顶点对由 <strong>最多一条</strong> 边连接，并且没有顶点存在与自身相连的边。</p>
+
+<p>请你确定是否存在从顶点 <code>source</code> 开始，到顶点 <code>destination</code> 结束的 <strong>有效路径</strong> 。</p>
+
+<p>给你数组 <code>edges</code> 和整数 <code>n</code>、<code>source</code> 和 <code>destination</code>，如果从 <code>source</code> 到 <code>destination</code> 存在 <strong>有效路径</strong> ，则返回 <code>true</code>，否则返回 <code>false</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/08/14/validpath-ex1.png" style="width: 141px; height: 121px;" />
+<pre>
+<strong>输入：</strong>n = 3, edges = [[0,1],[1,2],[2,0]], source = 0, destination = 2
+<strong>输出：</strong>true
+<strong>解释：</strong>存在由顶点 0 到顶点 2 的路径:
+- 0 → 1 → 2 
+- 0 → 2
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/08/14/validpath-ex2.png" style="width: 281px; height: 141px;" />
+<pre>
+<strong>输入：</strong>n = 6, edges = [[0,1],[0,2],[3,5],[5,4],[4,3]], source = 0, destination = 5
+<strong>输出：</strong>false
+<strong>解释：</strong>不存在由顶点 0 到顶点 5 的路径.
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 2 * 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= edges.length &lt;= 2 * 10<sup>5</sup></code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>0 &lt;= u<sub>i</sub>, v<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>u<sub>i</sub> != v<sub>i</sub></code></li>
+	<li><code>0 &lt;= source, destination &lt;= n - 1</code></li>
+	<li>不存在重复边</li>
+	<li>不存在指向顶点自身的边</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 111 ms</p>
+                    <p>内存: 78.5 MB</p>
+                    <pre class="bg-light p-2 code-pre"># class Solution:
+#     def validPath(self, n: int, edges: List[List[int]], source: int, destination: int) -&gt; bool:
+#         if [source,destination] in edges or [destination,source] in edges: return True 
+#         if source==destination: return True
+#         s0=[]
+#         hasnew={}
+#         visit=set()
+#         for x,y in edges:
+#             hasnew={x,y}-visit
+            
+#             if len(hasnew)==2:
+#                 s0.append(hasnew)
+#                 visit|={x,y}
+#             elif len(hasnew)==0:
+#                 a,b=-1,-1
+#                 for i,s in enumerate(s0):
+#                     if x in s:
+#                         a=i
+#                         if b!=-1:
+#                             if a!=b:
+#                                 s0[b]|=s
+#                                 if source in s0[b]  and destination in s0[b]:
+#                                     return True
+#                                 s0.pop(a)
+#                             break
+
+#                     if y in s:
+#                         b=i
+#                         if a!=-1:
+#                             if a!=b:
+#                                 s0[a]|=s
+#                                 if source in s0[a]  and destination in s0[a]:
+#                                     return True
+#                                 s0.pop(b)
+#                             break    
+#             else:
+#                 visit|=hasnew
+#                 tx=list({x,y}-hasnew)[0]
+#                 for i,s in enumerate(s0):
+#                     if tx in s:
+#                         s0[i]|=hasnew
+#                         if source in s0[i]  and destination in s0[i]:
+#                             return True
+#                         break
+            
+
+#         return False                
+
+class Solution:
+    def validPath(self, n: int, edges: List[List[int]], source: int, destination: int) -&gt; bool:
+        reachable =set([source])
+        nE = len(edges)
+        while 1:
+            n = len(reachable)
+            for ii in range(nE):
+                if edges[ii][0] in reachable:
+                    reachable.add(edges[ii][1])
+                elif edges[ii][1] in reachable:
+                    reachable.add(edges[ii][0])
+            if destination in reachable:
+                return True
+            if len(reachable) == n:
+                return False        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了一种迭代的方法来判断从给定的源点source是否可以到达目标点destination。首先定义一个集合reachable，初始时只包括源点source。然后不断迭代，尝试通过边集edges中的边来扩展reachable集合。在每次迭代中，遍历所有的边，若边的任一顶点已在reachable中，则将另一顶点加入reachable。如果在任意迭代后destination出现在reachable中，则返回true。如果在某次迭代后reachable的大小不再增加，说明所有可达的顶点都已被找到，若此时destination仍未被包含在内，则返回false。</p>
+                                <p>时间复杂度: O(E * V)</p>
+                                <p>空间复杂度: O(V)</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def validPath(self, n: int, edges: List[List[int]], source: int, destination: int) -&gt; bool:
+#         reachable =set([source])  # 初始化包含源点的可达集合
+#         nE = len(edges)  # 边的数量
+#         while 1:  # 不断尝试扩展reachable集合
+#             n = len(reachable)  # 记录当前可达集合的大小
+#             for ii in range(nE):  # 遍历所有边
+#                 if edges[ii][0] in reachable:  # 如果边的一个顶点已在reachable中
+#                     reachable.add(edges[ii][1])  # 添加另一个顶点
+#                 elif edges[ii][1] in reachable:  # 同上，反向检查
+#                     reachable.add(edges[ii][0])
+#             if destination in reachable:  # 如果目标点已在可达集合中
+#                 return True  # 返回true
+#             if len(reachable) == n:  # 如果可达集合的大小未增加
+#                 return False  # 返回false</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在你的算法中，是否有处理图中可能存在的环的特殊逻辑，或者算法本身就能有效处理环的存在？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>我的算法没有专门处理图中环的特殊逻辑，但由于使用了集合（set）来存储已经到达的顶点，该算法自然可以处理环的存在。当一个顶点通过环路再次到达时，由于它已经存在于集合中，不会被重复添加，因此算法不会因环的存在而陷入无限循环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当图中的顶点非常多，但实际边的数量较少时，你的算法效率如何？是否存在更优的方法来处理这种稀疏图？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在顶点非常多但边较少的情况下，我的算法可能不是最优的，因为它每次迭代都会检查所有边，即使大多数顶点未与边直接相连。对于这种稀疏图，使用邻接表而不是边列表可以更高效地进行图遍历，例如通过深度优先搜索（DFS）或广度优先搜索（BFS）。这样可以只检查与已访问顶点直接相连的顶点，从而减少不必要的检查和存储。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            此算法是否能够处理边中存在重复元素的情况，例如edges数组中包含多个[1, 2]，这会影响算法的性能或结果吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该算法可以处理边中存在的重复元素。由于使用了集合来存储已达到的顶点，即使边[1, 2]重复多次出现，顶点2只会在第一次被发现时加入到集合中。因此，重复的边不会影响最终的结果，但会造成算法在处理这些重复边时的性能浪费，因为它需要多次检查这些边。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在算法的迭代过程中，如果source和destination是同一个顶点，即source == destination，该算法是否能立即返回结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，如果source和destination是同一个顶点，算法可以立即返回结果。在算法的初始设定中，源点source已经被添加到可达集合中，因此如果源点和目标点相同，那么目标点已在可达集合中，算法将立即检测到这一点并返回True。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-if-path-exists-in-graph')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-if-path-exists-in-graph/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

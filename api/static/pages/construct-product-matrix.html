@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>构造乘积矩阵</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>构造乘积矩阵</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始、大小为 <code>n * m</code> 的二维整数矩阵 <code><font face="monospace">grid</font></code><font face="monospace"> ，定义一个下标从 <strong>0</strong> 开始、大小为 <code>n * m</code> 的的二维矩阵</font> <code>p</code>。如果满足以下条件，则称 <code>p</code> 为 <code>grid</code> 的 <strong>乘积矩阵</strong> ：</p>
+
+<ul>
+	<li>对于每个元素 <code>p[i][j]</code> ，它的值等于除了 <code>grid[i][j]</code> 外所有元素的乘积。乘积对 <code>12345</code> 取余数。</li>
+</ul>
+
+<p>返回 <code>grid</code> 的乘积矩阵。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1,2],[3,4]]
+<strong>输出：</strong>[[24,12],[8,6]]
+<strong>解释：</strong>p[0][0] = grid[0][1] * grid[1][0] * grid[1][1] = 2 * 3 * 4 = 24
+p[0][1] = grid[0][0] * grid[1][0] * grid[1][1] = 1 * 3 * 4 = 12
+p[1][0] = grid[0][0] * grid[0][1] * grid[1][1] = 1 * 2 * 4 = 8
+p[1][1] = grid[0][0] * grid[0][1] * grid[1][0] = 1 * 2 * 3 = 6
+所以答案是 [[24,12],[8,6]] 。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[12345],[2],[1]]
+<strong>输出：</strong>[[2],[0],[0]]
+<strong>解释：</strong>p[0][0] = grid[0][1] * grid[0][2] = 2 * 1 = 2
+p[0][1] = grid[0][0] * grid[0][2] = 12345 * 1 = 12345. 12345 % 12345 = 0 ，所以 p[0][1] = 0
+p[0][2] = grid[0][0] * grid[0][1] = 12345 * 2 = 24690. 24690 % 12345 = 0 ，所以 p[0][2] = 0
+所以答案是 [[2],[0],[0]] 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n == grid.length&nbsp;&lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= m == grid[i].length&nbsp;&lt;= 10<sup>5</sup></code></li>
+	<li><code>2 &lt;= n * m &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= grid[i][j] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 171 ms</p>
+                    <p>内存: 39.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def constructProductMatrix(self, grid: List[List[int]]) -&gt; List[List[int]]:
+        MOD = 12345
+        m = len(grid)
+        n = len(grid[0])
+        res = [[0] * n for _ in range(m)]
+        #前缀积
+        suf = 1
+        for i in range(m-1, -1, -1):
+            for j in range(n-1, -1, -1):
+                res[i][j] = suf
+                suf = (suf * grid[i][j]) % MOD
+        #后缀积
+        pre = 1
+        for i in range(m):
+            for j in range(n):
+                res[i][j] = (res[i][j] * pre) % MOD
+                pre = (pre * grid[i][j]) % MOD
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了前缀积和后缀积的概念来计算每个位置上的乘积矩阵值。首先，通过两次遍历来构造乘积矩阵：第一次从矩阵的末尾开始，计算从当前位置到末尾的所有元素的乘积（后缀积），存储在结果矩阵中。第二次从矩阵的开头开始，用一个累积变量（前缀积）乘以当前存储的后缀积并取余，更新到结果矩阵中。这样，每个位置的值即为除当前元素外所有元素的乘积。</p>
+                                <p>时间复杂度: O(k)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def constructProductMatrix(self, grid: List[List[int]]) -&gt; List[List[int]]:
+        MOD = 12345  # 定义模数
+        m = len(grid)  # 行数
+        n = len(grid[0])  # 列数
+        res = [[0] * n for _ in range(m)]  # 初始化结果矩阵
+        # 后缀积初始化
+        suf = 1
+        for i in range(m-1, -1, -1):
+            for j in range(n-1, -1, -1):
+                res[i][j] = suf  # 存储后缀积
+                suf = (suf * grid[i][j]) % MOD  # 更新后缀积
+        # 前缀积初始化
+        pre = 1
+        for i in range(m):
+            for j in range(n):
+                res[i][j] = (res[i][j] * pre) % MOD  # 更新结果矩阵
+                pre = (pre * grid[i][j]) % MOD  # 更新前缀积
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理前缀积和后缀积时，如何确保不会涉及当前元素grid[i][j]本身的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算前缀积和后缀积时，确保当前元素grid[i][j]不被包含的关键在于更新积的顺序和应用时机。对于后缀积，首先将当前位置的后缀积存储在结果矩阵中，然后再乘以grid[i][j]更新后缀积。这样，当计算下一个元素的后缀积时，当前元素已经在更新后的后缀积中。前缀积则相反，先用前缀积更新结果矩阵，然后再乘以当前元素。这种处理方式确保在计算某个位置的结果时，该位置的元素不参与乘积运算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            请问如何初始化前缀积和后缀积，以及为什么选择这种初始化方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>前缀积和后缀积在开始计算时都初始化为1。这是因为乘积的初始状态应为乘法的单位元素，即任何数与1相乘都不会改变。这种初始化方式允许在第一次迭代时正确地引入数组中的第一个或最后一个元素。如果初始化为0，则任何乘法操作的结果都将是0，这会导致错误的输出。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用前缀积和后缀积的方法中，如何处理矩阵的边界情况，例如第一行和最后一行？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理矩阵的边界情况时，前缀积和后缀积的操作并不需要特别的边界处理，因为初始化已经设置了积为1，并且循环覆盖了从第一行到最后一行的所有元素。对于后缀积，从最后一行开始向第一行计算；对于前缀积，从第一行开始向最后一行计算。每次迭代都是独立的，确保了边界行也被正确地处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新结果矩阵时为何需要立即取模12345，这样做有什么好处或者必要性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新结果矩阵时立即取模12345主要有两个原因：一是防止计算过程中数值过大导致整数溢出，特别是在使用大数据集时；二是模运算可以保持数值在一个合理的范围内，便于处理和存储。此外，取模操作还有助于保持结果的一致性，确保输出结果的稳定性和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/construct-product-matrix')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/construct-product-matrix/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

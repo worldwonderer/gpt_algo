@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大二叉搜索子树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大二叉搜索子树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-search-tree" class="badge bg-secondary tag-link">二叉搜索树</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 18.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def largestBSTSubtree(self, root: Optional[TreeNode]) -&gt; int:
+        max_nums = 0
+
+        def dfs(node):
+            nonlocal max_nums
+            if node is None:
+                return None
+            
+            left_ret = dfs(node.left)
+            right_ret = dfs(node.right)
+
+            if left_ret is None and right_ret is None:
+                # leaf node
+                is_bst = True
+                cur_num = 1
+                max_val = node.val
+                min_val = node.val
+                max_nums = max(max_nums, cur_num)
+                return is_bst, min_val, max_val, cur_num
+            elif left_ret and right_ret:
+                if left_ret[0] and right_ret[0] and node.val &gt; left_ret[2] and node.val &lt; right_ret[1]:
+                    is_bst = True
+                    cur_num = 1 + left_ret[-1] + right_ret[-1]
+                    max_val = right_ret[2]
+                    min_val = left_ret[1]
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+            elif left_ret:
+                if left_ret[0] and node.val &gt; left_ret[2]:
+                    is_bst = True
+                    cur_num = 1 + left_ret[-1]
+                    min_val = left_ret[1]
+                    max_val = node.val
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+
+            elif right_ret:
+                if right_ret[0] and node.val &lt; right_ret[1]:
+                    is_bst = True
+                    cur_num = 1 + right_ret[-1]
+                    min_val = node.val
+                    max_val = right_ret[2]
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+
+            return False, None, None, None
+        dfs(root)
+        return max_nums</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用深度优先遍历（DFS）的方法来遍历二叉树的每个节点。对于每个节点，判断其是否能成为一个二叉搜索树（BST）的根节点。如果当前节点能成为BST的根，那么以该节点为根的子树就是一个BST，记录其节点数，并与当前最大BST节点数比较，更新最大值。DFS函数返回一个元组，包含当前子树是否为BST、子树的最小值、最大值和节点数。通过比较当前节点与其左右子树的最大最小值，可以判断当前节点是否能成为BST的根。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(h)，最坏情况下O(n)，平均情况下O(logn)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class Solution:
+    def largestBSTSubtree(self, root: Optional[TreeNode]) -&gt; int:
+        max_nums = 0
+
+        def dfs(node):
+            nonlocal max_nums
+            if node is None:
+                return None
+            
+            # 递归遍历左子树
+            left_ret = dfs(node.left)
+            # 递归遍历右子树 
+            right_ret = dfs(node.right)
+
+            if left_ret is None and right_ret is None:
+                # 当前节点为叶子节点
+                is_bst = True
+                cur_num = 1
+                max_val = node.val
+                min_val = node.val
+                max_nums = max(max_nums, cur_num)
+                return is_bst, min_val, max_val, cur_num
+            elif left_ret and right_ret:
+                # 当前节点的左右子树都存在
+                if left_ret[0] and right_ret[0] and node.val &gt; left_ret[2] and node.val &lt; right_ret[1]:
+                    # 如果左右子树都是BST，且当前节点的值在左子树最大值和右子树最小值之间，则当前节点也是BST的根
+                    is_bst = True 
+                    cur_num = 1 + left_ret[-1] + right_ret[-1]
+                    max_val = right_ret[2]
+                    min_val = left_ret[1]
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+            elif left_ret:
+                # 只存在左子树
+                if left_ret[0] and node.val &gt; left_ret[2]:
+                    # 如果左子树是BST，且当前节点的值大于左子树的最大值，则当前节点也是BST的根
+                    is_bst = True
+                    cur_num = 1 + left_ret[-1] 
+                    min_val = left_ret[1]
+                    max_val = node.val
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+            elif right_ret:
+                # 只存在右子树
+                if right_ret[0] and node.val &lt; right_ret[1]:
+                    # 如果右子树是BST，且当前节点的值小于右子树的最小值，则当前节点也是BST的根
+                    is_bst = True
+                    cur_num = 1 + right_ret[-1]
+                    min_val = node.val
+                    max_val = right_ret[2]
+                    max_nums = max(max_nums, cur_num)
+                    return is_bst, min_val, max_val, cur_num
+
+            return False, None, None, None
+        
+        dfs(root)
+        return max_nums</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS的返回值中，元组的各个部分分别代表什么？具体如何使用这些信息来判断一个节点是否能成为BST的根节点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS的返回值中，元组包含四个部分：(is_bst, min_val, max_val, cur_num)。其中，is_bst是一个布尔值，表示当前子树是否为二叉搜索树；min_val是当前子树中的最小值；max_val是当前子树中的最大值；cur_num是当前子树的节点数。使用这些信息来判断一个节点是否能成为BST的根节点时：首先检查左右子树是否分别是BST（即左右子树的is_bst都为True），然后确保当前节点的值大于左子树的最大值且小于右子树的最小值。如果这些条件都满足，当前节点可以成为BST的根节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果左右子树都是BST且满足一定条件，当前节点也可以是BST的根。这里的条件是什么？为什么需要这些条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中提到的条件是：左子树的所有节点值都必须小于当前节点的值，右子树的所有节点值都必须大于当前节点的值。这些条件是必须的，因为二叉搜索树的定义要求任一节点的左子树只包含小于当前节点的值的节点，右子树只包含大于当前节点的值的节点。只有当这些条件被满足时，整个树结构才能维持BST的性质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理只有左子树或只有右子树的情况时，题解如何确保当前节点的值与其子树的值满足BST的性质？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在只有左子树的情况下，题解确保当前节点的值大于左子树的最大值，这符合BST的性质，即所有左侧节点的值必须小于根节点的值。在只有右子树的情况下，确保当前节点的值小于右子树的最小值，这同样符合BST的性质，即所有右侧节点的值必须大于根节点的值。通过这种方式，题解确保了即使只有一侧子树存在时，当前节点与其子树的值也能满足BST的基本要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中没有明确提到如何处理当前节点的左子树或右子树不是BST的情况。这种情况应该如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果当前节点的左子树或右子树不是BST（即is_bst为False），则当前节点本身也不能成为BST的根节点。在这种情况下，我们不会尝试将当前节点作为BST的根，而是直接返回False以及无效的最小值和最大值。这样做是因为，如果任何子树不满足BST的性质，那么整个包含该子树的更大的树也不能是BST。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/largest-bst-subtree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/largest-bst-subtree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

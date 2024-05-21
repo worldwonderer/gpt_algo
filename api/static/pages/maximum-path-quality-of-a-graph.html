@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大化一张图中的路径价值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大化一张图中的路径价值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一张 <strong>无向</strong>&nbsp;图，图中有 <code>n</code>&nbsp;个节点，节点编号从 <code>0</code>&nbsp;到 <code>n - 1</code>&nbsp;（<strong>都包括</strong>）。同时给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>values</code>&nbsp;，其中&nbsp;<code>values[i]</code>&nbsp;是第 <code>i</code>&nbsp;个节点的 <strong>价值</strong>&nbsp;。同时给你一个下标从 <strong>0</strong>&nbsp;开始的二维整数数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[j] = [u<sub>j</sub>, v<sub>j</sub>, time<sub>j</sub>]</code>&nbsp;表示节点&nbsp;<code>u<sub>j</sub></code> 和&nbsp;<code>v<sub>j</sub></code>&nbsp;之间有一条需要&nbsp;<code>time<sub>j</sub></code>&nbsp;秒才能通过的无向边。最后，给你一个整数&nbsp;<code>maxTime</code>&nbsp;。</p>
+
+<p><strong>合法路径</strong>&nbsp;指的是图中任意一条从节点&nbsp;<code>0</code>&nbsp;开始，最终回到节点 <code>0</code>&nbsp;，且花费的总时间 <strong>不超过</strong>&nbsp;<code>maxTime</code> 秒的一条路径。你可以访问一个节点任意次。一条合法路径的 <b>价值</b>&nbsp;定义为路径中 <strong>不同节点</strong>&nbsp;的价值 <strong>之和</strong>&nbsp;（每个节点的价值 <strong>至多</strong>&nbsp;算入价值总和中一次）。</p>
+
+<p>请你返回一条合法路径的 <strong>最大</strong>&nbsp;价值。</p>
+
+<p><strong>注意：</strong>每个节点 <strong>至多</strong>&nbsp;有 <strong>四条</strong>&nbsp;边与之相连。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/10/19/ex1drawio.png" style="width: 269px; height: 170px;" /></p>
+
+<pre>
+<b>输入：</b>values = [0,32,10,43], edges = [[0,1,10],[1,2,15],[0,3,10]], maxTime = 49
+<b>输出：</b>75
+<strong>解释：</strong>
+一条可能的路径为：0 -&gt; 1 -&gt; 0 -&gt; 3 -&gt; 0 。总花费时间为 10 + 10 + 10 + 10 = 40 &lt;= 49 。
+访问过的节点为 0 ，1 和 3 ，最大路径价值为 0 + 32 + 43 = 75 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/10/19/ex2drawio.png" style="width: 269px; height: 170px;" /></p>
+
+<pre>
+<b>输入：</b>values = [5,10,15,20], edges = [[0,1,10],[1,2,10],[0,3,10]], maxTime = 30
+<b>输出：</b>25
+<strong>解释：</strong>
+一条可能的路径为：0 -&gt; 3 -&gt; 0 。总花费时间为 10 + 10 = 20 &lt;= 30 。
+访问过的节点为 0 和 3 ，最大路径价值为 5 + 20 = 25 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/10/19/ex31drawio.png" style="width: 236px; height: 170px;" /></p>
+
+<pre>
+<b>输入：</b>values = [1,2,3,4], edges = [[0,1,10],[1,2,11],[2,3,12],[1,3,13]], maxTime = 50
+<b>输出：</b>7
+<strong>解释：</strong>
+一条可能的路径为：0 -&gt; 1 -&gt; 3 -&gt; 1 -&gt; 0 。总花费时间为 10 + 13 + 13 + 10 = 46 &lt;= 50 。
+访问过的节点为 0 ，1 和 3 ，最大路径价值为 1 + 2 + 4 = 7 。</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode.com/uploads/2021/10/21/ex4drawio.png" style="width: 270px; height: 71px;" /></strong></p>
+
+<pre>
+<b>输入：</b>values = [0,1,2], edges = [[1,2,10]], maxTime = 10
+<b>输出：</b>0
+<b>解释：</b>
+唯一一条路径为 0 。总花费时间为 0 。
+唯一访问过的节点为 0 ，最大路径价值为 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == values.length</code></li>
+	<li><code>1 &lt;= n &lt;= 1000</code></li>
+	<li><code>0 &lt;= values[i] &lt;= 10<sup>8</sup></code></li>
+	<li><code>0 &lt;= edges.length &lt;= 2000</code></li>
+	<li><code>edges[j].length == 3 </code></li>
+	<li><code>0 &lt;= u<sub>j </sub>&lt; v<sub>j</sub> &lt;= n - 1</code></li>
+	<li><code>10 &lt;= time<sub>j</sub>, maxTime &lt;= 100</code></li>
+	<li><code>[u<sub>j</sub>, v<sub>j</sub>]</code>&nbsp;所有节点对 <strong>互不相同</strong>&nbsp;。</li>
+	<li>每个节点 <strong>至多有四条&nbsp;</strong>边。</li>
+	<li>图可能不连通。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 271 ms</p>
+                    <p>内存: 62.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximalPathQuality(self, values: List[int], edges: List[List[int]], maxTime: int) -&gt; int:
+        n = len(values)
+        g = [[] for _ in range(n)]
+        for a, b, t in edges:
+            g[a].append((b, t))
+            g[b].append((a, t))
+        
+        disFromStart = [inf] * n
+        q = [(0, 0)]
+        vis = set([0])
+        while q:
+            d, x = heappop(q)
+            if disFromStart[x] &lt; d: continue
+            disFromStart[x] = d
+            for y, c in g[x]:
+                if disFromStart[y] &gt; (newD := d + c):
+                    disFromStart[y] = newD
+                    heappush(q, (newD, y))
+
+        total = sum(values)
+        q = [(0, values[0], 0, 1)]  # (node, value, cost, visited)
+        ans = -inf
+        while q:
+            tmp, q = q, []
+            for node, val, cost, vis in tmp:
+                if not node and val &gt; ans:
+                    ans = val
+                    if ans == total: return ans
+                for child, c in g[node]:
+                    if (newCost := cost + c) &lt;= maxTime - disFromStart[child]:
+                        newVal = val + (vis &gt;&gt; child &amp; 1 ^ 1) * values[child]
+                        q.append((child, newVal, newCost, vis | (1 &lt;&lt; child)))
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>The problem is solved using a two-stage strategy. First, Dijkstra&#39;s algorithm is used to find the shortest distance from the start node (node 0) to all other nodes. This information is essential for the second part, where we search for the highest-value path. For the second stage, we employ a breadth-first search (BFS) approach using a queue to explore all possible paths from the start node that return to the start within the allowed time, recording the maximum value achieved by these paths. The BFS iterates over all possible moves from a node, checking the cost to ensure it does not exceed maxTime minus the shortest path to the return node. A bit-mask is used to keep track of visited nodes and to avoid counting a node&#39;s value more than once.</p>
+                                <p>时间复杂度: O((n + e) log n + 2^n * n * e)</p>
+                                <p>空间复杂度: O(n + e + 2^n * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximalPathQuality(self, values: List[int], edges: List[List[int]], maxTime: int) -&gt; int:
+        n = len(values)
+        g = [[] for _ in range(n)]
+        for a, b, t in edges:
+            g[a].append((b, t))
+            g[b].append((a, t))
+
+        disFromStart = [inf] * n
+        q = [(0, 0)]
+        while q:
+            d, x = heappop(q)
+            if disFromStart[x] &lt; d: continue
+            disFromStart[x] = d
+            for y, c in g[x]:
+                if disFromStart[y] &gt; (newD := d + c):
+                    disFromStart[y] = newD
+                    heappush(q, (newD, y))
+
+        total = sum(values)
+        q = [(0, values[0], 0, 1)]
+        ans = -inf
+        while q:
+            tmp, q = q, []
+            for node, val, cost, vis in tmp:
+                if not node and val &gt; ans:
+                    ans = val
+                    if ans == total: return ans
+                for child, c in g[node]:
+                    if (newCost := cost + c) &lt;= maxTime - disFromStart[child]:
+                        newVal = val + (vis &gt;&gt; child &amp; 1 ^ 1) * values[child]
+                        q.append((child, newVal, newCost, vis | (1 &lt;&lt; child)))
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解决这个问题时选择使用Dijkstra算法来找到起始节点到其他节点的最短距离？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，我们需要找到从起始节点返回到起始节点的最大价值路径，但同时需要确保路径的总时间不超过给定的最大时间（maxTime）。使用Dijkstra算法可以有效地找到从起始节点到图中任何其他节点的最短时间路径。这些信息是必要的，因为在后续的广度优先搜索（BFS）阶段，我们需要确保任何考虑的路径加上返回起始节点的时间总和不超过maxTime。因此，了解到每个节点的最短返回时间，可以帮助我们在BFS阶段有效地剪枝，排除那些无法在时间限制内返回起始节点的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在BFS阶段，如何确保在不超过maxTime的条件下，可以探索所有可能的路径并找到最大价值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在BFS阶段，算法使用一个队列来迭代地探索从起始节点出发的所有可能路径。每次从队列中取出一个节点时，都会计算从该节点出发到任何可达子节点的新路径的总时间，并检查这个新路径的时间加上从该子节点返回起始节点的最短时间是否仍然在maxTime内。如果是，这条路径就被认为是有效的，并被加入到队列中以便进一步探索。通过这种方法，算法能够在确保时间限制的同时，尽可能地探索更多的路径，从而找到最大价值的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用bit-mask来跟踪访问过的节点时，为什么选择使用bit-mask而不是其他数据结构如集合或字典？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中使用bit-mask（位掩码）来跟踪已访问的节点是为了提高空间和时间效率。位掩码允许我们以非常紧凑的形式存储访问状态（每个节点仅占用一位），同时提供快速的访问和修改操作。相比之下，使用集合或字典虽然在理论上也可以实现相同的功能，但通常会占用更多的空间并可能导致较慢的查找和插入操作。特别是在节点数量较多的情况下，位掩码的效率优势更为明显。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在你的算法中，有没有特殊的情况或图的结构可能导致算法效率大幅降低？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在某些特殊情况下，如图形结构非常密集或图中存在许多低成本的边，算法的效率可能会降低。这是因为密集的图结构或低成本边会导致在BFS阶段产生大量的有效路径，使得队列迅速增大，增加了算法的空间和时间消耗。此外，如果图中的节点和边的数量非常大，Dijkstra算法和BFS阶段的时间复杂度也会显著增加，从而影响整体性能。因此，虽然这种策略在一般情况下表现良好，但在极端情况下可能需要考虑更高效的算法或优化措施。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-path-quality-of-a-graph')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-path-quality-of-a-graph/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

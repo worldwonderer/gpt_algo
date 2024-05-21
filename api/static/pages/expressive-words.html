@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>情感丰富的文字</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>情感丰富的文字</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有时候人们会用重复写一些字母来表示额外的感受，比如 <code>"hello" -&gt; "heeellooo"</code>, <code>"hi" -&gt; "hiii"</code>。我们将相邻字母都相同的一串字符定义为相同字母组，例如："h", "eee", "ll", "ooo"。</p>
+
+<p>对于一个给定的字符串 S ，如果另一个单词能够通过将一些字母组扩张从而使其和 S 相同，我们将这个单词定义为可扩张的（stretchy）。扩张操作定义如下：选择一个字母组（包含字母&nbsp;<code>c</code>&nbsp;），然后往其中添加相同的字母&nbsp;<code>c</code>&nbsp;使其长度达到 3 或以上。</p>
+
+<p>例如，以&nbsp;"hello" 为例，我们可以对字母组&nbsp;"o" 扩张得到 "hellooo"，但是无法以同样的方法得到 "helloo" 因为字母组 "oo" 长度小于&nbsp;3。此外，我们可以进行另一种扩张 "ll" -&gt; "lllll" 以获得&nbsp;"helllllooo"。如果&nbsp;<code>s = "helllllooo"</code>，那么查询词&nbsp;"hello" 是可扩张的，因为可以对它执行这两种扩张操作使得&nbsp;<code>query = "hello" -&gt; "hellooo" -&gt;&nbsp;"helllllooo" = s</code>。</p>
+
+<p>输入一组查询单词，输出其中可扩张的单词数量。</p>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre>
+<strong>输入：</strong> 
+s = "heeellooo"
+words = ["hello", "hi", "helo"]
+<strong>输出：</strong>1
+<strong>解释</strong>：
+我们能通过扩张 "hello" 的 "e" 和 "o" 来得到 "heeellooo"。
+我们不能通过扩张 "helo" 来得到 "heeellooo" 因为 "ll" 的长度小于 3 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length, words.length &lt;= 100</code></li>
+	<li><code>1 &lt;= words[i].length &lt;= 100</code></li>
+	<li><font color="#c7254e" face="Menlo, Monaco, Consolas, Courier New, monospace"><span style="font-size: 12.6px; background-color: rgb(249, 242, 244);">s</span></font> 和所有在&nbsp;<code>words</code>&nbsp;中的单词都只由小写字母组成。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def expressiveWords(self, s: str, words: List[str]) -&gt; int:
+        def traversal(s):
+            cache = []
+            for char in s:
+                if not cache or cache[-1][0] != char:
+                    cache.append(char)
+                else:
+                    cache[-1] += char
+            return cache
+        cache = traversal(s)
+
+        ans = 0
+        length = len(cache)
+        for word in words:
+            word_cache = traversal(word)
+            i = 0
+            j = 0
+            word_length = len(word_cache)
+            if word_length == length:
+                while i&lt;length:
+                    if cache[i] == word_cache[j]:
+                        i += 1
+                        j += 1
+                        continue
+                    if cache[i][0] == word_cache[j][0] and len(cache[i])&gt;=3 and len(cache[i])&gt;=len(word_cache[j]):
+                        i += 1
+                        j += 1
+                        continue
+                    break
+                if i == length and j == length:
+                    ans += 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的核心思路是首先将输入字符串S和比较的单词列表words中的每个单词分解成字母组的形式。字母组是指相邻的并且相同的字母序列。例如，&#39;heeellooo&#39; 会被分解为 [&#39;h&#39;, &#39;eee&#39;, &#39;ll&#39;, &#39;ooo&#39;]。分解后，对于每个单词，检查其分解形式是否可以通过扩展操作与S的分解形式匹配。扩展操作允许将一个字母组扩展到至少3个相同字符，前提是原始字母组至少有1个字符。题解通过遍历words列表中每个单词的字母组，逐个比较每个字母组的字符和长度，以判断是否可以通过扩展变为目标字母组。如果一个单词的所有字母组都能匹配，那么这个单词被认为是可扩张的。</p>
+                                <p>时间复杂度: O(n + m*k + m*l)</p>
+                                <p>空间复杂度: O(n + k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def expressiveWords(self, s: str, words: List[str]) -&gt; int:
+        def traversal(s):
+            cache = []
+            for char in s:
+                if not cache or cache[-1][0] != char:
+                    cache.append(char)
+                else:
+                    cache[-1] += char
+            return cache
+        cache = traversal(s)
+
+        ans = 0
+        length = len(cache)
+        for word in words:
+            word_cache = traversal(word)
+            i = 0
+            j = 0
+            word_length = len(word_cache)
+            if word_length == length:
+                while i&lt;length:
+                    if cache[i] == word_cache[j]:
+                        i += 1
+                        j += 1
+                        continue
+                    if cache[i][0] == word_cache[j][0] and len(cache[i])&gt;=3 and len(cache[i])&gt;=len(word_cache[j]):
+                        i += 1
+                        j += 1
+                        continue
+                    break
+                if i == length and j == length:
+                    ans += 1
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，如何确保每个字母组的正确分割，避免例如 &#39;aaa&#39; 错误地分割成 [&#39;a&#39;, &#39;aa&#39;]？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，确保字母组正确分割的关键在于使用一个循环来检查当前字符是否与上一个字符相同。如果相同，则将当前字符添加到当前字母组中；如果不同，则开始一个新的字母组。这种方法可以确保如 &#39;aaa&#39; 被正确分割为 [&#39;aaa&#39;] 而不是 [&#39;a&#39;, &#39;aa&#39;]。在题解中，这一逻辑通过检查是否有前一个元素以及前一个元素的字符是否与当前字符相同来实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的 &#39;扩张操作允许将一个字母组扩展到至少3个相同字符，前提是原始字母组至少有1个字符&#39;，这是否意味着原字符串S中的字母组长度必须比words中相应的字母组长才能进行扩展？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，根据题解的逻辑，要进行扩展操作，S中的字母组不仅需要比word中的相应字母组长，并且S中的字母组长度必须至少为3或者更多。这确保了只有当S中的字母组足够长时，才能通过添加相同字符来进行有效的扩展。如果word中的某个字母组比S中的相应字母组长，或者S中的字母组长度少于3而word中的字母组长度为3或更多，则这种扩展是不可能的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在比较两个字母组时，题解考虑了字母组的字符和长度，但如果两个字母组的长度相同，字符相同，却不满足扩展条件（例如长度小于3），这种情况如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，如果两个字母组的长度相同且字符相同，但长度小于3，这意味着无法进行扩展操作，但这并不影响两个字母组的匹配性。只要字符和长度都相同，就认为这两个字母组是匹配的。因此，在题解中，这种情况下仍然会视两个字母组为相匹配，不需要额外的处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/expressive-words')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/expressive-words/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

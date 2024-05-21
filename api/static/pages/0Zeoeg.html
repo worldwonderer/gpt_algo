@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>探险营地</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>探险营地</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        探险家小扣的行动轨迹，都将保存在记录仪中。`expeditions[i]` 表示小扣第 `i` 次探险记录，用一个字符串数组表示。其中的每个「营地」由大小写字母组成，通过子串 `->` 连接。
+> 例："Leet->code->Campsite"，表示到访了 "Leet"、"code"、"Campsite" 三个营地。
+
+`expeditions[0]` 包含了初始小扣已知的所有营地；对于之后的第 `i` 次探险(即 `expeditions[i]` 且 i > 0)，如果记录中包含了之前均没出现的营地，则表示小扣 **新发现** 的营地。
+
+请你找出小扣发现新营地最多且索引最小的那次探险，并返回对应的记录索引。如果所有探险记录都没有发现新的营地，返回 `-1`
+
+**注意：**
+- 大小写不同的营地视为不同的营地；
+- 营地的名称长度均大于 `0`。
+
+**示例 1：**
+>输入：`expeditions = ["leet->code","leet->code->Campsite->Leet","leet->code->leet->courier"]`
+>
+>输出：`1`
+>
+>解释：
+>初始已知的所有营地为 "leet" 和 "code"
+>第 1 次，到访了 "leet"、"code"、"Campsite"、"Leet"，新发现营地 2 处："Campsite"、"Leet"
+>第 2 次，到访了 "leet"、"code"、"courier"，新发现营地 1 处："courier"
+>第 1 次探险发现的新营地数量最多，因此返回 `1`
+
+**示例 2：**
+>输入：`expeditions = ["Alice->Dex","","Dex"]`
+>
+>输出：`-1`
+>
+>解释：
+>初始已知的所有营地为 "Alice" 和 "Dex"
+>第 1 次，未到访任何营地；
+>第 2 次，到访了 "Dex"，未新发现营地；
+>因为两次探险均未发现新的营地，返回 `-1`
+
+**示例 3：**
+>输入：`expeditions = ["","Gryffindor->Slytherin->Gryffindor","Hogwarts->Hufflepuff->Ravenclaw"]`
+>
+>输出：`2`
+>
+>解释：
+>初始未发现任何营地；
+>第 1 次，到访 "Gryffindor"、"Slytherin" 营地，其中重复到访 "Gryffindor" 两次，
+>因此新发现营地为 2 处："Gryffindor"、"Slytherin"
+>第 2 次，到访 "Hogwarts"、"Hufflepuff"、"Ravenclaw" 营地；
+>新发现营地 3 处："Hogwarts"、"Hufflepuff"、"Ravenclaw"；
+>第 2 次探险发现的新营地数量最多，因此返回 `2`
+
+**提示：**
+- `1 <= expeditions.length <= 1000`
+- `0 <= expeditions[i].length <= 1000`
+- 探险记录中只包含大小写字母和子串"->"
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 137 ms</p>
+                    <p>内存: 24.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def adventureCamp(self, expeditions: List[str]) -&gt; int:
+        seen = set(expeditions[0].split(&#39;-&gt;&#39;))
+        mx = 0
+        ans = -1
+        for i in range(1, len(expeditions)):
+            if not expeditions[i]:
+                continue
+            cnt = 0
+            for camp in expeditions[i].split(&#39;-&gt;&#39;):
+                if camp not in seen:
+                    cnt += 1
+                    seen.add(camp)
+            if cnt &gt; mx:
+                mx = cnt
+                ans = i
+        return ans
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是首先将第一个探险记录中的所有营地名存储到一个集合中，表示这些营地已经被发现。然后，从第二个记录开始遍历每一次探险的记录。对于每条记录，将其中的营地名与已知的集合进行比较，如果发现新的营地（即不在集合中的营地），则将这个新营地添加到集合中，并计数新发现的营地数量。如果某次探险发现的新营地数量超过之前的最大值，则更新最大值并记录当前的探险索引。最后，返回发现新营地最多的探险索引，如果没有发现新营地则返回-1。</p>
+                                <p>时间复杂度: O(n * m)</p>
+                                <p>空间复杂度: O(n * m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def adventureCamp(self, expeditions: List[str]) -&gt; int:
+        seen = set(expeditions[0].split(&#39;-&gt;&#39;))  # 初始化已知营地集合
+        mx = 0  # 记录发现的最大新营地数量
+        ans = -1  # 记录发现最多新营地的探险索引
+        for i in range(1, len(expeditions)):
+            if not expeditions[i]:
+                continue  # 跳过空的探险记录
+            cnt = 0  # 当前探险的新发现营地数量
+            for camp in expeditions[i].split(&#39;-&gt;&#39;):
+                if camp not in seen:
+                    cnt += 1  # 新发现一个营地
+                    seen.add(camp)  # 将新营地添加到集合中
+            if cnt &gt; mx:
+                mx = cnt  # 更新最大新发现营地数量
+                ans = i  # 更新记录索引
+        return ans  # 返回发现新营地最多的探险索引，或-1如果没有新发现</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，如何处理和识别大小写不同的营地名称？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中没有明确指出如何处理大小写不同的营地名称。在实际应用中，如果考虑到大小写不同的营地名称应当被视为同一个营地，应该在处理名称前将所有的营地名称统一转化为小写或大写。这可以通过在添加到集合之前使用 Python 的 str.lower() 或 str.upper() 方法来实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择使用集合（set）来存储已知的营地，而不是使用其他数据结构如列表或字典？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>集合（set）在 Python 中是一个无序的、不重复的元素集，它提供了高效的成员检查功能，时间复杂度为 O(1)。这使得在每次探险中检查新营地是否已被发现变得非常高效。相比之下，列表的成员检查时间复杂度为 O(n)，字典虽然也支持 O(1) 时间复杂度的成员检查，但对于本题的需求来说，集合的功能已足够，并且使用集合可以使代码更为简洁，因为它直接表示了一个不重复的元素集合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到跳过空的探险记录，空记录是如何定义的？是否包括只有&#39;-&gt;&#39;符号无实际营地名称的记录？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，空的探险记录可能被定义为不包含任何营地名称的记录，即一个空字符串。题解中的代码通过检查字符串是否为空来跳过空记录。关于只有 &#39;-&gt;&#39; 符号而无实际营地名称的记录，题解中没有明确说明如何处理这种情况。理论上，这种记录应当也视为无效记录，因为它不包含实际的营地名称。在实操中，应该增加处理逻辑来识别并跳过这类记录，例如检查分割后的列表中是否存在非空字符串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/0Zeoeg')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/0Zeoeg/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

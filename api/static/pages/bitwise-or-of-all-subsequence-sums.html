@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>所有子序列和的按位或</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>所有子序列和的按位或</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=brainteaser" class="badge bg-secondary tag-link">脑筋急转弯</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 64 ms</p>
+                    <p>内存: 25.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def subsequenceSumOr(self, nums: List[int]) -&gt; int:
+        # cur, res, h, mask = 0, 0, max(nums).bit_length(), [1&lt;&lt;j for j in range(46)]
+        # for m in mask:
+        #     for num in nums:
+        #         if num&amp;m:    cur += 1
+        #     if cur:             res |= m
+        #     cur &gt;&gt;= 1
+        # return res
+
+        if max(nums)==0:    return 0
+        j, mask, ans = 0, reduce(ior,nums), (1&lt;&lt;sum(nums).bit_length())-1
+        while not mask&amp;1:
+            ans ^= 1&lt;&lt;j
+            mask &gt;&gt;= 1
+            j += 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的核心思路是通过操作位来计算所有子序列的按位或的和。首先，利用Python内置的reduce函数和按位或操作ior，计算出给定数组nums中所有元素的按位或结果（变量mask）。然后，通过计算nums的所有元素之和的位长度，确定可能的最大位数，以此创建一个全1的掩码（变量ans）。接下来，从最低位开始，逐位检查mask的每一位，如果该位为0，则在ans对应的位上置0，以此去除不需要的最高位。最终，ans中剩下的即为所有子序列和的按位或结果。</p>
+                                <p>时间复杂度: O(n + log C)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def subsequenceSumOr(self, nums: List[int]) -&gt; int:
+        if max(nums) == 0: return 0  # 如果数组中最大值为0，直接返回0
+        j, mask, ans = 0, reduce(ior, nums), (1 &lt;&lt; sum(nums).bit_length()) - 1  # 初始化变量：j为当前处理的位数，mask为所有数字的按位或结果，ans为初始掩码
+        while not mask &amp; 1:  # 循环直到mask的最低位为1
+            ans ^= 1 &lt;&lt; j  # 将结果ans的第j位翻转（即从1变为0）
+            mask &gt;&gt;= 1  # mask右移一位
+            j += 1  # 更新正在处理的位数
+        return ans  # 返回最终计算的结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用`reduce`和`ior`函数来计算所有元素的按位或结果，能否详细解释这两个函数是如何被应用的，以及它们的工作原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`reduce`函数是一个高阶函数，它接收一个二元操作函数和一个序列，然后重复应用这个函数到序列的元素上，直到序列被归约为一个单一的值。在本题中，`reduce`使用`ior`函数作为操作函数。`ior`是`operator`模块中的函数，代表按位或操作。通过`reduce(ior, nums)`，我们可以连续对数组`nums`中的所有元素执行按位或操作，从而得到一个整数，这个整数的每一个位上的值表示该位在数组中至少有一个元素是1。这样，就能有效地计算出所有元素的按位或结果，这个结果是所有可能子序列按位或的上界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中，创建了一个全1的掩码`ans`，为什么要根据`sum(nums).bit_length()`来确定掩码的位数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中使用`sum(nums).bit_length()`来确定掩码位数的原因是，这个值代表将数组中的所有元素相加后的和所需的最小位数。这是因为所有元素的总和代表了可能的最大数值范围，而其二进制位长度则反映了代表该数值所需的最大位数。通过创建一个全1的掩码，其位数等于`sum(nums)`的位长度，可以确保掩码足够大，能覆盖所有可能的按位或结果。这种方法确保了在后续的操作中不会因位数不足而丢失重要信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            初始化时检查`max(nums) == 0`直接返回0的逻辑是基于什么考虑？在所有元素为0的情况下，按位或运算的结果有何特性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>检查`max(nums) == 0`并直接返回0的逻辑基于按位或运算的特性。按位或运算的结果中的每一位都是对应位上至少有一个1时该位才为1。如果数组中的最大值是0，意味着数组中的所有元素都是0，因此任何子序列的按位或结果也将是0。因为在所有元素都是0的情况下，无论组合多少个0，其按位或的结果仍然是0。这个检查是一个优化步骤，可以在明确结果为0的情况下避免不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bitwise-or-of-all-subsequence-sums')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bitwise-or-of-all-subsequence-sums/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

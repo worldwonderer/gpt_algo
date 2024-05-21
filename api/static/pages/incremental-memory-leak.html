@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>增长的内存泄露</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>增长的内存泄露</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数 <code>memory1</code> 和 <code>memory2</code> 分别表示两个内存条剩余可用内存的位数。现在有一个程序每秒递增的速度消耗着内存。</p>
+
+<p>在第 <code>i</code> 秒（秒数从 1 开始），有 <code>i</code> 位内存被分配到 <strong>剩余内存较多</strong> 的内存条（如果两者一样多，则分配到第一个内存条）。如果两者剩余内存都不足 <code>i</code> 位，那么程序将 <b>意外退出</b> 。</p>
+
+<p>请你返回一个数组，包含<em> </em><code>[crashTime, memory1<sub>crash</sub>, memory2<sub>crash</sub>]</code> ，其中 <code>crashTime</code>是程序意外退出的时间（单位为秒），<em> </em><code>memory1<sub>crash</sub></code><em> </em>和<em> </em><code>memory2<sub>crash</sub></code><em> </em>分别是两个内存条最后剩余内存的位数。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>memory1 = 2, memory2 = 2
+<b>输出：</b>[3,1,0]
+<b>解释：</b>内存分配如下：
+- 第 1 秒，内存条 1 被占用 1 位内存。内存条 1 现在有 1 位剩余可用内存。
+- 第 2 秒，内存条 2 被占用 2 位内存。内存条 2 现在有 0 位剩余可用内存。
+- 第 3 秒，程序意外退出，两个内存条分别有 1 位和 0 位剩余可用内存。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>memory1 = 8, memory2 = 11
+<b>输出：</b>[6,0,4]
+<b>解释：</b>内存分配如下：
+- 第 1 秒，内存条 2 被占用 1 位内存，内存条 2 现在有 10 位剩余可用内存。
+- 第 2 秒，内存条 2 被占用 2 位内存，内存条 2 现在有 8 位剩余可用内存。
+- 第 3 秒，内存条 1 被占用 3 位内存，内存条 1 现在有 5 位剩余可用内存。
+- 第 4 秒，内存条 2 被占用 4 位内存，内存条 2 现在有 4 位剩余可用内存。
+- 第 5 秒，内存条 1 被占用 5 位内存，内存条 1 现在有 0 位剩余可用内存。
+- 第 6 秒，程序意外退出，两个内存条分别有 0 位和 4 位剩余可用内存。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= memory1, memory2 &lt;= 2<sup>31</sup> - 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 38 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def memLeak(self, memory1: int, memory2: int) -&gt; List[int]:
+        # 从大的数开始减，减到比小的数小，再减就一定是交替进行的
+        swap = memory2 &gt; memory1
+        memory1, memory2 = sorted((memory1, memory2), reverse=True)
+        time = int(((memory1 - memory2 &lt;&lt; 1) + 0.25)**0.5 - 0.5)
+        memory1 -= time * (time + 1) &gt;&gt; 1
+        swap = swap and memory1 != memory2
+        # 各自减公差为2的等差数列，共有pair与pair-1项；memory2最后还要单独判断
+        pair = int((memory1 + time**2 / 4)**0.5 - time / 2)
+        memory1 -= (time + pair) * pair
+        memory2 -= (time + pair) * (pair - 1)
+        time += pair &lt;&lt; 1
+        if memory2 &gt;= time:
+            memory2 -= time
+            time += 1
+        return [time, memory1, memory2] if not swap else [time, memory2, memory1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了数学方法为主，在常数时间内求解出程序意外退出的时间。首先，题解中通过判断memory2是否大于memory1来决定是否交换两者，以便始终让memory1是较大的那个内存值。接下来，使用数学公式快速计算出在两内存条不平衡的情况下，内存分配多久后会变得平衡。这一计算基于等差数列的求和公式，因为每秒消耗的内存量是递增的。然后，当内存开始平衡分配时，又用等差数列的公式计算出在内存完全耗尽前可以进行多少次平衡分配。最后，再判断是否有剩余足够的内存进行下一秒的分配，从而确定程序的意外退出时间。代码中的各个步骤均有对应的数学推导和计算优化，避免了直接的循环检查，从而大幅提升了效率。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def memLeak(self, memory1: int, memory2: int) -&gt; List[int]:
+        # 判断是否需要交换，以保证memory1始终为较大值
+        swap = memory2 &gt; memory1
+        memory1, memory2 = sorted((memory1, memory2), reverse=True)
+        # 计算两内存条开始平衡消耗前的时间
+        time = int(((memory1 - memory2 &lt;&lt; 1) + 0.25)**0.5 - 0.5)
+        # 更新memory1的内存值
+        memory1 -= time * (time + 1) &gt;&gt; 1
+        # 检查当前两内存是否相等，决定是否交换输出结果
+        swap = swap and memory1 != memory2
+        # 计算能平衡消耗的次数
+        pair = int((memory1 + time**2 / 4)**0.5 - time / 2)
+        # 更新两内存值
+        memory1 -= (time + pair) * pair
+        memory2 -= (time + pair) * (pair - 1)
+        # 更新时间
+        time += pair &lt;&lt; 1
+        # 检查是否还能进行下一次消耗
+        if memory2 &gt;= time:
+            memory2 -= time
+            time += 1
+        # 根据是否交换过，返回正确的内存条剩余值
+        return [time, memory1, memory2] if not swap else [time, memory2, memory1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在内存条值接近平衡时，你选择只使用数学公式而不继续模拟每一秒的内存消耗？这种方法在所有情况下都准确吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用数学公式而不是模拟每一秒的内存消耗可以显著提高算法的效率和执行速度。数学公式可以直接计算出在内存平衡之前需要的时间和消耗的内存量，避免了逐秒遍历的时间复杂度。这种方法在理论上是准确的，因为它基于等差数列求和的数学原理，只要正确地应用公式并处理好精度问题，就可以准确计算出结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在使用数学公式计算过程中，如何确保浮点运算不会引入错误，尤其是在计算平方根和平方时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用浮点运算时，的确存在精度误差的风险。为了减少这种风险，算法设计时应该尽可能使用整数运算。在计算平方根或其他可能引入浮点运算的步骤时，可以通过适当的舍入和类型转换来控制误差。在Python中，整数除法和位运算可以帮助避免不必要的浮点运算，从而减少误差。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到&#39;更新两内存值&#39;时，使用了`(time + pair) * pair`和`(time + pair) * (pair - 1)`，能否详细解释这两个表达式的由来和它们如何工作的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这两个表达式是根据等差数列的求和公式来计算在平衡消耗阶段每个内存条的总消耗量。其中，`(time + pair) * pair` 是计算从时间 `time` 开始，连续 `pair` 次操作后，内存条1的总消耗量；而 `(time + pair) * (pair - 1)` 是计算内存条2的总消耗量，由于内存条2在每一轮操作中先被消耗，所以消耗次数比内存条1少一次。这两个表达式直接应用了等差数列的求和公式，从而快速计算出消耗的内存量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在交换memory1和memory2的值时，你是基于什么考虑？这种交换对最终结果的准确性有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法开始时交换memory1和memory2的值，是为了确保memory1始终是较大的内存值，这样可以简化后续的计算逻辑（始终从较大的内存开始消耗）。这种交换不会影响最终结果的准确性，因为无论怎样交换，消耗的总逻辑和量不变。最终在输出结果时，还会根据是否进行了交换来调整输出顺序，保证输出的内存条顺序与输入一致。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/incremental-memory-leak')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/incremental-memory-leak/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

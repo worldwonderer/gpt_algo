@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>得到新鲜甜甜圈的最多组数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>得到新鲜甜甜圈的最多组数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个甜甜圈商店，每批次都烤 <code>batchSize</code> 个甜甜圈。这个店铺有个规则，就是在烤一批新的甜甜圈时，之前 <strong>所有</strong> 甜甜圈都必须已经全部销售完毕。给你一个整数 <code>batchSize</code> 和一个整数数组 <code>groups</code> ，数组中的每个整数都代表一批前来购买甜甜圈的顾客，其中 <code>groups[i]</code> 表示这一批顾客的人数。每一位顾客都恰好只要一个甜甜圈。</p>
+
+<p>当有一批顾客来到商店时，他们所有人都必须在下一批顾客来之前购买完甜甜圈。如果一批顾客中第一位顾客得到的甜甜圈不是上一组剩下的，那么这一组人都会很开心。</p>
+
+<p>你可以随意安排每批顾客到来的顺序。请你返回在此前提下，<strong>最多</strong> 有多少组人会感到开心。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>batchSize = 3, groups = [1,2,3,4,5,6]
+<b>输出：</b>4
+<b>解释：</b>你可以将这些批次的顾客顺序安排为 [6,2,4,5,1,3] 。那么第 1，2，4，6 组都会感到开心。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>batchSize = 4, groups = [1,3,2,5,2,2,1,6]
+<b>输出：</b>4
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= batchSize <= 9</code></li>
+	<li><code>1 <= groups.length <= 30</code></li>
+	<li><code>1 <= groups[i] <= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxHappyGroups(self, batchSize: int, groups: List[int]) -&gt; int:
+        ans = 0
+        freq = [0] * batchSize
+        for g in groups:
+            k = g % batchSize
+            if k == 0:
+                ans += 1
+            elif freq[-k]:
+                freq[-k] -= 1
+                ans += 1
+            else:
+                freq[k] += 1
+        
+        @cache
+        def dfs(left: int, cnt: Tuple[int]) -&gt; int:
+            res = 0
+            cnt = list(cnt)
+            for x, c in enumerate(cnt):
+                if c:
+                    cnt[x] -= 1
+                    res = max(res, (left == 0) + dfs((left + x + 1) % batchSize, tuple(cnt)))
+                    cnt[x] += 1
+            return res
+        return ans + dfs(0, tuple(freq[1:]))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了贪心策略和深度优先搜索（DFS）结合记忆化递归的方法。首先，遍历所有顾客组，将每组顾客人数对batchSize取模后的余数记录在频率数组freq中，同时统计可以直接满足条件的组数（余数为0或者存在互补的余数对）。然后，使用记忆化的DFS来处理剩余的顾客组，尝试不同的顺序来最大化满足条件的组数。在DFS中，根据当前剩余的甜甜圈数量和各余数的频率，递归地探索不同的选择，并返回最大的满足条件的组数。</p>
+                                <p>时间复杂度: O((batchSize - 1) ^ groups.length)</p>
+                                <p>空间复杂度: O((batchSize - 1) ^ groups.length)</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def maxHappyGroups(self, batchSize: int, groups: List[int]) -&gt; int:
+#         ans = 0
+#         freq = [0] * batchSize
+#         for g in groups:
+#             k = g % batchSize
+#             if k == 0:
+#                 ans += 1
+#             elif freq[-k]:
+#                 freq[-k] -= 1
+#                 ans += 1
+#             else:
+#                 freq[k] += 1
+#         
+#         @cache
+#         def dfs(left: int, cnt: Tuple[int]) -&gt; int:
+#             res = 0
+#             cnt = list(cnt)
+#             for x, c in enumerate(cnt):
+#                 if c:
+#                     cnt[x] -= 1
+#                     res = max(res, (left == 0) + dfs((left + x + 1) % batchSize, tuple(cnt)))
+#                     cnt[x] += 1
+#             return res
+#         return ans + dfs(0, tuple(freq[1:]))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么需要将每组顾客人数对batchSize取模，这个操作的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，将每组顾客人数对batchSize取模的操作是为了简化问题。这是因为题目中涉及的是组数的最大化，而不是具体的顾客人数。通过取模操作，可以将问题转化为处理顾客组与batchSize的余数问题，这样就可以只关注余数，而不是具体的顾客数量。这种转化可以有效地减少问题的复杂度，因为处理的变量（余数）数量最多只有batchSize个。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解提到了&#39;存在互补的余数对&#39;这一概念，具体是如何定义互补的余数对，以及它们是如何影响开心组数的增加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>互补的余数对是指两个数的余数和等于batchSize的一对值。例如，如果batchSize是5，那么余数1和4，余数2和3，以及余数0和5（如果有余数5的话）都是互补的余数对。在题解中，当检测到存在互补的余数对时，可以直接将这一对顾客组算作满足条件的组，因为它们加起来的总数正好是batchSize的倍数。这样做可以直接增加开心组数，因为每找到一对互补的余数对，就意味着有一组额外的顾客可以完全分配甜甜圈，从而增加满足条件的组数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了记忆化的DFS来处理剩余的顾客组，具体来说，状态的记忆化是基于哪些变量实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的记忆化DFS是基于两个主要变量实现的：当前剩余的甜甜圈数量（left）和各余数的频率数组（cnt）。状态的记忆化是通过缓存已经计算过的(left, cnt)组合的结果来实现的。这种方法可以避免重复计算相同状态下的结果，从而大大提高算法的效率。每个状态代表了一个特定的余数组合以及相应的剩余甜甜圈数量，其结果表示从该状态开始可以额外满足的最大组数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在DFS函数中，参数left代表什么意义？它如何影响递归过程中的决策？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS函数中，参数left表示当前剩余甜甜圈数量对batchSize的余数。它的主要作用是帮助判断加上当前选择的顾客组之后是否能形成一个完整的batchSize倍数，即是否能够形成一个新的满足条件的组。在递归过程中，通过更新left来模拟分配甜甜圈给当前选择的顾客组后的情况。如果在选择某个余数后left变为0，表示当前的选择可以使得总数达到batchSize的倍数，从而形成一个新的满足条件的组。这个参数对于决策过程至关重要，因为它直接影响了每一步选择后的状态和最终能够满足条件的组数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-groups-getting-fresh-donuts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-groups-getting-fresh-donuts/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

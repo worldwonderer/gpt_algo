@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>任务调度器 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>任务调度器 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的正整数数组&nbsp;<code>tasks</code>&nbsp;，表示需要 <strong>按顺序</strong>&nbsp;完成的任务，其中&nbsp;<code>tasks[i]</code>&nbsp;表示第&nbsp;<code>i</code>&nbsp;件任务的 <strong>类型</strong>&nbsp;。</p>
+
+<p>同时给你一个正整数&nbsp;<code>space</code>&nbsp;，表示一个任务完成&nbsp;<strong>后</strong>&nbsp;，另一个&nbsp;<strong>相同</strong>&nbsp;类型任务完成前需要间隔的&nbsp;<strong>最少</strong>&nbsp;天数。</p>
+
+<p>在所有任务完成前的每一天，你都必须进行以下两种操作中的一种：</p>
+
+<ul>
+	<li>完成&nbsp;<code>tasks</code>&nbsp;中的下一个任务</li>
+	<li>休息一天</li>
+</ul>
+
+<p>请你返回完成所有任务所需的 <strong>最少</strong>&nbsp;天数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>tasks = [1,2,1,2,3,1], space = 3
+<b>输出：</b>9
+<strong>解释：</strong>
+9 天完成所有任务的一种方法是：
+第 1 天：完成任务 0 。
+第 2 天：完成任务 1 。
+第 3 天：休息。
+第 4 天：休息。
+第 5 天：完成任务 2 。
+第 6 天：完成任务 3 。
+第 7 天：休息。
+第 8 天：完成任务 4 。
+第 9 天：完成任务 5 。
+可以证明无法少于 9 天完成所有任务。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>tasks = [5,8,8,5], space = 2
+<b>输出：</b>6
+<strong>解释：</strong>
+6 天完成所有任务的一种方法是：
+第 1 天：完成任务 0 。
+第 2 天：完成任务 1 。
+第 3 天：休息。
+第 4 天：休息。
+第 5 天：完成任务 2 。
+第 6 天：完成任务 3 。
+可以证明无法少于 6 天完成所有任务。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= tasks.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= tasks[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= space &lt;= tasks.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 120 ms</p>
+                    <p>内存: 34.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def taskSchedulerII(self, tasks: List[int], space: int) -&gt; int:
+        days=0
+        dealtask={}#记录每类任务最后一次完成时间（第几天完成，从0开始）
+        for t in tasks:
+            days+=1
+            if t not in dealtask:
+                dealtask[t]=days
+            else:
+                if days-dealtask[t]&gt;space:
+                    dealtask[t]=days
+                else:
+                    days=dealtask[t]+space+1
+                    dealtask[t]=days
+        return days
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了哈希表来记录每种任务最后一次完成的日期。对于每一个任务，我们首先递增天数（模拟每天完成任务），然后检查该任务是否之前完成过。如果完成过，我们比较当前日期与该任务上次完成日期的差值是否大于space。如果大于space，说明可以直接执行此任务，更新该任务的最新完成日期。如果不大于，则必须等待直到满足space的要求，然后更新完成日期。这种方式确保了在满足间隔要求的情况下，尽可能早地完成所有任务。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def taskSchedulerII(self, tasks: List[int], space: int) -&gt; int:
+        days = 0  # 初始化天数
+        dealtask = {}  # 哈希表记录每种任务的最后完成日期
+        for t in tasks:
+            days += 1  # 每处理一个任务，天数加一
+            if t in dealtask and days - dealtask[t] &lt;= space:
+                # 如果任务已经完成过，并且未满足间隔要求，需要调整天数
+                days = dealtask[t] + space + 1
+            # 更新这个任务的最新完成日期
+            dealtask[t] = days
+        return days</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            哈希表中存储的是任务的最后完成日期，那么这个信息是如何确保任务按照顺序完成的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表存储每个任务的最后完成日期主要用于判断任务是否能够按照规定的间隔（space）再次执行。通过追踪每个任务的完成时间，算法在遍历任务数组时能够按照任务数组的顺序检查每个任务是否满足间隔条件。因此，任务的顺序由输入的任务数组的顺序决定，算法确保在此顺序下，每个任务都在满足间隔要求的最早可能时间执行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            解释中提到的‘如果大于space，则可以直接执行此任务’的逻辑是否意味着即使有足够的间隔也可能因为任务顺序而导致不能立即执行？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当哈希表中记录的最后完成日期与当前日期的差值大于space时，任务可以立即执行。这意味着任务的执行仅依赖于它自身的间隔满足情况，而与其他任务无关。如果当前任务的间隔已足够，它将立即执行，无论其他任务的状态如何。因此，即使有足够的间隔，任务也总是按照输入数组的顺序执行，不会因为其他任务的安排而延迟。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于连续出现的相同任务，算法如何处理间隔小于space的情况，具体是如何计算需要休息的天数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于连续出现的相同任务，如果当前天数与上次完成该任务的日期的差值小于或等于space，则说明任务不能立即执行。此时，算法会将当前天数设置为上一次任务完成后需等待的最小天数，即上次完成日期加上间隔space再加一天。这样确保了每个任务都在满足间隔要求后的第一个可能日子执行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法在处理每个任务时都增加了天数，这是否意味着算法默认每天只能完成一个任务或休息？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中的天数增加逻辑（每执行一个任务，天数加一）确实表明在模拟过程中，默认每天只处理一个任务或者休息。这是为了简化任务执行间隔的计算和调度。在实际情况中，可能一天能完成多个任务，但在这个算法模型中，为了保持间隔和执行顺序的清晰，采用了每天最多执行一个任务的简化模型。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/task-scheduler-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/task-scheduler-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

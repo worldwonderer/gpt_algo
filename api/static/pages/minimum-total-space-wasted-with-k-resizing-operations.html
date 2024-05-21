@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>K 次调整数组大小浪费的最小总空间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>K 次调整数组大小浪费的最小总空间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你正在设计一个动态数组。给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;，其中&nbsp;<code>nums[i]</code>&nbsp;是&nbsp;<code>i</code>&nbsp;时刻数组中的元素数目。除此以外，你还有一个整数 <code>k</code>&nbsp;，表示你可以 <strong>调整</strong>&nbsp;数组大小的 <strong>最多</strong>&nbsp;次数（每次都可以调整成 <strong>任意</strong>&nbsp;大小）。</p>
+
+<p><code>t</code>&nbsp;时刻数组的大小&nbsp;<code>size<sub>t</sub></code>&nbsp;必须大于等于&nbsp;<code>nums[t]</code>&nbsp;，因为数组需要有足够的空间容纳所有元素。<code>t</code>&nbsp;时刻 <strong>浪费的空间</strong>&nbsp;为&nbsp;<code>size<sub>t</sub> - nums[t]</code>&nbsp;，<strong>总</strong>&nbsp;浪费空间为满足&nbsp;<code>0 &lt;= t &lt; nums.length</code>&nbsp;的每一个时刻&nbsp;<code>t</code>&nbsp;浪费的空间&nbsp;<strong>之和</strong>&nbsp;。</p>
+
+<p>在调整数组大小不超过 <code>k</code>&nbsp;次的前提下，请你返回 <strong>最小总浪费空间</strong>&nbsp;。</p>
+
+<p><strong>注意：</strong>数组最开始时可以为&nbsp;<strong>任意大小</strong>&nbsp;，且&nbsp;<strong>不计入</strong>&nbsp;调整大小的操作次数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums = [10,20], k = 0
+<b>输出：</b>10
+<b>解释：</b>size = [20,20].
+我们可以让数组初始大小为 20 。
+总浪费空间为 (20 - 10) + (20 - 20) = 10 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [10,20,30], k = 1
+<b>输出：</b>10
+<b>解释：</b>size = [20,20,30].
+我们可以让数组初始大小为 20 ，然后时刻 2 调整大小为 30 。
+总浪费空间为 (20 - 10) + (20 - 20) + (30 - 30) = 10 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>nums = [10,20,15,30,20], k = 2
+<b>输出：</b>15
+<b>解释：</b>size = [10,20,20,30,30].
+我们可以让数组初始大小为 10 ，时刻 1 调整大小为 20 ，时刻 3 调整大小为 30 。
+总浪费空间为 (10 - 10) + (20 - 20) + (20 - 15) + (30 - 30) + (30 - 20) = 15 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 200</code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+	<li><code>0 &lt;= k &lt;= nums.length - 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 805 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class SkipList:
+    def __init__(self):
+        self.head = [None, [None]]
+        self.tail = [self.head]
+        
+    def insert_back(self, val):
+        new_node = [val, []]
+        self.tail[0][1][0] = new_node
+        new_node[1].append(None)
+        self.tail[0] = new_node
+
+    def query(self, val):
+        curr = self.head
+        for i in range(len(self.tail) - 1, -1, -1):
+            while (node := curr[1][i]) and node[0][0][0] &lt;= val * node[0][0][2]:
+                curr = curr[1][i]
+        return curr
+
+    def split(self, criteria):
+        new_list = SkipList()
+        curr = self.head
+        for i in range(len(self.tail) - 1, -1, -1):
+            while curr[1][i] and criteria(curr[1][i]):
+                curr = curr[1][i]
+            if curr[1][i] is not None:
+                if len(new_list.tail) &lt;= i:
+                    delta = i + 1 - len(new_list.tail)
+                    new_list.head[1].extend([None] * delta)
+                    new_list.tail.extend([new_list.head] * delta)
+                t = curr[1][i]
+                new_list.head[1][i] = t
+                new_list.tail[i] = self.tail[i]
+                curr[1][i] = None
+                self.tail[i] = curr
+                if i and curr is self.head:
+                    self.tail.pop()
+                    self.head[1].pop()
+        return new_list
+
+    def merge(self, new_list):
+        for i in range(min(len(self.tail), len(new_list.tail))):
+            if new_list.head[1][i] is not None:
+                t = self.tail[i]
+                t[1][i] = new_list.head[1][i]
+                self.tail[i] = new_list.tail[i]
+        for i in range(len(self.tail), len(new_list.tail)):
+            self.head[1].append(new_list.head[1][i])
+            self.tail.append(new_list.tail[i])
+        new_list.tail = [new_list.head]
+        new_list.head[1] = [None]
+
+class Solution:
+    def minSpaceWastedKResizing(self, nums: List[int], k: int) -&gt; int:
+        N = len(nums)
+        dp = []
+        m = 0
+        for i, n in enumerate(nums, 1):
+            if n &gt; m:
+                m = n
+            dp.append(m * i)
+        dp2 = [None] * len(dp)
+        for j in range(k):
+            ranges = []
+            lines_arc = SkipList()
+            for i in range(j + 1, N):
+                new_arc = deque([(i - 1, dp[i - 1])])
+                new_L = nums[i]
+                while ranges and ranges[-1][1] &lt;= new_L:
+                    old_arc, _ = ranges.pop()
+                    while True:
+                        p1 = old_arc[-1]
+                        while len(new_arc) &gt; 1:
+                            p2, p3 = new_arc[0], new_arc[1]
+                            if (p2[0] - p1[0]) * (p3[1] - p2[1]) - (p3[0] - p2[0]) * (p2[1] - p1[1]) &gt; 0:
+                                break
+                            else:
+                                new_arc.popleft()
+                        p0, p2 = (old_arc[-2] if len(old_arc) &gt; 1 else None), new_arc[0]
+                        if p0 is None or (p1[0] - p0[0]) * (p2[1] - p1[1]) - (p2[0] - p1[0]) * (p1[1] - p0[1]) &gt; 0:
+                            new_arc = old_arc+new_arc
+                            break
+                        else:
+                            old_arc.pop()
+                    while len(new_arc) &gt; 1:
+                        p0, p1 = new_arc[0], new_arc[1]
+                        if p1 and p0[1] - p0[0] * new_L &gt;= p1[1] - p1[0] * new_L:
+                            new_arc.popleft()
+                        else:
+                            break
+                ranges.append((new_arc, new_L))
+                x, y = new_arc[0]
+                b = y - x * new_L
+                new_list = lines_arc.split(lambda x: x[0][1] &gt; new_L)
+                while new_list.tail[0] is not new_list.head:
+                    removed_list = new_list.head[1][0][0][2]
+                    if removed_list.tail[0] is removed_list.head:
+                        break
+                    new_list = removed_list.split(lambda x: x[0][1] &gt; new_L)
+                    lines_arc.merge(removed_list)
+                removed_list = lines_arc.split(lambda node: new_L * node[0][0][0] + b * node[0][0][2] &gt; node[0][0][1])
+                if lines_arc.tail[0] is lines_arc.head:
+                    xp = x
+                    yp = y
+                    q = 1
+                else:
+                    (xp0, yp0, q0), k0, _ = lines_arc.tail[0][0]
+                    b0 = (yp0 - k0 * xp0) // q0
+                    q = k0 - new_L
+                    xp = b - b0
+                    yp = b * k0 - b0 * new_L
+                lines_arc.insert_back(((xp, yp, q), new_L, removed_list))
+                curr_node = lines_arc.query(i)
+                (xp0, yp0, q0), k0, _ = curr_node[0]
+                b0 = (yp0 - k0 * xp0) // q0
+                dp2[i] = k0 * i + b0
+            dp2, dp = dp, dp2
+        return dp[-1] - sum(nums)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用动态规划和几何优化方法。初始阶段，它构建一个最大的DP数组，每个元素表示从起始到当前位置的最小浪费空间。随后，为了处理k次调整的问题，使用数据结构（如SkipList）来优化查找和更新操作，确保每次调整都是在最优的位置。在每一轮中，它尝试确定新的调整点，并计算从该点到下一个可能的调整点之间的最小浪费空间。最终，这种方法可以在给定调整次数的限制下，找到总浪费空间最小的策略。</p>
+                                <p>时间复杂度: O(k * N^2)</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2">class SkipList:
+    def __init__(self):
+        # 初始化头节点和尾节点
+        self.head = [None, [None]]
+        self.tail = [self.head]
+        
+    def insert_back(self, val):
+        # 在跳表尾部插入新节点
+        new_node = [val, []]
+        self.tail[0][1][0] = new_node
+        new_node[1].append(None)
+        self.tail[0] = new_node
+
+    def query(self, val):
+        # 查询小于等于给定值的最大节点
+        curr = self.head
+        for i in range(len(self.tail) - 1, -1, -1):
+            while (node := curr[1][i]) and node[0][0][0] &lt;= val * node[0][0][2]:
+                curr = curr[1][i]
+        return curr
+
+    def split(self, criteria):
+        # 根据给定条件分割跳表
+        new_list = SkipList()
+        curr = self.head
+        for i in range(len(self.tail) - 1, -1, -1):
+            while curr[1][i] and criteria(curr[1][i]):
+                curr = curr[1][i]
+            if curr[1][i] is not None:
+                if len(new_list.tail) &lt;= i:
+                    delta = i + 1 - len(new_list.tail)
+                    new_list.head[1].extend([None] * delta)
+                    new_list.tail.extend([new_list.head] * delta)
+                t = curr[1][i]
+                new_list.head[1][i] = t
+                new_list.tail[i] = self.tail[i]
+                curr[1][i] = None
+                self.tail[i] = curr
+                if i and curr is self.head:
+                    self.tail.pop()
+                    self.head[1].pop()
+        return new_list
+
+    def merge(self, new_list):
+        # 合并两个跳表
+        for i in range(min(len(self.tail), len(new_list.tail))):
+            if new_list.head[1][i] is not None:
+                t = self.tail[i]
+                t[1][i] = new_list.head[1][i]
+                self.tail[i] = new_list.tail[i]
+        for i in range(len(self.tail), len(new_list.tail)):
+            self.head[1].append(new_list.head[1][i])
+            self.tail.append(new_list.tail[i])
+        new_list.tail = [new_list.head]
+        new_list.head[1] = [None]
+
+class Solution:
+    def minSpaceWastedKResizing(self, nums: List[int], k: int) -&gt; int:
+        # 主函数使用动态规划求解最小浪费空间
+        N = len(nums)
+        dp = []
+        m = 0
+        for i, n in enumerate(nums, 1):
+            # 更新每个时间点的最大需求空间
+            if n &gt; m:
+                m = n
+            dp.append(m * i)
+        dp2 = [None] * len(dp)
+        for j in range(k):
+            ranges = []
+            lines_arc = SkipList()
+            for i in range(j + 1, N):
+                new_arc = deque([(i - 1, dp[i - 1])])
+                new_L = nums[i]
+                while ranges and ranges[-1][1] &lt;= new_L:
+                    old_arc, _ = ranges.pop()
+                    while True:
+                        # 几何优化处理交叉和更新范围
+                        p1 = old_arc[-1]
+                        while len(new_arc) &gt; 1:
+                            p2, p3 = new_arc[0], new_arc[1]
+                            if (p2[0] - p1[0]) * (p3[1] - p2[1]) - (p3[0] - p2[0]) * (p2[1] - p1[1]) &gt; 0:
+                                break
+                            else:
+                                new_arc.popleft()
+                        p0, p2 = (old_arc[-2] if len(old_arc) &gt; 1 else None), new_arc[0]
+                        if p0 is None or (p1[0] - p0[0]) * (p2[1] - p1[1]) - (p2[0] - p1[0]) * (p1[1] - p0[1]) &gt; 0:
+                            new_arc = old_arc+new_arc
+                            break
+                        else:
+                            old_arc.pop()
+                    while len(new_arc) &gt; 1:
+                        p0, p1 = new_arc[0], new_arc[1]
+                        if p1 and p0[1] - p0[0] * new_L &gt;= p1[1] - p1[0] * new_L:
+                            new_arc.popleft()
+                        else:
+                            break
+                ranges.append((new_arc, new_L))
+                x, y = new_arc[0]
+                b = y - x * new_L
+                new_list = lines_arc.split(lambda x: x[0][1] &gt; new_L)
+                while new_list.tail[0] is not new_list.head:
+                    removed_list = new_list.head[1][0][0][2]
+                    if removed_list.tail[0] is removed_list.head:
+                        break
+                    new_list = removed_list.split(lambda x: x[0][1] &gt; new_L)
+                    lines_arc.merge(removed_list)
+                removed_list = lines_arc.split(lambda node: new_L * node[0][0][0] + b * node[0][0][2] &gt; node[0][0][1])
+                if lines_arc.tail[0] is lines_arc.head:
+                    xp = x
+                    yp = y
+                    q = 1
+                else:
+                    (xp0, yp0, q0), k0, _ = lines_arc.tail[0][0]
+                    b0 = (yp0 - k0 * xp0) // q0
+                    q = k0 - new_L
+                    xp = b - b0
+                    yp = b * k0 - b0 * new_L
+                lines_arc.insert_back(((xp, yp, q), new_L, removed_list))
+                curr_node = lines_arc.query(i)
+                (xp0, yp0, q0), k0, _ = curr_node[0]
+                b0 = (yp0 - k0 * xp0) // q0
+                dp2[i] = k0 * i + b0
+            dp2, dp = dp, dp2
+        return dp[-1] - sum(nums)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            message <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>The provided question list contains only the word &#39;message&#39; which does not specify a clear question about the algorithm or its implementation. To provide a meaningful response, please specify the question related to the logic, boundary details, or data structure characteristics of the provided solution for the LeetCode problem.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-total-space-wasted-with-k-resizing-operations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-total-space-wasted-with-k-resizing-operations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

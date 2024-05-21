@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计所有可行路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计所有可行路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <strong>互不相同</strong>&nbsp;的整数数组，其中&nbsp;<code>locations[i]</code>&nbsp;表示第&nbsp;<code>i</code>&nbsp;个城市的位置。同时给你&nbsp;<code>start</code>，<code>finish</code>&nbsp;和&nbsp;<code>fuel</code>&nbsp;分别表示出发城市、目的地城市和你初始拥有的汽油总量</p>
+
+<p>每一步中，如果你在城市 <code>i</code>&nbsp;，你可以选择任意一个城市 <code>j</code>&nbsp;，满足 &nbsp;<code>j != i</code>&nbsp;且&nbsp;<code>0 &lt;= j &lt; locations.length</code>&nbsp;，并移动到城市&nbsp;<code>j</code>&nbsp;。从城市&nbsp;<code>i</code>&nbsp;移动到&nbsp;<code>j</code>&nbsp;消耗的汽油量为&nbsp;<code>|locations[i] - locations[j]|</code>，<code>|x|</code>&nbsp;表示&nbsp;<code>x</code>&nbsp;的绝对值。</p>
+
+<p>请注意，&nbsp;<code>fuel</code>&nbsp;任何时刻都&nbsp;<strong>不能</strong>&nbsp;为负，且你&nbsp;<strong>可以</strong>&nbsp;经过任意城市超过一次（包括&nbsp;<code>start</code>&nbsp;和&nbsp;<code>finish</code>&nbsp;）。</p>
+
+<p>请你返回从<em>&nbsp;</em><code>start</code>&nbsp;到&nbsp;<code>finish</code>&nbsp;所有可能路径的数目。</p>
+
+<p>由于答案可能很大， 请将它对&nbsp;<code>10^9 + 7</code>&nbsp;取余后返回。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>locations = [2,3,6,8,4], start = 1, finish = 3, fuel = 5
+<strong>输出：</strong>4
+<strong>解释：</strong>以下为所有可能路径，每一条都用了 5 单位的汽油：
+1 -&gt; 3
+1 -&gt; 2 -&gt; 3
+1 -&gt; 4 -&gt; 3
+1 -&gt; 4 -&gt; 2 -&gt; 3
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>locations = [4,3,1], start = 1, finish = 0, fuel = 6
+<strong>输出：</strong>5
+<strong>解释：</strong>以下为所有可能的路径：
+1 -&gt; 0，使用汽油量为 fuel = 1
+1 -&gt; 2 -&gt; 0，使用汽油量为 fuel = 5
+1 -&gt; 2 -&gt; 1 -&gt; 0，使用汽油量为 fuel = 5
+1 -&gt; 0 -&gt; 1 -&gt; 0，使用汽油量为 fuel = 3
+1 -&gt; 0 -&gt; 1 -&gt; 0 -&gt; 1 -&gt; 0，使用汽油量为 fuel = 5
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>locations = [5,2,1], start = 0, finish = 2, fuel = 3
+<strong>输出：</strong>0
+<strong>解释：</strong>没有办法只用 3 单位的汽油从 0 到达 2 。因为最短路径需要 4 单位的汽油。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= locations.length &lt;= 100</code></li>
+	<li><code>1 &lt;= locations[i] &lt;= 10<sup>9</sup></code></li>
+	<li>所有&nbsp;<code>locations</code>&nbsp;中的整数 <strong>互不相同</strong>&nbsp;。</li>
+	<li><code>0 &lt;= start, finish &lt;&nbsp;locations.length</code></li>
+	<li><code>1 &lt;= fuel &lt;= 200</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 145 ms</p>
+                    <p>内存: 17.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countRoutes(self, locations: List[int], start: int, finish: int, fuel: int) -&gt; int:
+        mod = 10**9 + 7
+
+        n = len(locations)
+        startPos = locations[start]
+        finishPos = locations[finish]
+        locations.sort()
+        start = locations.index(startPos)
+        finish = locations.index(finishPos)
+
+        dpL = [[0] * (fuel + 1) for _ in range(n)]
+        dpR = [[0] * (fuel + 1) for _ in range(n)]
+        dpL[start][0] = dpR[start][0] = 1
+        
+        for used in range(fuel + 1):
+            for city in range(n - 2, -1, -1):
+                if (delta := locations[city + 1] - locations[city]) &lt;= used:
+                    dpL[city][used] = ((0 if used == delta else dpL[city + 1][used - delta]) * 2 + dpR[city + 1][used - delta]) % mod
+            for city in range(1, n):
+                if (delta := locations[city] - locations[city - 1]) &lt;= used:
+                    dpR[city][used] = ((0 if used == delta else dpR[city - 1][used - delta]) * 2 + dpL[city - 1][used - delta]) % mod
+
+        ans = sum(dpL[finish]) + sum(dpR[finish])
+        if start == finish:
+            ans -= 1
+        return ans % mod</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用动态规划的方法来解决。首先对城市位置进行排序，并且重新定位起始和结束城市的索引。这样可以利用位置的有序性来简化状态转移。定义两个动态规划数组 dpL 和 dpR，分别表示从左向右和从右向左计算到达某个城市的路径数。dpL[i][f] 表示从起点到位置i使用f单位燃料的路径数，dpR[i][f] 则是相反方向的计数。通过遍历每一步可能使用的燃料量和城市，我们更新两个DP数组。这种方法不断地根据前一个城市的状态来更新当前城市的状态，利用了前后城市距离的具体值来减少燃料，并在途中累加可能的路径。最后，将两个DP数组在目标城市的所有燃料状态下的值相加，得到最终结果。如果起始城市和目标城市是同一个，则还需调整最终计数，因为算法中计算了从起点到起点的一个额外路径。</p>
+                                <p>时间复杂度: O(n * f)</p>
+                                <p>空间复杂度: O(n * f)</p>
+                                <pre class="bg-light p-2"># 定义 Solution 类
+
+class Solution:
+    def countRoutes(self, locations: List[int], start: int, finish: int, fuel: int) -&gt; int:
+        mod = 10**9 + 7  # 用于取余的数
+
+        # 初始化和处理位置信息
+        n = len(locations)
+        startPos = locations[start]
+        finishPos = locations[finish]
+        locations.sort()
+        start = locations.index(startPos)
+        finish = locations.index(finishPos)
+
+        # 初始化动态规划表
+        dpL = [[0] * (fuel + 1) for _ in range(n)]
+        dpR = [[0] * (fuel + 1) for _ in range(n)]
+        dpL[start][0] = dpR[start][0] = 1
+
+        # 动态规划处理
+        for used in range(fuel + 1):
+            for city in range(n - 2, -1, -1):
+                if (delta := locations[city + 1] - locations[city]) &lt;= used:
+                    dpL[city][used] = ((0 if used == delta else dpL[city + 1][used - delta]) * 2 + dpR[city + 1][used - delta]) % mod
+            for city in range(1, n):
+                if (delta := locations[city] - locations[city - 1]) &lt;= used:
+                    dpR[city][used] = ((0 if used == delta else dpR[city - 1][used - delta]) * 2 + dpL[city - 1][used - delta]) % mod
+
+        # 结果统计
+        ans = sum(dpL[finish]) + sum(dpR[finish])
+        if start == finish:
+            ans -= 1  # 如果起始和结束城市相同，调整计数
+        return ans % mod
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            动态规划数组 dpL 和 dpR 的设计是如何确保能够覆盖从任一起点到任一终点的所有可能路径的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划数组 dpL 和 dpR 通过逐步计算每种燃料使用情况下从起点到各个城市的路径数量，确保了能够覆盖从任一起点到任一终点的所有可能路径。dpL 从左向右计算，负责记录从起点开始向右移动到达每个城市时各种燃料情况的路径数量；dpR 从右向左计算，记录从起点开始向左移动到达每个城市时的路径数量。这样，无论目标城市在起点的左边还是右边，都有相应的动态规划数组来记录到达该城市的所有可能路径数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果起始城市和目标城市是同一个，则需要调整最终计数，具体是如何调整的？为什么要进行这样的调整？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果起始城市和目标城市是同一个，算法实际上会在初始化时将 dpL[start][0] 和 dpR[start][0] 设为 1，意味着考虑了从起点到起点的路径。因此，当最后统计所有路径时，这一路径会被重复计算一次。为了纠正这一重复计数，需要在最终结果中减去1。这样调整是为了确保路径计数的准确性，避免因初始化导致的重复计数问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新 dpL 和 dpR 数组时，为什么要同时考虑从左到右和从右到左的情况？这种双向更新是如何帮助解题的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新 dpL 和 dpR 数组时，同时考虑从左到右和从右到左的情况能够有效处理城市间的双向移动。这种双向更新允许算法在任一方向上捕捉路径，并根据当前城市和燃料消耗来调整下一个可能的移动方向。例如，当城市间距离较小并且剩余燃料较多时，可以通过双向更新来探索更多的路径可能性。这种方法增强了动态规划的灵活性和覆盖面，使其能够更好地适应不同的燃料和距离情况，从而找到所有可能的到达路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中未详细说明如何处理边界条件，比如当燃料为0或非常少时的情况。这种情况下算法如何确保正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在燃料为0或非常少的情况下，动态规划的设计保证了算法的正确性。dpL 和 dpR 在初始化时，将 dpL[start][0] 和 dpR[start][0] 设置为 1，表明无需消耗燃料即可停留在起点。对于其他城市，如果没有足够的燃料到达某个城市，则对应的 dpL[i][f] 和 dpR[i][f] 保持为0，表示无法到达。这种处理确保了即使在燃料非常少的情况下，算法也能正确反映从起点到其他城市的可达性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-all-possible-routes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-all-possible-routes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

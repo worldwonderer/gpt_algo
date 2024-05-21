@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>分割数组使乘积互质</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>分割数组使乘积互质</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <code>n</code> 的整数数组 <code>nums</code> ，下标从 <strong>0</strong> 开始。</p>
+
+<p>如果在下标 <code>i</code> 处 <strong>分割</strong> 数组，其中 <code>0 &lt;= i &lt;= n - 2</code> ，使前 <code>i + 1</code> 个元素的乘积和剩余元素的乘积互质，则认为该分割 <strong>有效</strong> 。</p>
+
+<ul>
+	<li>例如，如果 <code>nums = [2, 3, 3]</code> ，那么在下标 <code>i = 0</code> 处的分割有效，因为 <code>2</code> 和 <code>9</code> 互质，而在下标 <code>i = 1</code> 处的分割无效，因为 <code>6</code> 和 <code>3</code> 不互质。在下标 <code>i = 2</code> 处的分割也无效，因为 <code>i == n - 1</code> 。</li>
+</ul>
+
+<p>返回可以有效分割数组的最小下标 <code>i</code> ，如果不存在有效分割，则返回 <code>-1</code> 。</p>
+
+<p>当且仅当 <code>gcd(val1, val2) == 1</code> 成立时，<code>val1</code> 和 <code>val2</code> 这两个值才是互质的，其中 <code>gcd(val1, val2)</code> 表示 <code>val1</code> 和 <code>val2</code> 的最大公约数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/12/14/second.PNG" style="width: 450px; height: 211px;" /></p>
+
+<pre>
+<strong>输入：</strong>nums = [4,7,8,15,3,5]
+<strong>输出：</strong>2
+<strong>解释：</strong>上表展示了每个下标 i 处的前 i + 1 个元素的乘积、剩余元素的乘积和它们的最大公约数的值。
+唯一一个有效分割位于下标 2 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/12/14/capture.PNG" style="width: 450px; height: 215px;" /></p>
+
+<pre>
+<strong>输入：</strong>nums = [4,7,15,8,3,5]
+<strong>输出：</strong>-1
+<strong>解释：</strong>上表展示了每个下标 i 处的前 i + 1 个元素的乘积、剩余元素的乘积和它们的最大公约数的值。
+不存在有效分割。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 376 ms</p>
+                    <p>内存: 48.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+ma = 10**6
+
+def get_primes(M):
+    f = [1]*M
+    for i in range(2,isqrt(M)+1):
+        if f[i]:
+            f[i*i:M:i] = [0] * ((M-1-i*i)//i+1)
+    return [i for i in range(2,M) if f[i]]
+
+primes = get_primes(isqrt(ma)+1)
+
+@cache
+def factor(x):
+    ct = Counter()
+    for p in primes:
+        while x%p==0:
+            x//=p
+            ct[p] += 1
+    if x&gt;1:
+        ct[x] += 1
+    return ct
+
+class Solution:
+    def findValidSplit(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        d = {p:i for i in range(n) for p in factor(nums[i])}
+        r = 0
+        for i in range(n-1):
+            for p in factor(nums[i]):
+                r = max(r,d[p])
+            if r==i:
+                return i
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了一种基于数论和质因数分解的方法来寻找有效的分割点。首先，创建一个质数列表，用于对数组中的每个元素进行质因数分解。然后，利用一个字典记录每个质因数最后一次出现的位置。接着，遍历数组，对于每个元素，更新其质因数的最后出现位置，并检查当前位置是否是有效的分割点。如果当前位置与记录的最大质因数位置相等，说明该位置是一个有效的分割点，因为在此之前的所有元素的乘积与之后的元素的乘积不共享任何质因数，因而互质。如果遍历完成后没有找到有效分割点，则返回-1。</p>
+                                <p>时间复杂度: O(n log M)</p>
+                                <p>空间复杂度: O(n log M)</p>
+                                <pre class="bg-light p-2">from math import isqrt
+from functools import cache
+from collections import Counter
+
+# 计算不超过M的所有质数
+ma = 10**6
+def get_primes(M):
+    f = [1]*M
+    for i in range(2, isqrt(M)+1):
+        if f[i]:
+            f[i*i:M:i] = [0] * ((M-1-i*i)//i+1)
+    return [i for i in range(2, M) if f[i]]
+
+primes = get_primes(isqrt(ma)+1)
+
+# 使用质数列表对x进行质因数分解
+@cache
+def factor(x):
+    ct = Counter()
+    for p in primes:
+        while x % p == 0:
+            x //= p
+            ct[p] += 1
+    if x &gt; 1:
+        ct[x] += 1
+    return ct
+
+class Solution:
+    def findValidSplit(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        # 记录每个质因数最后出现的位置
+        d = {p: i for i in range(n) for p in factor(nums[i])}
+        r = 0
+        for i in range(n-1):
+            # 更新质因数的最后位置
+            for p in factor(nums[i]):
+                r = max(r, d[p])
+            # 检查当前位置是否为有效的分割点
+            if r == i:
+                return i
+        return -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在实现中，你是如何确定数组中元素的最大值`ma`，以便于控制生成质数列表的范围？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现中，`ma`代表数组中元素的最大值，该值是估计的或基于问题的上下文确定的。生成质数列表的范围需要覆盖到数组中所有元素的可能质因数，因此需要至少包括到数组中最大元素的平方根。这是因为一个数的最大质因数不会超过其平方根。如果题目中给出了元素的最大范围，我们可以直接使用这一信息。如果没有给出，可能需要先遍历数组确定最大元素。在这个题解中，假设`ma`为10^6，是基于一般情况或题目设定的典型数据范围。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中使用了`cache`装饰器来优化质因数分解的函数，请问这种方法在哪些情况下最有效，以及可能存在的性能瓶颈是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`cache`装饰器来优化质因数分解的函数在数组中存在重复元素或多个元素共享相同质因数时最有效。这种缓存机制可以避免对相同值重复进行质因数分解，从而节省计算时间。然而，缓存也可能导致大量内存使用，尤其是当处理大数据集时。如果质因数分解的数据非常多样，那么缓存可能会存储大量结果，这可能成为性能瓶颈，特别是在内存有限的环境中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            质因数字典`d`初始化中，为什么选择使用字典推导式 `{p: i for i in range(n) for p in factor(nums[i])}`，这是否意味着最后一个质因数的位置会覆盖之前的记录？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中使用字典推导式初始化质因数字典`d`是为了记录每个质因数在数组中的最后一次出现的位置。这种方法确实意味着如果一个质因数在多个位置出现，字典中的记录会被更新为该质因数最后一次出现的位置。这是因为在分割点检查中，我们需要知道质因数出现的最后位置来确定是否可以在某个点进行分割。如果一个质因数的最后位置在当前检查点之后，那么当前点不能作为有效的分割点。因此，覆盖之前的记录是符合逻辑的，以确保我们总是有最新的位置信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/split-the-array-to-make-coprime-products')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/split-the-array-to-make-coprime-products/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

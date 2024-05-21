@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>通过移动项目到空白区域来排序数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>通过移动项目到空白区域来排序数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 143 ms</p>
+                    <p>内存: 28.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution(object):
+    def sortArray(self, nums):
+        n = len(nums)
+        p = [0] * n
+        ans1 = 0
+        for i in range(n):
+            if p[i] == 0:
+                p[i] = 1
+                j = i
+                next_j = nums[j]
+                if next_j == j:
+                    continue
+                count = 1
+                while next_j != i:
+                    j = next_j
+                    p[j] = 1
+                    next_j = nums[j]
+                    count += 1
+                if i == 0:
+                    ans1 += count - 1
+                else:
+                    ans1 += count + 1
+        p = [0] * n
+        ans2 = 0
+        for i in range(n - 1, -1, -1):
+            if p[i] == 0:
+                p[i] = 1
+                j = i
+                next_j = (nums[j] - 1) % n
+                if next_j == j:
+                    continue
+                count = 1
+                while next_j != i:
+                    j = next_j
+                    p[j] = 1
+                    next_j = (nums[j] - 1) % n
+                    count += 1
+                if i == n - 1:
+                    ans2 += count - 1
+                else:
+                    ans2 += count + 1
+        return min(ans1, ans2)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解试图通过两种策略来最小化移动数组元素到正确位置所需的步数。第一种策略是直接按照每个元素的目标位置进行排序，尝试发现和纠正位置错误的元素，从而形成一个闭环。第二种策略是考虑元素可能向左移动的情况，也形成闭环。具体步骤包括：检查每个元素是否已经在正确位置上；如果不在，则通过循环跟踪每个元素应该在的位置，直到循环回到起点；计算每个闭环中移动的次数。最终返回两种策略中最小的移动次数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution(object):
+    def sortArray(self, nums):
+        n = len(nums)
+        p = [0] * n  # 用于跟踪每个位置的元素是否已经在正确位置
+        ans1 = 0  # 第一种策略的最小移动次数
+        for i in range(n):
+            if p[i] == 0:  # 如果当前元素未处理
+                p[i] = 1  # 标记为已处理
+                j = i
+                next_j = nums[j]  # 下一个需要检查的位置
+                if next_j == j:
+                    continue
+                count = 1  # 用于计算闭环中的移动次数
+                while next_j != i:  # 继续循环直到回到起点
+                    j = next_j
+                    p[j] = 1
+                    next_j = nums[j]
+                    count += 1
+                if i == 0:
+                    ans1 += count - 1
+                else:
+                    ans1 += count + 1
+        p = [0] * n  # 重新初始化 p 用于第二种策略
+        ans2 = 0  # 第二种策略的最小移动次数
+        for i in range(n - 1, -1, -1):
+            if p[i] == 0:  # 如果当前元素未处理
+                p[i] = 1
+                j = i
+                next_j = (nums[j] - 1) % n
+                if next_j == j:
+                    continue
+                count = 1
+                while next_j != i:
+                    j = next_j
+                    p[j] = 1
+                    next_j = (nums[j] - 1) % n
+                    count += 1
+                if i == n - 1:
+                    ans2 += count - 1
+                else:
+                    ans2 += count + 1
+        return min(ans1, ans2)  # 返回两种策略的最小值</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在第一种策略中，元素在其正确位置时，可以直接跳过而不考虑其他因素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在第一种策略中，如果一个元素已经位于其正确的位置，即数组索引与元素值相等，这意味着这个位置上的元素不需要移动。因此，我们可以将其标记为已处理并跳过，这样做可以避免不必要的操作，减少计算量。此外，跳过已正确放置的元素也可以防止形成只有一个元素的闭环，从而简化问题处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你是如何确定在第二种策略中，使用 `(nums[j] - 1) % n` 来计算下一个索引的？这种计算方式与数组的特性有什么关联？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>第二种策略考虑了元素可能需要向左移动的情况。使用 `(nums[j] - 1) % n` 的计算方式基于假设数组中的元素应该位于 `nums[j] - 1` 的位置，即元素值减1后的位置（考虑元素值与索引的对应关系）。模运算 `% n` 确保索引值在数组的有效范围内，特别是当 `nums[j] - 1` 为负数时，模运算可以正确地将索引环绕到数组的末尾。这种计算方式允许我们在数组中循环定位每个元素应放置的正确位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在两种策略中，你是如何处理元素已经在正确位置上的情况，以确保不会对这些元素重复操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，通过使用一个辅助数组 `p` 来跟踪每个元素的处理状态，确保每个元素只被处理一次。在开始处理每个元素之前，首先检查其对应的 `p` 值是否为0（未处理）。如果已经标记为处理（`p[i]` 不为0），则直接跳过该元素，从而避免重复处理已经在正确位置的元素。这种方法确保每个元素只在它首次被发现不在正确位置时被移动，有效避免了重复和不必要的操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在代码中，对于每一个闭环，你是怎样决定增加的移动次数的？尤其是在闭环的起始点为数组的第一个元素或最后一个元素时，为什么移动次数的计算会有所不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，闭环的移动次数计算基于闭环内的元素个数。对于每个闭环，我们通过循环跟踪元素位置，直到回到闭环的起点，计算过程中每一次跳转都增加1到移动次数。特别地，如果闭环的起始点是数组的第一个元素或最后一个元素，移动次数的计算稍有不同，以适应数组边界的特殊情况。对于起始点为0的情况，因为第一个元素的位置通常是移动的起始点，所以移动次数是闭环长度减1。而对于起始点为数组最后一个元素的情况，由于可能需要额外的一步将元素移回起点，因此移动次数是闭环长度加1。这种计算确保了考虑到数组边界和元素的实际移动需求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/sort-array-by-moving-items-to-empty-space')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/sort-array-by-moving-items-to-empty-space/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>乘积小于 K 的子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>乘积小于 K 的子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        给你一个整数数组 <code>nums</code> 和一个整数 <code>k</code> ，请你返回子数组内所有元素的乘积严格小于<em> </em><code>k</code> 的连续子数组的数目。
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [10,5,2,6], k = 100
+<strong>输出：</strong>8
+<strong>解释：</strong>8 个乘积小于 100 的子数组分别为：[10]、[5]、[2],、[6]、[10,5]、[5,2]、[2,6]、[5,2,6]。
+需要注意的是 [10,5,2] 并不是乘积小于 100 的子数组。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,3], k = 0
+<strong>输出：</strong>0</pre>
+
+
+
+<p><strong>提示:&nbsp;</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 3 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 1000</code></li>
+	<li><code>0 &lt;= k &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 78 ms</p>
+                    <p>内存: 18.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numSubarrayProductLessThanK(self, nums: List[int], k: int) -&gt; int:
+        if k &lt;= 1:
+            return 0
+
+        count = 0
+        left = 0
+        prod = 1
+
+        for right in range(len(nums)):
+            prod *= nums[right]
+
+            while prod &gt;= k and left &lt;= right:
+                prod //= nums[left]
+                left += 1
+
+            count += right - left + 1
+
+        return count
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了滑动窗口的策略来找出所有乘积小于 k 的子数组。首先，定义一个变量 prod 来存储当前窗口内所有元素的乘积，和一个计数器 count 来统计符合条件的子数组数目。遍历数组 nums，使用一个右指针 right 表示当前窗口的右边界。对于每一个新的 right，将 nums[right] 乘到 prod 上。如果 prod 大于或等于 k，则移动左指针 left 直到 prod 小于 k。每次找到有效的窗口后，可以通过 right-left+1 计算出新添加的子数组数量，因为每扩展一次右边界，就会增加从 left 到 right 的所有连续子数组。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numSubarrayProductLessThanK(self, nums: List[int], k: int) -&gt; int:
+        if k &lt;= 1:
+            return 0  # 当 k 小于等于 1 时，没有有效的子数组
+
+        count = 0  # 计数符合条件的子数组数量
+        left = 0  # 左指针
+        prod = 1  # 用于计算当前窗口内所有元素的乘积
+
+        for right in range(len(nums)):
+            prod *= nums[right]  # 将当前元素乘到 prod 上
+
+            while prod &gt;= k and left &lt;= right:
+                prod //= nums[left]  # 如果 prod 大于等于 k，移动左指针，并更新 prod
+                left += 1
+
+            count += right - left + 1  # 计算包括当前右指针元素的新子数组数量
+
+        return count  # 返回总数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在k小于等于1时直接返回0，这种情况下是否有可能存在其他的有效子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当k小于等于1时，无论数组中的元素如何，任何非空子数组的乘积都至少为1（因为数组元素都是正整数）。因此，不能存在乘积小于1的子数组，所以直接返回0是合理的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在滑动窗口算法中，为什么选择右指针向右移动时增加元素至prod，而不是左指针向右移动时减少元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口的目标是探索所有可能的子数组，而右指针向右移动时增加元素至prod，可以帮助我们持续扩展当前的窗口，从而发现新的符合条件的子数组。如果仅在左指针移动时更新prod，我们将无法有效地利用之前的计算结果，因每次右指针扩展都可能产生新的符合条件的子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您提到每次右指针扩展可以通过right-left+1计算新增的子数组数量，能否具体解释一下这种计算方式的逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>每当右指针right向右移动并包含一个新元素时，我们可以形成新的子数组，这些子数组的结束点都是新的right位置，起始点从left到right。例如，如果left为2而right为5，那么新增的子数组包括[2,5]、[3,5]、[4,5]和[5]共(right-left+1)个。这样计算可以快速统计每扩展一次右边界时新增的子数组数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果nums数组中存在0，这种滑动窗口方法怎样处理？是否需要特别的处理逻辑来应对prod为0的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组中存在0，那么任何包含0的子数组的乘积都将是0，这显然小于k（假设k&gt;1）。在遇到0的情况下，prod会变成0，我们需要重置prod为1并将左指针移动到0的下一个位置，因为包含0的任何子数组都不需要进一步考虑乘积是否满足条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/maximum-product-subarray" class="list-group-item list-group-item-action">
+                                乘积最大子数组
+                            </a>
+                        
+                            <a href="/problem/maximum-size-subarray-sum-equals-k" class="list-group-item list-group-item-action">
+                                和等于 k 的最长子数组长度
+                            </a>
+                        
+                            <a href="/problem/subarray-sum-equals-k" class="list-group-item list-group-item-action">
+                                和为 K 的子数组
+                            </a>
+                        
+                            <a href="/problem/two-sum-less-than-k" class="list-group-item list-group-item-action">
+                                小于 K 的两数之和
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/subarray-product-less-than-k')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/subarray-product-less-than-k/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

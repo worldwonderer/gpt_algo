@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>需要教语言的最少人数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>需要教语言的最少人数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在一个由 <code>m</code> 个用户组成的社交网络里，我们获取到一些用户之间的好友关系。两个用户之间可以相互沟通的条件是他们都掌握同一门语言。</p>
+
+<p>给你一个整数 <code>n</code> ，数组 <code>languages</code> 和数组 <code>friendships</code> ，它们的含义如下：</p>
+
+<ul>
+	<li>总共有 <code>n</code> 种语言，编号从 <code>1</code> 到 <code>n</code> 。</li>
+	<li><code>languages[i]</code> 是第 <code>i</code> 位用户掌握的语言集合。</li>
+	<li><code>friendships[i] = [u<sub>​​​​​​i</sub>​​​, v<sub>​​​​​​i</sub>]</code> 表示 <code>u<sup>​​​​​</sup><sub>​​​​​​i</sub></code>​​​​​ 和 <code>v<sub>i</sub></code> 为好友关系。</li>
+</ul>
+
+<p>你可以选择 <strong>一门</strong> 语言并教会一些用户，使得所有好友之间都可以相互沟通。请返回你 <strong>最少</strong> 需要教会多少名用户。</p>
+请注意，好友关系没有传递性，也就是说如果 <code>x</code> 和 <code>y</code> 是好友，且 <code>y</code> 和 <code>z</code> 是好友， <code>x</code> 和 <code>z</code> 不一定是好友。
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>n = 2, languages = [[1],[2],[1,2]], friendships = [[1,2],[1,3],[2,3]]
+<b>输出：</b>1
+<b>解释：</b>你可以选择教用户 1 第二门语言，也可以选择教用户 2 第一门语言。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>n = 3, languages = [[2],[1,3],[1,2],[3]], friendships = [[1,4],[1,2],[3,4],[2,3]]
+<b>输出：</b>2
+<b>解释：</b>教用户 1 和用户 3 第三门语言，需要教 2 名用户。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 <= n <= 500</code></li>
+	<li><code>languages.length == m</code></li>
+	<li><code>1 <= m <= 500</code></li>
+	<li><code>1 <= languages[i].length <= n</code></li>
+	<li><code>1 <= languages[i][j] <= n</code></li>
+	<li><code>1 <= u<sub>​​​​​​i</sub> < v<sub>​​​​​​i</sub> <= languages.length</code></li>
+	<li><code>1 <= friendships.length <= 500</code></li>
+	<li>所有的好友关系 <code>(u<sub>​​​​​i, </sub>v<sub>​​​​​​i</sub>)</code> 都是唯一的。</li>
+	<li><code>languages[i]</code> 中包含的值互不相同。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 90 ms</p>
+                    <p>内存: 29.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumTeachings(self, n: int, languages: List[List[int]], friendships: List[List[int]]) -&gt; int:
+        # 没想到，居然是... 只是统计计数就可以...!!!!!
+        # 贪心：统计所有的无法沟通的好友们，找到他们会的最多的语言，教给所有这些人中不会这门语言的人.
+        # 但是每对人两两就需要确定出来共同语言... 会很慢的吧???
+        # 我日，只能这么暴力...
+        
+        tmp = [None] * len(languages)   # set 化，大幅降低复杂度!!!
+        for i, langs in enumerate(languages):
+            tmp[i] = set(langs)
+        
+        def has_common(p1, p2):
+            for lang1 in tmp[p1-1]:
+                if lang1 in tmp[p2-1]:
+                    return True
+            return False
+        
+        p_cnt = Counter()
+        # 统计没有共同语言的总人数
+        for p1, p2 in friendships:
+            if not has_common(p1, p2):
+                p_cnt[p1] += 1
+                p_cnt[p2] += 1
+        
+        if len(p_cnt) == 0:
+            # 所有人都可正常交流...
+            return 0
+        
+        lang_cnt = Counter()
+        # 统计这些人会的语言总数
+        for p, _ in p_cnt.items():
+            for lang in languages[p - 1]:
+                lang_cnt[lang] += 1
+        
+        best_lang, cnt = lang_cnt.most_common(1)[0]  # 会的最多的语言
+        return len(p_cnt) - cnt</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用的是贪心的策略。首先，将每个用户会的语言转换成集合，以便快速判断两个用户是否有共同语言。接着，遍历所有的好友关系，对于没有共同语言的好友对，统计他们各自的出现次数。然后，统计这些用户会的语言的出现次数。最后，找出这些用户会的语言中出现次数最多的那个，教给不会这门语言的用户，使得所有好友之间都可以相互沟通。需要教的人数就是不会这门语言的用户数减去已经会这门语言的用户数。</p>
+                                <p>时间复杂度: O(m*n + f*n)</p>
+                                <p>空间复杂度: O(m*n + m + n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumTeachings(self, n: int, languages: List[List[int]], friendships: List[List[int]]) -&gt; int:
+        # 将每个用户会的语言转换成集合
+        tmp = [None] * len(languages)
+        for i, langs in enumerate(languages):
+            tmp[i] = set(langs)
+        
+        # 判断两个用户是否有共同语言
+        def has_common(p1, p2):
+            for lang1 in tmp[p1-1]:
+                if lang1 in tmp[p2-1]:
+                    return True
+            return False
+        
+        # 统计没有共同语言的好友对中各自的出现次数
+        p_cnt = Counter()
+        for p1, p2 in friendships:
+            if not has_common(p1, p2):
+                p_cnt[p1] += 1
+                p_cnt[p2] += 1
+        
+        if len(p_cnt) == 0:
+            return 0
+        
+        # 统计这些用户会的语言的出现次数
+        lang_cnt = Counter()
+        for p, _ in p_cnt.items():
+            for lang in languages[p - 1]:
+                lang_cnt[lang] += 1
+        
+        # 找出出现次数最多的语言
+        best_lang, cnt = lang_cnt.most_common(1)[0]
+        return len(p_cnt) - cnt
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在这个题解中，你是如何保证在所有用户中选择一门语言来教授能满足最少教授人数的目标？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，通过统计每种语言在不会共同语言的用户对中的出现频率来保证选择。首先识别出所有好友对中不共享任何语言的用户对，然后对这些用户统计他们各自所会的语言的出现次数。目标是选择一门语言，使得需要新学这门语言的用户数量最小。因此，选择出现次数最多的语言，意味着这门语言已经被最多的目标用户学会，从而教授这门语言的总人数会最少。这种策略在贪心算法的框架下是有效的，因为它每一步都尽可能减少需要教授的人数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在实现函数`has_common`时，为什么选择使用循环遍历而不是使用集合的交集操作来判断两个用户是否有共同语言？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现`has_common`函数时，选择使用循环遍历的原因可能是出于效率的考虑。虽然使用集合的交集操作（如`set1 &amp; set2`）可以直接判断两个集合是否有共同元素，但这种方法会产生一个新的集合，可能涉及额外的内存分配和计算开销。相反，循环遍历列表并检查元素是否存在于另一个集合中（使用`in`操作符），可以在找到第一个共同元素时立即停止，这样在最佳情况下可以更快地返回结果，尤其是当共同语言出现在列表的开始部分时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在最后计算最少教授人数时，使用`len(p_cnt) - cnt`的方式来得出结果？这种计算方式的前提条件是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在最后计算最少教授人数时，使用`len(p_cnt) - cnt`的方式基于以下前提条件：`p_cnt`记录的是所有需要通过教授新语言来实现沟通的用户数量（即没有共同语言的好友对中的用户），而`cnt`是这些用户中已经会某一特定语言（出现次数最多的语言）的用户数量。这样，`len(p_cnt) - cnt`实际上计算的是在已经确定最优语言之后，还需要被教授这门语言的用户数量。这种计算方式假设最优语言是能够最大程度减少教授需求的语言，即这种语言已经被尽可能多的目标用户掌握。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-number-of-people-to-teach')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-number-of-people-to-teach/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>24 点游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>24 点游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个长度为4的整数数组&nbsp;<code>cards</code>&nbsp;。你有 <code>4</code> 张卡片，每张卡片上都包含一个范围在 <code>[1,9]</code> 的数字。您应该使用运算符&nbsp;<code>['+', '-', '*', '/']</code>&nbsp;和括号&nbsp;<code>'('</code>&nbsp;和&nbsp;<code>')'</code>&nbsp;将这些卡片上的数字排列成数学表达式，以获得值24。</p>
+
+<p>你须遵守以下规则:</p>
+
+<ul>
+	<li>除法运算符 <code>'/'</code> 表示实数除法，而不是整数除法。
+
+	<ul>
+		<li>例如，&nbsp;<code>4 /(1 - 2 / 3)= 4 /(1 / 3)= 12</code>&nbsp;。</li>
+	</ul>
+	</li>
+	<li>每个运算都在两个数字之间。特别是，不能使用 <code>“-”</code> 作为一元运算符。
+	<ul>
+		<li>例如，如果 <code>cards =[1,1,1,1]</code> ，则表达式 <code>“-1 -1 -1 -1”</code> 是 <strong>不允许</strong> 的。</li>
+	</ul>
+	</li>
+	<li>你不能把数字串在一起
+	<ul>
+		<li>例如，如果 <code>cards =[1,2,1,2]</code> ，则表达式 <code>“12 + 12”</code> 无效。</li>
+	</ul>
+	</li>
+</ul>
+
+<p>如果可以得到这样的表达式，其计算结果为 <code>24</code> ，则返回 <code>true </code>，否则返回 <code>false</code>&nbsp;。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> cards = [4, 1, 8, 7]
+<strong>输出:</strong> true
+<strong>解释:</strong> (8-4) * (7-1) = 24
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> cards = [1, 2, 1, 2]
+<strong>输出:</strong> false
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>cards.length == 4</code></li>
+	<li><code>1 &lt;= cards[i] &lt;= 9</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+class Solution:
+    def judgePoint24(self, cards: List[int]) -&gt; bool:
+        if len(cards) == 1:
+            return abs(cards[0] - 24) &lt; 1e-6
+
+        # 尝试每一种分割方式
+        for i in range(len(cards)):
+            for j in range(len(cards)):
+                if i != j:
+                    # 选择两个不同的数字
+                    num1, num2 = cards[i], cards[j]
+                    # 剩余的数字
+                    next_cards = [cards[k] for k in range(len(cards)) if i != k != j]
+                    # 尝试每种运算符
+                    for op in (truediv, mul, add, sub):
+                        # 避免除以零
+                        if op is not truediv or num2 != 0:
+                            next_num = op(num1, num2)
+                            # 加入运算结果并递归
+                            if self.judgePoint24(next_cards + [next_num]):
+                                return True
+                        # 对于减法和除法，还需要考虑反过来的情况
+                        if op in (sub, truediv) and num1 != 0:
+                            next_num = op(num2, num1)
+                            if self.judgePoint24(next_cards + [next_num]):
+                                return True
+        return False</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了递归回溯的方法来解决24点游戏。主要思路是，每次递归中选择两个数字进行所有四种运算（加、减、乘、除），并将结果作为新的数字与剩余的数字一起继续递归处理，直到数组中只剩下一个数字，如果这个数字接近24（由于浮点运算，这里使用了一个小的阈值来判断），则返回true。对于除法和减法，由于它们不满足交换律，需要额外处理两个数字位置交换的情况。递归终止的基本情况是当数组中只剩一个数字，检查这个数字是否接近24。</p>
+                                <p>时间复杂度: O(1) （因为输入的卡片数量固定为4，所以时间复杂度可以视为常量时间复杂度）</p>
+                                <p>空间复杂度: O(4) （递归深度）</p>
+                                <pre class="bg-light p-2">class Solution:
+    def judgePoint24(self, cards: List[int]) -&gt; bool:
+        if len(cards) == 1:
+            return abs(cards[0] - 24) &lt; 1e-6
+
+        # 尝试每一种分割方式
+        for i in range(len(cards)):
+            for j in range(len(cards)):
+                if i != j:
+                    # 选择两个不同的数字
+                    num1, num2 = cards[i], cards[j]
+                    # 剩余的数字
+                    next_cards = [cards[k] for k in range(len(cards)) if i != k != j]
+                    # 尝试每种运算符
+                    for op in (truediv, mul, add, sub):
+                        # 避免除以零
+                        if op is not truediv or num2 != 0:
+                            next_num = op(num1, num2)
+                            # 加入运算结果并递归
+                            if self.judgePoint24(next_cards + [next_num]):
+                                return True
+                        # 对于减法和除法，还需要考虑反过来的情况
+                        if op in (sub, truediv) and num1 != 0:
+                            next_num = op(num2, num1)
+                            if self.judgePoint24(next_cards + [next_num]):
+                                return True
+        return False</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用递归回溯方法来解决这道24点游戏题目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>递归回溯方法适用于这种问题因为24点游戏要求我们探索所有可能的数字组合和运算符组合，以找到能够形成特定值（如24）的表达式。递归允许我们深入每一种可能的运算和数字组合，而回溯则允许我们在一条路径不再有希望时放弃它，回退到上一步尝试其他可能的路径。这种方法在解决需要枚举多种组合和顺序的问题时非常高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            递归方法中，如何处理数字的重复使用问题，避免在递归过程中多次选择同一数字？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归中处理重复数字的问题，通过在每次递归调用时创建一个新的数字列表来解决。在具体实现中，我们首先选择两个数字进行运算，然后将这两个数字从当前列表中移除，将运算结果添加到剩余数字的列表中。通过索引确保每次只选择不同的数字。这样，即使原始数组中有重复的数字，也能保证每次递归处理的是不同的数字实例，从而避免了在递归过程中多次使用同一数字的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在递归过程中，你是如何决定在哪一层递归中终止并返回结果的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归过程中，终止条件是当数字列表只剩一个数字时。在每次递归中，我们通过不同的运算减少列表中的数字数量，直到列表中仅剩一个数字。如果这个数字非常接近24（由于浮点数的精度问题，通常使用一个小的阈值如1e-6来判断），我们认为找到了一个有效的解决方案，返回true。如果所有的路径都被尝试过后没有找到解决方案，最终返回false。这种方法确保了我们能够全面地探索所有可能的数字和运算符组合，直到找到答案或确认无解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/24-game')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/24-game/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

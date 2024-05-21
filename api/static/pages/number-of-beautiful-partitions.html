@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>完美分割的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>完美分割的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>s</code>&nbsp;，每个字符是数字&nbsp;<code>'1'</code>&nbsp;到&nbsp;<code>'9'</code>&nbsp;，再给你两个整数&nbsp;<code>k</code> 和&nbsp;<code>minLength</code>&nbsp;。</p>
+
+<p>如果对 <code>s</code>&nbsp;的分割满足以下条件，那么我们认为它是一个 <strong>完美</strong>&nbsp;分割：</p>
+
+<ul>
+	<li><code>s</code>&nbsp;被分成 <code>k</code>&nbsp;段互不相交的子字符串。</li>
+	<li>每个子字符串长度都 <strong>至少</strong>&nbsp;为&nbsp;<code>minLength</code>&nbsp;。</li>
+	<li>每个子字符串的第一个字符都是一个 <b>质数</b> 数字，最后一个字符都是一个 <strong>非质数</strong>&nbsp;数字。质数数字为&nbsp;<code>'2'</code>&nbsp;，<code>'3'</code>&nbsp;，<code>'5'</code>&nbsp;和&nbsp;<code>'7'</code>&nbsp;，剩下的都是非质数数字。</li>
+</ul>
+
+<p>请你返回 <code>s</code>&nbsp;的 <strong>完美</strong>&nbsp;分割数目。由于答案可能很大，请返回答案对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong>&nbsp;后的结果。</p>
+
+<p>一个 <strong>子字符串</strong>&nbsp;是字符串中一段连续字符串序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "23542185131", k = 3, minLength = 2
+<b>输出：</b>3
+<b>解释：</b>存在 3 种完美分割方案：
+"2354 | 218 | 5131"
+"2354 | 21851 | 31"
+"2354218 | 51 | 31"
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>s = "23542185131", k = 3, minLength = 3
+<b>输出：</b>1
+<b>解释：</b>存在一种完美分割方案："2354 | 218 | 5131" 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>s = "3312958", k = 3, minLength = 1
+<b>输出：</b>1
+<b>解释：</b>存在一种完美分割方案："331 | 29 | 58" 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= k, minLength &lt;= s.length &lt;= 1000</code></li>
+	<li><code>s</code>&nbsp;每个字符都为数字&nbsp;<code>'1'</code>&nbsp;到&nbsp;<code>'9'</code> 之一。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 250 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">MOD = int(1e9 + 7)
+
+class Solution:
+
+    def beautifulPartitions(self, s: str, k: int, minLength: int) -&gt; int:
+        n = len(s)
+        pri = [False] * 11
+        pri[2] = pri[3] = pri[5] = pri[7] = True
+        s = [int(i) for i in s]
+        if pri[s[-1]] is True or pri[s[0]] is False:
+            return 0
+        split_allowed = [True] * n
+        for i in range(n - 1):
+            if not (pri[s[i]] == False and pri[s[i + 1]] == True):
+                split_allowed[i] = False
+        #print(split_allowed)
+        # dp = [0 if ind &lt; minLength else int(i) for ind, val in enumerate(split_allowed)]
+        dp_last = dp = [0] * (n + 1)
+        for i in range(1,len(dp_last)):
+            dp_last[i] = split_allowed[i-1]
+
+
+        sum_last = [1] * (n + 1)
+
+        for i in range(1, k + 1):
+            # es = []
+            sum_cur = [0] * (n + 1)
+            dp = [0] * (n+1)
+            #print(&#39;\t&#39;, sum_last)
+            for j in range(i * minLength, n + 1):
+                if not split_allowed[j - 1]:
+                    sum_cur[j] = sum_cur[j - 1]
+                    continue
+                # f = bisect.bisect_left(es, j - minLength) - 1
+                # if f == -1:
+                #     dp[j] = sum_last[j - minLength - 1]
+                # else:
+                #     dp[j] = sum_last[es[f]]
+                dp[j] = sum_last[j - minLength]
+                sum_cur[j] = (sum_cur[j - 1] + dp[j]) % MOD
+                # if dp[j] != 0:
+                #     es.append(j)
+
+            #print(dp)
+            dp_last = dp
+            sum_last = sum_cur
+
+        return dp[-1]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题目的解法使用了动态规划。首先，创建一个布尔数组`pri`来标记哪些数字是质数。接着，将字符串`s`转换为整数数组方便处理。然后，创建一个`split_allowed`数组用来标记在哪些位置可以进行分割，即前一个字符是非质数并且后一个字符是质数的位置。接下来，使用一个动态规划数组`dp`，其中`dp[j]`表示从字符串开始到位置`j`的完美分割数。`sum_last`数组用来存储累加和，以便在计算中快速获取区间和。对于每段可能的分割，更新`dp`和`sum_cur`数组，并最终返回最后的分割方案数。</p>
+                                <p>时间复杂度: O(kn)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">MOD = int(1e9 + 7)
+
+class Solution:
+
+    def beautifulPartitions(self, s: str, k: int, minLength: int) -&gt; int:
+        n = len(s)
+        pri = [False] * 11
+        pri[2] = pri[3] = pri[5] = pri[7] = True  # 标记质数
+        s = [int(i) for i in s]  # 将字符转换为整数
+        if pri[s[-1]] is True or pri[s[0]] is False:
+            return 0  # 处理字符串首尾字符不符合条件的情况
+        split_allowed = [True] * n
+        for i in range(n - 1):
+            if not (pri[s[i]] == False and pri[s[i + 1]] == True):
+                split_allowed[i] = False  # 标记可以分割的位置
+
+        dp_last = dp = [0] * (n + 1)  # 初始化dp数组
+        for i in range(1,len(dp_last)):
+            dp_last[i] = split_allowed[i-1]  # 初始化dp_last为分割允许的情况
+
+        sum_last = [1] * (n + 1)  # 初始化sum_last数组
+
+        for i in range(1, k + 1):
+            sum_cur = [0] * (n + 1)
+            dp = [0] * (n+1)
+            for j in range(i * minLength, n + 1):
+                if not split_allowed[j - 1]:
+                    sum_cur[j] = sum_cur[j - 1]  # 更新当前累加和数组
+                    continue
+                dp[j] = sum_last[j - minLength]  # 计算当前dp值
+                sum_cur[j] = (sum_cur[j - 1] + dp[j]) % MOD  # 更新累加和取模
+
+            dp_last = dp
+            sum_last = sum_cur
+
+        return dp[-1]  # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在检查是否可以作为分割点时，只考虑前一个字符是非质数和后一个字符是质数的情况？是否还需要考虑字符长度的限制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此问题中，分割点的选择基于特定的质数规则，即前一个字符（分割点前的字符）必须是非质数，后一个字符（分割点后的字符）必须是质数。这种规则是为了确保每个分割出来的子字符串在特定的质数条件下开始和结束。至于字符长度的限制，这确实是一个重要的考虑因素，但在确定分割点是否允许时，长度限制并未直接涉及。字符长度的限制在动态规划的具体实现中考虑，通过控制从哪些位置可以开始新的子段，以确保每个子段至少有 `minLength` 长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理字符串首尾字符不符合条件的情况时，为什么直接返回0？是否有可能存在其他有效的分割方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果字符串的首字符是质数或尾字符是非质数，则整个字符串无法在题目定义的规则下完美分割，因为所有的分割都必须确保每个子字符串从非质数开始到质数结束。由于首尾字符设置了整个字符串的起始和结束条件，如果这些条件不满足，那么无法形成任何有效的分割，因此直接返回0是合理的。在这种情况下，不存在其他有效的分割方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划实现中，`dp[j]`是如何确保每个子字符串长度至少为`minLength`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划的实现中，`dp[j]`表示从字符串开始到位置`j`的完美分割数。为了确保每个子字符串长度至少为`minLength`，代码中的循环从`i * minLength`开始，这保证了每次计算`dp[j]`时，都至少从`minLength`长度之前的索引开始考虑，即确保了分割出来的每个子字符串长度至少为`minLength`。此外，计算`dp[j]`时，使用的是`sum_last[j - minLength]`，这也进一步确保了长度限制的遵守。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新`sum_cur`数组时，为什么选择累加`dp[j]`值而不是直接使用`dp[j]`的当前值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新`sum_cur`数组时，选择累加`dp[j]`值是为了维护一个到当前位置为止的所有可能的分割方案的总和。这样做可以便于下一次计算新的`dp[j]`值时，直接利用这个累积和，无需重新遍历之前的元素来求和。这是一种优化手段，使得每次更新`dp[j]`时的计算更加高效，只需要O(1)的时间即可得到所需的前缀和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-beautiful-partitions')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-beautiful-partitions/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>收藏清单</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>收藏清单</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个数组 <code>favoriteCompanies</code> ，其中 <code>favoriteCompanies[i]</code> 是第 <code>i</code> 名用户收藏的公司清单（<strong>下标从 0 开始</strong>）。</p>
+
+<p>请找出不是其他任何人收藏的公司清单的子集的收藏清单，并返回该清单下标<em>。</em>下标需要按升序排列<em>。</em></p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>favoriteCompanies = [[&quot;leetcode&quot;,&quot;google&quot;,&quot;facebook&quot;],[&quot;google&quot;,&quot;microsoft&quot;],[&quot;google&quot;,&quot;facebook&quot;],[&quot;google&quot;],[&quot;amazon&quot;]]
+<strong>输出：</strong>[0,1,4] 
+<strong>解释：</strong>
+favoriteCompanies[2]=[&quot;google&quot;,&quot;facebook&quot;] 是 favoriteCompanies[0]=[&quot;leetcode&quot;,&quot;google&quot;,&quot;facebook&quot;] 的子集。
+favoriteCompanies[3]=[&quot;google&quot;] 是 favoriteCompanies[0]=[&quot;leetcode&quot;,&quot;google&quot;,&quot;facebook&quot;] 和 favoriteCompanies[1]=[&quot;google&quot;,&quot;microsoft&quot;] 的子集。
+其余的收藏清单均不是其他任何人收藏的公司清单的子集，因此，答案为 [0,1,4] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>favoriteCompanies = [[&quot;leetcode&quot;,&quot;google&quot;,&quot;facebook&quot;],[&quot;leetcode&quot;,&quot;amazon&quot;],[&quot;facebook&quot;,&quot;google&quot;]]
+<strong>输出：</strong>[0,1] 
+<strong>解释：</strong>favoriteCompanies[2]=[&quot;facebook&quot;,&quot;google&quot;] 是 favoriteCompanies[0]=[&quot;leetcode&quot;,&quot;google&quot;,&quot;facebook&quot;] 的子集，因此，答案为 [0,1] 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>favoriteCompanies = [[&quot;leetcode&quot;],[&quot;google&quot;],[&quot;facebook&quot;],[&quot;amazon&quot;]]
+<strong>输出：</strong>[0,1,2,3]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;=&nbsp;favoriteCompanies.length &lt;= 100</code></li>
+	<li><code>1 &lt;=&nbsp;favoriteCompanies[i].length &lt;= 500</code></li>
+	<li><code>1 &lt;=&nbsp;favoriteCompanies[i][j].length &lt;= 20</code></li>
+	<li><code>favoriteCompanies[i]</code> 中的所有字符串 <strong>各不相同</strong> 。</li>
+	<li>用户收藏的公司清单也 <strong>各不相同</strong> ，也就是说，即便我们按字母顺序排序每个清单， <code>favoriteCompanies[i] != favoriteCompanies[j] </code>仍然成立。</li>
+	<li>所有字符串仅包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 60 ms</p>
+                    <p>内存: 30.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def peopleIndexes(self, favoriteCompanies: List[List[str]]) -&gt; List[int]:
+        n = len(favoriteCompanies)
+        compSets = [set(favList) for favList in favoriteCompanies] # list转化为set，节省后续时间
+        tops = set(range(n)) # 如果一个下标在tops内，说明他此时没被判定为其他用户的子集
+
+        for i in range(n):
+            if i not in tops: continue # 当前用户的清单已是之前的清单的子集了，不用继续考虑他
+            for j in range(i+1, n): # 与i之前用户的子集关系已经在之前用户的外层循环检查过了，只需往i后检查
+                if j not in tops: continue
+                if i in tops and compSets[i] &lt; compSets[j]: # 当前用户为子集（先判断当前用户没被移除，再判断子集）
+                    tops.remove(i)
+                elif compSets[i] &gt; compSets[j]: # 后续被检查的用户j是否为子集
+                    tops.remove(j)
+        return list(tops)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用集合操作来确定是否有一个收藏清单是另一个收藏清单的子集。首先，每个用户的收藏清单都转换为集合，以方便后续操作。使用一个集合tops来存储所有的索引，代表每个用户的收藏清单初始状态下认为都不是其他清单的子集。然后通过双重循环遍历所有的清单组合，比较两个集合的子集关系。如果发现一个集合是另一个集合的子集，那么将子集对应的索引从tops中移除。最终，tops中剩余的索引即为不是任何其他收藏清单子集的收藏清单索引。</p>
+                                <p>时间复杂度: O(n^2 * min(m, n))</p>
+                                <p>空间复杂度: O(n + nm)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def peopleIndexes(self, favoriteCompanies: List[List[str]]) -&gt; List[int]:
+        n = len(favoriteCompanies) # 收藏清单的数量
+        compSets = [set(favList) for favList in favoriteCompanies] # 将每个收藏清单转换为集合
+        tops = set(range(n)) # 初始化tops集合，包含所有索引
+
+        for i in range(n):
+            if i not in tops: continue # 如果i已经是某个其他清单的子集，则跳过
+            for j in range(i+1, n): # 只比较后面的清单，避免重复比较
+                if j not in tops: continue # 如果j已经是某个其他清单的子集，则跳过
+                if compSets[i] &lt; compSets[j]: # 检查是否i是j的子集
+                    tops.remove(i)
+                    break # 一旦确认为子集，无需继续比较
+                elif compSets[j] &lt; compSets[i]: # 检查是否j是i的子集
+                    tops.remove(j)
+        return list(tops) # 返回结果列表</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法实现中，为什么选择使用集合来存储每个用户的收藏清单，而不是使用列表或其他数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中使用集合来存储每个用户的收藏清单是因为集合（Set）提供了高效的成员检查和去重功能。此外，集合数据结构支持高效的集合运算，如检查子集关系，这是解决问题的关键操作。使用集合能够简化代码并提高性能，特别是在涉及大量数据和需要频繁检查成员资格或进行集合比较的场景中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中提到，如果i已经是某个其他清单的子集，则跳过。这种逻辑是否可能导致某些情况下漏掉不应该跳过的比较？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该逻辑基于一个前提，即如果一个清单已经确定为另一个清单的子集，则在后续比较中，无需再将其作为主体进行子集检查，因为它不可能是最终结果的一部分。这种处理方式不会导致漏掉必要的比较，因为一旦一个清单被识别为子集，它就已经不满足题目要求的独立性。这种方法能有效减少不必要的比较，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            函数中的if compSets[i] &lt; compSets[j]用来检查集合是否为另一个集合的子集。这种方法是否总是准确？存在哪些潜在的效率问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用 &#39;&lt;&#39; 运算符来检查一个集合是否为另一个集合的真子集是准确的。然而，这种方法的效率问题在于，每次子集检查都可能需要遍历整个集合来确认所有元素是否都属于另一集合，导致操作的时间复杂度为 O(n)。在最坏的情况下，需要对所有清单对进行这样的检查，导致总体时间复杂度可能高达 O(n^2 * m)，其中 m 是清单中平均元素数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            最终返回的结果列表是否已经确保了按照题目要求的升序排列？如果没有，需要额外进行排序吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据代码实现，最终返回的结果列表是从一个集合（set）中转换而来的。集合在Python中是无序的，因此直接从集合转换得到的列表顺序是不确定的。如果题目要求结果必须是升序的，那么在返回结果之前需要对列表进行额外的排序操作，使用例如 list.sort() 或 sorted() 方法来保证列表是按照升序排列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/people-whose-list-of-favorite-companies-is-not-a-subset-of-another-list')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/people-whose-list-of-favorite-companies-is-not-a-subset-of-another-list/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

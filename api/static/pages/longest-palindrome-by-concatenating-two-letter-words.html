@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>连接两字母单词得到的最长回文串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>连接两字母单词得到的最长回文串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串数组&nbsp;<code>words</code>&nbsp;。<code>words</code>&nbsp;中每个元素都是一个包含 <strong>两个</strong>&nbsp;小写英文字母的单词。</p>
+
+<p>请你从 <code>words</code>&nbsp;中选择一些元素并按 <b>任意顺序</b>&nbsp;连接它们，并得到一个 <strong>尽可能长的回文串</strong>&nbsp;。每个元素 <strong>至多</strong>&nbsp;只能使用一次。</p>
+
+<p>请你返回你能得到的最长回文串的 <strong>长度</strong>&nbsp;。如果没办法得到任何一个回文串，请你返回 <code>0</code>&nbsp;。</p>
+
+<p><strong>回文串</strong>&nbsp;指的是从前往后和从后往前读一样的字符串。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>words = ["lc","cl","gg"]
+<b>输出：</b>6
+<b>解释：</b>一个最长的回文串为 "lc" + "gg" + "cl" = "lcggcl" ，长度为 6 。
+"clgglc" 是另一个可以得到的最长回文串。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>words = ["ab","ty","yt","lc","cl","ab"]
+<b>输出：</b>8
+<strong>解释：</strong>最长回文串是 "ty" + "lc" + "cl" + "yt" = "tylcclyt" ，长度为 8 。
+"lcyttycl" 是另一个可以得到的最长回文串。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>words = ["cc","ll","xx"]
+<b>输出：</b>2
+<b>解释：</b>最长回文串是 "cc" ，长度为 2 。
+"ll" 是另一个可以得到的最长回文串。"xx" 也是。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= words.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>words[i].length == 2</code></li>
+	<li><code>words[i]</code>&nbsp;仅包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 91 ms</p>
+                    <p>内存: 33.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def longestPalindrome(self, words) -&gt; int:
+        d = Counter(words)
+        r = 0
+        odd = 0
+        for k, v in d.items():
+            if k[0] == k[1]:  # 重叠
+                r += v // 2 * 4
+                if v % 2:
+                    odd = 1
+            else:  # 非重叠
+                rk = k[::-1]
+                if d[rk] &gt; 0:
+                    r += min(d[k], d[rk]) * 4
+                    d[k], d[rk] = 0, 0
+        if odd:
+            r += 2
+        return r
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题的思路是利用哈希表记录每个单词出现的次数。然后遍历哈希表，对于每个键值对，分两种情况讨论：
+1. 如果单词是由两个相同字母组成，比如&#39;aa&#39;，那么它们可以放在回文串的中间，但只能使用偶数个。每使用两个这样的单词，回文串长度增加4（两边各增加2）。如果有剩余的不能成对的单词，可以考虑放在回文串的正中间，但这种情况最多只能发生一次，因此用一个变量 odd 来标记是否已经使用过这样的单词。
+2. 如果单词是由两个不同字母组成，比如&#39;ab&#39;，那么必须找到一个相反的单词（比如&#39;ba&#39;）才能一起使用，每找到一对，回文串长度增加4。为了避免重复计算，处理一对这样的单词后，将它们的计数清零。
+最后，如果存在可以放在中间的单词（odd为1），则回文串长度再加2。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def longestPalindrome(self, words) -&gt; int:
+        d = Counter(words)
+        r = 0
+        odd = 0
+        for k, v in d.items():
+            if k[0] == k[1]:  # 同字母组成的单词
+                r += v // 2 * 4
+                if v % 2:
+                    odd = 1
+            else:  # 不同字母组成的单词
+                rk = k[::-1]
+                if d[rk] &gt; 0:
+                    r += min(d[k], d[rk]) * 4
+                    d[k], d[rk] = 0, 0
+        if odd:
+            r += 2
+        return r</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，对于形如&#39;ab&#39;和&#39;ba&#39;这样的单词对，为什么在处理完一对后要将它们的计数清零？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这样做是为了避免重复计算。当我们找到一对符合条件的单词（例如&#39;ab&#39;和&#39;ba&#39;）时，我们会将它们一起添加到回文串中，每对这样的单词可以在回文串的两边各增加2，总共增加4。一旦这两个单词被使用，它们就应该从后续计算中排除，以防再次被错误地计算。因此，将这两个单词的计数清零是确保每对单词只被计算一次的简单方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么题解中提到，如果单词由相同的字母组成（比如&#39;aa&#39;），可以将剩余的不能成对的单词最多放一个在回文串的正中间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>回文串是一种前后对称的字符串。对于由相同字母组成的单词（如&#39;aa&#39;），当它们成对出现时可以分别放在回文串的两端，保持对称。如果有一个单词剩余，它可以放在回文串的中心位置，但因为回文串的中心只有一个位置，所以即使有多个这样的单词剩余，也只能使用一个。这是为了维持回文串结构的整体对称性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的回文串长度增加的计算方法（如每对&#39;aa&#39;增加4，每对&#39;ab&#39;+&#39;ba&#39;增加4），这种计算方式是否适用于所有可能的字母组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，这种计算方式适用于所有两个字母的组合。对于每对由相同字母组成的单词（如&#39;aa&#39;, &#39;bb&#39;等），可以在回文串的两端各添加一个，总共增加4。对于由两个不同字母组成的单词及其逆序单词（如&#39;ab&#39;和&#39;ba&#39;），同样每找到一对就可以在回文串的两端各添加一个，也总共增加4。这种计算方法适用于所有两字母的可能组合，因为它们都遵循相同的回文构造规则。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中没有详细解释为什么odd变量的存在只能导致回文串长度最终增加2，能否详细解释这个逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回文串中，若有单词由相同字母构成且剩余单个无法成对，这个单词可以独特地放置在回文串的正中心。由于回文的对称性质，中心位置只能放置一个这样的单词。因此，虽然可能有多个这样的单词剩余，但只有一个可以被使用。使用这个单词后，它将回文串的长度增加2（因为它自身由两个字母组成）。因此，即使有多个单个剩余，odd变量的存在（标记至少有一个这样的单词剩余）只会使回文串长度最终增加2。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-palindrome-by-concatenating-two-letter-words')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-palindrome-by-concatenating-two-letter-words/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

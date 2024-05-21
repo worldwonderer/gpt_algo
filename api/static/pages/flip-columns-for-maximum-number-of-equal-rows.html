@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>按列翻转得到最大值等行数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>按列翻转得到最大值等行数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定&nbsp;<code>m x n</code>&nbsp;矩阵&nbsp;<code>matrix</code>&nbsp;。</p>
+
+<p>你可以从中选出任意数量的列并翻转其上的&nbsp;<strong>每个&nbsp;</strong>单元格。（即翻转后，单元格的值从 <code>0</code> 变成 <code>1</code>，或者从 <code>1</code> 变为 <code>0</code> 。）</p>
+
+<p>返回 <em>经过一些翻转后，行内所有值都相等的最大行数</em>&nbsp;。</p>
+
+
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>matrix = [[0,1],[1,1]]
+<strong>输出：</strong>1
+<strong>解释：</strong>不进行翻转，有 1 行所有值都相等。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>matrix = [[0,1],[1,0]]
+<strong>输出：</strong>2
+<strong>解释：</strong>翻转第一列的值之后，这两行都由相等的值组成。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>matrix = [[0,0,0],[0,0,1],[1,1,0]]
+<strong>输出：</strong>2
+<strong>解释：</strong>翻转前两列的值之后，后两行由相等的值组成。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == matrix.length</code></li>
+	<li><code>n == matrix[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 300</code></li>
+	<li><code>matrix[i][j] == 0</code> 或&nbsp;<code>1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 73 ms</p>
+                    <p>内存: 19.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxEqualRowsAfterFlips(self, matrix: List[List[int]]) -&gt; int:
+        n, m = len(matrix), len(matrix[0])
+        d = Counter()
+        for i in range(n):
+            if matrix[i][0]:
+                for k in range(m):
+                    matrix[i][k] ^= 1
+            d[tuple(matrix[i])] += 1  
+        return max(d.values())</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题的核心思路在于将每一行通过列翻转变为全0或全1，以此来最大化行内值相同的行数。因此，可以利用翻转的特性来规范化行的表示。例如，如果某行的第一个元素为1，我们可以翻转整行以使其首元素变为0，从而得到统一的行表示。通过统计每种行表示出现的频次，可以找到最多可以通过翻转得到相同元素的行数。使用字典来记录每种行的出现次数，并通过翻转来确保每一行的第一个元素始终为0，这样只需要比较剩余的部分即可。</p>
+                                <p>时间复杂度: O(n*m)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxEqualRowsAfterFlips(self, matrix: List[List[int]]) -&gt; int:
+        n, m = len(matrix), len(matrix[0])  # 获取行数n和列数m
+        d = Counter()  # 初始化计数器
+        for i in range(n):  # 遍历每一行
+            if matrix[i][0]:  # 如果当前行的第一个元素是1
+                for k in range(m):  # 遍历这一行的每个元素
+                    matrix[i][k] ^= 1  # 将1翻转为0，0翻转为1
+            d[tuple(matrix[i])] += 1  # 将翻转后的行转换为元组并计数
+        return max(d.values())  # 返回出现最多的行的次数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在你的代码中，为什么选择将行的第一个元素统一为0，而不是选择统一为1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择将行的第一个元素统一为0是为了确保行的表示具有一致性和可比性。将第一个元素设为0是一个规范化的过程，使每一行都基于相同的起始条件进行比较和计数。这样做的好处是简化了逻辑，因为0通常在数字操作中作为基础更为直观和统一。此外，无论选择0还是1作为规范化的目标，都不会影响最终结果，因为翻转操作是可逆的，关键在于保持一致的比较标准。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果在矩阵中某行所有元素已经是全0或全1，翻转操作是否会对结果产生不利影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>翻转操作不会对全0或全1行产生不利影响。对于全0行，如果第一个元素已经是0，那么整行不会进行翻转，维持其原样。对于全1行，整行将被翻转成全0，这是一种有效的转换，旨在统一行的格式。这种方法确保了即使原始行是全0或全1，通过翻转可以使所有行尽可能地相似，从而最大化相同行数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            代码实现中将行数据转换为元组来作为字典的键值，这种方式在处理大规模数据时是否有性能瓶颈？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将行数据转换为元组并用作字典键确实可能在处理大规模数据时产生性能瓶颈。首先，元组是不可变的，需要在每次迭代时创建新的元组对象，这会增加内存使用。其次，如果矩阵的列数很大，元组将包含大量元素，这会增加哈希计算的复杂度和存储空间。在面对非常大的数据集时，可以考虑使用更高效的数据结构或优化算法，例如使用位操作和整数哈希来减少内存使用和提高处理速度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在统计行表示出现频次时，是否考虑了各行翻转后可能相等的情况，即原始不同但翻转后相同的行？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，代码实现中确实考虑了各行翻转后可能相等的情况。通过将所有行的第一个元素统一为0，并对需要翻转的行进行实际的翻转操作，确保了即使原始行不同，只要它们翻转后相同，就会被统计为相同的行。这种方法通过对行的统一表示和计数，能够有效地识别和统计那些原始不同但翻转后相同的行，从而最大化可以通过翻转得到相同元素的行数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/flip-columns-for-maximum-number-of-equal-rows')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/flip-columns-for-maximum-number-of-equal-rows/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

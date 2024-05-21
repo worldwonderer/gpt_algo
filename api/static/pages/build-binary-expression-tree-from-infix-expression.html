@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>根据中缀表达式构造二叉表达式树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>根据中缀表达式构造二叉表达式树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 35 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class Node(object):
+#     def __init__(self, val=&#34; &#34;, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def expTree(self, s: str) -&gt; &#39;Node&#39;:
+        
+        # copied from discussion Two stacks approach
+        ops, nums = [], []
+
+        def mock_compute():
+            op = ops.pop()
+            r = nums.pop()
+            l = nums.pop()
+            nums.append(Node(val=op, left=l, right=r))
+
+        for ch in s:
+            if ch.isdigit():
+                nums.append(Node(val=ch))
+            elif ch in [&#39;+&#39;, &#39;-&#39;]:
+                while ops and ops[-1] in [&#39;+&#39;, &#39;-&#39;, &#39;*&#39;, &#39;/&#39;]:
+                    mock_compute()
+                ops.append(ch)
+            elif ch in [&#39;*&#39;, &#39;/&#39;]:
+                while ops and ops[-1] in [&#39;*&#39;, &#39;/&#39;]:
+                    mock_compute()
+                ops.append(ch)
+            elif ch == &#39;(&#39;:
+                ops.append(ch)
+            elif ch == &#39;)&#39;:
+                while ops[-1] != &#39;(&#39;:
+                    mock_compute()
+                ops.pop()
+        while ops:
+            mock_compute()
+        return nums[0]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了两个栈（操作符栈 ops 和数字栈 nums）来处理并构造表达式树。数字栈用于存储表达式中的数字（或已构造的子表达式树），而操作符栈用于存储操作符。在遍历输入字符串 s 时，根据字符的类型（数字、操作符、括号）进行不同的操作：
+1. 数字直接转换为树节点并压入 nums 栈。
+2. 操作符 &#39;+&#39;, &#39;-&#39; 时，如果 ops 栈顶的操作符为 &#39;+&#39;, &#39;-&#39;, &#39;*&#39;, &#39;/&#39;, 需要进行计算以保持操作符的优先级，然后将当前操作符压栈。
+3. 操作符 &#39;*&#39;, &#39;/&#39; 类似，但只比较栈顶是否为 &#39;*&#39;, &#39;/&#39;, 因为这两者优先级更高。
+4. 左括号 &#39;(&#39; 直接压栈，表示优先级的提升。
+5. 右括号 &#39;)&#39; 表示一个括号内的表达式结束，需要执行计算直到遇到左括号。遇到左括号后，将其出栈。
+最后，如果操作符栈中还有剩余操作符，继续执行计算，直到栈为空。最终，nums 栈顶的节点即为根节点。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class Node(object):
+#     def __init__(self, val=&#39; &#39;, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def expTree(self, s: str) -&gt; &#39;Node&#39;:
+        ops, nums = [], [] # 操作符栈和数字栈
+        def mock_compute():
+            op = ops.pop() # 弹出操作符
+            r = nums.pop() # 弹出右操作数
+            l = nums.pop() # 弹出左操作数
+            nums.append(Node(val=op, left=l, right=r)) # 构造节点并压栈
+        for ch in s:
+            if ch.isdigit():
+                nums.append(Node(val=ch)) # 数字转为节点
+            elif ch in [&#39;+&#39;, &#39;-&#39;]:
+                while ops and ops[-1] in [&#39;+&#39;, &#39;-&#39;, &#39;*&#39;, &#39;/&#39;]:
+                    mock_compute() # 处理优先级高或相等的操作符
+                ops.append(ch)
+            elif ch in [&#39;*&#39;, &#39;/&#39;]:
+                while ops and ops[-1] in [&#39;*&#39;, &#39;/&#39;]:
+                    mock_compute() # 处理优先级高的操作符
+                ops.append(ch)
+            elif ch == &#39;(&#39;: # 处理左括号
+                ops.append(ch)
+            elif ch == &#39;)&#39;: # 处理右括号
+                while ops[-1] != &#39;(&#39;: 
+                    mock_compute() # 计算到左括号为止
+                ops.pop() # 弹出左括号
+        while ops:
+            mock_compute() # 处理剩余的操作符
+        return nums[0] # 返回表达式树的根节点</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理操作符 &#39;+&#39; 和 &#39;-&#39; 时，为什么需要检查并可能执行 mock_compute 函数，而处理 &#39;*&#39; 和 &#39;/&#39; 时只检查栈顶为 &#39;*&#39; 或 &#39;/&#39;？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理操作符 &#39;+&#39; 和 &#39;-&#39; 时，需要考虑到 &#39;+&#39; 和 &#39;-&#39; 的优先级比 &#39;*&#39; 和 &#39;/&#39; 低。因此，如果栈顶含有任何操作符（包括 &#39;+&#39;、&#39;-&#39;、&#39;*&#39;、&#39;/&#39;），都可能需要先执行这些操作符，以确保表达式的计算顺序和优先级正确。而在处理 &#39;*&#39; 和 &#39;/&#39; 时，由于它们的优先级较高，仅当栈顶为 &#39;*&#39; 或 &#39;/&#39; 时，才需要执行 mock_compute，即处理其他同样优先级高的操作符，否则可以保留在栈中等待下一步操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中如何处理数字多位的情况，例如 &#39;23&#39; 或 &#39;105&#39;，因为示例中只提到了单个字符的数字处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中未直接处理多位数字的情况。在实际实现时，应当在遍历字符串时识别连续的数字字符。可以通过一个循环来读取完整的数字序列，直到遇到非数字字符，然后将读取到的完整数字转换为数值或节点。例如，使用一个临时变量存储数字字符串，当遇到非数字字符时，将这个字符串转换为数值，然后创建数值节点压入 nums 栈。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            mock_compute 函数在遇到右括号 &#39;)&#39; 时如何确保所有在括号内的操作符都被处理掉，尤其是考虑到嵌套括号的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在遇到右括号 &#39;)&#39; 时，mock_compute 函数会循环执行，直到栈顶为左括号 &#39;(&#39;。这确保了所有在括号内的操作符都会被处理。每遇到一个右括号，算法都会处理直到最近的一个左括号，因此嵌套的括号也能正确处理，每一对括号内的表达式都会在遇到其对应右括号时完全解决。左括号之后的操作符和数字都被视为括号内的一部分，直到遇到对应的右括号。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在遍历完成输入字符串后，直接返回 nums 栈顶元素作为根节点是否安全？是否存在 nums 栈为空的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接返回 nums 栈顶元素作为根节点通常是安全的，前提是输入字符串有效且至少包含一个数字。如果输入字符串为空或不包含任何数字（例如只有操作符或不匹配的括号），则 nums 栈可能为空。因此，在实际的代码实现中，应该加入检查确保 nums 栈不为空。如果输入字符串有效并且表达式正确解析，nums 栈的顶层元素应该是整个表达式的根节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/build-binary-expression-tree-from-infix-expression')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/build-binary-expression-tree-from-infix-expression/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>K 个不同整数的子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>K 个不同整数的子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个正整数数组 <code>nums</code>和一个整数 <code>k</code>，返回 <code>nums</code> 中 「<strong>好子数组」</strong><em>&nbsp;</em>的数目。</p>
+
+<p>如果 <code>nums</code>&nbsp;的某个子数组中不同整数的个数恰好为 <code>k</code>，则称 <code>nums</code>&nbsp;的这个连续、不一定不同的子数组为 <strong>「</strong><strong>好子数组 」</strong>。</p>
+
+<ul>
+	<li>例如，<code>[1,2,3,1,2]</code> 中有&nbsp;<code>3</code>&nbsp;个不同的整数：<code>1</code>，<code>2</code>，以及&nbsp;<code>3</code>。</li>
+</ul>
+
+<p><strong>子数组</strong> 是数组的 <strong>连续</strong> 部分。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,1,2,3], k = 2
+<strong>输出：</strong>7
+<strong>解释：</strong>恰好由 2 个不同整数组成的子数组：[1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2].
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,1,3,4], k = 3
+<strong>输出：</strong>3
+<strong>解释：</strong>恰好由 3 个不同整数组成的子数组：[1,2,1,3], [2,1,3], [1,3,4].
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= nums[i], k &lt;= nums.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 96 ms</p>
+                    <p>内存: 18.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def subarraysWithKDistinct(self, nums: List[int], k: int) -&gt; int:
+        return self.atMostKDistinct(nums, k) - self.atMostKDistinct(nums, k-1)
+    def atMostKDistinct(self, nums, k):
+        n = len(nums)
+        freq = [0] * (n+1)
+        left, right = 0, 0
+        cnt, res = 0, 0
+
+        while right &lt; n:
+            if freq[nums[right]] == 0:
+                cnt += 1
+            freq[nums[right]] += 1
+            right += 1
+
+            while cnt &gt; k:
+                freq[nums[left]] -= 1
+                if freq[nums[left]] == 0:
+                    cnt -= 1
+                left += 1
+            res += right - left
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题要求找出数组中恰好包含 k 个不同整数的子数组数目。题解采用了双指针技术和滑动窗口的方法，结合了两个具体的函数：计算最多有 k 个不同整数的子数组数目的函数 `atMostKDistinct`，以及通过计算 `atMostKDistinct(nums, k) - atMostKDistinct(nums, k-1)` 来得到恰好有 k 个不同整数的子数组数目。这种方法使用了频率数组来跟踪每个元素的出现次数，并动态调整窗口的大小来满足条件。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def subarraysWithKDistinct(self, nums: List[int], k: int) -&gt; int:
+        # 使用 atMostKDistinct 函数计算至多包含 k 个不同整数的子数组数目
+        return self.atMostKDistinct(nums, k) - self.atMostKDistinct(nums, k-1)
+    def atMostKDistinct(self, nums, k):
+        n = len(nums)
+        # 初始化频率数组，长度比 nums 多 1 以处理元素索引直接使用
+        freq = [0] * (n+1)
+        left, right = 0, 0
+        cnt, res = 0, 0
+        # 右指针负责扩展窗口
+        while right &lt; n:
+            if freq[nums[right]] == 0:
+                cnt += 1
+            freq[nums[right]] += 1
+            right += 1
+            # 左指针负责缩小窗口直至窗口内不同整数数量不大于 k
+            while cnt &gt; k:
+                freq[nums[left]] -= 1
+                if freq[nums[left]] == 0:
+                    cnt -= 1
+                left += 1
+            # 累计可能的子数组数目
+            res += right - left
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在函数`atMostKDistinct`中，为什么在`nums[right]`的频率为0时，计数器`cnt`会增加？这与算法的哪个部分有关？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`atMostKDistinct`函数中，当`nums[right]`的频率为0时增加计数器`cnt`是因为每当遇到一个新的整数（即此前未出现过的整数），我们需要增加不同整数的计数。频率为0表示此前该整数没有在当前考虑的窗口中出现过。增加`cnt`反映了窗口内不同整数的增加，这是为了确保我们可以正确追踪和控制窗口中包含的不同整数的数量，符合函数的目标——计算至多包含k个不同整数的子数组数目。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何理解和计算`res += right - left`这一步骤中的`right - left`？它代表了什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`right - left`代表的是当前有效窗口的长度。在滑动窗口方法中，每当我们扩展右指针`right`以包括一个新的元素，并且窗口内的不同整数的数量符合条件时（即不超过k个），窗口从左指针`left`到右指针`right`之间的任何一个子数组都是有效的。因此，`right - left`实际上表示以`nums[right]`结尾的、符合条件的子数组的数量，这些子数组的起始位置可以从`left`到`right`的任何位置。这一步骤通过累加这些可能的子数组数目来更新结果`res`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理边界条件时，如何确保`left`指针不会超过`right`指针，特别是在右指针开始移动时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`atMostKDistinct`函数的实现中，右指针`right`总是先于左指针`left`移动，这确保了在任何调整左指针之前，右指针已经至少向前移动了一步。这种先移动右指针扩展窗口，再移动左指针缩小窗口的策略，确保了`left`指针永远不会超过`right`指针。此外，左指针的移动是在一个内部的循环中进行的，该循环只有在`cnt`（窗口中的不同整数数量）超过k时才会执行，并且循环的条件是`cnt &gt; k`，这保证了左指针的移动是有条件和有限的，避免了越过右指针。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在减少`freq[nums[left]]`后，为什么要检查`freq[nums[left]]`是否变为0来决定是否减少`cnt`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在减少`freq[nums[left]]`后检查是否变为0是因为我们需要准确追踪窗口内不同整数的数量。`freq[nums[left]]`表示整数`nums[left]`在窗口中的频率，当这个频率降至0时，意味着该整数已经完全从窗口中移除，因此不应再被计入窗口内不同整数的总数。于是，我们需要减少`cnt`以反映窗口内不同整数数量的减少。这是确保`cnt`准确反映当前窗口状态的关键步骤。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/longest-substring-without-repeating-characters" class="list-group-item list-group-item-action">
+                                无重复字符的最长子串
+                            </a>
+                        
+                            <a href="/problem/longest-substring-with-at-most-two-distinct-characters" class="list-group-item list-group-item-action">
+                                至多包含两个不同字符的最长子串
+                            </a>
+                        
+                            <a href="/problem/longest-substring-with-at-most-k-distinct-characters" class="list-group-item list-group-item-action">
+                                至多包含 K 个不同字符的最长子串
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/subarrays-with-k-different-integers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/subarrays-with-k-different-integers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

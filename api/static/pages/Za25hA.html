@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>追逐游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>追逐游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        秋游中的小力和小扣设计了一个追逐游戏。他们选了秋日市集景区中的 N 个景点，景点编号为 1~N。此外，他们还选择了 N 条小路，满足任意两个景点之间都可以通过小路互相到达，且不存在两条连接景点相同的小路。整个游戏场景可视作一个无向连通图，记作二维数组 `edges`，数组中以 `[a,b]` 形式表示景点 a 与景点 b 之间有一条小路连通。
+
+小力和小扣只能沿景点间的小路移动。小力的目标是在最快时间内追到小扣，小扣的目标是尽可能延后被小力追到的时间。游戏开始前，两人分别站在两个不同的景点 `startA` 和 `startB`。每一回合，小力先行动，小扣观察到小力的行动后再行动。小力和小扣在每回合可选择以下行动之一：
+- 移动至相邻景点
+- 留在原地
+
+如果小力追到小扣（即两人于某一时刻出现在同一位置），则游戏结束。若小力可以追到小扣，请返回最少需要多少回合；若小力无法追到小扣，请返回 -1。
+
+注意：小力和小扣一定会采取最优移动策略。
+
+**示例 1：**
+>输入：`edges = [[1,2],[2,3],[3,4],[4,1],[2,5],[5,6]], startA = 3, startB = 5`
+>
+>输出：`3`
+>
+>解释：
+>![image.png](https://pic.leetcode-cn.com/1597991318-goeHHr-image.png){:height="250px"}
+>
+>第一回合，小力移动至 2 号点，小扣观察到小力的行动后移动至 6 号点；
+>第二回合，小力移动至 5 号点，小扣无法移动，留在原地；
+>第三回合，小力移动至 6 号点，小力追到小扣。返回 3。
+
+
+**示例 2：**
+>输入：`edges = [[1,2],[2,3],[3,4],[4,1]], startA = 1, startB = 3`
+>
+>输出：`-1`
+>
+>解释：
+>![image.png](https://pic.leetcode-cn.com/1597991157-QfeakF-image.png){:height="250px"}
+>
+>小力如果不动，则小扣也不动；否则小扣移动到小力的对角线位置。这样小力无法追到小扣。
+
+**提示：**
+- `edges` 的长度等于图中节点个数
+- `3 <= edges.length <= 10^5`
+- `1 <= edges[i][0], edges[i][1] <= edges.length 且 edges[i][0] != edges[i][1]`
+- `1 <= startA, startB <= edges.length 且 startA != startB`
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 263 ms</p>
+                    <p>内存: 55.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def chaseGame(self, edges: List[List[int]], sta: int, stb: int) -&gt; int:
+        n = len(edges)
+        g = [[] for _ in range(n)]
+        deg = [0] * n
+
+        sta -= 1
+        stb -= 1
+    
+        for u, v in edges:
+            u -= 1
+            v -= 1
+            g[u].append(v)
+            g[v].append(u)
+            deg[u] += 1
+            deg[v] += 1
+    
+        q = deque()
+        for i in range(n):
+            if deg[i] == 1:
+                q.append(i)
+        
+        rest = n
+        while q:
+            u = q.popleft()
+            rest -= 1
+
+            for v in g[u]:
+                deg[v] -= 1
+                if deg[v] == 1:
+                    q.append(v)
+
+        def bfs(st: int) -&gt; List[int]:
+            q = deque()
+            q.append(st)
+            dis = [inf] * n
+            dis[st] = 0
+
+            while q:
+                u = q.popleft()
+                for v in g[u]:
+                    if dis[v] == inf:
+                        dis[v] = dis[u] + 1
+                        q.append(v)
+
+            return dis
+        
+        da = bfs(sta)
+        db = bfs(stb)
+
+        ans = 1
+        for i in range(n):
+            if db[i] &lt; da[i] - 1:
+                if rest &gt; 3 and deg[i] &gt; 1:
+                    return -1
+                ans = max(ans, da[i])
+        
+        return ans
+        
+
+
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解首先处理输入的边列表构建了一个无向图，并计算了每个节点的度。接着使用宽度优先搜索（BFS）来计算从起始点sta和stb到每个节点的最短距离。通过比较这两个距离数组，确定是否存在一个位置i使得小扣在小力之前到达且小力无法在下一步直接到达。如果存在这样的点，并且该点不是一个环路中的节点（即度大于1），则返回-1表示小力无法追上小扣。否则，计算小力追上小扣所需的最大距离，即为答案。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def chaseGame(self, edges: List[List[int]], sta: int, stb: int) -&gt; int:
+        n = len(edges)
+        g = [[] for _ in range(n)]  # 邻接表表示图
+        deg = [0] * n  # 节点的度
+
+        sta -= 1  # 转换为0-based索引
+        stb -= 1
+
+        for u, v in edges:
+            u -= 1
+            v -= 1
+            g[u].append(v)
+            g[v].append(u)
+            deg[u] += 1
+            deg[v] += 1
+
+        q = deque()  # 用于BFS
+        for i in range(n):
+            if deg[i] == 1:
+                q.append(i)  # 叶子节点加入队列
+
+        rest = n
+        while q:  # BFS处理所有节点
+            u = q.popleft()
+            rest -= 1
+
+            for v in g[u]:
+                deg[v] -= 1
+                if deg[v] == 1:
+                    q.append(v)
+
+        def bfs(st: int) -&gt; List[int]:
+            q = deque()
+            q.append(st)
+            dis = [inf] * n
+            dis[st] = 0
+
+            while q:
+                u = q.popleft()
+                for v in g[u]:
+                    if dis[v] == inf:
+                        dis[v] = dis[u] + 1  # 更新距离
+                        q.append(v)
+
+            return dis
+
+        da = bfs(sta)  # 从sta开始的距离数组
+        db = bfs(stb)  # 从stb开始的距离数组
+
+        ans = 1
+        for i in range(n):
+            if db[i] &lt; da[i] - 1:
+                if rest &gt; 3 and deg[i] &gt; 1:
+                    return -1  # 小扣可以逃脱
+                ans = max(ans, da[i])  # 更新所需最大回合数
+
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中您提到构建无向图，但没有明确说明如何处理重复边或自环（如果存在的话），请问这种情况在题目中有可能发生吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在大多数图论问题中，尤其是在算法竞赛或在线编程平台如LeetCode中，题目通常会明确指出是否允许图中存在重复边或自环。通常，除非特别指示，我们假设输入的图不包含重复边和自环。如果题目允许这种情况发生，解题时必须对输入数据进行额外处理，比如使用集合来存储邻接点以避免重复边的影响，或者在添加边时检查是否形成自环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中使用了宽度优先搜索（BFS）来找到从两个起始点到所有其他节点的最短距离。为什么选择BFS而不是DFS或其他路径查找算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>宽度优先搜索（BFS）是确定无权图中从单一源点到其他所有点的最短路径的最优算法，因为它按层次遍历节点，确保当我们首次访问某节点时，我们已找到从起始点到该节点的最短路径。相比之下，深度优先搜索（DFS）可能会首先沿一条路径深入，不一定能直接找到最短路径。尽管其他算法如Dijkstra或Bellman-Ford也可用于找最短路径，但对于无权图来说，BFS更为简洁且效率更高。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您在代码中减少了每个节点的度并检查度为1的情况。在游戏逻辑中，节点的度数为1（即叶子节点）具有什么特殊意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在游戏逻辑中，度数为1的节点（即叶子节点）表示该节点仅与图中一个其他节点相连接。这在逃脱或追捕类游戏中非常关键，因为叶子节点本质上是图的边界，意味着从该节点只有一条路可走。这对策略制定非常重要，例如在追逐游戏中，如果追逐者（小力）追到一个叶子节点，且逃跑者（小扣）已经到达或即将到达那里，逃跑者的逃脱选择将非常有限。因此，叶子节点在确定追逐是否成功或是否存在潜在的逃脱路线时起着重要作用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/Za25hA')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/Za25hA/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

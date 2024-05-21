@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>从始点到终点的所有路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>从始点到终点的所有路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 45 ms</p>
+                    <p>内存: 19.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def leadsToDestination(self, n: int, edges: List[List[int]], source: int, destination: int) -&gt; bool:
+        
+        g=[[]for _ in range(n)]
+        cnt=[0]*n
+        for u,v in edges:
+            g[v].append(u)
+            cnt[u]+=1
+        if cnt[destination]!=0:
+            return False
+        
+        dq=deque()
+        dq.append(destination)
+        while dq:
+            cur=dq.popleft()
+            if cur==source:
+                return True
+            for nex in g[cur]:
+                cnt[nex]-=1
+                if cnt[nex]==0:
+                    dq.append(nex)
+        return False
+
+        
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了逆向拓扑排序的方法来解决问题。首先，根据输入的边构建了一个逆向的邻接表，即对于每个边(u, v)，在邻接表中v指向u。同时，使用一个计数器数组来记录每个节点入边的数量。如果终点destination的入边不为0，直接返回False，因为终点不应该有出边。之后使用一个队列来进行逆向拓扑排序，从终点开始，每次从队列中取出一个节点，检查该节点是否为始点source，是则返回True。对于该节点的每个邻居，减少它的入边计数，并在入边计数为0时将其加入队列。如果队列处理完，始点未被访问到，则返回False。这个方法主要是检查是否存在从source到destination的有效路径。</p>
+                                <p>时间复杂度: O(V + E)</p>
+                                <p>空间复杂度: O(V)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def leadsToDestination(self, n: int, edges: List[List[int]], source: int, destination: int) -&gt; bool:
+        # 创建逆向邻接表
+        g=[[] for _ in range(n)]
+        # 创建入边计数器
+        cnt=[0]*n
+        # 填充逆向邻接表和入边计数器
+        for u, v in edges:
+            g[v].append(u)
+            cnt[u]+=1
+        # 检查终点是否有入边
+        if cnt[destination]!=0:
+            return False
+        
+        # 初始化队列，开始从终点逆向拓扑排序
+        dq=deque()
+        dq.append(destination)
+        while dq:
+            cur=dq.popleft()
+            # 检查当前节点是否是起点
+            if cur==source:
+                return True
+            # 遍历当前节点的所有邻居
+            for nex in g[cur]:
+                cnt[nex]-=1
+                # 当邻居的入边计数为0时，加入队列
+                if cnt[nex]==0:
+                    dq.append(nex)
+        # 如果队列处理完还没找到起点，返回False
+        return False</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建逆向邻接表时，为何选择将每个边(u, v)存储为v指向u而不是u指向v？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建逆向邻接表的时候，选择将每个边(u, v)存储为v指向u是为了实现逆向拓扑排序。逆向拓扑排序是从终点开始，逐步退回到起点的过程。通过将边逆向存储，我们可以从终点开始，沿着逆向的边移动，逐步退回到起点。这种方法可以在不追踪已访问节点的情况下，验证是否存在一条从起点到终点的有效路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            逆向拓扑排序在此题中的作用是什么？它是如何确保可以找到从起点到终点的有效路径的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>逆向拓扑排序在此题中的作用是从终点开始，逐步检查每个可到达的节点，直到到达起点或者无更多节点可访问。通过这种方式，我们可以有效地确认是否存在一条从起点到终点的路径。在逆向拓扑排序过程中，我们使用一个入边计数器来管理每个节点的入边数量。只有当一个节点的所有入边都被访问过（即入边计数为0时），这个节点才会被加入到处理队列中。这确保了我们按照正确的顺序访问节点，从而可以正确地验证从起点到终点的路径是否存在。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在检查终点destination时，如果其入边不为0则直接返回False？终点在逻辑上应具备什么样的特性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在检查终点destination时，如果其入边不为0则直接返回False，因为在一个有效的有向无环图中，终点不应有任何出边（即没有其他节点指向终点之外的节点）。如果终点的入边计数不为0，说明存在指向终点的边，这违背了终点应是图中最后一个节点的特性。因此，如果终点的入边计数不为0，我们可以断定不存在一条有效的从起点到终点的路径，因此返回False。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/all-paths-from-source-lead-to-destination')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/all-paths-from-source-lead-to-destination/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

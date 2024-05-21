@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大三角形面积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大三角形面积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由 <strong>X-Y</strong> 平面上的点组成的数组 <code>points</code> ，其中 <code>points[i] = [x<sub>i</sub>, y<sub>i</sub>]</code> 。从其中取任意三个不同的点组成三角形，返回能组成的最大三角形的面积。与真实值误差在 <code>10<sup>-5</sup></code> 内的答案将会视为正确答案<strong>。</strong></p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://s3-lc-upload.s3.amazonaws.com/uploads/2018/04/04/1027.png" style="height: 369px; width: 450px;" />
+<pre>
+<strong>输入：</strong>points = [[0,0],[0,1],[1,0],[0,2],[2,0]]
+<strong>输出：</strong>2.00000
+<strong>解释：</strong>输入中的 5 个点如上图所示，红色的三角形面积最大。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>points = [[1,0],[0,0],[0,1]]
+<strong>输出：</strong>0.50000
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= points.length &lt;= 50</code></li>
+	<li><code>-50 &lt;= x<sub>i</sub>, y<sub>i</sub> &lt;= 50</code></li>
+	<li>给出的所有点 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 42 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def getConvexHull(self, points: List[List[int]]) -&gt; List[List[int]]:
+        def cross(p: List[int], q: List[int], r: List[int]) -&gt; int:
+            return (q[0] - p[0]) * (r[1] - q[1]) - (q[1] - p[1]) * (r[0] - q[0])
+
+        n = len(points)
+        if n &lt; 4:
+            return points
+
+        # 按照 x 从小到大排序，如果 x 相同，则按照 y 从小到大排序
+        points.sort()
+
+        hull = []
+        # 求凸包的下半部分
+        for i, p in enumerate(points):
+            while len(hull) &gt; 1 and cross(hull[-2], hull[-1], p) &lt;= 0:
+                hull.pop()
+            hull.append(p)
+        # 求凸包的上半部分
+        m = len(hull)
+        for i in range(n - 2, -1, -1):
+            while len(hull) &gt; m and cross(hull[-2], hull[-1], points[i]) &lt;= 0:
+                hull.pop()
+            hull.append(points[i])
+        hull.pop()  # hull[0] 同时参与凸包的上半部分检测，因此需去掉重复的 hull[0]
+        return hull
+
+    def largestTriangleArea(self, points: List[List[int]]) -&gt; float:
+        def triangleArea(x1: int, y1: int, x2: int, y2: int, x3: int, y3: int) -&gt; float:
+            return abs(x1 * y2 + x2 * y3 + x3 * y1 - x1 * y3 - x2 * y1 - x3 * y2) / 2
+
+        convexHull = self.getConvexHull(points)
+        ans, n = 0, len(convexHull)
+        for i, p in enumerate(convexHull):
+            k = i + 2
+            for j in range(i + 1, n - 1):
+                q = convexHull[j]
+                while k + 1 &lt; n:
+                    curArea = triangleArea(p[0], p[1], q[0], q[1], convexHull[k][0], convexHull[k][1])
+                    nextArea = triangleArea(p[0], p[1], q[0], q[1], convexHull[k + 1][0], convexHull[k + 1][1])
+                    if curArea &gt;= nextArea:
+                        break
+                    k += 1
+                ans = max(ans, triangleArea(p[0], p[1], q[0], q[1], convexHull[k][0], convexHull[k][1]))
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用的是计算凸包和在凸包上查找最大三角形面积的方法。首先，使用Graham扫描算法计算点集的凸包，这保证了三角形的顶点位于凸包的顶点上，这是因为非凸包点无法形成最大面积的三角形。计算凸包后，对凸包上的每对点（作为三角形的两个顶点），使用旋转卡壳技术优化地寻找第三个点，这个点使得三角形的面积最大。通过对每个固定的边，逐步旋转至最佳的第三点位置，可有效地找到最大面积。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def getConvexHull(self, points: List[List[int]]) -&gt; List[List[int]]:
+        def cross(p: List[int], q: List[int], r: List[int]) -&gt; int:
+            # 使用向量叉积判断点的相对位置
+            return (q[0] - p[0]) * (r[1] - q[1]) - (q[1] - p[1]) * (r[0] - q[0])
+
+        n = len(points)
+        if n &lt; 4:
+            return points
+
+        # 按照 x 从小到大排序，如果 x 相同，则按照 y 从小到大排序
+        points.sort()
+
+        hull = []
+        # 求凸包的下半部分
+        for i, p in enumerate(points):
+            while len(hull) &gt; 1 and cross(hull[-2], hull[-1], p) &lt;= 0:
+                hull.pop()
+            hull.append(p)
+        # 求凸包的上半部分
+        m = len(hull)
+        for i in range(n - 2, -1, -1):
+            while len(hull) &gt; m and cross(hull[-2], hull[-1], points[i]) &lt;= 0:
+                hull.pop()
+            hull.append(points[i])
+        hull.pop()  # 移除重复的起点
+        return hull
+
+    def largestTriangleArea(self, points: List[List[int]]) -&gt; float:
+        def triangleArea(x1: int, y1: int, x2: int, y2: int, x3: int, y3: int) -&gt; float:
+            # 计算三角形的面积
+            return abs(x1 * y2 + x2 * y3 + x3 * y1 - x1 * y3 - x2 * y1 - x3 * y2) / 2
+
+        convexHull = self.getConvexHull(points)
+        ans, n = 0, len(convexHull)
+        for i, p in enumerate(convexHull):
+            k = i + 2
+            for j in range(i + 1, n - 1):
+                q = convexHull[j]
+                while k + 1 &lt; n:
+                    curArea = triangleArea(p[0], p[1], q[0], q[1], convexHull[k][0], convexHull[k][1])
+                    nextArea = triangleArea(p[0], p[1], q[0], q[1], convexHull[k + 1][0], convexHull[k + 1][1])
+                    if curArea &gt;= nextArea:
+                        break
+                    k += 1
+                ans = max(ans, triangleArea(p[0], p[1], q[0], q[1], convexHull[k][0], convexHull[k][1]))
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在Graham扫描算法中，如何确定使用向量叉积来计算凸包的正确性，特别是在处理边界点的时候？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Graham扫描算法使用向量叉积来确定三个点的相对位置，进而决定是否将点包括在凸包内。向量叉积结果为正，表示三个点构成的转向是逆时针；为负则为顺时针；为零则三点共线。在构建凸包时，我们希望保留构成凸包边界的逆时针转向，因此，当叉积为非正时（即顺时针或共线），当前点不应加入凸包。这种方法确保了在处理边界点时，只有当新点能与已有的凸包边界维持逆时针关系时才被添加，从而正确地构造出凸包的下半部和上半部。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            旋转卡壳技术在寻找最大三角形面积时的效率为什么比传统方法高，能否详细说明其优化的核心原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>旋转卡壳技术优化了在凸包上寻找最大三角形面积的过程。传统方法需要对凸包上的每个点对进行三重循环查找最大面积，时间复杂度为O(n^3)。旋转卡壳技术通过固定两点，然后通过旋转找到使三角形面积最大的第三点，这一点通常是对腰的对角线方向上的点。核心原理是在固定一条边的情况下，第三点位置的最优解是单调的，即随着边的旋转，第三点也按一定方向移动，不需要每次都重头搜索，从而将搜索时间从线性减少到常数时间，整体算法复杂度降为O(n^2)。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于凸包中的每一对点，如何保证使用旋转卡壳技术找到的第三点确实是使得面积最大的点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在旋转卡壳技术中，对于凸包上的每对固定点（A和B），算法通过逐步旋转来选择作为第三点的C。由于凸包上的点是按顺序排列的，当从点A和点B出发，逐步增加第三点C的索引时，三角形ABC的面积会首先增加直到达到最大值，然后开始减小。这是因为凸包的性质保证了点的线性序，避免了内部的“突出”点干扰。一旦面积开始减少，就不再需要继续搜索，因为后续的三角形面积将会继续减小。这种方法确保了找到的第三点是能够使三角形面积最大化的点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/largest-perimeter-triangle" class="list-group-item list-group-item-action">
+                                三角形的最大周长
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/largest-triangle-area')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/largest-triangle-area/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

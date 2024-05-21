@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>衣橱整理</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>衣橱整理</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>家居整理师将待整理衣橱划分为 <code>m x n</code> 的二维矩阵 <code>grid</code>，其中 <code>grid[i][j]</code> 代表一个需要整理的格子。整理师自 <code>grid[0][0]</code> 开始 <strong>逐行逐列</strong> 地整理每个格子。</p>
+
+<p>整理规则为：在整理过程中，可以选择&nbsp;<strong>向右移动一格&nbsp;</strong>或&nbsp;<strong>向下移动一格</strong>，但不能移动到衣柜之外。同时，不需要整理 <code>digit(i)&nbsp;+ digit(j)&nbsp;&gt; cnt</code> 的格子，其中 <code>digit(x)</code>&nbsp;表示数字&nbsp;<code>x</code> 的各数位之和。</p>
+
+<p>请返回整理师&nbsp;<strong>总共需要整理多少个格子</strong>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>m = 4, n = 7, cnt = 5
+<strong>输出：</strong>18
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n, m &lt;= 100</code></li>
+	<li><code>0 &lt;= cnt &lt;= 20</code></li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 76 ms</p>
+                    <p>内存: 15.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def movingCount(self, m: int, n: int, k: int) -&gt; int:
+        visited = set()
+
+        def dfs(i, j):
+            s = sum(int(x) for x in str(i) + str(j))
+            if not 0 &lt;= i &lt; m or not 0 &lt;= j &lt; n or s &gt; k or (i, j) in visited:
+                return 0
+            visited.add((i, j))
+            return 1 + dfs(i+1, j) + dfs(i, j+1)
+        return dfs(0, 0)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用深度优先搜索（DFS）的方法。从矩阵的左上角开始，递归地向右和向下进行搜索，同时跟踪已访问的节点以避免重复计算。搜索过程中，首先判断当前位置是否有效（即坐标在矩阵内，且各数位之和不超过给定的阈值k，且未被访问过），如果有效，则递归地探索当前位置的右侧和下方位置。每访问一个有效格子，就计算当前格子和其递归得到的格子数之和，最终返回总的可访问格子数。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def movingCount(self, m: int, n: int, k: int) -&gt; int:
+        visited = set()  # 用来存储已访问的格子
+
+        def dfs(i, j):
+            # 计算i和j的数位之和
+            s = sum(int(x) for x in str(i) + str(j))
+            # 判断位置是否有效
+            if not 0 &lt;= i &lt; m or not 0 &lt;= j &lt; n or s &gt; k or (i, j) in visited:
+                return 0
+            visited.add((i, j))  # 标记当前格子为已访问
+            # 递归地访问下一个格子，并累加可访问的格子数
+            return 1 + dfs(i+1, j) + dfs(i, j+1)
+        return dfs(0, 0)  # 从左上角开始搜索</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择深度优先搜索(DFS)而不是广度优先搜索(BFS)来解决这个问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解决路径搜索问题时，深度优先搜索(DFS)和广度优先搜索(BFS)各有优势。对于本题，DFS的优势在于实现简单，易于递归调用。DFS可以直接利用递归堆栈跟踪路径，而BFS则需要显式使用队列来存储未探索的节点。此外，DFS在遇到无效节点时可以立即回溯，这有助于减少不必要的计算和空间占用。虽然BFS也可以工作，但在这种情况下，DFS的空间和时间效率稍优，特别是在矩阵较大且阈值k较小导致可访问区域较小的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在实际实现中DFS如何确保不会因为递归过深而导致栈溢出？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了防止递归过深导致栈溢出，通常需要对递归的深度进行控制。在本题中，递归的最大深度受到矩阵的大小和阈值k的限制。由于每次递归都需要满足数位和的条件，这通常限制了递归的深度。例如，当矩阵的尺寸很大但k非常小时，许多路径都会因为数位和过大而被剪枝，从而减少递归深度。此外，递归中还加入了检查是否已访问的逻辑，进一步减少不必要的递归调用。如果实际应用中仍担心栈溢出，可以考虑使用迭代的DFS实现，利用显式栈来模拟递归。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算数位之和的函数中，是否有更高效的方法，尤其是对于大矩阵中的较大数值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算数位之和时，当前实现通过转换数字为字符串然后再进行迭代求和是有效的，但存在一定的性能开销。一个更高效的方法是直接使用数学计算：通过对数字连续使用除法和取模操作来提取每一位。例如，可以定义一个辅助函数，使用循环来提取每一位并累加。这种方法避免了字符串操作的开销，对于大数字或大矩阵更为高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/ji-qi-ren-de-yun-dong-fan-wei-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/ji-qi-ren-de-yun-dong-fan-wei-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

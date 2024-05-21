@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>多数元素 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>多数元素 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个大小为&nbsp;<em>n&nbsp;</em>的整数数组，找出其中所有出现超过&nbsp;<code>⌊ n/3 ⌋</code>&nbsp;次的元素。</p>
+
+
+
+<p><strong>示例&nbsp;1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [3,2,3]
+<strong>输出：</strong>[3]</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1]
+<strong>输出：</strong>[1]
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2]
+<strong>输出：</strong>[1,2]</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 5 * 10<sup>4</sup></code></li>
+	<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+
+
+<p><strong>进阶：</strong>尝试设计时间复杂度为 O(n)、空间复杂度为 O(1)的算法解决此问题。</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 17.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def majorityElement(self, nums: List[int]) -&gt; List[int]:
+        # 摩根投票 每三个不一样的数抵消一次
+        numA = numB = None
+        cntA = cntB = 0
+        for num in nums:
+            if num == numA:
+                cntA += 1
+            elif num == numB:
+                cntB += 1
+            elif numA is None:
+                numA = num
+                cntA += 1
+            elif numB is None:
+                numB = num
+                cntB += 1
+            else:
+                cntA -= 1
+                cntB -= 1
+                if not cntA:
+                    numA = None
+                if not cntB:
+                    numB = None
+        # 个数验证
+        cntA = cntB = 0
+        for num in nums:
+            if num == numA:
+                cntA += 1
+            elif num == numB:
+                cntB += 1
+        s = len(nums)//3
+        ans = []
+        if cntA &gt; s:
+            ans.append(numA)
+        if cntB &gt; s:
+            ans.append(numB)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了摩尔投票算法的扩展版本，用于解决找出所有出现超过 ⌊ n/3 ⌋ 次的元素的问题。算法核心思想是维护两个候选元素以及它们的计数。遍历数组时，若当前元素等于其中一个候选元素，则增加该候选的计数；若不等于任何候选且有候选位置为空，则将当前元素设为新候选并计数为1；若两个候选都非空且当前元素与它们都不相等，则同时减少两个候选的计数。每次减计数时，若某候选的计数减到0，则释放该候选。最后，再次遍历数组以验证两个候选的真实计数是否超过 ⌊ n/3 ⌋，符合条件的则加入结果列表。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def majorityElement(self, nums: List[int]) -&gt; List[int]:
+        # 初始化两个候选及其计数器
+        numA = numB = None
+        cntA = cntB = 0
+        # 第一次遍历：选出两个候选元素
+        for num in nums:
+            if num == numA:
+                cntA += 1
+            elif num == numB:
+                cntB += 1
+            elif numA is None:
+                numA = num
+                cntA += 1
+            elif numB is None:
+                numB = num
+                cntB += 1
+            else:
+                cntA -= 1
+                cntB -= 1
+                if not cntA:
+                    numA = None
+                if not cntB:
+                    numB = None
+        # 第二次遍历：验证候选元素的计数是否满足条件
+        cntA = cntB = 0
+        for num in nums:
+            if num == numA:
+                cntA += 1
+            elif num == numB:
+                cntB += 1
+        s = len(nums)//3
+        ans = []
+        if cntA &gt; s:
+            ans.append(numA)
+        if cntB &gt; s:
+            ans.append(numB)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在摩尔投票算法中，为什么可以通过维护两个候选元素来确保找到所有满足条件的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在摩尔投票扩展算法中，我们维护两个候选元素来确保找到所有出现次数超过 ⌊n/3⌋ 的元素，因为数学上不可能有超过两个元素的出现次数都超过 ⌊n/3⌋。算法通过不断调整这两个候选以确保至少包含了那些频率高的元素。如果有任何元素的出现次数确实超过了 ⌊n/3⌋，那么经过第一次遍历后，这些元素中至少有一个会成为候选元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果数组中没有任何元素的出现次数超过 ⌊n/3⌋ 次，算法是如何处理这种情况的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果没有元素的出现次数超过⌊n/3⌋，算法的第二次遍历将会验证这一点。在第一次遍历中，算法可能会选择两个候选元素，但在第二次遍历时对这些候选进行计数验证时，将发现他们的计数未能超过 ⌊n/3⌋。因此，这些候选将不会被添加到最终的结果列表中，从而正确反映出没有元素满足条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中如何保证在第一次遍历结束后，被保留的候选元素确实是出现次数可能超过 ⌊n/3⌋ 的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过持续调整候选元素来响应输入数组的元素分布。如果一个元素频繁出现，它将有更大的机会成为候选之一或通过减少其他候选的计数来保持候选地位。第一次遍历确保将出现频率高的元素保留为候选，但这并不保证这些候选的真实计数确实超过 ⌊n/3⌋，这需要通过第二次遍历的验证来确定。第二次遍历是必要的，因为第一次遍历只是基于相对比较和候选调整，而没有进行实际计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/majority-element" class="list-group-item list-group-item-action">
+                                多数元素
+                            </a>
+                        
+                            <a href="/problem/check-if-a-number-is-majority-element-in-a-sorted-array" class="list-group-item list-group-item-action">
+                                检查一个数是否在数组中占绝大多数
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/majority-element-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/majority-element-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

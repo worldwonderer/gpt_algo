@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>修改数组后最大化数组中的连续元素数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>修改数组后最大化数组中的连续元素数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始只包含 <strong>正</strong>&nbsp;整数的数组&nbsp;<code>nums</code>&nbsp;。</p>
+
+<p>一开始，你可以将数组中 <strong>任意数量</strong> 元素增加 <strong>至多</strong> <code>1</code> 。</p>
+
+<p>修改后，你可以从最终数组中选择 <strong>一个或者更多</strong>&nbsp;元素，并确保这些元素升序排序后是 <strong>连续</strong>&nbsp;的。比方说，<code>[3, 4, 5]</code> 是连续的，但是&nbsp;<code>[3, 4, 6]</code> 和&nbsp;<code>[1, 1, 2, 3]</code>&nbsp;不是连续的。<!-- notionvc: 312f8c5d-40d0-4cd1-96cc-9e96a846735b --></p>
+
+<p>请你返回 <strong>最多</strong>&nbsp;可以选出的元素数目。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,1,5,1,1]
+<b>输出：</b>3
+<b>解释：</b>我们将下标 0 和 3 处的元素增加 1 ，得到结果数组 nums = [3,1,5,2,1] 。
+我们选择元素 [<em><strong>3</strong></em>,<em><strong>1</strong></em>,5,<em><strong>2</strong></em>,1] 并将它们排序得到 [1,2,3] ，是连续元素。
+最多可以得到 3 个连续元素。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,4,7,10]
+<b>输出：</b>1
+<b>解释：</b>我们可以选择的最多元素数目是 1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 162 ms</p>
+                    <p>内存: 26.9 MB</p>
+                    <pre class="bg-light p-2 code-pre"># https://leetcode.cn/u/l00/
+
+# class Solution:
+#     def maxSelectedElements(self, nums: List[int]) -&gt; int:
+#         n = len(nums)
+#         nums.sort()
+#         ans = [0]
+        
+#         def dfs(index: int) -&gt; List[int]:
+#             if index == n: return [inf, 0, inf, 0]
+#             num = nums[index]
+#             queue = dfs(index + 1)
+#             res = [num, 1, num + 1, 1]
+#             if num + 1 == queue[0] or num + 1 == queue[2]:
+#                 m = queue[1] if num + 1 == queue[0] else queue[3]
+#                 res[1] = m + 1
+#             if num + 2 == queue[0] or num + 2 == queue[2]:
+#                 m = queue[1] if num + 2 == queue[0] else queue[3]
+#                 res[3] = m + 1
+            
+#             if index &lt; n - 1:
+#                 if num == nums[index + 1]:
+#                     res[1] = max(queue[1], res[1])
+
+#             ans[0] = max(ans[0], res[1], res[3])
+#             return res
+            
+#         dfs(0)
+            
+#         return ans[0]
+
+class Solution:
+    def maxSelectedElements(self, nums: List[int]) -&gt; int:
+        preNum = -10
+        ans = highLength = lowLength = 1
+        for num in sorted(nums):
+            if num == preNum:
+                lowLength = max(lowLength, highLength + 1)
+                if lowLength &gt; ans: ans = lowLength
+            elif num - 1 == preNum:
+                lowLength += 1
+                highLength += 1
+                # if highLength &gt; lowLength:
+                if highLength &gt; ans: ans = highLength
+                # else:
+                if lowLength &gt; ans: ans = lowLength
+                preNum = num
+            elif num - 2 == preNum:
+                highLength = lowLength + 1
+                lowLength = 1
+                if highLength &gt; ans: ans = highLength
+                preNum = num
+            else:
+                highLength = lowLength = 1
+                preNum = num
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用排序加动态规划的方法来解决问题。首先将数组排序，然后使用两个变量 highLength 和 lowLength 来跟踪可以构成的连续子序列的最大长度。highLength 记录不需要增加的连续子序列的长度，而 lowLength 则考虑可以通过增加 1 的方式延伸的子序列的长度。通过迭代排序后的数组，根据当前数与前一个数的关系更新 highLength 和 lowLength，并在每步中更新最大长度 ans。当当前数等于前一个数加一时，这两个长度都增加。如果当前数等于前一个数加二，说明可以通过增加 1 形成新的序列，此时更新 highLength。如果两者差距超过 2，重置这两个长度。这种方法通过一次遍历就能找到可能的最大连续子序列长度。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def maxSelectedElements(self, nums: List[int]) -&gt; int:
+#         nums.sort()  # 对数组进行排序
+#         preNum = -10  # 初始化前一个数字，设置为一个不可能的值
+#         ans = highLength = lowLength = 1  # 初始化结果和连续长度计数器
+#         for num in nums:  # 遍历排序后的数组
+#             if num == preNum:  # 如果当前数字与前一个数字相同
+#                 lowLength = max(lowLength, highLength + 1)  # 更新 lowLength
+#                 if lowLength &gt; ans: ans = lowLength  # 更新最大长度
+#             elif num - 1 == preNum:  # 如果当前数字正好比前一个数字大1
+#                 lowLength += 1  # 增加 lowLength
+#                 highLength += 1  # 增加 highLength
+#                 if highLength &gt; ans: ans = highLength  # 更新最大长度
+#                 if lowLength &gt; ans: ans = lowLength
+#                 preNum = num  # 更新前一个数字
+#             elif num - 2 == preNum:  # 如果当前数字比前一个数字大2
+#                 highLength = lowLength + 1  # 更新 highLength
+#                 lowLength = 1  # 重置 lowLength
+#                 if highLength &gt; ans: ans = highLength  # 更新最大长度
+#                 preNum = num  # 更新前一个数字
+#             else:  # 如果当前数字与前一个数字差距大于2
+#                 highLength = lowLength = 1  # 重置连续长度计数器
+#                 preNum = num  # 更新前一个数字
+#         return ans  # 返回最大连续长度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在算法中选择排序数组作为第一步，而不是直接在未排序的数组上进行操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在未排序的数组中，数字的顺序是随机的，这使得直接检测数字之间的连续性或差距非常困难，因为我们必须不断地检查数组中的每个数字来找到可能的连续序列。通过首先对数组进行排序，我们能够保证所有数字都是按照递增顺序排列的。这样，我们只需要按顺序遍历一次数组，就可以有效地检查每个数字与前一个数字之间的关系，从而判断能否形成或延伸连续子序列，或者是否需要重置序列长度。排序简化了问题的复杂性，并且提高了算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你是如何确定两个连续数字之间可以通过增加1来填补的，而不是通过增加更多的数字？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个数字之间的差为2时，意味着它们之间正好缺少一个数字，我们可以通过增加这一个缺失的数字来构成连续序列。例如，如果有数字4和6，它们之间差2，那么我们可以增加数字5来使这三个数字构成一个连续序列。如果两数字之间的差大于2，那么意味着缺少的不仅仅是一个数字，增加更多的数字会使问题变得复杂，并且在题目设定中可能不允许随意增加过多的数字。因此，算法只考虑通过增加一个数字来填补的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理数字之间的差距大于2的情况时，为什么选择重置连续长度计数器 highLength 和 lowLength？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当数字之间的差距大于2时，说明在这两个数字之间缺少至少两个数字，因此它们之间无法构成连续序列，也不能通过简单地增加一个数字来连接。在这种情况下，之前跟踪的连续子序列已经无法继续延伸，因此必须重新开始计算新的连续子序列的长度。重置 highLength 和 lowLength 使我们可以从当前数字开始，尝试构建新的连续子序列，而不是错误地将之前的非连续数字纳入计算。这样做可以确保我们始终跟踪的是有效的连续序列长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-consecutive-elements-in-an-array-after-modification')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-consecutive-elements-in-an-array-after-modification/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

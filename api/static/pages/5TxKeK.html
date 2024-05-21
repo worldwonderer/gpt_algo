@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>数字游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>数字游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        小扣在秋日市集入口处发现了一个数字游戏。主办方共有 `N` 个计数器，计数器编号为 `0 ~ N-1`。每个计数器上分别显示了一个数字，小扣按计数器编号升序将所显示的数字记于数组 `nums`。每个计数器上有两个按钮，分别可以实现将显示数字加一或减一。小扣每一次操作可以选择一个计数器，按下加一或减一按钮。
+
+主办方请小扣回答出一个长度为 `N` 的数组，第 `i` 个元素(0 <= i < N)表示将 `0~i` 号计数器 **初始** 所示数字操作成满足所有条件 `nums[a]+1 == nums[a+1],(0 <= a < i)` 的最小操作数。回答正确方可进入秋日市集。
+
+由于答案可能很大，请将每个最小操作数对 `1,000,000,007` 取余。
+
+
+**示例 1：**
+>输入：`nums = [3,4,5,1,6,7]`
+>
+>输出：`[0,0,0,5,6,7]`
+>
+>解释：
+>i = 0，[3] 无需操作
+>i = 1，[3,4] 无需操作；
+>i = 2，[3,4,5] 无需操作；
+>i = 3，将 [3,4,5,1] 操作成 [3,4,5,6], 最少 5 次操作；
+>i = 4，将 [3,4,5,1,6] 操作成 [3,4,5,6,7], 最少 6 次操作；
+>i = 5，将 [3,4,5,1,6,7] 操作成 [3,4,5,6,7,8]，最少 7 次操作；
+>返回 [0,0,0,5,6,7]。
+
+
+**示例 2：**
+>输入：`nums = [1,2,3,4,5]`
+>
+>输出：`[0,0,0,0,0]`
+>
+>解释：对于任意计数器编号 i 都无需操作。
+
+**示例 3：**
+>输入：`nums = [1,1,1,2,3,4]`
+>
+>输出：`[0,1,2,3,3,3]`
+>
+>解释：
+>i = 0，无需操作；
+>i = 1，将 [1,1] 操作成 [1,2] 或 [0,1] 最少 1 次操作；
+>i = 2，将 [1,1,1] 操作成 [1,2,3] 或 [0,1,2]，最少 2 次操作；
+>i = 3，将 [1,1,1,2] 操作成 [1,2,3,4] 或 [0,1,2,3]，最少 3 次操作；
+>i = 4，将 [1,1,1,2,3] 操作成 [-1,0,1,2,3]，最少 3 次操作；
+>i = 5，将 [1,1,1,2,3,4] 操作成 [-1,0,1,2,3,4]，最少 3 次操作；
+>返回 [0,1,2,3,3,3]。
+
+
+**提示：**
+- `1 <= nums.length <= 10^5`
+- `1 <= nums[i] <= 10^3`
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 130 ms</p>
+                    <p>内存: 35.3 MB</p>
+                    <pre class="bg-light p-2 code-pre"># https://leetcode.cn/u/l00/
+
+class Solution:
+    def numsGame(self, nums: List[int]) -&gt; List[int]:
+        MOD = 1_000_000_007
+        ans = [0]
+
+        nums = [i - num for i, num in enumerate(nums)]
+        lower = higher = nums[0]
+        for i, num in enumerate(nums[1:], 1):
+            if lower &gt; num: lower = num
+            if higher &lt; num: higher = num
+
+        # 标准值左右两边的点位数量差值
+        totalDiff = 0
+        
+        # 标准值，也就是当前最佳数值，得出最佳的结果的标准
+        cur = nums[0] - lower
+        cnt = [0] * (higher - lower + 1)
+        cnt[cur] = 1
+        
+        # 一开始标准值必然就是第一个数，然后枚举后面全部情况
+        res = 0
+        for num in nums[1:]:
+            diff = num - lower
+            cnt[diff] += 1
+            # 新值与标准值一致，不需要改变
+            if diff == cur:
+                ans.append(res)
+                continue
+            # 判断新值与标准值的大小，对比其添加方向上的数量是否超过另一个方向的数量
+            # 如果超过，就进行移动，这样必然形成更优的结果
+            if diff &gt; cur:
+                totalDiff -= 1
+                res += diff - cur
+                if totalDiff &lt; -cnt[cur]:
+                    target = cur + 1
+                    while cnt[target] == 0: target += 1
+                    totalDiff += cnt[cur]
+                    res += (target - cur) * (totalDiff)
+                    totalDiff += cnt[target]
+                    cur = target
+
+            else:
+                totalDiff += 1
+                res += cur - diff
+                if totalDiff &gt; cnt[cur]:
+                    target = cur - 1
+                    while cnt[target] == 0: target -= 1
+                    totalDiff -= cnt[cur]
+                    res += (target - cur) * (totalDiff)
+                    totalDiff -= cnt[target]
+                    cur = target
+
+            res %= MOD
+            ans.append(res)
+        return ans
+
+                    
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题目的是通过最少的操作次数，使得数组nums的前i个元素满足nums[a]+1 == nums[a+1]的条件。为了方便处理，我们首先将数组nums中的每个元素减去其索引，得到一个新的数组。接着，我们从左到右遍历这个新数组，并维护一个当前的标准值cur，以及左右两边的元素数量差值totalDiff。每次遍历到一个新元素时，我们更新左右两边的元素数量，并根据这个数量差值来调整标准值cur，以及计算出当前的最少操作次数res，并将其加入到答案数组ans中。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># https://leetcode.cn/u/l00/
+
+class Solution:
+    def numsGame(self, nums: List[int]) -&gt; List[int]:
+        MOD = 1_000_000_007
+        ans = [0]
+
+        nums = [i - num for i, num in enumerate(nums)]
+        lower = higher = nums[0]
+        for i, num in enumerate(nums[1:], 1):
+            if lower &gt; num: lower = num
+            if higher &lt; num: higher = num
+
+        # 标准值左右两边的点位数量差值
+        totalDiff = 0
+        
+        # 标准值，也就是当前最佳数值，得出最佳的结果的标准
+        cur = nums[0] - lower
+        cnt = [0] * (higher - lower + 1)
+        cnt[cur] = 1
+        
+        # 一开始标准值必然就是第一个数，然后枚举后面全部情况
+        res = 0
+        for num in nums[1:]:
+            diff = num - lower
+            cnt[diff] += 1
+            # 新值与标准值一致，不需要改变
+            if diff == cur:
+                ans.append(res)
+                continue
+            # 判断新值与标准值的大小，对比其添加方向上的数量是否超过另一个方向的数量
+            # 如果超过，就进行移动，这样必然形成更优的结果
+            if diff &gt; cur:
+                totalDiff -= 1
+                res += diff - cur
+                if totalDiff &lt; -cnt[cur]:
+                    target = cur + 1
+                    while cnt[target] == 0: target += 1
+                    totalDiff += cnt[cur]
+                    res += (target - cur) * (totalDiff)
+                    totalDiff += cnt[target]
+                    cur = target
+
+            else:
+                totalDiff += 1
+                res += cur - diff
+                if totalDiff &gt; cnt[cur]:
+                    target = cur - 1
+                    while cnt[target] == 0: target -= 1
+                    totalDiff -= cnt[cur]
+                    res += (target - cur) * (totalDiff)
+                    totalDiff -= cnt[target]
+                    cur = target
+
+            res %= MOD
+            ans.append(res)
+        return ans
+        </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理数组时首先要对每个元素执行减去其索引的操作？这样做的目的和好处是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理数组时，对每个元素减去其索引的操作是为了将问题转化为寻找一个连续的、以0开始递增的数列。原问题要求nums[a]+1 == nums[a+1]，减去索引后，这个条件变为新数组中的相邻元素应该相等。这种转换简化了问题，使得我们可以通过维护一个当前的标准值和左右两边的元素数量差值来优化操作，从而更有效地达到目标条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到维护一个当前的标准值`cur`以及左右两边的元素数量差值`totalDiff`，请问这两个变量具体是如何影响操作次数计算的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，`cur`表示当前的最优或标准值，即使得操作次数最小的目标数值。`totalDiff`是左右两边相对于`cur`的元素数量差值，用于判断是否需要调整`cur`以达到更优的操作次数。当新的元素数值与`cur`不一致时，根据它们的差值和`totalDiff`的正负，我们可以确定是增加还是减少`cur`，并计算因此产生的操作次数。调整`cur`时，我们还需要考虑跳过那些计数为0的值，以确保`cur`总是指向存在的元素，从而最小化操作次数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在调整标准值`cur`时，如果新的目标`target`需要跳过一些没有元素的位置，这种跳过操作在算法中是如何实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当需要调整标准值`cur`到新的目标`target`，且`target`处的元素计数为0时，算法通过循环遍历`cnt`数组来寻找下一个非零计数的位置。这个遍历过程涉及向左或向右检查直到找到有元素的位置。通过这种方式，我们确保了`cur`总是更新到有效的、有实际元素存在的位置，即使需要跳过一些计数为0的间隔。这个过程是通过简单的循环实现的，保证了在调整`cur`时总能找到最近的有效目标值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/5TxKeK')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/5TxKeK/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

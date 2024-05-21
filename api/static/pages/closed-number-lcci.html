@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>下一个数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>下一个数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>下一个数。给定一个正整数，找出与其二进制表达式中1的个数相同且大小最接近的那两个数（一个略大，一个略小）。</p>
+
+<p> <strong>示例1:</strong></p>
+
+<pre>
+<strong> 输入</strong>：num = 2（或者0b10）
+<strong> 输出</strong>：[4, 1] 或者（[0b100, 0b1]）
+</pre>
+
+<p> <strong>示例2:</strong></p>
+
+<pre>
+<strong> 输入</strong>：num = 1
+<strong> 输出</strong>：[2, -1]
+</pre>
+
+<p> <strong>提示:</strong></p>
+
+<ol>
+<li><code>num</code>的范围在[1, 2147483647]之间；</li>
+<li>如果找不到前一个或者后一个满足条件的正数，那么输出 -1。</li>
+</ol>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findClosedNumbers(self, num: int) -&gt; List[int]:
+        digits = []
+        for i in range(31):
+            mask = 1 &lt;&lt; i
+            digit = num &amp; mask
+            if digit &gt; 0:
+                digits.append(1)
+            else:
+                digits.append(0)
+        #print(digits)
+        #exit(0)
+
+        res1 = 0
+        i = 0
+        while i &lt; 30:
+            if digits[i] == 1 and digits[i+1] == 0:
+                break
+            i += 1    
+        # print(i)
+        
+        digits1 = digits.copy()        
+        if i == 30:        
+            res1 = -1
+        else:
+            digits1[i+1] = 1
+            digits1[i] = 0
+            j = i-1
+            while j &gt;= 0:
+                if digits1[j] == 0:
+                    break
+                digits1[j] = 0
+                j -= 1
+            digits1[0:i-j-1] = [1] * (i-j-1)
+            #print(digits1)
+            #print(j)
+            res1 = self.digits_to_int(digits1)
+            
+        res2 = 0
+        i = 1
+        while i &lt; 30:
+            if digits[i] == 1 and digits[i-1] == 0:
+                break
+            i += 1    
+                
+        digits2 = digits.copy()        
+        if i == 30:        
+            res2 = -1
+        else:
+            digits2[i-1] = 1
+            digits2[i] = 0
+            j = 0
+            while j &lt; i-1:
+                if digits2[j] == 0:
+                    break
+                digits2[j] = 0
+                j += 1
+            digits2[i-j-1:i-1] = [1] * j
+            res2 = self.digits_to_int(digits2)
+            
+        return [res1, res2]
+        
+    def digits_to_int(self, digits: List[int]):
+        res = 0
+        for i, x in enumerate(digits):
+            mask = 0
+            if x &gt; 0:
+                mask = 1 &lt;&lt; i
+            res = res | mask
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解首先将给定的数转换成二进制数组形式，便于处理。接着，为找出略大的数，从低位到高位找到第一个&#39;01&#39;的模式并将其交换成&#39;10&#39;，这会使得该数稍微变大。同时，为了保证增加最小，将所有位于该&#39;01&#39;模式之前的1都移到最低位。若找不到这样的模式，返回-1表示不存在这样的数。对于略小的数，寻找&#39;10&#39;模式并交换为&#39;01&#39;，再将前面的1移动到该&#39;10&#39;模式的左边，保持数尽可能大但小于原数。最后，提供一个辅助函数来将二进制数组转换回整数。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findClosedNumbers(self, num: int) -&gt; List[int]:
+        digits = [] # 存储num的二进制表示
+        for i in range(31): # 固定31位，处理每一位
+            mask = 1 &lt;&lt; i
+            digit = num &amp; mask
+            digits.append(1 if digit &gt; 0 else 0)
+
+        # 寻找略大的数
+        res1 = 0
+        i = 0
+        while i &lt; 30: # 除最高位外，寻找&#39;01&#39;模式
+            if digits[i] == 1 and digits[i+1] == 0:
+                break
+            i += 1
+
+        digits1 = digits.copy()
+        if i == 30: # 未找到合适的&#39;01&#39;模式
+            res1 = -1
+        else:
+            digits1[i+1] = 1 # 交换&#39;01&#39;为&#39;10&#39;
+            digits1[i] = 0
+            j = i-1
+            while j &gt;= 0 and digits1[j] == 1: # 移动前面的1到最低位
+                digits1[j] = 0
+                j -= 1
+            digits1[0:i-j-1] = [1] * (i-j-1)
+            res1 = self.digits_to_int(digits1) # 将数组转回整数
+
+        # 寻找略小的数
+        res2 = 0
+        i = 1
+        while i &lt; 30: # 除最低位外，寻找&#39;10&#39;模式
+            if digits[i] == 1 and digits[i-1] == 0:
+                break
+            i += 1
+
+        digits2 = digits.copy()
+        if i == 30: # 未找到合适的&#39;10&#39;模式
+            res2 = -1
+        else:
+            digits2[i-1] = 1 # 交换&#39;10&#39;为&#39;01&#39;
+            digits2[i] = 0
+            j = 0
+            while j &lt; i-1 and digits2[j] == 1: # 将前面的1尽量靠近i位
+                digits2[j] = 0
+                j += 1
+            digits2[i-j-1:i-1] = [1] * j
+            res2 = self.digits_to_int(digits2) # 将数组转回整数
+
+        return [res1, res2] # 返回结果
+
+    def digits_to_int(self, digits: List[int]): # 辅助函数：将二进制数组转回整数
+        res = 0
+        for i, x in enumerate(digits):
+            if x &gt; 0:
+                res |= 1 &lt;&lt; i
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么这个解决方案中使用31位来表示整数，而不是其他位数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算机中，通常使用32位来表示整数，其中有符号整数的最高位是符号位。在无符号整数的情况下，可以使用全部的32位来表示数值。这个解决方案中使用31位是为了保证处理的是一个没有符号的整数，避免涉及符号位带来的复杂性，同时确保结果在常用的整数表示范围内。如果使用更多的位数，可能会超出标准整数类型的范围，而使用更少的位数可能无法充分利用可用的数值范围。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理略大的数时，为什么选择从低位到高位寻找第一个&#39;01&#39;模式，并将其交换为&#39;10&#39;，这种操作的数学依据是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二进制数中，低位权重较小，高位权重较大。当我们将低位的&#39;01&#39;交换为&#39;10&#39;时，实际上是将一个较小的权重（0）替换为一个较大的权重（1），并且这个改变尽可能地小，因为它发生在尽可能低的位数上。这样，数值会略微增大，而增加的幅度也是最小的，这正是寻找略大的数的目的。数学上来说，这是因为我们通过最小的位改变来实现数值的最小增加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果在整个二进制数组中都没有找到&#39;01&#39;或&#39;10&#39;模式，为什么直接返回-1？是否有其他可能的解决方案或替代方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二进制数中，如果找不到&#39;01&#39;模式，意味着没有可能通过简单的位交换来获得一个略大的数，因为所有的&#39;1&#39;都在更高的位上，或者数值已经是连续的1后跟连续的0（如111...111000...000），这是一个递减或递增的极限情况。同理，找不到&#39;10&#39;模式意味着无法通过简单的位交换得到略小的数。在这种情况下，返回-1是表示没有可行的更大或更小的相邻数。理论上，除非增加额外的操作如位扩展或使用不同的数学方法，否则没有简单的替代方案来生成所需的略大或略小的数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/closed-number-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/closed-number-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>对数组执行操作使平方和最大</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>对数组执行操作使平方和最大</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;和一个 <strong>正</strong>&nbsp;整数&nbsp;<code>k</code>&nbsp;。</p>
+
+<p>你可以对数组执行以下操作 <strong>任意次</strong>&nbsp;：</p>
+
+<ul>
+	<li>选择两个互不相同的下标&nbsp;<code>i</code> 和&nbsp;<code>j</code>&nbsp;，<strong>同时</strong>&nbsp;将&nbsp;<code>nums[i]</code>&nbsp;更新为&nbsp;<code>(nums[i] AND nums[j])</code> 且将&nbsp;<code>nums[j]</code>&nbsp;更新为&nbsp;<code>(nums[i] OR nums[j])</code>&nbsp;，<code>OR</code>&nbsp;表示按位 <strong>或</strong>&nbsp;运算，<code>AND</code>&nbsp;表示按位 <strong>与</strong>&nbsp;运算。</li>
+</ul>
+
+<p>你需要从最终的数组里选择&nbsp;<code>k</code>&nbsp;个元素，并计算它们的 <strong>平方</strong>&nbsp;之和。</p>
+
+<p>请你返回你可以得到的 <strong>最大</strong>&nbsp;平方和。</p>
+
+<p>由于答案可能会很大，将答案对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong>&nbsp;后返回。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,6,5,8], k = 2
+<b>输出：</b>261
+<b>解释：</b>我们可以对数组执行以下操作：
+- 选择 i = 0 和 j = 3 ，同时将 nums[0] 变为 (2 AND 8) = 0 且 nums[3] 变为 (2 OR 8) = 10 ，结果数组为 nums = [0,6,5,10] 。
+- 选择 i = 2 和 j = 3 ，同时将 nums[2] 变为 (5 AND 10) = 0 且 nums[3] 变为 (5 OR 10) = 15 ，结果数组为 nums = [0,6,0,15] 。
+从最终数组里选择元素 15 和 6 ，平方和为 15<sup>2</sup> + 6<sup>2</sup> = 261 。
+261 是可以得到的最大结果。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [4,5,4,7], k = 3
+<b>输出：</b>90
+<b>解释：</b>不需要执行任何操作。
+选择元素 7 ，5 和 4 ，平方和为 7<sup>2</sup> + 5<sup>2</sup> + 4<sup>2</sup> = 90 。
+90 是可以得到的最大结果。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= k &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1189 ms</p>
+                    <p>内存: 29.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">&#34;&#34;&#34;
+nums[i] = 0, nums[j] = 0，无变化
+nums[i] = 0, nums[j] = 1，可以交换 0 和 1 的位置，也可以不变
+nums[i] = 1, nums[j] = 1，无变化
+
+所以对数组的操作就是交互两个数某个比特位上的0和1，但两个数的和是不变的
+(a+b)^2 = a^2 + b^2 + 2ab
+a^2+b^2 = (a+b)^2 - 2ab，a+b的值不变，要使平方和最大，需要使 ab 最小，a 和 b 的差要最大，所以要把 1 集中到一个数上
+&#34;&#34;&#34;
+
+class Solution:
+    def maxSum(self, nums: List[int], k: int) -&gt; int:
+        m = max(nums).bit_length()
+        f = [0] * m
+        for i in range(m):
+            f[i] = sum(x &gt;&gt; i &amp; 1 for x in nums)
+        ans = 0
+        mod = 10 ** 9 + 7
+        while True:
+            x = 0
+            for i in range(m):
+                if f[i]:
+                    x += (1 &lt;&lt; i)
+                    f[i] -= 1
+            ans = (ans + x * x) % mod
+            k -= 1
+            if x == 0 or k == 0:
+                break
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解首先获取数组中最大数的二进制位长度。然后，创建一个数组 f，其长度为最大二进制位长度，用于统计 nums 中每个比特位上 1 的个数。随后，采用贪心算法尝试构造最大的数。具体来说，从最高位到最低位，如果某个位上有 1，就将该位加到构造的数 x 中，并更新计数。这样构建的 x 将会是局部最大的可能值。重复这一过程 k 次或直到无法构造更多的非零数 x。每次迭代中计算 x 的平方，并累加到结果 ans 中。最终，返回的 ans 就是 k 个数的平方和最大的可能值。</p>
+                                <p>时间复杂度: O((n+k)*m)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">
+&#34;&#34;&#34;
+nums[i] = 0, nums[j] = 0，无变化
+nums[i] = 0, nums[j] = 1，可以交换 0 和 1 的位置，也可以不变
+nums[i] = 1, nums[j] = 1，无变化
+
+所以对数组的操作就是交互两个数某个比特位上的0和1，但两个数的和是不变的
+(a+b)^2 = a^2 + b^2 + 2ab
+a^2+b^2 = (a+b)^2 - 2ab，a+b的值不变，要使平方和最大，需要使 ab 最小，a 和 b 的差要最大，所以要把 1 集中到一个数上
+&#34;&#34;&#34;
+
+class Solution:
+    def maxSum(self, nums: List[int], k: int) -&gt; int:
+        m = max(nums).bit_length()  # 获取 nums 中最大值的位数
+        f = [0] * m  # f[i] 将存储每个位上 1 的总个数
+        for i in range(m):  # 计算每个位上 1 的个数
+            f[i] = sum(x &gt;&gt; i &amp; 1 for x in nums)
+        ans = 0  # 初始化结果变量
+        mod = 10 ** 9 + 7  # 定义模数
+        while True:
+            x = 0  # 从 f 中构建最大数
+            for i in range(m):  # 对于每个位，尝试构建最大数
+                if f[i]:
+                    x += (1 &lt;&lt; i)  # 构建数
+                    f[i] -= 1  # 减少该位的可用 1 的数量
+            ans = (ans + x * x) % mod  # 更新结果
+            k -= 1  # 减少还需要构建的数的数量
+            if x == 0 or k == 0:  # 如果 x 为 0 或已达到 k 个数，结束循环
+                break
+        return ans  # 返回最大平方和
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到的操作`选择两个互不相同的下标 i 和 j ，同时将 nums[i] 更新为 (nums[i] AND nums[j]) 且将 nums[j] 更新为 (nums[i] OR nums[j])`，这种操作如何保证最终能够形成k个最大的数值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中描述的操作实际上是不会形成 k 个最大数值的确切解决方案。这种操作仅仅是对位操作的一种思考，其目的在于通过组合 nums[i] 和 nums[j] 的位来尝试形成更大的数值。然而，这种操作并不直接关注于形成最大的 k 个数值，而是更多的是通过位操作的方式尝试增加某些数的大小。真正的解决方案是使用贪心算法从数组 f 中构建最大可能的数，这种方法更直接有效地针对问题的目标。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在提到的贪心算法中，`从最高位到最低位`的构造方式，为什么是从最高位开始，较低位的1的数量是否会影响这种构造方式的有效性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造最大数值的过程中，从最高位到最低位开始是因为高位的数值权重远大于低位。例如，在二进制表示中，最高位（如第 31 位）的权重是 2^31，远大于第 1 位的权重 2^0。因此，为了使得构造的数值尽可能大，应优先考虑在高位放置尽可能多的 1。虽然低位的 1 的数量可能较多，但它们对最终数值的影响较小，因此从最高位开始构造是最有效的策略。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的数组f用于存储每个位上1的个数，这种方法对于非常大的nums数组是否仍然有效，有没有可能造成计算上的延迟或内存不足？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>数组 f 的长度由 nums 中最大数的二进制位数决定，通常为 32 或 64，这取决于数据类型（如 int 或 long）。因此，f 的内存占用是非常小的，即使对于非常大的 nums 数组，f 数组的大小也不会变得很大。此外，对于每个位的计算，虽然需要遍历整个 nums 数组，但这是线性时间复杂度的操作，通常对于现代计算系统来说是可接受的。总的来说，这种方法在空间和时间上都是高效的，适用于处理大规模数据。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/apply-operations-on-array-to-maximize-sum-of-squares')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/apply-operations-on-array-to-maximize-sum-of-squares/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

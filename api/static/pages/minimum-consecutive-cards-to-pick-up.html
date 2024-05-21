@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>必须拿起的最小连续卡牌数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>必须拿起的最小连续卡牌数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>cards</code> ，其中 <code>cards[i]</code> 表示第 <code>i</code> 张卡牌的 <strong>值</strong> 。如果两张卡牌的值相同，则认为这一对卡牌 <strong>匹配</strong> 。</p>
+
+<p>返回你必须拿起的最小连续卡牌数，以使在拿起的卡牌中有一对匹配的卡牌。如果无法得到一对匹配的卡牌，返回 <code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>cards = [3,4,2,3,4,7]
+<strong>输出：</strong>4
+<strong>解释：</strong>拿起卡牌 [3,4,2,3] 将会包含一对值为 3 的匹配卡牌。注意，拿起 [4,2,3,4] 也是最优方案。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>cards = [1,0,5,3]
+<strong>输出：</strong>-1
+<strong>解释：</strong>无法找出含一对匹配卡牌的一组连续卡牌。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= cards.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= cards[i] &lt;= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 107 ms</p>
+                    <p>内存: 35.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumCardPickup(self, cards: List[int]) -&gt; int:
+        # 字典用于记录最近一次卡牌值的索引
+        d = dict()
+        ans = len(cards)+1
+        for i, item in enumerate(cards):
+            if (item in d):
+                ans = min(ans, i - d[item] + 1)
+            d[item] = i 
+        return -1 if ans == len(cards)+1 else ans
+      
+        &#39;&#39;&#39;
+        cardsSet = set(cards)
+        if len(cards) == len(cardsSet):
+            return -1
+
+        # create a dictionary to store location of every elements
+        index = {}
+        for i in range(len(cards)):
+            if cards[i] not in index:
+                index[cards[i]] = []
+            index[cards[i]].append(i)
+        
+        miniLen = len(cards)
+        for key in index:
+            if len(index[key]) &gt; 2:
+                lastLoc = index[key][0]
+                for i in index[key][1:-1]:
+                    currLoc = i
+                    currLen = currLoc - lastLoc
+                    lastLoc = i
+                    miniLen = min(currLen, miniLen)
+            elif len(index[key]) == 2 :
+                currLen = index[key][1] - index[key][0]
+                miniLen = min(currLen, miniLen)
+            elif len(index[key]) &lt; 2:
+                continue
+        
+        return miniLen+1
+        &#39;&#39;&#39;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用了哈希表来存储每个卡牌值最近一次出现的索引。遍历卡牌数组，对于每张卡牌，如果它之前出现过（即在哈希表中存在），则计算当前索引与上一次出现索引的差（即连续卡牌的数量），并更新最小数量。如果没有找到任何匹配的卡牌对，则返回-1。这种方法直接通过索引差计算得到最小连续卡牌数，避免了不必要的重复计算。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumCardPickup(self, cards: List[int]) -&gt; int:
+        # Initialize a dictionary to store the latest index of each card value
+        d = dict()
+        # Initialize the minimum number of cards to a large value
+        ans = len(cards)+1
+        # Iterate over the card list
+        for i, item in enumerate(cards):
+            # If the card value has been seen before, calculate the distance
+            if (item in d):
+                ans = min(ans, i - d[item] + 1)
+            # Update the dictionary with the current index for the card value
+            d[item] = i
+        # Return -1 if no such pair is found, else return the minimum distance
+        return -1 if ans == len(cards)+1 else ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在哈希表中存储卡牌值的最新索引而不是其出现次数或其他信息？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此问题中，存储卡牌值的最新索引是为了直接计算两次相同卡牌出现的连续距离，这是求解最小连续卡牌数的关键。存储出现次数或其他信息不能直接提供两次出现之间的距离，因此不适用于解决此特定问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            代码中使用了`ans = len(cards)+1`来初始化最小卡牌数，这样的初始化方法有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`ans = len(cards)+1`初始化最小卡牌数的目的是确保在比较过程中，任何有效的连续卡牌数都小于这个初始值。这样可以保证即使数组中的所有卡牌都不重复，也能正确地返回一个超过任何可能卡牌数的值，从而通过后续的条件判断返回-1，表明没有找到任何连续的卡牌对。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的返回值为-1代表没有找到匹配的卡牌，这种设计对于错误处理和算法的可读性有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>返回-1作为错误或特殊情况的标志是一种常见的编程惯例，有助于调用者区分正常结果和没有找到匹配的特殊情况。这种设计提高了算法的可读性和易用性，使得算法的输出更加直观明确，便于外部代码根据返回值做出适当的处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解提到每次遇到已经见过的卡牌时，会计算当前索引与上一次出现索引的差，这种方法是否考虑了所有可能的边界条件（如数组中只有一对匹配卡牌等情况）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，这种方法考虑了所有可能的边界条件。每当遇到重复的卡牌时，通过计算当前索引与上一次出现索引的差值来更新最小连续卡牌数，这包括了数组中只有一对匹配卡牌的情况。此外，初始化`ans`为一个大于任何可能卡牌长度的值也保证了即使数组中没有重复卡牌，算法仍然能正确返回-1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-consecutive-cards-to-pick-up')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-consecutive-cards-to-pick-up/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

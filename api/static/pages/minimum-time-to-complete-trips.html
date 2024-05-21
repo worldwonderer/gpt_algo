@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>完成旅途的最少时间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>完成旅途的最少时间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个数组&nbsp;<code>time</code>&nbsp;，其中&nbsp;<code>time[i]</code>&nbsp;表示第 <code>i</code>&nbsp;辆公交车完成 <strong>一趟</strong><strong>旅途</strong>&nbsp;所需要花费的时间。</p>
+
+<p>每辆公交车可以 <strong>连续</strong> 完成多趟旅途，也就是说，一辆公交车当前旅途完成后，可以 <strong>立马开始</strong>&nbsp;下一趟旅途。每辆公交车 <strong>独立</strong>&nbsp;运行，也就是说可以同时有多辆公交车在运行且互不影响。</p>
+
+<p>给你一个整数&nbsp;<code>totalTrips</code>&nbsp;，表示所有公交车&nbsp;<strong>总共</strong>&nbsp;需要完成的旅途数目。请你返回完成 <strong>至少</strong>&nbsp;<code>totalTrips</code>&nbsp;趟旅途需要花费的 <strong>最少</strong>&nbsp;时间。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>time = [1,2,3], totalTrips = 5
+<b>输出：</b>3
+<strong>解释：</strong>
+- 时刻 t = 1 ，每辆公交车完成的旅途数分别为 [1,0,0] 。
+  已完成的总旅途数为 1 + 0 + 0 = 1 。
+- 时刻 t = 2 ，每辆公交车完成的旅途数分别为 [2,1,0] 。
+  已完成的总旅途数为 2 + 1 + 0 = 3 。
+- 时刻 t = 3 ，每辆公交车完成的旅途数分别为 [3,1,1] 。
+  已完成的总旅途数为 3 + 1 + 1 = 5 。
+所以总共完成至少 5 趟旅途的最少时间为 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>time = [2], totalTrips = 1
+<b>输出：</b>2
+<strong>解释：</strong>
+只有一辆公交车，它将在时刻 t = 2 完成第一趟旅途。
+所以完成 1 趟旅途的最少时间为 2 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= time.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= time[i], totalTrips &lt;= 10<sup>7</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 577 ms</p>
+                    <p>内存: 29.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumTime(self, time: List[int], totalTrips: int) -&gt; int:
+        n = len(time)
+
+        left, right = 1, min(time) * totalTrips
+        while left &lt;= right:
+            mid = left + (right - left) // 2
+            s = sum([mid // t for t in time])
+            if s &lt; totalTrips:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return left
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的核心思路是使用二分查找来确定最少时间完成所有旅途。首先确定搜索的时间范围：最小时间left设为1（最快可能的时间），最大时间right设为min(time) * totalTrips（假设所有旅途都由最快的公交车完成）。在这个搜索范围内，我们计算中间时间点mid，然后计算所有公交车在mid时间内可以完成的旅途总数s。如果s小于totalTrips，意味着mid太小，需要增加时间，因此调整left为mid + 1；如果s大于等于totalTrips，说明可能有解或者可以有更小的解，调整right为mid - 1。当left超过right时，left就是最少需要的时间。</p>
+                                <p>时间复杂度: O(n log(min(time) * totalTrips))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumTime(self, time: List[int], totalTrips: int) -&gt; int:
+        n = len(time)
+
+        # 初始化二分查找的左右边界
+        left, right = 1, min(time) * totalTrips
+        while left &lt;= right:
+            mid = left + (right - left) // 2
+            # 计算在mid时间内，所有公交车可以完成的旅途总数
+            s = sum([mid // t for t in time])
+            if s &lt; totalTrips:
+                # 如果完成的旅途数不足，增加时间
+                left = mid + 1
+            else:
+                # 如果完成的旅途数足够或者有余，尝试减少时间
+                right = mid - 1
+
+        # 当left &gt; right时，left即为所求最小时间
+        return left
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择二分查找作为解决这个问题的方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找是解决这个问题的有效方法，因为我们寻找的是满足特定条件（即在给定时间内完成所有旅途）的最小时间。这个时间值从理论上是有序的，即如果某个时间点可以完成所有旅途，那么任何比这个时间点长的时间也都可以；反之，比这个时间点短的时间则不能完成所有旅途。这种有序性质使得二分查找成为寻找最优解的理想选择，因为二分查找能够有效地缩小搜索范围，从而快速地找到满足条件的最小时间。此外，考虑到时间范围可能很大，直接遍历每一个可能的时间点会非常耗时，而二分查找的时间复杂度为O(log n)，可以大幅提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-time-to-complete-trips')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-time-to-complete-trips/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

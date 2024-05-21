@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>按序打印</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>按序打印</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=concurrency" class="badge bg-secondary tag-link">多线程</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个类：</p>
+
+<pre>
+public class Foo {
+&nbsp; public void first() { print("first"); }
+&nbsp; public void second() { print("second"); }
+&nbsp; public void third() { print("third"); }
+}</pre>
+
+<p>三个不同的线程 A、B、C 将会共用一个&nbsp;<code>Foo</code>&nbsp;实例。</p>
+
+<ul>
+	<li>线程 A 将会调用 <code>first()</code> 方法</li>
+	<li>线程 B 将会调用&nbsp;<code>second()</code> 方法</li>
+	<li>线程 C 将会调用 <code>third()</code> 方法</li>
+</ul>
+
+<p>请设计修改程序，以确保 <code>second()</code> 方法在 <code>first()</code> 方法之后被执行，<code>third()</code> 方法在 <code>second()</code> 方法之后被执行。</p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>尽管输入中的数字似乎暗示了顺序，但是我们并不保证线程在操作系统中的调度顺序。</li>
+	<li>你看到的输入格式主要是为了确保测试的全面性。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,3]
+<strong>输出：</strong>"firstsecondthird"
+<strong>解释：</strong>
+有三个线程会被异步启动。输入 [1,2,3] 表示线程 A 将会调用 first() 方法，线程 B 将会调用 second() 方法，线程 C 将会调用 third() 方法。正确的输出是 "firstsecondthird"。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,3,2]
+<strong>输出：</strong>"firstsecondthird"
+<strong>解释：</strong>
+输入 [1,3,2] 表示线程 A 将会调用 first() 方法，线程 B 将会调用 third() 方法，线程 C 将会调用 second() 方法。正确的输出是 "firstsecondthird"。</pre>
+
+
+
+<ul>
+</ul>
+<strong>提示：</strong>
+
+<ul>
+	<li><code>nums</code> 是 <code>[1, 2, 3]</code> 的一组排列</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">import threading
+class Foo:
+    def __init__(self):
+        self.l1=threading.Lock()
+        self.l1.acquire()
+        self.l2=threading.Lock()
+        self.l2.acquire()
+
+
+    def first(self, printFirst: &#39;Callable[[], None]&#39;) -&gt; None:
+        
+        # printFirst() outputs &#34;first&#34;. Do not change or remove this line.
+        printFirst()
+        self.l1.release()
+
+
+    def second(self, printSecond: &#39;Callable[[], None]&#39;) -&gt; None:
+        # printSecond() outputs &#34;second&#34;. Do not change or remove this line.
+        self.l1.acquire()
+        printSecond()
+        self.l2.release()
+
+
+    def third(self, printThird: &#39;Callable[[], None]&#39;) -&gt; None:
+        # printThird() outputs &#34;third&#34;. Do not change or remove this line.
+        self.l2.acquire()
+        printThird()</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了两个锁（Lock）来控制方法执行的顺序。初始时，两个锁都被获取（锁定状态），确保 &#39;second&#39; 和 &#39;third&#39; 方法在 &#39;first&#39; 和 &#39;second&#39; 方法之后执行。在 &#39;first&#39; 方法结束时释放第一个锁，允许 &#39;second&#39; 方法执行；&#39;second&#39; 方法执行后释放第二个锁，允许 &#39;third&#39; 方法执行。这样通过锁的控制，保证了方法按照 &#39;first&#39;, &#39;second&#39;, &#39;third&#39; 的顺序执行。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">import threading
+
+class Foo:
+    def __init__(self):
+        # 初始化两个锁，并立即获取，确保在释放前无法被其他线程获取
+        self.l1 = threading.Lock()
+        self.l1.acquire()
+        self.l2 = threading.Lock()
+        self.l2.acquire()
+
+    def first(self, printFirst: &#39;Callable[[], None]&#39;) -&gt; None:
+        # 输出&#39;first&#39;，然后释放第一个锁，允许second()方法执行
+        printFirst()
+        self.l1.release()
+
+    def second(self, printSecond: &#39;Callable[[], None]&#39;) -&gt; None:
+        # 等待first()释放第一个锁后执行，输出&#39;second&#39;，然后释放第二个锁，允许third()方法执行
+        self.l1.acquire()
+        printSecond()
+        self.l2.release()
+
+    def third(self, printThird: &#39;Callable[[], None]&#39;) -&gt; None:
+        # 等待second()释放第二个锁后执行，输出&#39;third&#39;
+        self.l2.acquire()
+        printThird()</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在类的构造方法中初始化并立刻获取锁的做法是否会有资源浪费或引发死锁的风险？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，初始化并立即获取锁不会引发资源浪费或死锁风险，因为锁的获取和释放都是有序且明确的。每个锁都被用于控制特定的执行顺序，只有在前一个任务完成后才会释放，这样的设计确保了执行流程的顺序性，没有未解的依赖或循环等待，因此不会导致死锁。虽然在任务运行前这些锁被持续占用，但考虑到它们是为了同步特定的线程操作而设计的，这种占用是必要的，不构成资源浪费。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中描述的锁的操作顺序如何确保线程的正确执行顺序，尤其在多核处理器或多线程环境中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>锁的操作顺序通过控制锁的获取和释放来确保线程的正确执行顺序。具体地，&#39;first&#39;方法结束时释放第一个锁，这样只有在第一个锁被释放后，&#39;second&#39;方法才能通过获取该锁来执行。同样，&#39;second&#39;方法结束时释放第二个锁，只有这个锁被释放后，&#39;third&#39;方法才能执行。这种机制确保了即使在多核处理器或多线程环境中，执行顺序也总是&#39;first&#39;, &#39;second&#39;, &#39;third&#39;。锁提供了一个强制的同步机制，防止了并发执行和竞态条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            释放锁操作放在打印方法之后，是否存在执行顺序风险，即可能在打印完成前另一个线程开始执行？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据题解的代码，锁的释放是在打印方法之后进行的。这确保了打印操作在锁释放前完全完成，因此不会有其他线程在当前打印操作完成前开始执行其对应的打印操作。这种设计确保了操作的原子性和顺序性，没有执行顺序风险。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际的多线程应用中，这种锁的使用方式是否最优，还是有其他同步机制（如条件变量、信号量等）可能更适合这种场景？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>虽然使用锁是解决这个问题的一种直接方法，但它可能不是最优解，因为锁通常涉及较重的资源竞争和管理开销。在这种特定场景下，使用条件变量或信号量可能更合适。例如，使用条件变量可以允许更灵活的线程间通信，而信号量可以限制对某一资源的访问，这两者都可能提供更优的性能和资源管理。具体选择哪种机制，还需要根据问题的具体需求和环境来定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/print-foobar-alternately" class="list-group-item list-group-item-action">
+                                交替打印 FooBar
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/print-in-order')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/print-in-order/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

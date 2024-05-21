@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>叶值的最小代价生成树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>叶值的最小代价生成树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个正整数数组&nbsp;<code>arr</code>，考虑所有满足以下条件的二叉树：</p>
+
+<ul>
+	<li>每个节点都有 <code>0</code> 个或是 <code>2</code> 个子节点。</li>
+	<li>数组&nbsp;<code>arr</code>&nbsp;中的值与树的中序遍历中每个叶节点的值一一对应。</li>
+	<li>每个非叶节点的值等于其左子树和右子树中叶节点的最大值的乘积。</li>
+</ul>
+
+<p>在所有这样的二叉树中，返回每个非叶节点的值的最小可能总和。这个和的值是一个&nbsp;32 位整数。</p>
+
+<p>如果一个节点有 0 个子节点，那么该节点为叶节点。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/08/10/tree1.jpg" style="width: 500px; height: 169px;" />
+<pre>
+<strong>输入：</strong>arr = [6,2,4]
+<strong>输出：</strong>32
+<strong>解释：</strong>有两种可能的树，第一种的非叶节点的总和为 36 ，第二种非叶节点的总和为 32 。 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/08/10/tree2.jpg" style="width: 224px; height: 145px;" />
+<pre>
+<strong>输入：</strong>arr = [4,11]
+<strong>输出：</strong>44
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= arr.length &lt;= 40</code></li>
+	<li><code>1 &lt;= arr[i] &lt;= 15</code></li>
+	<li>答案保证是一个 32 位带符号整数，即小于&nbsp;<code>2<sup>31</sup></code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 29 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -&gt; int:
+        res = 0
+        stack = []
+        for x in arr:
+            if not stack:
+                stack.append(x)
+            else:
+                while stack and stack[-1] &lt;= x:
+                    y = stack.pop()
+                    if not stack or stack[-1] &gt; x:
+                        res += y*x
+                    else:
+                        res += y*stack[-1]
+                stack.append(x)
+        
+        while len(stack) &gt;= 2:
+            x = stack.pop()
+            res += stack[-1] * x
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了一个单调栈的方法来寻求最小化非叶节点值的总和。核心思想是在遍历数组的过程中，通过维持一个单调递减的栈，确保每次计算的非叶节点值是局部最优的。栈中的每个元素都代表了一个潜在的叶子节点。当新的元素x大于栈顶元素时，栈顶元素将被弹出，并计算产生的非叶节点的值，这个值是弹出元素和其邻近的更大元素的乘积。这样可以保证在每个步骤中，选择的都是可能的最小的非叶节点值。最后，栈中剩余的元素将按照顺序继续计算，直到栈中仅剩一个元素。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -&gt; int:
+        res = 0  # 用于存储结果
+        stack = []  # 初始化一个空栈
+        for x in arr:  # 遍历输入数组
+            if not stack:  # 如果栈为空，直接添加元素
+                stack.append(x)
+            else:
+                while stack and stack[-1] &lt;= x:  # 维持栈的单调递减
+                    y = stack.pop()  # 弹出栈顶元素
+                    if not stack or stack[-1] &gt; x:  # 计算非叶节点值
+                        res += y*x
+                    else:
+                        res += y*stack[-1]
+                stack.append(x)  # 将当前元素压入栈
+        while len(stack) &gt;= 2:  # 清空栈
+            x = stack.pop()  # 弹出栈顶元素
+            res += stack[-1] * x  # 计算最后的非叶节点值
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在单调栈解法中，为什么在遇到新元素x大于栈顶元素时，需要弹出栈顶元素并计算非叶节点值？这个逻辑是如何最小化非叶节点总和的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在单调栈解法中，当新元素x大于栈顶元素时，弹出栈顶元素并计算非叶节点值是为了维持栈的单调递减性。这种做法可以确保在每个步骤中，非叶节点的值是局部最小的。通过选择栈顶元素和其邻近的较大元素进行乘积，可以避免在之后的计算中产生更大的非叶节点值，从而在全局范围内最小化非叶节点的总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解里提到，当弹出一个元素y，如果栈不为空且`stack[-1]`大于x时，计算的非叶节点值为`y*x`，否则为`y*stack[-1]`。这种处理方式的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式目的在于最小化新生成的非叶节点值。当弹出元素y时，如果栈不为空且栈顶元素（`stack[-1]`）大于新元素x，使用x作为乘数可以得到较小的乘积结果（因为x比栈顶元素小）。如果栈顶元素小于或等于x，则使用栈顶元素作为乘数，因为这是此时唯一可用的、相邻的较大值。这样的策略有助于在每一步保证生成的非叶节点值尽可能小，从而推动整体代价的最小化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理完整个数组后，题解中提到需要继续处理栈中剩余的元素。如果在栈中剩余多个元素，为什么总是选择栈顶两个元素进行计算，而不是考虑其他组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理栈中剩余的元素时，总是选择栈顶的两个元素进行计算，是因为这些元素已经是按照单调递减的顺序排列的。由于单调栈的特性，位于栈顶的两个元素是相邻的最小元素，计算它们的乘积可以保证此步骤的非叶节点值最小。考虑其他组合可能会导致更大的非叶节点值，因为这会涉及到非相邻的、可能更大的元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到的单调递减栈是如何确保每次计算的非叶节点值是局部最优的？这种局部最优如何贡献于全局最优解的形成？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调递减栈通过保证栈中的元素始终保持递减顺序，确保每次弹出栈顶元素时，与其相邻的元素是可能的最小值。这样在计算非叶节点值时，总是选择两个相邻最小元素的乘积，保证了每个步骤的局部最优。这种局部最优的累积最终导致了全局最优解的形成，因为每一步的最小选择减少了整体计算过程中可能出现的较大值，从而最小化了整体的非叶节点值总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-tree-from-leaf-values')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-tree-from-leaf-values/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>安装栅栏 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>安装栅栏 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 132 ms</p>
+                    <p>内存: 18.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def outerTrees(self, trees: List[List[int]]) -&gt; List[float]:  
+        n = len(trees)
+        # 随机化点防止恶心用例
+        random.shuffle(trees)
+                                      
+        # 求两点距离的平方
+        def getDist(a,b,x,y):
+            return (a-x)*(a-x)+(b-y)*(b-y)
+                              
+        # 根据两点求圆心和半径
+        def getCircleBy2(i,j):
+            a,b = trees[i]
+            x,y = trees[j]
+            rx,ry = (a+x)/2,(b+y)/2
+            r = getDist(rx,ry,x,y)
+            return [rx,ry,r]               
+        
+        # 根据三个点求圆心和半径，保证三点不共线              
+        def getCircleBy3(i,j,h):
+            x,y = trees[i]
+            a,b = trees[j]
+            p,q = trees[h]            
+            
+            if a == x:
+                k1 = float(&#39;inf&#39;)
+            else:
+                k1 = (y-b)/(x-a)
+            
+            if x == p:
+                k2 = float(&#39;inf&#39;)
+            else:
+                k2 = (q-y)/(p-x)
+            
+            # 同斜率，三点共线 
+            if k1 == k2 or abs(k1-k2) &lt; 1e-7:
+                tmp = []
+                tmp.append(getCircleBy2(i,j))
+                tmp.append(getCircleBy2(i,h))
+                tmp.append(getCircleBy2(j,h))
+                tmp.sort(key = lambda x:x[2])
+                return tmp[-1]
+                
+            # 不同斜率，选取两直线，其中垂线斜率要存在的，然后求出两中垂线交点，即为圆心
+            # 保证中垂线有斜率
+            if b == y:
+                x,y,p,q = p,q,x,y
+            elif y == q:
+                a,b,x,y = x,y,a,b
+                       
+            
+            # a,b,x,y 中垂线            
+            k1 = -(x-a)/(y-b)            
+            tmpx,tmpy = (a+x)/2,(b+y)/2
+            b1 = tmpy - tmpx*k1
+                       
+            # x,y,p,q 中垂线
+            k2 = -(x-p)/(y-q)
+            tmpx,tmpy = (p+x)/2,(q+y)/2
+            b2 = tmpy - tmpx*k2
+            
+            # y = k1*x+b1
+            # y = k2*x+b2
+            # (k1-k2)x + b1 - b2 = 0                                                                      
+            X = (b2-b1)/(k1-k2)              
+            Y = k1*X+b1
+            r = ((X-x)*(X-x)+(Y-y)*(Y-y))
+            return [X,Y,r]
+        
+        # 初始化，第一个点为圆心，半径为0
+        x,y = trees[0]
+        r = 0
+        # welzl 算法，当前k个点在圆内，若第k+1个点不在圆内，那么第k+1个点必在圆上
+        for i in range(1,n):
+            a,b = trees[i]
+            # 在圆内
+            if getDist(x,y,a,b) &lt;= r:
+                continue
+            
+            # 在圆外，那么i点必定在圆上
+            # 重新找圆，已知i必在圆上
+            x,y = trees[i]
+            r = 0
+            
+            # 找第二个必在圆上的点
+            for j in range(i):
+                a,b = trees[j]
+                # 在圆上
+                if getDist(x,y,a,b) &lt;= r:
+                    continue
+                
+                # 在圆外，那么j必在圆上，已知i也必在圆上，那就两点为圆直径，更新圆
+                x,y,r = getCircleBy2(i,j)
+                
+                # 找第三个必在圆上的点
+                for h in range(j):
+                    a,b = trees[h]
+                    if getDist(x,y,a,b) &lt;= r:
+                        continue
+                    
+                    # 在圆外，那么h必在圆上，即i,j,h必在圆上，更新圆
+                    x,y,r = getCircleBy3(i,j,h)
+        
+        return [x,y,r**0.5]
+                    
+                </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了Welzl算法，这是一个递归算法，用于找到覆盖给定点集的最小圆。算法的基本思想是，开始假设没有点在圆内，逐步添加点，并调整圆的位置和大小以包含所有点。如果添加的点已在圆内，则不需要调整；如果不在圆内，该点必在新的圆的边界上，此时需要重新计算圆。算法具体包括以下步骤：
+1. 随机化点的顺序，以避免特定边界情况影响性能。
+2. 使用两点确定一个圆，计算圆心和半径。
+3. 使用三点确定一个圆，确保这三点不共线，计算圆心和半径。
+4. 递归地检查每个点，如果点在当前圆外，则更新圆，使其包括该点，这可能需要找到新的两点或三点定圆。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def outerTrees(self, trees: List[List[int]]) -&gt; List[float]:  
+        n = len(trees)
+        # 随机化点防止恶心用例
+        random.shuffle(trees)
+                                      
+        # 求两点距离的平方
+        def getDist(a,b,x,y):
+            return (a-x)*(a-x)+(b-y)*(b-y)
+                              
+        # 根据两点求圆心和半径
+        def getCircleBy2(i,j):
+            a,b = trees[i]
+            x,y = trees[j]
+            rx,ry = (a+x)/2,(b+y)/2
+            r = getDist(rx,ry,x,y)
+            return [rx,ry,r]               
+        
+        # 根据三个点求圆心和半径，保证三点不共线              
+        def getCircleBy3(i,j,h):
+            x,y = trees[i]
+            a,b = trees[j]
+            p,q = trees[h]            
+            
+            if a == x:
+                k1 = float(&#39;inf&#39;)
+            else:
+                k1 = (y-b)/(x-a)
+            
+            if x == p:
+                k2 = float(&#39;inf&#39;)
+            else:
+                k2 = (q-y)/(p-x)
+            
+            # 同斜率，三点共线 
+            if k1 == k2 or abs(k1-k2) &lt; 1e-7:
+                tmp = []
+                tmp.append(getCircleBy2(i,j))
+                tmp.append(getCircleBy2(i,h))
+                tmp.append(getCircleBy2(j,h))
+                tmp.sort(key = lambda x:x[2])
+                return tmp[-1]
+                
+            # 不同斜率，选取两直线，其中垂线斜率要存在的，然后求出两中垂线交点，即为圆心
+            # 保证中垂线有斜率
+            if b == y:
+                x,y,p,q = p,q,x,y
+            elif y == q:
+                a,b,x,y = x,y,a,b
+                       
+            
+            # a,b,x,y 中垂线            
+            k1 = -(x-a)/(y-b)            
+            tmpx,tmpy = (a+x)/2,(b+y)/2
+            b1 = tmpy - tmpx*k1
+                       
+            # x,y,p,q 中垂线
+            k2 = -(x-p)/(y-q)
+            tmpx,tmpy = (p+x)/2,(q+y)/2
+            b2 = tmpy - tmpx*k2
+            
+            # y = k1*x+b1
+            # y = k2*x+b2
+            # (k1-k2)x + b1 - b2 = 0                                                                  
+            X = (b2-b1)/(k1-k2)              
+            Y = k1*X+b1
+            r = ((X-x)*(X-x)+(Y-y)*(Y-y))
+            return [X,Y,r]
+        
+        # 初始化，第一个点为圆心，半径为0
+        x,y = trees[0]
+        r = 0
+        # welzl 算法，当前k个点在圆内，若第k+1个点不在圆内，那么第k+1个点必在圆上
+        for i in range(1,n):
+            a,b = trees[i]
+            # 在圆内
+            if getDist(x,y,a,b) &lt;= r:
+                continue
+            
+            # 在圆外，那么i点必定在圆上
+            # 重新找圆，已知i必在圆上
+            x,y = trees[i]
+            r = 0
+            
+            # 找第二个必在圆上的点
+            for j in range(i):
+                a,b = trees[j]
+                # 在圆上
+                if getDist(x,y,a,b) &lt;= r:
+                    continue
+                
+                # 在圆外，那么j必在圆上，已知i也必在圆上，那就两点为圆直径，更新圆
+                x,y,r = getCircleBy2(i,j)
+                
+                # 找第三个必在圆上的点
+                for h in range(j):
+                    a,b = trees[h]
+                    if getDist(x,y,a,b) &lt;= r:
+                        continue
+                    
+                    # 在圆外，那么h必在圆上，即i,j,h必在圆上，更新圆
+                    x,y,r = getCircleBy3(i,j,h)
+        
+        return [x,y,r**0.5]
+                    
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在Welzl算法中，为什么需要随机化点的顺序？具体来说，这种随机化如何影响算法的性能和稳定性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Welzl算法通过递归方式构建最小包围圆，如果处理的点序列恰好是一种极端或特定的顺序，比如按照某种几何关系排列，可能导致性能降低，因为算法可能需要更频繁地调整已构建的圆。随机化点的顺序可以使算法的性能表现更加均匀，更不易受到特定点序列的影响，从而提高算法的平均性能和稳定性。这种随机化有助于避免最坏情况的发生，尤其是在实际应用中，数据可能具有某种未预见的有序性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法描述中提到用两点或三点确定圆的过程，但没有详细解释如何确保三点不共线时计算圆心和半径。能否详细说明这一计算过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当三点不共线时，可以通过求解这三点的外接圆来确定圆心和半径。首先，利用两点间的中点和斜率的负倒数（如果存在）来确定两条中垂线的方程。接着，求这两条中垂线的交点，该交点即为所求圆的圆心。圆的半径则是圆心到任一点的距离。具体计算时，需要处理斜率不存在的情况，即两点垂直排列，这时中垂线将是水平或垂直线。通过解方程组来找到交点，并计算半径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理三点确定圆的情况时，算法如何处理三点共线的特殊情况？具体的处理策略是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当算法检测到三点共线时，无法直接使用标准的外接圆计算方法，因为共线的三点无法确定一个唯一的圆。在这种情况下，算法的处理策略是比较这三点对应的三个由任两点确定的圆（每两点可确定一个最小圆即其直径的圆）。算法将计算这三个圆的半径，并选择半径最大的圆作为结果。这保证了包含所有三点的圆的存在，虽然这不一定是最小圆，但确保了算法可以继续进行下去。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/erect-the-fence-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/erect-the-fence-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

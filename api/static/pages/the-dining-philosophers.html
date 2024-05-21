@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>哲学家进餐</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>哲学家进餐</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=concurrency" class="badge bg-secondary tag-link">多线程</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>5 个沉默寡言的哲学家围坐在圆桌前，每人面前一盘意面。叉子放在哲学家之间的桌面上。（5 个哲学家，5 根叉子）</p>
+
+<p>所有的哲学家都只会在思考和进餐两种行为间交替。哲学家只有同时拿到左边和右边的叉子才能吃到面，而同一根叉子在同一时间只能被一个哲学家使用。每个哲学家吃完面后都需要把叉子放回桌面以供其他哲学家吃面。只要条件允许，哲学家可以拿起左边或者右边的叉子，但在没有同时拿到左右叉子时不能进食。</p>
+
+<p>假设面的数量没有限制，哲学家也能随便吃，不需要考虑吃不吃得下。</p>
+
+<p>设计一个进餐规则（并行算法）使得每个哲学家都不会挨饿；也就是说，在没有人知道别人什么时候想吃东西或思考的情况下，每个哲学家都可以在吃饭和思考之间一直交替下去。</p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/10/23/an_illustration_of_the_dining_philosophers_problem.png" style="height: 415px; width: 400px;"></p>
+
+<p><em>问题描述和图片来自维基百科&nbsp;<a href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">wikipedia.org</a></em></p>
+
+
+
+<p>哲学家从&nbsp;<strong>0</strong> 到 <strong>4</strong> 按 <strong>顺时针</strong> 编号。请实现函数&nbsp;<code>void wantsToEat(philosopher, pickLeftFork, pickRightFork, eat, putLeftFork, putRightFork)</code>：</p>
+
+<ul>
+	<li><code>philosopher</code>&nbsp;哲学家的编号。</li>
+	<li><code>pickLeftFork</code>&nbsp;和&nbsp;<code>pickRightFork</code>&nbsp;表示拿起左边或右边的叉子。</li>
+	<li><code>eat</code>&nbsp;表示吃面。</li>
+	<li><code>putLeftFork</code>&nbsp;和&nbsp;<code>putRightFork</code>&nbsp;表示放下左边或右边的叉子。</li>
+	<li>由于哲学家不是在吃面就是在想着啥时候吃面，所以思考这个方法没有对应的回调。</li>
+</ul>
+
+<p>给你 5 个线程，每个都代表一个哲学家，请你使用类的同一个对象来模拟这个过程。在最后一次调用结束之前，可能会为同一个哲学家多次调用该函数。</p>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>n = 1
+<strong>输出：</strong>[[4,2,1],[4,1,1],[0,1,1],[2,2,1],[2,1,1],[2,0,3],[2,1,2],[2,2,2],[4,0,3],[4,1,2],[0,2,1],[4,2,2],[3,2,1],[3,1,1],[0,0,3],[0,1,2],[0,2,2],[1,2,1],[1,1,1],[3,0,3],[3,1,2],[3,2,2],[1,0,3],[1,1,2],[1,2,2]]
+<strong>解释:</strong>
+n 表示每个哲学家需要进餐的次数。
+输出数组描述了叉子的控制和进餐的调用，它的格式如下：
+output[i] = [a, b, c] (3个整数)
+- a 哲学家编号。
+- b 指定叉子：{1 : 左边, 2 : 右边}.
+- c 指定行为：{1 : 拿起, 2 : 放下, 3 : 吃面}。
+如 [4,2,1] 表示 4 号哲学家拿起了右边的叉子。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 60</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 39 ms</p>
+                    <p>内存: 17.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">from threading import Semaphore, Lock
+
+class DiningPhilosophers:
+    def __init__(self):
+        self.limit = Semaphore(4)
+        self.fork = [Lock() for i in range(5)]
+
+
+    # call the functions directly to execute, for example, eat()
+    def wantsToEat(self,
+                   philosopher: int,
+                   pickLeftFork: &#39;Callable[[], None]&#39;,
+                   pickRightFork: &#39;Callable[[], None]&#39;,
+                   eat: &#39;Callable[[], None]&#39;,
+                   putLeftFork: &#39;Callable[[], None]&#39;,
+                   putRightFork: &#39;Callable[[], None]&#39;) -&gt; None:
+        
+        rightFork = philosopher
+        leftFork = (philosopher+1)%5
+
+        self.limit.acquire()
+
+        self.fork[rightFork].acquire()
+        self.fork[leftFork].acquire()
+
+        pickRightFork()
+        pickLeftFork()
+
+        eat()
+
+        putLeftFork()
+        putRightFork()
+
+        self.fork[rightFork].release()
+        self.fork[leftFork].release()
+
+        self.limit.release()
+        
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用信号量和锁来解决哲学家就餐问题。问题的核心在于避免死锁和饥饿。首先，一个信号量限制了同时尝试就餐的哲学家数量为4，这避免了所有哲学家同时拿起左边的叉子而造成的死锁。每个哲学家尝试拿起他们的右边叉子（philosopher编号的叉子）和左边叉子（(philosopher + 1) % 5），用锁确保了同一时间内只有一个哲学家能够使用一根叉子。通过拿起右边叉子开始，然后是左边叉子，吃完饭后再依次放下叉子，确保了操作的原子性。此方法通过控制就餐哲学家的数量以及加锁机制有效避免了死锁和饥饿现象。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">from threading import Semaphore, Lock
+
+class DiningPhilosophers:
+    def __init__(self):
+        # 限制最多4个哲学家同时尝试就餐以避免死锁
+        self.limit = Semaphore(4)
+        # 为每根叉子创建一个锁，确保同时只有一个哲学家可以使用
+        self.fork = [Lock() for i in range(5)]
+
+    def wantsToEat(self, philosopher: int, pickLeftFork: &#39;Callable[[], None]&#39;, pickRightFork: &#39;Callable[[], None]&#39;, eat: &#39;Callable[[], None]&#39;, putLeftFork: &#39;Callable[[], None]&#39;, putRightFork: &#39;Callable[[], None]&#39;) -&gt; None:
+        # 确定每个哲学家的右侧和左侧叉子编号
+        rightFork = philosopher
+        leftFork = (philosopher+1)%5
+
+        # 通过信号量控制进入就餐的哲学家数量
+        self.limit.acquire()
+
+        # 尝试获取右侧和左侧叉子的锁
+        self.fork[rightFork].acquire()
+        self.fork[leftFork].acquire()
+
+        # 执行拿起叉子的动作
+        pickRightFork()
+        pickLeftFork()
+
+        # 执行吃面动作
+        eat()
+
+        # 执行放下叉子的动作
+        putLeftFork()
+        putRightFork()
+
+        # 释放叉子的锁
+        self.fork[rightFork].release()
+        self.fork[leftFork].release()
+
+        # 释放信号量
+        self.limit.release()
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决方案中，为什么选择让最多4个哲学家同时尝试就餐来避免死锁？是否有其他可能的数目可以实现同样的效果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解决方案中，限制最多4个哲学家同时尝试就餐是为了确保至少有一个哲学家能同时访问其两边的叉子，从而避免所有哲学家同时拿起一边的叉子而导致的死锁。如果所有5个哲学家都尝试同时吃饭，每个哲学家拿起左边的叉子，那么所有的叉子都会被占用，导致每个哲学家都无法拿起右边的叉子，从而发生死锁。限制为4个哲学家，总有一个叉子是空闲的，从而避免了这种情况。实际上，只要不是所有哲学家同时吃饭，就可以避免死锁，但允许4个是最高效的利用率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            解决方案中提到，每个哲学家首先尝试拿起右边的叉子再拿左边的叉子，这种顺序是否有特别的原因？如果哲学家改为先拿左边的叉子会怎样？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>指定一个固定的顺序（如先右后左）可以防止循环等待，从而避免死锁。如果每个哲学家都遵循同一顺序拿叉子，则不会出现两个哲学家相互等待对方放下的叉子的情况。如果哲学家改为先拿左边的叉子，只要所有哲学家都遵守这一规则，结果仍然是相同的，避免了死锁。但如果哲学家中有的先拿左边叉子，有的先拿右边叉子，则可能会引发死锁，因为可能形成一个循环等待的环路。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            使用信号量和锁的方式处理并发时，是否存在性能瓶颈或者潜在的效率问题？例如，频繁的锁操作会不会影响系统的整体性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用信号量和锁确实可以引入性能瓶颈和效率问题，尤其是在高并发情况下。锁操作涉及到内核态的转换和线程的上下文切换，这些都是耗时的操作。当锁的竞争非常激烈时，线程可能会频繁地被挂起和唤醒，导致效率降低。此外，如果锁的保持时间过长，也会增加其他线程的等待时间，从而降低并发性能。设计良好的锁策略和尽可能减少锁的粒度是提升性能的关键。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-dining-philosophers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-dining-philosophers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

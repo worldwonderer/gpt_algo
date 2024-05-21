@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>按字典序排列最小的等效字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>按字典序排列最小的等效字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给出长度相同的两个字符串<code>s1</code> 和&nbsp;<code>s2</code>&nbsp;，还有一个字符串&nbsp;<code>baseStr</code>&nbsp;。</p>
+
+<p>其中 &nbsp;<code>s1[i]</code>&nbsp;和&nbsp;<code>s2[i]</code>&nbsp; 是一组等价字符。</p>
+
+<ul>
+	<li>举个例子，如果&nbsp;<code>s1 = "abc"</code> 且&nbsp;<code>s2 = "cde"</code>，那么就有&nbsp;<code>'a' == 'c', 'b' == 'd', 'c' == 'e'</code>。</li>
+</ul>
+
+<p>等价字符遵循任何等价关系的一般规则：</p>
+
+<ul>
+	<li><strong>&nbsp;自反性&nbsp;</strong>：<code>'a' == 'a'</code></li>
+	<li>&nbsp;<strong>对称性&nbsp;</strong>：<code>'a' == 'b'</code> 则必定有 <code>'b' == 'a'</code></li>
+	<li>&nbsp;<strong>传递性</strong> ：<code>'a' == 'b'</code> 且 <code>'b' == 'c'</code> 就表明 <code>'a' == 'c'</code></li>
+</ul>
+
+<p>例如，&nbsp;<code>s1 = "abc"</code>&nbsp;和&nbsp;<code>s2 = "cde"</code>&nbsp;的等价信息和之前的例子一样，那么&nbsp;<code>baseStr = "eed"</code>&nbsp;, <code>"acd"</code>&nbsp;或&nbsp;<code>"aab"</code>，这三个字符串都是等价的，而&nbsp;<code>"aab"</code>&nbsp;是&nbsp;<code>baseStr</code>&nbsp;的按字典序最小的等价字符串</p>
+
+<p>利用<em>&nbsp;</em><code>s1</code>&nbsp;和&nbsp;<code>s2</code>&nbsp;的等价信息，找出并返回<em>&nbsp;</em><code>baseStr</code><em>&nbsp;</em>的按字典序排列最小的等价字符串。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "parker", s2 = "morris", baseStr = "parser"
+<strong>输出：</strong>"makkek"
+<strong>解释：</strong>根据 <code>A</code> 和 <code>B 中的等价信息，</code>我们可以将这些字符分为 <code>[m,p]</code>, <code>[a,o]</code>, <code>[k,r,s]</code>, <code>[e,i] 共 4 组</code>。每组中的字符都是等价的，并按字典序排列。所以答案是 <code>"makkek"</code>。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "hello", s2 = "world", baseStr = "hold"
+<strong>输出：</strong>"hdld"
+<strong>解释：</strong>根据 <code>A</code> 和 <code>B 中的等价信息，</code>我们可以将这些字符分为 <code>[h,w]</code>, <code>[d,e,o]</code>, <code>[l,r] 共 3 组</code>。所以只有 S 中的第二个字符 <code>'o'</code> 变成 <code>'d'，最后答案为 </code><code>"hdld"</code>。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s1 = "leetcode", s2 = "programs", baseStr = "sourcecode"
+<strong>输出：</strong>"aauaaaaada"
+<strong>解释：</strong>我们可以把 A 和 B 中的等价字符分为 <code>[a,o,e,r,s,c]</code>, <code>[l,p]</code>, <code>[g,t]</code> 和 <code>[d,m] 共 4 组</code>，因此 <code>S</code> 中除了 <code>'u'</code> 和 <code>'d'</code> 之外的所有字母都转化成了 <code>'a'</code>，最后答案为 <code>"aauaaaaada"</code>。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s1.length, s2.length, baseStr &lt;= 1000</code></li>
+	<li><code>s1.length == s2.length</code></li>
+	<li>字符串<code>s1</code>,&nbsp;<code>s2</code>, and&nbsp;<code>baseStr</code>&nbsp;仅由从&nbsp;<code>'a'</code> 到&nbsp;<code>'z'</code>&nbsp;的小写英文字母组成。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class UnionFind:
+    def __init__(self, n):
+        self.root = [i for i in range(n)]
+
+    def find(self, x):
+        if x != self.root[x]:
+            # 在查询的时候合并到顺带直接根节点
+            root_x = self.find(self.root[x])
+            self.root[x] = root_x
+            return root_x
+        return x
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return
+        if root_x &lt; root_y:
+            root_x, root_y = root_y, root_x
+        self.root[root_x] = root_y
+        return
+
+
+class Solution:
+    def smallestEquivalentString(self, s1: str, s2: str, baseStr: str) -&gt; str:
+        n = len(s1)
+        uf = UnionFind(26)
+        for i in range(n):
+            uf.union(ord(s1[i]) - ord(&#34;a&#34;), ord(s2[i]) - ord(&#34;a&#34;))
+        ans = &#34;&#34;
+        for w in baseStr:
+            ans += chr(uf.find(ord(w) - ord(&#34;a&#34;)) + ord(&#34;a&#34;))
+        return ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题使用并查集(Union-Find)数据结构来解决字符等价的问题。并查集是一种有效管理元素分组关系的数据结构，特别适合处理动态连通性问题。首先，初始化一个大小为26的并查集，代表26个英文字母。遍历s1和s2中的字符，将每对等价字符联合在一起。这样，所有传递性等价的字符都会被归入同一个集合。在处理完所有等价关系后，对于baseStr中的每个字符，查找其所属的集合代表（即最小字典序的字符），并构建最终的结果字符串。</p>
+                                <p>时间复杂度: O(n + m)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class UnionFind:
+    def __init__(self, n):
+        self.root = [i for i in range(n)]  # 初始化每个字母的根节点
+
+    def find(self, x):
+        if x != self.root[x]:
+            root_x = self.find(self.root[x])  # 查找根节点
+            self.root[x] = root_x  # 路径压缩
+            return root_x
+        return x
+
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x != root_y:
+            if root_x &lt; root_y:
+                root_x, root_y = root_y, root_x  # 保证小的根节点作为代表
+            self.root[root_x] = root_y  # 合并集合
+
+
+class Solution:
+    def smallestEquivalentString(self, s1: str, s2: str, baseStr: str) -&gt; str:
+        n = len(s1)
+        uf = UnionFind(26)  # 初始化并查集
+        for i in range(n):
+            uf.union(ord(s1[i]) - ord(&#39;a&#39;), ord(s2[i]) - ord(&#39;a&#39;))  # 处理等价关系
+        ans = &#39;&#39;
+        for w in baseStr:
+            ans += chr(uf.find(ord(w) - ord(&#39;a&#39;)) + ord(&#39;a&#39;))  # 查找并构建结果字符串
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在并查集的实现中，如何确保在union操作时总是将字典序较小的字符作为代表？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在并查集的实现中，确保在union操作时总是将字典序较小的字符作为代表，可以通过比较两个字符的根节点的字典序来实现。首先，使用`find`函数确定每个字符的根节点。然后，在`union`函数中，比较这两个根节点所代表的字符的字典序，将字典序较大的根节点指向字典序较小的根节点。这样，较小字典序的字符始终作为代表，从而保证了集合中的代表是字典序最小的字符。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于多个等价类交叉的情况，例如&#39;A == B&#39;, &#39;B == C&#39;, &#39;A == D&#39;, 并查集是如何处理这种复杂的传递性关系的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>并查集通过其设计本质上支持处理等价类的传递性关系。当处理诸如&#39;A == B&#39;, &#39;B == C&#39;, &#39;A == D&#39;等关系时，通过逐对调用`union`操作，确保每个字符与其等价的字符连接。例如，首先连接&#39;A&#39;和&#39;B&#39;，然后&#39;B&#39;和&#39;C&#39;，接着由于&#39;A&#39;和&#39;B&#39;已连接，&#39;A&#39;与&#39;C&#39;也会通过&#39;B&#39;连接起来。最后，&#39;A&#39;与&#39;D&#39;的连接直接加入这个集合。因此，所有等价的字符都会逐渐形成一个组或集合，其中任何一个字符都可以通过根节点或中间节点连接到任何其他字符。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在并查集中使用路径压缩优化find操作时，是否会影响union操作的效率，以及如何在union时保持路径压缩的效果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>路径压缩技术是在执行find操作时应用的，其目的是将查找路径上的每个节点直接连接到根节点，从而减少后续查找操作的深度和时间。这种优化虽然改变了树的深度，但不会影响union操作的基本效率。在执行union操作时，先通过find操作找到各自的根节点，并进行合并。由于find操作已经进行了路径压缩，因此union操作也会间接受益，因为合并操作涉及到的树高度较低，从而保持了高效率。维护路径压缩的效果主要是在find操作中实现，而union操作继续保证了结构的正确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            解题方法中是否考虑了所有字符都是自反性的情况，即baseStr中的字符在s1和s2中没有出现，这种情况下算法是否仍然有效？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，每个字符的初始根节点是其自身，这意味着每个字符最初都是自己的代表。如果baseStr中的某个字符在s1和s2中没有出现，即没有任何等价关系影响这个字符，这个字符将简单地被视为与自身等价。因此，当查找这种字符的代表时，会发现其代表仍然是自身。这样，算法不仅处理了在s1和s2中定义的等价关系，也自然处理了自反性的情况，确保对于baseStr中未出现的字符，算法仍然有效且这些字符简单地映射到自身。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/lexicographically-smallest-equivalent-string')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/lexicographically-smallest-equivalent-string/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>查询删除和添加元素后的数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>查询删除和添加元素后的数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 142 ms</p>
+                    <p>内存: 44.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def elementInNums(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        m, n = len(nums), len(queries)
+        ans = []
+        for j in range(n):
+            time, index = queries[j][0] % (2 * m), queries[j][1]
+            lengthAtTime = abs(m - time)
+            if index &lt; lengthAtTime:
+                numsIndex = index + time if time &lt; m else index
+                ans.append(nums[numsIndex])
+            else:
+                ans.append(-1)
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目的核心是模拟数组在一系列操作后的状态。这里的操作包括添加和删除元素，但是具体的添加和删除规则并没有明确说明。基于题解代码，我们可以推测操作是周期性的，周期长度为2m（m是数组初始长度）。在前m个时间单位，数组长度递减，之后的m个时间单位，数组长度递增。查询操作是确定在特定时间点给定索引位置的元素。如果索引有效，则返回该位置的元素；如果无效（索引超出当前数组长度），则返回-1。\n\n1. 对于每个查询，计算时间点和索引。\n2. 使用time % (2 * m)确保处理的时间在合法范围内（即0到2m-1）。\n3. 计算当前时间的数组长度。\n4. 判断索引是否在当前数组长度内。如果在，计算并确定该索引在原始数组中的位置；如果不在，返回-1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def elementInNums(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        m, n = len(nums), len(queries)  # m是原数组长度，n是查询数量
+        ans = []  # 用于保存每个查询的结果
+        for j in range(n):  # 遍历所有查询
+            time, index = queries[j][0] % (2 * m), queries[j][1]  # 计算修正后的时间和索引
+            lengthAtTime = abs(m - time)  # 计算当前时间的数组长度
+            if index &lt; lengthAtTime:  # 如果索引小于当前长度，说明索引有效
+                numsIndex = index + time if time &lt; m else index  # 计算索引对应的原始数组位置
+                ans.append(nums[numsIndex])  # 添加对应的元素到答案中
+            else:  # 如果索引无效，添加-1到答案中
+                ans.append(-1)
+        return ans  # 返回答案列表</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在此算法中，如何确保每次计算的`lengthAtTime`正确反映了删除或添加操作后数组的实际长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中，`lengthAtTime` 的计算依赖于时间 `time` 和数组最初长度 `m` 的关系。通过 `lengthAtTime = abs(m - time)`，在周期的前半部分（即 `time &lt; m` 时），数组长度从 `m` 减少到 `0`；而在周期的后半部分（即 `time &gt;= m` 时），数组长度则从 `0` 增加回 `m`。这种计算方式利用了绝对值函数的性质来模拟数组长度的周期性增减，确保每次计算反映的是删除或添加后的实际数组长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在计算`time`时使用`time % (2 * m)`，这样的周期性处理对算法的正确性有什么关键作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用 `time % (2 * m)` 是为了将时间限制在一个固定的周期内，这里的周期长度为 `2m`，代表一个完整的增减周期。在此周期内，数组长度先减少再增加。这样的处理确保无论查询的时间点多久远，我们总能将其映射回这个固定的周期内，从而正确模拟数组长度的变化。这对于算法模拟周期性变化的数组状态是必要的，确保无论何时进行查询，都能得到正确的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果数组的操作规则不是简单的周期增减，算法需要做哪些调整来适应更复杂的操作规则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组的操作规则更加复杂，例如不同时间段有不同的添加或删除模式，算法需要进行适应性的调整。首先，可能需要一个更复杂的函数或数据结构来记录每个时间点数组的状态或长度变化。其次，查询处理也需要根据这些记录的状态动态调整，以确保能够准确地反映出任何给定时间点的数组长度和内容。此外，可能还需要修改周期性处理的逻辑，以适应非周期性或不规则周期性的变化模式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理查询结果时，算法如何处理数组长度在减少到0之后再次增加的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，数组长度的减少到0然后再增加是通过计算 `lengthAtTime = abs(m - time)` 实现的。在周期的前半部分，长度逐渐减少至0（当 `time` 接近 `m` 时）。一旦 `time` 超过 `m`，`abs(m - time)` 会使得长度从0开始逐步增加。这种处理方式确保在数组长度减至0后，随着时间的推移，数组的长度能够正确地重新增加。因此，无论查询发生在减少阶段还是增加阶段，算法都能根据当前 `time` 计算出正确的数组长度，并据此处理查询结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/elements-in-array-after-removing-and-replacing-elements')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/elements-in-array-after-removing-and-replacing-elements/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>设计前中后队列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>设计前中后队列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=linked-list" class="badge bg-secondary tag-link">链表</a>
+                    
+                        <a href="/problems?tag=data-stream" class="badge bg-secondary tag-link">数据流</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>请你设计一个队列，支持在前，中，后三个位置的 <code>push</code> 和 <code>pop</code> 操作。</p>
+
+<p>请你完成 <code>FrontMiddleBack</code> 类：</p>
+
+<ul>
+	<li><code>FrontMiddleBack()</code> 初始化队列。</li>
+	<li><code>void pushFront(int val)</code> 将 <code>val</code> 添加到队列的 <strong>最前面</strong> 。</li>
+	<li><code>void pushMiddle(int val)</code> 将 <code>val</code> 添加到队列的 <strong>正中间</strong> 。</li>
+	<li><code>void pushBack(int val)</code> 将 <code>val</code> 添加到队里的 <strong>最后面</strong> 。</li>
+	<li><code>int popFront()</code> 将 <strong>最前面</strong> 的元素从队列中删除并返回值，如果删除之前队列为空，那么返回 <code>-1</code> 。</li>
+	<li><code>int popMiddle()</code> 将 <b>正中间</b> 的元素从队列中删除并返回值，如果删除之前队列为空，那么返回 <code>-1</code> 。</li>
+	<li><code>int popBack()</code> 将 <strong>最后面</strong> 的元素从队列中删除并返回值，如果删除之前队列为空，那么返回 <code>-1</code> 。</li>
+</ul>
+
+<p>请注意当有 <strong>两个</strong> 中间位置的时候，选择靠前面的位置进行操作。比方说：</p>
+
+<ul>
+	<li>将 <code>6</code> 添加到 <code>[1, 2, 3, 4, 5]</code> 的中间位置，结果数组为 <code>[1, 2, <strong>6</strong>, 3, 4, 5]</code> 。</li>
+	<li>从 <code>[1, 2, <strong>3</strong>, 4, 5, 6]</code> 的中间位置弹出元素，返回 <code>3</code> ，数组变为 <code>[1, 2, 4, 5, 6]</code> 。</li>
+</ul>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>
+["FrontMiddleBackQueue", "pushFront", "pushBack", "pushMiddle", "pushMiddle", "popFront", "popMiddle", "popMiddle", "popBack", "popFront"]
+[[], [1], [2], [3], [4], [], [], [], [], []]
+<strong>输出：</strong>
+[null, null, null, null, null, 1, 3, 4, 2, -1]
+
+<strong>解释：</strong>
+FrontMiddleBackQueue q = new FrontMiddleBackQueue();
+q.pushFront(1);   // [<strong>1</strong>]
+q.pushBack(2);    // [1, <strong>2</strong>]
+q.pushMiddle(3);  // [1, <strong>3</strong>, 2]
+q.pushMiddle(4);  // [1, <strong>4</strong>, 3, 2]
+q.popFront();     // 返回 1 -> [4, 3, 2]
+q.popMiddle();    // 返回 3 -> [4, 2]
+q.popMiddle();    // 返回 4 -> [2]
+q.popBack();      // 返回 2 -> []
+q.popFront();     // 返回 -1 -> [] （队列为空）
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= val <= 10<sup>9</sup></code></li>
+	<li>最多调用 <code>1000</code> 次 <code>pushFront</code>， <code>pushMiddle</code>， <code>pushBack</code>， <code>popFront</code>， <code>popMiddle</code> 和 <code>popBack</code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 76 ms</p>
+                    <p>内存: 15.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import deque
+
+
+class FrontMiddleBackQueue:
+
+    def __init__(self):
+        self.front = deque()
+        self.back = deque()
+
+    def pushFront(self, val: int) -&gt; None:
+        self.front.appendleft(val)
+        if len(self.front) &gt; len(self.back) + 1:
+            val = self.front.pop()
+            self.back.appendleft(val)
+
+    def pushMiddle(self, val: int) -&gt; None:
+        if len(self.front) &gt; len(self.back):
+            self.back.appendleft(self.front.pop())
+        self.front.append(val)
+
+    def pushBack(self, val: int) -&gt; None:
+        self.back.append(val)
+        if len(self.back) &gt; len(self.front):
+            val = self.back.popleft()
+            self.front.append(val)
+
+    def popFront(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1
+        ret = self.front.popleft()
+        if len(self.front) &lt; len(self.back):
+            val = self.back.popleft()
+            self.front.append(val)
+        return ret
+
+    def popMiddle(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1
+        ret = self.front.pop()
+        if len(self.front) &lt; len(self.back):
+            val = self.back.popleft()
+            self.front.append(val)
+        return ret
+
+    def popBack(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1
+        if len(self.back) == 0:
+            return self.front.pop()
+        ret = self.back.pop()
+        if len(self.front) &gt; len(self.back) + 1:
+            val = self.front.pop()
+            self.back.appendleft(val)
+        return ret
+
+# Your FrontMiddleBackQueue object will be instantiated and called as such:
+# obj = FrontMiddleBackQueue()
+# obj.pushFront(val)
+# obj.pushMiddle(val)
+# obj.pushBack(val)
+# param_4 = obj.popFront()
+# param_5 = obj.popMiddle()
+# param_6 = obj.popBack()
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了两个双端队列（deque）来高效地支持队列的前中后操作。两个队列分别称为 front 和 back，其中 front 队列处理前半部分的元素，而 back 队列处理后半部分的元素。对于中间的操作，当 front 队列的长度比 back 队列长时，将会调整元素以保持平衡。此方法通过两个队列来协调元素，使得添加和删除操作都可以尽可能接近 O(1) 时间复杂度。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">from collections import deque
+
+class FrontMiddleBackQueue:
+
+    def __init__(self):
+        self.front = deque()  # 前半部分的双端队列
+        self.back = deque()   # 后半部分的双端队列
+
+    def pushFront(self, val: int) -&gt; None:
+        self.front.appendleft(val)  # 在前面添加元素
+        # 平衡两个队列的长度
+        if len(self.front) &gt; len(self.back) + 1:
+            val = self.front.pop()
+            self.back.appendleft(val)
+
+    def pushMiddle(self, val: int) -&gt; None:
+        # 确保 front 和 back 的长度适当
+        if len(self.front) &gt; len(self.back):
+            self.back.appendleft(self.front.pop())
+        self.front.append(val)  # 在中间添加元素
+
+    def pushBack(self, val: int) -&gt; None:
+        self.back.append(val)  # 在后面添加元素
+        # 平衡两个队列的长度
+        if len(self.back) &gt; len(self.front):
+            val = self.back.popleft()
+            self.front.append(val)
+
+    def popFront(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1  # 队列为空时返回 -1
+        ret = self.front.popleft()  # 从前面弹出元素
+        # 平衡两个队列的长度
+        if len(self.front) &lt; len(self.back):
+            val = self.back.popleft()
+            self.front.append(val)
+        return ret
+
+    def popMiddle(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1  # 队列为空时返回 -1
+        ret = self.front.pop()  # 从中间弹出元素
+        # 平衡两个队列的长度
+        if len(self.front) &lt; len(self.back):
+            val = self.back.popleft()
+            self.front.append(val)
+        return ret
+
+    def popBack(self) -&gt; int:
+        if len(self.front) == 0:
+            return -1  # 队列为空时返回 -1
+        if len(self.back) == 0:
+            return self.front.pop()  # 如果 back 为空，从 front 弹出
+        ret = self.back.pop()  # 从后面弹出元素
+        # 平衡两个队列的长度
+        if len(self.front) &gt; len(self.back) + 1:
+            val = self.front.pop()
+            self.back.appendleft(val)
+        return ret</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用两个双端队列的设计中，为何选择在两个队列长度不平衡时从一个队列的末尾移动元素到另一个队列的开头，而不是从开头到末尾？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种设计选择主要是为了保持队列的中间元素位置正确并简化操作。当元素从一个队列的末尾移动到另一个队列的开头时，我们能更容易地维持中间元素的位置，特别是在执行中间添加或删除操作时。这样的移动方式可以确保在任何操作后，两个队列都能迅速平衡，而不需要进行额外的元素重排。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何处理在 pushMiddle 和 popMiddle 操作中，当队列具有偶数个元素时，中间位置的选择和元素的移动？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在设计中，当队列元素总数为偶数时，中间位置的元素被视为靠近前半部分队列的最后一个元素。因此，pushMiddle 操作会将新元素添加到 front 队列的末尾。如果添加后 front 队列比 back 队列长，会将 front 的最后一个元素移动到 back 的开头。对于 popMiddle，操作总是从 front 队列的末尾移除元素，这样可以保持操作简单并确保两个队列的平衡。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在 pushBack 操作中，当 back 队列长度超过 front 队列时，你是如何决定何时以及如何从 back 移动元素到 front 来保持平衡？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在 pushBack 操作中，每当一个元素被添加到 back 队列后，算法会检查两个队列的长度。如果 back 队列的长度超过 front 队列，此时会从 back 队列的开头移除一个元素，并将其添加到 front 队列的末尾。这种平衡策略确保了两个队列长度的平衡，同时也维持了队列中元素的顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在 popFront 操作中，如果 front 队列为空而 back 队列不为空，为什么直接将 back 队列的元素移至 front，而不考虑 back 队列中元素的具体位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 front 队列为空而需要执行 popFront 操作时，最简单和直接的方法是直接从 back 队列中转移元素到 front 队列。这种做法不仅简化了操作过程，而且由于 back 队列的元素本来就是队列后半部分的元素，直接转移不会影响队列元素的整体顺序。在 popFront 需要执行时，通常意味着队列正在从一个非常不平衡的状态恢复平衡，因此，这种简单的转移操作是恢复平衡的最快方式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/design-front-middle-back-queue')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/design-front-middle-back-queue/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

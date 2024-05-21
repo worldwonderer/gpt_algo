@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>3n 块披萨</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>3n 块披萨</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个披萨，它由 3n 块不同大小的部分组成，现在你和你的朋友们需要按照如下规则来分披萨：</p>
+
+<ul>
+	<li>你挑选 <strong>任意</strong>&nbsp;一块披萨。</li>
+	<li>Alice 将会挑选你所选择的披萨逆时针方向的下一块披萨。</li>
+	<li>Bob 将会挑选你所选择的披萨顺时针方向的下一块披萨。</li>
+	<li>重复上述过程直到没有披萨剩下。</li>
+</ul>
+
+<p>每一块披萨的大小按顺时针方向由循环数组 <code>slices</code>&nbsp;表示。</p>
+
+<p>请你返回你可以获得的披萨大小总和的最大值。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/03/21/sample_3_1723.png" style="height: 240px; width: 475px;" /></p>
+
+<pre>
+<strong>输入：</strong>slices = [1,2,3,4,5,6]
+<strong>输出：</strong>10
+<strong>解释：</strong>选择大小为 4 的披萨，Alice 和 Bob 分别挑选大小为 3 和 5 的披萨。然后你选择大小为 6 的披萨，Alice 和 Bob 分别挑选大小为 2 和 1 的披萨。你获得的披萨总大小为 4 + 6 = 10 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/03/21/sample_4_1723.png" style="height: 250px; width: 475px;" /></strong></p>
+
+<pre>
+<strong>输入：</strong>slices = [8,9,8,6,1,1]
+<strong>输出：</strong>16
+<strong>解释：</strong>两轮都选大小为 8 的披萨。如果你选择大小为 9 的披萨，你的朋友们就会选择大小为 8 的披萨，这种情况下你的总和不是最大的。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= slices.length &lt;= 500</code></li>
+	<li><code>slices.length % 3 == 0</code></li>
+	<li><code>1 &lt;= slices[i] &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxSizeSlices(self, arr: List[int]) -&gt; int:
+        n=len(arr)
+        k=n//3
+        arr=[0]+arr+[0]
+        h=[]
+        pre=[0]*(n+2)#前驱
+        nxt=[0]*(n+2)#后继
+        vis=[False]*(n+2)#是否删除了
+        for i in range(1,n+1):
+            pre[i]=i-1
+            nxt[i]=i+1
+            heappush(h,(-arr[i],i))
+        pre[1]=n
+        nxt[n]=1
+        def remove(x):
+            nxt[pre[x]]=nxt[x]
+            pre[nxt[x]]=pre[x]
+            vis[x]=True
+        tot=0
+        for _ in range(k):
+            while h and vis[h[0][1]]:
+                heappop(h)
+            if len(h)==0:
+                break
+            val,idx=heappop(h)
+            val*=-1
+            tot+=val
+            arr[idx]=arr[pre[idx]]+arr[nxt[idx]]-val
+            heappush(h,(-arr[idx],idx))
+            remove(pre[idx])
+            remove(nxt[idx])
+            
+        return tot</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的思路是使用贪心算法加上双向链表和最小堆。首先，为了方便处理环形数组，我们在数组两端各添加一个0，并建立双向链表来表示这个环。我们的目标是在每一轮中选择一个披萨片，使得当前披萨片加上相邻两个披萨片的总和最大，然后删除这三个披萨片，并更新相邻披萨片的值。为了快速找到这样的披萨片，我们使用最小堆来维护每个披萨片及其相邻披萨片的总和。每次从堆中取出最小的元素，检查其是否已经被删除（由于堆的延迟删除特性），如果没有被删除，则更新总和并进行相应的删除和更新操作。这个过程重复进行k次，其中k是披萨片总数除以3。</p>
+                                <p>时间复杂度: O(nlogn)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxSizeSlices(self, arr: List[int]) -&gt; int:
+        n=len(arr)
+        k=n//3
+        arr=[0]+arr+[0]
+        h=[]
+        pre=[0]*(n+2)  # 前驱
+        nxt=[0]*(n+2)  # 后继
+        vis=[False]*(n+2)  # 是否删除了
+        for i in range(1,n+1):
+            pre[i]=i-1
+            nxt[i]=i+1
+            heappush(h,(-arr[i],i))
+        pre[1]=n
+        nxt[n]=1
+        def remove(x):
+            nxt[pre[x]]=nxt[x]
+            pre[nxt[x]]=pre[x]
+            vis[x]=True
+        tot=0
+        for _ in range(k):
+            while h and vis[h[0][1]]:
+                heappop(h)
+            if len(h)==0:
+                break
+            val,idx=heappop(h)
+            val*=-1
+            tot+=val
+            arr[idx]=arr[pre[idx]]+arr[nxt[idx]]-val
+            heappush(h,(-arr[idx],idx))
+            remove(pre[idx])
+            remove(nxt[idx])
+            
+        return tot</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么需要在数组两端各添加一个0，这样做有什么具体的作用或好处？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数组两端各添加一个0主要是为了处理环形数组的边界情况。在环形结构中，数组的第一个元素和最后一个元素是相邻的，通过添加0可以简化编程逻辑，使得数组的起始和结束位置能够统一处理。这样，在使用双向链表表示环时，可以无需编写特殊的边界条件代码，从而降低错误率并简化代码实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            双向链表在这个解法中起到了什么作用，是否可以通过其他数据结构替代？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双向链表在此解法中用于动态地删除和更新元素。双向链表允许在O(1)时间复杂度内删除任何一个节点，并快速更新其前驱和后继节点，这对于该题中需要频繁删除和调整元素位置的需求来说非常重要。尽管理论上可以使用数组或其他数据结构，但双向链表在此场景下提供了无与伦比的操作效率和简便性，尤其是在需要频繁地插入和删除操作时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用最小堆维护每个披萨片及其相邻披萨片的总和时，为什么选择最小堆而不是最大堆？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中使用最小堆可能是一个错误，因为题目要求是在每一轮中选择一个披萨片，使得当前披萨片加上相邻两个披萨片的总和最大。因此，应该使用最大堆来维护每个披萨片及其相邻披萨片的总和，以便每次都能从堆中取出当前总和最大的元素。如果确实使用了最小堆，这可能是题解中的一个逻辑错误或者是描述错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            堆中元素的延迟删除策略是如何实现的？能否详细解释其必要性和具体操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>堆中的延迟删除策略是通过在堆操作中结合一个标记数组来实现的。在这种策略中，当一个元素从逻辑上被删除（即不再是堆中的有效元素）时，并不立即从物理上从堆中移除，而是简单地标记这个元素为已删除。当这个元素浮到堆顶部，堆的操作（如pop）会检查该元素是否被标记为删除，如果是，则丢弃它并继续从堆中移除下一个元素。这种策略的必要性在于它避免了复杂和耗时的堆重构操作，尤其是在连续删除多个堆元素的情况下，可以显著提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/pizza-with-3n-slices')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/pizza-with-3n-slices/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

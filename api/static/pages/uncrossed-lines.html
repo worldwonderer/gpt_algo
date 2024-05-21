@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>不相交的线</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>不相交的线</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在两条独立的水平线上按给定的顺序写下 <code>nums1</code> 和 <code>nums2</code> 中的整数。</p>
+
+<p>现在，可以绘制一些连接两个数字 <code>nums1[i]</code>&nbsp;和 <code>nums2[j]</code>&nbsp;的直线，这些直线需要同时满足：</p>
+
+<ul>
+	<li>&nbsp;<code>nums1[i] == nums2[j]</code></li>
+	<li>且绘制的直线不与任何其他连线（非水平线）相交。</li>
+</ul>
+
+<p>请注意，连线即使在端点也不能相交：每个数字只能属于一条连线。</p>
+
+<p>以这种方法绘制线条，并返回可以绘制的最大连线数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2019/04/26/142.png" style="width: 400px; height: 286px;" />
+<pre>
+<strong>输入：</strong>nums1 = <span id="example-input-1-1">[1,4,2]</span>, nums2 = <span id="example-input-1-2">[1,2,4]</span>
+<strong>输出：</strong><span id="example-output-1">2</span>
+<strong>解释：</strong>可以画出两条不交叉的线，如上图所示。 
+但无法画出第三条不相交的直线，因为从 nums1[1]=4 到 nums2[2]=4 的直线将与从 nums1[2]=2 到 nums2[1]=2 的直线相交。
+</pre>
+
+<div>
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = <span id="example-input-2-1">[2,5,1,2,5]</span>, nums2 = <span id="example-input-2-2">[10,5,2,1,5,2]</span>
+<strong>输出：</strong><span id="example-output-2">3</span>
+</pre>
+
+<div>
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums1 = <span id="example-input-3-1">[1,3,7,1,7,5]</span>, nums2 = <span id="example-input-3-2">[1,9,2,5,1]</span>
+<strong>输出：</strong><span id="example-output-3">2</span></pre>
+
+
+</div>
+</div>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums1.length, nums2.length &lt;= 500</code></li>
+	<li><code>1 &lt;= nums1[i], nums2[j] &lt;= 2000</code></li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 35 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre"># class Solution:
+#     def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -&gt; int:
+#         nums2 = nums2[::-1]
+#         @cache
+#         def find(n, m):
+#             if not n or m == len(nums2): return 0
+#             try: return max(find(n - 1, nums2[m:].index(nums1[n - 1]) + m + 1) + 1, find(n - 1, m))
+#             except: return find(n - 1, m)
+#         return find(len(nums1), 0)
+
+class Solution:
+    def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -&gt; int:
+        nums1, nums2 = (nums2, nums1) if len(nums2) &gt; len(nums1) else (nums1, nums2)
+
+        dic = collections.defaultdict(list)
+        for i in range(len(nums1) - 1, -1, -1):#同值坐标降序放置，排除对最长递增公共序列的干扰
+            dic[nums1[i]].append(i)
+        #print(dic)
+        tmp = []
+        for n in nums2:#取公共值
+            tmp += dic[n]
+        #print(tmp)
+        dp = []
+        for x in tmp:#求最长递增公共序列，因为题意要求的连线序号肯定是单调递增的
+            i = bisect_left(dp, x)
+            if i == len(dp): dp.append(x)
+            else: dp[i] = x
+        
+        return len(dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解的思路是将问题转化为寻找两个数组之间的最长递增子序列（Longest Increasing Subsequence, LIS）的问题。首先，为了方便处理，确保nums1是两个数组中较短的一个。然后，使用一个字典dic来存储nums1中每个数字的所有出现位置，并按照逆序存储，以便后续操作。接下来，遍历nums2数组，将nums2中的元素按照在nums1中出现的位置顺序记录到一个列表tmp中。这一步是为了找到所有在nums1和nums2中都出现的元素，并保留其在nums1中的位置。最后，通过计算tmp列表的最长递增子序列的长度来确定最大的不相交的线的数量，这是因为这些位置的递增序列对应于不相交的连接线。</p>
+                                <p>时间复杂度: O(m log m)</p>
+                                <p>空间复杂度: O(n + m)</p>
+                                <pre class="bg-light p-2">#class Solution:
+#    def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -&gt; int:
+#        nums2 = nums2[::-1]
+#        @cache
+#        def find(n, m):
+#            if not n or m == len(nums2): return 0
+#            try: return max(find(n - 1, nums2[m:].index(nums1[n - 1]) + m + 1) + 1, find(n - 1, m))
+#            except: return find(n - 1, m)
+#        return find(len(nums1), 0)
+
+class Solution:
+    def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -&gt; int:
+        # 选择较短的数组作为nums1以减少空间使用
+        nums1, nums2 = (nums2, nums1) if len(nums2) &gt; len(nums1) else (nums1, nums2)
+
+        # 创建字典存储nums1中元素的索引，逆序存储以便后续操作
+        dic = collections.defaultdict(list)
+        for i in range(len(nums1) - 1, -1, -1):
+            dic[nums1[i]].append(i)
+
+        # 遍历nums2，记录nums1中元素的出现位置
+        tmp = []
+        for n in nums2:
+            tmp += dic[n]
+
+        # 使用二分法计算最长递增子序列
+        dp = []
+        for x in tmp:
+            i = bisect_left(dp, x)
+            if i == len(dp): dp.append(x)
+            else: dp[i] = x
+        
+        # 返回最长递增子序列的长度，即最大连线数
+        return len(dp)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解决问题时首先选择将nums1和nums2中较短的数组作为nums1？这种选择对算法的效率有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在该算法实现中，选择较短的数组作为nums1主要是为了优化空间复杂度和提高算法效率。具体来说，由于需要建立一个字典来存储nums1中每个元素的出现位置，如果nums1较短，则字典的大小也会较小，从而减少内存使用。此外，遍历nums2并查找其元素在nums1的位置时，较短的nums1意味着在字典中查找操作的平均复杂度较低，从而可以加快整个算法的执行速度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构建字典dic时，为什么选择逆序存储nums1中元素的出现位置？这样做有什么特别的优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>逆序存储nums1中元素的出现位置的主要优势在于便于处理重复元素并保持他们的相对顺序。当nums2中的元素在nums1中多次出现时，逆序存储可以确保我们总是能够尽可能地使用最靠后的元素，从而在构造tmp数组时保持最长递增子序列的潜在长度。这样做有助于确保找到的递增子序列是有效的，不会因为重复利用前面的元素而导致错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何理解算法中对tmp列表使用二分查找来计算最长递增子序列（LIS）的过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中利用二分查找来构建最长递增子序列是通过维护一个动态的列表dp，该列表存储当前找到的最长递增子序列的元素。对于tmp中的每个元素x，使用二分查找确定它在dp中的位置i。如果x可以添加到dp的末尾（即i等于dp的长度），则直接添加x；如果i小于dp的长度，则替换dp中的第i个元素为x。这种方法有效地保持了dp的长度为当前的最长递增子序列的长度，并确保dp始终尽可能小，从而提高查找和更新的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            给定的算法实现中，是否考虑了nums1或nums2为空的情况，如果没有，应该如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在给定的算法实现中没有显式处理nums1或nums2为空的情况。如果任一数组为空，则最长递增子序列的长度自然应为0，因为没有可用的元素来形成连线。为了处理这种情况，应在算法开始时添加一个检查，如果发现任一数组为空，则直接返回0。这样可以有效避免后续的无意义计算，并保证算法的鲁棒性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/edit-distance" class="list-group-item list-group-item-action">
+                                编辑距离
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/uncrossed-lines')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/uncrossed-lines/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

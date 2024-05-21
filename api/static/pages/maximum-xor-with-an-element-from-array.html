@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>与数组中元素的最大异或值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>与数组中元素的最大异或值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由非负整数组成的数组 <code>nums</code> 。另有一个查询数组 <code>queries</code> ，其中 <code>queries[i] = [x<sub>i</sub>, m<sub>i</sub>]</code> 。</p>
+
+<p>第 <code>i</code> 个查询的答案是 <code>x<sub>i</sub></code> 和任何 <code>nums</code> 数组中不超过 <code>m<sub>i</sub></code> 的元素按位异或（<code>XOR</code>）得到的最大值。换句话说，答案是 <code>max(nums[j] XOR x<sub>i</sub>)</code> ，其中所有 <code>j</code> 均满足 <code>nums[j] &lt;= m<sub>i</sub></code> 。如果 <code>nums</code> 中的所有元素都大于 <code>m<sub>i</sub></code>，最终答案就是 <code>-1</code> 。</p>
+
+<p>返回一个整数数组<em> </em><code>answer</code><em> </em>作为查询的答案，其中<em> </em><code>answer.length == queries.length</code><em> </em>且<em> </em><code>answer[i]</code><em> </em>是第<em> </em><code>i</code><em> </em>个查询的答案。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums = [0,1,2,3,4], queries = [[3,1],[1,3],[5,6]]
+<strong>输出：</strong>[3,3,7]
+<strong>解释：</strong>
+1) 0 和 1 是仅有的两个不超过 1 的整数。0 XOR 3 = 3 而 1 XOR 3 = 2 。二者中的更大值是 3 。
+2) 1 XOR 2 = 3.
+3) 5 XOR 2 = 7.
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>nums = [5,2,4,6,6,3], queries = [[12,4],[8,1],[6,3]]
+<strong>输出：</strong>[15,-1,5]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length, queries.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>queries[i].length == 2</code></li>
+	<li><code>0 &lt;= nums[j], x<sub>i</sub>, m<sub>i</sub> &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 2613 ms</p>
+                    <p>内存: 162.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Trie:
+    L = 30
+
+    def __init__(self):
+        self.left = None
+        self.right = None
+
+    def insert(self, val: int):
+        node = self
+        for i in range(Trie.L, -1, -1):
+            bit = (val &gt;&gt; i) &amp; 1
+            if bit == 0:
+                if not node.left:
+                    node.left = Trie()
+                node = node.left
+            else:
+                if not node.right:
+                    node.right = Trie()
+                node = node.right
+    
+    def getMaxXor(self, val: int) -&gt; int:
+        ans, node = 0, self
+        for i in range(Trie.L, -1, -1):
+            bit = (val &gt;&gt; i) &amp; 1
+            check = False
+            if bit == 0:
+                if node.right:
+                    node = node.right
+                    check = True
+                else:
+                    node = node.left
+            else:
+                if node.left:
+                    node = node.left
+                    check = True
+                else:
+                    node = node.right
+            if check:
+                ans |= 1 &lt;&lt; i
+        return ans
+
+
+class Solution:
+    def maximizeXor(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n, q = len(nums), len(queries)
+        nums.sort()
+        queries = sorted([(x, m, i) for i, (x, m) in enumerate(queries)], key=lambda query: query[1])
+        
+        ans = [0] * q
+        t = Trie()
+        idx = 0
+        for x, m, qid in queries:
+            while idx &lt; n and nums[idx] &lt;= m:
+                t.insert(nums[idx])
+                idx += 1
+            if idx == 0:
+                # 字典树为空
+                ans[qid] = -1
+            else:
+                ans[qid] = t.getMaxXor(x)
+        
+        return ans
+
+
+#-------------------------------
+# class Trie:
+#     def __init__(self):
+#         self.num = [None,None]
+
+#     def insert(self,nums):
+#         node = self
+#         for i in range(30,-1,-1):
+#             n = nums&gt;&gt;i &amp; 1
+#             if not node.num[n]:
+#                 node.num[n] = Trie()
+#             node = node.num[n]
+
+#     def search(self,nums):
+#         node = self
+#         ans = 0
+#         for i in range(30,-1,-1):
+#             ans |= 1&lt;&lt;i
+#             cur = nums&gt;&gt;i &amp; 1
+#             if not node.num[1^cur]:
+#                 node = node.num[cur]
+#                 ans ^= 1&lt;&lt;i
+#             else:
+#                 node = node.num[1^cur]
+#         return ans
+
+# class Solution:
+#     def maximizeXor(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+#         n,q = len(nums),len(queries)
+#         ans = [-1] * q
+#         nums.sort()
+#         target = sorted([(x,m,i) for i,(x,m) in enumerate(queries)],key = lambda x:x[1])
+#         tree = Trie()
+#         for x,m,i in target:
+#             idx = 0
+#             while idx&lt;n and nums[idx]&lt;=m:
+#                 tree.insert(nums[idx])
+#                 idx += 1
+#             if idx&gt;0:
+#                 ans[i] = tree.search(x)
+#         return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解的核心是使用字典树（Trie）针对整数进行位操作的优化存储。首先，将数组nums排序并对查询数组queries按m值排序以方便处理。对于每个查询（xi, mi），我们将nums中所有不大于mi的元素插入到Trie中。之后，我们使用Trie树的getMaxXor函数来找到与xi进行XOR操作可以获得的最大值。如果没有任何元素被插入到Trie中（即所有nums元素均大于mi），则返回-1。</p>
+                                <p>时间复杂度: O((n + q) * L)</p>
+                                <p>空间复杂度: O(nL)</p>
+                                <pre class="bg-light p-2">class Trie:
+    L = 30  # 最多30位二进制数字
+
+    def __init__(self):
+        self.left = None  # 左子树表示0
+        self.right = None  # 右子树表示1
+
+    def insert(self, val: int):
+        node = self
+        for i in range(Trie.L, -1, -1):  # 从高位到低位处理
+            bit = (val &gt;&gt; i) &amp; 1  # 获取当前位的值
+            if bit == 0:
+                if not node.left:
+                    node.left = Trie()  # 如果左节点不存在，则创建
+                node = node.left
+            else:
+                if not node.right:
+                    node.right = Trie()  # 如果右节点不存在，则创建
+                node = node.right
+
+    def getMaxXor(self, val: int) -&gt; int:
+        ans, node = 0, self
+        for i in range(Trie.L, -1, -1):
+            bit = (val &gt;&gt; i) &amp; 1
+            check = False
+            if bit == 0:
+                if node.right:
+                    node = node.right
+                    check = True
+                else:
+                    node = node.left
+            else:
+                if node.left:
+                    node = node.left
+                    check = True
+                else:
+                    node = node.right
+            if check:
+                ans |= 1 &lt;&lt; i  # 如果对应位能够匹配到期望的异或结果，设置结果位
+        return ans
+
+class Solution:
+    def maximizeXor(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n, q = len(nums), len(queries)
+        nums.sort()  # 排序nums
+        queries = sorted([(x, m, i) for i, (x, m) in enumerate(queries)], key=lambda query: query[1])  # 按mi排序查询
+        ans = [0] * q
+        t = Trie()
+        idx = 0
+        for x, m, qid in queries:  # 处理每一个查询
+            while idx &lt; n and nums[idx] &lt;= m:
+                t.insert(nums[idx])  # 插入符合条件的nums元素
+                idx += 1
+            if idx == 0:
+                ans[qid] = -1  # 如果没有可用元素，返回-1
+            else:
+                ans[qid] = t.getMaxXor(x)  # 计算最大XOR值
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确保在Trie树中插入元素时不会重复插入相同的元素？是否有特定的机制来处理这个问题，还是假设数组中没有重复的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中并没有特别处理数组中可能出现的重复元素，Trie树的结构本身就支持重复插入，因为即使多次插入相同的值，也只会加强Trie树中相应路径的存在性，而不会对最终的XOR查询结果产生影响。因此，可以认为Trie树处理重复元素是无害的。但是，如果业务逻辑需要避免重复计算，可以在插入前通过集合或其他结构预处理以去除重复元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在查询过程中，如果nums的所有元素都大于mi，返回-1的逻辑是如何实现的？具体是依据哪个条件判断的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该逻辑是通过检查在处理每个查询时Trie树中是否有元素被插入来实现的。具体实现中，使用一个索引`idx`跟踪当前已处理的`nums`元素。如果在处理某个查询（xi, mi）时，`idx`还未增加（即`idx == 0`），这意味着没有任何元素被插入到Trie树中，因为所有的nums元素都大于mi。在这种情况下，直接为该查询返回-1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么要在处理查询之前对nums进行排序？这样做的具体好处是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对nums进行排序的主要好处是便于高效地处理查询。在查询处理过程中，我们需要将小于等于mi的nums元素插入Trie树。如果nums是排序的，我们可以使用一个单调递增的指针来遍历nums，并停止在第一个大于mi的元素处。这种方法避免了对每个查询重复检查整个nums数组，从而提高了整体效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            Trie树的getMaxXor函数在实现中如何确保找到与xi进行XOR操作的最大值？具体的比较和选择逻辑是什么样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>getMaxXor函数通过贪心算法确保找到最大的XOR结果。对于每一个二进制位，从最高位开始，函数尝试选择能够使得XOR结果最大化的路径。具体地，如果当前位xi为0，优先选择Trie树中的1（如果存在）；如果xi为1，则优先选择0（如果存在）。这样的选择是因为XOR操作中不同的位会产生1，从而增大结果。如果在某个位上没有可选择的路径来最大化结果，则选择可用的其他路径。通过这种方式，函数在每一位上都尽可能选取最优值，以确保最终的XOR结果是最大的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-xor-with-an-element-from-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-xor-with-an-element-from-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

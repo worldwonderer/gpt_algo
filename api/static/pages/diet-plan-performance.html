@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>健身计划评估</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>健身计划评估</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 26.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def dietPlanPerformance(self, calories: List[int], k: int, lower: int, upper: int) -&gt; int:
+        n = len(calories)
+        cumsum = [0] * (n + k)
+        for i in range(n):
+            cumsum[i + 1] = cumsum[i] + calories[i]
+        
+        score = 0
+        for i in range(n - k + 1):
+            T = cumsum[i + k] - cumsum[i]
+            if T &lt; lower:
+                score -= 1
+            elif T &gt; upper:
+                score += 1
+        
+        return score
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用滑动窗口和前缀和的方法来解决问题。首先计算出所有卡路里的前缀和数组 cumsum，其中 cumsum[i] 表示从开始到第 i-1 个元素的卡路里总和。这样，任意长度为 k 的子数组的卡路里和可以通过 cumsum[i+k] - cumsum[i] 快速计算得出，避免了重复计算。接着，遍历数组，对于每个长度为 k 的连续子数组，比较其卡路里总和与给定的 lower 和 upper 值，根据比较结果更新得分。如果总和小于 lower，则将 score 减一，如果大于 upper，则将 score 加一。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def dietPlanPerformance(self, calories: List[int], k: int, lower: int, upper: int) -&gt; int:
+        n = len(calories)
+        # 创建前缀和数组，长度为 n+k 为了方便计算
+        cumsum = [0] * (n + k)
+        # 计算前缀和
+        for i in range(n):
+            cumsum[i + 1] = cumsum[i] + calories[i]
+        
+        score = 0
+        # 遍历每个长度为 k 的子数组
+        for i in range(n - k + 1):
+            # 计算当前子数组的卡路里总和
+            T = cumsum[i + k] - cumsum[i]
+            # 根据卡路里总和更新得分
+            if T &lt; lower:
+                score -= 1
+            elif T &gt; upper:
+                score += 1
+        
+        return score
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在构建前缀和数组时，数组的长度设置为 `n + k` 而不是仅为 `n`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，前缀和数组的长度错误地设置为 `n + k`，实际上这是不必要的。前缀和数组的长度应当只需要为 `n + 1`，这是为了保证能够包括从第0个元素到第n-1个元素的所有前缀和，且使用从1开始的索引方式来方便计算。设置为 `n + k` 可能是对其他类型问题的通用处理误用，或者是错误，因为在这个特定问题中我们只需要计算到 `cumsum[n]`，即从第0个元素到最后一个元素的总和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算子数组卡路里总和时，使用 `cumsum[i + k] - cumsum[i]` 表达式的正确性是基于什么假设？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该表达式的正确性基于前缀和数组的定义，即 `cumsum[i]` 表示从数组开始到第i-1个元素的卡路里总和。因此，`cumsum[i + k]` 表示从数组开始到第i+k-1个元素的总和。当我们计算 `cumsum[i + k] - cumsum[i]` 时，实际上得到的是第i个元素到第i+k-1个元素的总和，即长度为k的子数组的卡路里总和。这个计算是基于索引从0开始连续的数组序列这一假设。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            前缀和数组 `cumsum` 的初始化为什么从索引1开始计算而非索引0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在前缀和数组中，`cumsum[0]` 被初始化为0是为了方便计算任意子区间的和，包括从数组第一个元素开始的区间。从索引1开始计算是因为，`cumsum[1]` 代表第一个元素的值，`cumsum[2]` 代表第一个和第二个元素的总和，依此类推。这种初始化方式使得任何从第i个到第j个元素的子数组和都可以简单地通过 `cumsum[j+1] - cumsum[i]` 来计算，其中i和j是基于0的索引。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如何处理数组 `calories` 的长度小于 k 的情况，这种情况下如何计算得分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组 `calories` 的长度小于 k，那么根据题目逻辑，不存在长度为 k 的子数组，因此不能形成一个有效的评估窗口来比较与 lower 和 upper 的值。在这种情况下，可以直接返回得分为0，因为没有任何子数组可以用来评估得分。这应该在算法实现的开始部分进行检查，如果 `n &lt; k`，直接返回0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/diet-plan-performance')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/diet-plan-performance/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>分隔数组以得到最大和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>分隔数组以得到最大和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>arr</code>，请你将该数组分隔为长度 <strong>最多 </strong>为 k 的一些（连续）子数组。分隔完成后，每个子数组的中的所有值都会变为该子数组中的最大值。</p>
+
+<p>返回将数组分隔变换后能够得到的元素最大和。本题所用到的测试用例会确保答案是一个 32 位整数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [1,15,7,9,2,5,10], k = 3
+<strong>输出：</strong>84
+<strong>解释：</strong>数组变为 [15,15,15,9,10,10,10]</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [1,4,1,5,7,3,6,1,9,9,3], k = 4
+<strong>输出：</strong>83
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [1], k = 1
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length &lt;= 500</code></li>
+	<li><code>0 &lt;= arr[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= k &lt;= arr.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 80 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxSumAfterPartitioning(self, arr: List[int], k: int) -&gt; int:
+        n = len(arr)
+        dp = [0] * n
+        max_val = dp[0] = arr[0]
+        for i in range(1, k):
+            if arr[i] &gt; max_val:
+                max_val = arr[i]
+            dp[i] = max_val * (i + 1)
+
+        for i in range(k, n):
+            max_val = arr[i]
+            res = dp[i - 1] + max_val
+            for j in range(2, k + 1):
+                if arr[i - j + 1] &gt; max_val:
+                    max_val = arr[i - j + 1]
+                temp = dp[i - j] + max_val * j
+                if temp &gt; res:
+                    res = temp
+            dp[i] = res
+
+        return dp[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划的策略来解决问题。定义一个dp数组，其中dp[i]表示到数组arr中第i个元素为止的最大和。初始化dp[0]为arr[0]。对于前k个元素，更新dp[i]为前i+1个元素中的最大值乘以i+1。对于第k个元素之后的每个元素，考虑所有可能的分割方式（最多k个元素为一组），计算每种方式下的最大和，更新dp[i]为所有这些可能中的最大值。</p>
+                                <p>时间复杂度: O(n*k)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxSumAfterPartitioning(self, arr: List[int], k: int) -&gt; int:
+        n = len(arr)
+        dp = [0] * n  # dp数组初始化
+        max_val = dp[0] = arr[0]  # 初始化第一个元素
+        for i in range(1, k):
+            if arr[i] &gt; max_val:
+                max_val = arr[i]  # 更新当前最大值
+            dp[i] = max_val * (i + 1)  # 更新dp数组
+
+        for i in range(k, n):
+            max_val = arr[i]
+            res = dp[i - 1] + max_val  # 计算以当前元素单独分割的情况
+            for j in range(2, k + 1):
+                if arr[i - j + 1] &gt; max_val:
+                    max_val = arr[i - j + 1]  # 更新区间最大值
+                temp = dp[i - j] + max_val * j  # 计算当前分割的总和
+                if temp &gt; res:
+                    res = temp  # 寻找最大的分割方案
+            dp[i] = res  # 更新dp数组
+
+        return dp[-1]  # 返回最终的最大和</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理前k个元素时，dp[i]可以简单地设置为前i+1个元素的最大值乘以i+1？这样做是否忽略了某些可能的分割方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理前k个元素时，由于分割的最大长度是k，因此可以将前i+1个元素视为一个整体进行考虑，其最大和可以通过取这个区间内的最大值乘以区域长度（即i+1）来实现。这种方法并没有忽略分割方式，因为在这个阶段内，任何分割都不会超过k个元素，而最优的分割方式就是取最大值乘以整个区域的长度，这样可以保证这部分的和是最大的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新dp[i]时，为什么要遍历之前的最多k个元素来重新计算最大值？这一步是否有可能通过优化减少重复计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新dp[i]时需要考虑以当前元素结尾的最长为k的所有子数组，并计算它们的最大可能和，这就需要遍历这些子数组来找到最大值。这个过程确实涉及到重复的最大值计算，可以通过使用滑动窗口的技术或者维护一个递减的双端队列来优化这个过程，这样可以在常数时间内获取到最大值，从而减少重复计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在考虑分割方案时，为什么选择最大值乘以子数组的长度作为该分割的总和？这种方法是否总是得到最优解？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择最大值乘以子数组的长度作为分割总和是基于这样一个观察：在限定子数组长度的情况下，最大化子数组的和可以通过选择最大的元素并使其影响尽可能大的范围来实现。这种方法在大部分情况下可以得到最优解，尤其是在题目约束中，分割后的每个子数组长度不超过k，且求最大和的情况下。然而，这种方法基于贪心算法的思想，在一些特殊配置的输入下可能不会得到全局最优解，但在大多数实际应用场景中是有效的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            dp数组的每个值代表什么含义？能否详细解释dp[i]的具体计算过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp数组中的每个值dp[i]代表考虑到数组arr的第i个元素为止，可以获得的最大和。具体计算过程如下：对于数组的每个元素i，如果i小于k，则dp[i]更新为从开始到当前元素的最大值乘以当前元素的索引加一。如果i大于等于k，则需要考虑所有可能的分割方式，即遍历之前的最多k个元素，计算每种情况下的可能最大和，并更新dp[i]为这些值中的最大值。这种方式确保了在每个阶段，dp[i]都存储了到当前元素为止可能达到的最大和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/partition-array-for-maximum-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/partition-array-for-maximum-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

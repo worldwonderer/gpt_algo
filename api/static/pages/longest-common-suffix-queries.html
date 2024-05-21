@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长公共后缀查询</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长公共后缀查询</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个字符串数组&nbsp;<code>wordsContainer</code> 和&nbsp;<code>wordsQuery</code>&nbsp;。</p>
+
+<p>对于每个&nbsp;<code>wordsQuery[i]</code>&nbsp;，你需要从&nbsp;<code>wordsContainer</code>&nbsp;中找到一个与&nbsp;<code>wordsQuery[i]</code>&nbsp;有&nbsp;<strong>最长公共后缀</strong>&nbsp;的字符串。如果 <code>wordsContainer</code>&nbsp;中有两个或者更多字符串有最长公共后缀，那么答案为长度<strong>&nbsp;最短</strong>&nbsp;的。如果有超过两个字符串有&nbsp;<strong>相同</strong>&nbsp;最短长度，那么答案为它们在&nbsp;<code>wordsContainer</code>&nbsp;中出现&nbsp;<strong>更早</strong>&nbsp;的一个。</p>
+
+<p>请你返回一个整数数组<em>&nbsp;</em><code>ans</code>&nbsp;，其中<em>&nbsp;</em><code>ans[i]</code>是<em>&nbsp;</em><code>wordsContainer</code>中与&nbsp;<code>wordsQuery[i]</code>&nbsp;有&nbsp;<strong>最长公共后缀</strong>&nbsp;字符串的下标。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>wordsContainer = ["abcd","bcd","xbcd"], wordsQuery = ["cd","bcd","xyz"]</span></p>
+
+<p><span class="example-io"><b>输出：</b>[1,1,1]</span></p>
+
+<p><strong>解释：</strong></p>
+
+<p>我们分别来看每一个&nbsp;<code>wordsQuery[i]</code>&nbsp;：</p>
+
+<ul>
+	<li>对于&nbsp;<code>wordsQuery[0] = "cd"</code>&nbsp;，<code>wordsContainer</code>&nbsp;中有最长公共后缀&nbsp;<code>"cd"</code>&nbsp;的字符串下标分别为&nbsp;0 ，1 和&nbsp;2 。这些字符串中，答案是下标为 1 的字符串，因为它的长度为 3 ，是最短的字符串。</li>
+	<li>对于&nbsp;<code>wordsQuery[1] = "bcd"</code>&nbsp;，<code>wordsContainer</code>&nbsp;中有最长公共后缀&nbsp;<code>"bcd"</code>&nbsp;的字符串下标分别为 0 ，1 和 2 。这些字符串中，答案是下标为 1 的字符串，因为它的长度为 3 ，是最短的字符串。</li>
+	<li>对于&nbsp;<code>wordsQuery[2] = "xyz"</code>&nbsp;，<code>wordsContainer</code>&nbsp;中没有字符串跟它有公共后缀，所以最长公共后缀为&nbsp;<code>""</code>&nbsp;，下标为&nbsp;0 ，1 和 2 的字符串都得到这一公共后缀。这些字符串中，&nbsp;答案是下标为 1 的字符串，因为它的长度为 3 ，是最短的字符串。</li>
+</ul>
+</div>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<div class="example-block">
+<p><span class="example-io"><b>输入：</b>wordsContainer = ["abcdefgh","poiuygh","ghghgh"], wordsQuery = ["gh","acbfgh","acbfegh"]</span></p>
+
+<p><span class="example-io"><b>输出：</b>[2,0,2]</span></p>
+
+<p><strong>解释：</strong></p>
+
+<p>我们分别来看每一个&nbsp;<code>wordsQuery[i]</code>&nbsp;：</p>
+
+<ul>
+	<li>对于&nbsp;<code>wordsQuery[0] = "gh"</code>&nbsp;，<code>wordsContainer</code>&nbsp;中有最长公共后缀&nbsp;<code>"gh"</code>&nbsp;的字符串下标分别为 0 ，1 和 2 。这些字符串中，答案是下标为 2 的字符串，因为它的长度为 6 ，是最短的字符串。</li>
+	<li>对于&nbsp;<code>wordsQuery[1] = "acbfgh"</code>&nbsp;，只有下标为 0 的字符串有最长公共后缀&nbsp;<code>"fgh"</code>&nbsp;。所以尽管下标为 2 的字符串是最短的字符串，但答案是 0 。</li>
+	<li>对于&nbsp;<code>wordsQuery[2] = "acbfegh"</code>&nbsp;，<code>wordsContainer</code>&nbsp;中有最长公共后缀&nbsp;<code>"gh"</code>&nbsp;的字符串下标分别为 0 ，1 和 2 。这些字符串中，答案是下标为 2 的字符串，因为它的长度为 6 ，是最短的字符串。</li>
+</ul>
+</div>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= wordsContainer.length, wordsQuery.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= wordsContainer[i].length &lt;= 5 * 10<sup>3</sup></code></li>
+	<li><code>1 &lt;= wordsQuery[i].length &lt;= 5 * 10<sup>3</sup></code></li>
+	<li><code>wordsContainer[i]</code>&nbsp;只包含小写英文字母。</li>
+	<li><code>wordsQuery[i]</code>&nbsp;只包含小写英文字母。</li>
+	<li><code>wordsContainer[i].length</code>&nbsp;的和至多为&nbsp;<code>5 * 10<sup>5</sup></code>&nbsp;。</li>
+	<li><code>wordsQuery[i].length</code>&nbsp;的和至多为&nbsp;<code>5 * 10<sup>5</sup></code>&nbsp;。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 179 ms</p>
+                    <p>内存: 28.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+
+class Solution:
+    def stringIndices(self, wordsContainer: List[str], wordsQuery: List[str]) -&gt; List[int]:
+        wordsContainer = [w[::-1] for w in wordsContainer]
+        wordsQuery = [w[::-1] for w in wordsQuery]
+        ret = [-1] * len(wordsQuery)
+
+        def f(wc: List[int], wq: List[int], zidx: int) -&gt; None:
+            if len(wc) == 1:
+                for qidx in wq:
+                    ret[qidx] = wc[0]
+            else:
+                nxt = defaultdict(lambda: ([], []))
+                lst = []
+                for cidx in wc:
+                    if len(wordsContainer[cidx]) &gt; zidx:
+                        nxt[wordsContainer[cidx][zidx]][0].append(cidx)
+                    else:
+                        lst.append(cidx)
+                for qidx in wq:
+                    if len(wordsQuery[qidx]) &gt; zidx and wordsQuery[qidx][zidx] in nxt:
+                            nxt[wordsQuery[qidx][zidx]][1].append(qidx)
+                    else:
+                        if len(lst):
+                            ret[qidx] = lst[0]
+                        else:
+                            ret[qidx] = wc[0]
+                for v in nxt.values():
+                    if len(v[1]):
+                        f(v[0], v[1], zidx + 1)
+        wcidx = list(range(len(wordsContainer)))
+        wcidx.sort(key=lambda x: (len(wordsContainer[x]), x))
+
+        f(wcidx, list(range(len(wordsQuery))), 0)
+        return ret
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用了基于字符匹配的分治递归策略，通过Trie（字典树）的思想来解决问题。首先，将wordsContainer和wordsQuery中的所有字符串逆序，目的是将最长公共后缀问题转换为字符串前缀匹配问题，这样可以利用Trie树的性质进行处理。在递归函数f中，对于当前层的字符索引zidx，将容器wordsContainer中的字符串根据当前字符分组，相同的字符分到同一个组中，没有当前字符的字符串（即短于zidx的字符串）放入一个单独的列表中。对于每一个查询字符串，根据其当前字符进行匹配：如果匹配到相应的字符组，则对这个组递归处理；如果没有匹配到，则在短字符串列表中选择一个（如果存在）。递归终止的条件是当只剩一个字符串需要处理时，直接将其分配给所有对应的查询。此策略有效地将大问题分解为小问题，递归地解决每一层的匹配问题。</p>
+                                <p>时间复杂度: O(n * l + m * l)</p>
+                                <p>空间复杂度: O(n * l + m * l)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def stringIndices(self, wordsContainer: List[str], wordsQuery: List[str]) -&gt; List[int]:
+        # Reverse all words to transform the problem to a prefix matching problem
+        wordsContainer = [w[::-1] for w in wordsContainer]
+        wordsQuery = [w[::-1] for w in wordsQuery]
+        ret = [-1] * len(wordsQuery)
+
+        def f(wc: List[int], wq: List[int], zidx: int) -&gt; None:
+            # If there is only one word, assign it to all queries
+            if len(wc) == 1:
+                for qidx in wq:
+                    ret[qidx] = wc[0]
+            else:
+                nxt = defaultdict(lambda: ([], []))
+                lst = []
+                for cidx in wc:
+                    if len(wordsContainer[cidx]) &gt; zidx:
+                        nxt[wordsContainer[cidx][zidx]][0].append(cidx)
+                    else:
+                        lst.append(cidx)
+                for qidx in wq:
+                    if len(wordsQuery[qidx]) &gt; zidx and wordsQuery[qidx][zidx] in nxt:
+                        nxt[wordsQuery[qidx][zidx]][1].append(qidx)
+                    else:
+                        if len(lst):
+                            ret[qidx] = lst[0]
+                        else:
+                            ret[qidx] = wc[0]
+                for v in nxt.values():
+                    if len(v[1]):
+                        f(v[0], v[1], zidx + 1)
+        # Sort words by length and index for optimal performance
+        wcidx = list(range(len(wordsContainer)))
+        wcidx.sort(key=lambda x: (len(wordsContainer[x]), x))
+
+        f(wcidx, list(range(len(wordsQuery))), 0)
+        return ret</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理最长公共后缀问题时选择将所有字符串逆序，并转换为前缀匹配问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将字符串逆序是为了将最长公共后缀问题转化为更易处理的最长公共前缀问题。在数据结构中，字典树（Trie树）是处理字符串前缀匹配问题的常用方式，其可以高效地通过逐字符比较来搜索和匹配字符串的公共前缀。通过逆序，我们可以重新利用字典树的这一特性来处理后缀匹配问题，从而使得算法更加直观和简洁。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在字典树Trie的递归分治解法中，如何确保如果有多个字符串满足最长公共后缀，返回的是长度最短的字符串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现中，为了确保在有多个字符串满足条件时返回最短的字符串，算法首先会根据字符串长度和索引对wordsContainer中的字符串进行排序。这样，在递归函数f中，当出现无法继续匹配当前字符的情况时，优先选择的是列表lst中的第一个元素，即最短的字符串。这一设计确保了在满足最长公共后缀的字符串中，返回的是长度最短的一个。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            递归函数f中，当无法匹配当前字符时选择短字符串列表中的第一个字符串作为结果，是否有可能导致没有选到实际具有最长公共后缀的字符串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，这种情况有可能发生。在递归函数f中，当当前字符无法匹配时，算法会选择短字符串列表lst中的第一个字符串作为结果。这可能不是实际具有最长公共后缀的字符串，尤其是当短字符串列表中的字符串并不包含其他更长字符串中的公共后缀时。这种方法在某些情况下可能会牺牲结果的准确性，以换取算法的简化和执行效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-common-suffix-queries')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-common-suffix-queries/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>得到子序列的最少操作次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>得到子序列的最少操作次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个数组 <code>target</code> ，包含若干 <strong>互不相同</strong> 的整数，以及另一个整数数组 <code>arr</code> ，<code>arr</code> <strong>可能</strong> 包含重复元素。</p>
+
+<p>每一次操作中，你可以在 <code>arr</code> 的任意位置插入任一整数。比方说，如果 <code>arr = [1,4,1,2]</code> ，那么你可以在中间添加 <code>3</code> 得到 <code>[1,4,<strong>3</strong>,1,2]</code> 。你可以在数组最开始或最后面添加整数。</p>
+
+<p>请你返回 <strong>最少</strong> 操作次数，使得<em> </em><code>target</code><em> </em>成为 <code>arr</code> 的一个子序列。</p>
+
+<p>一个数组的 <strong>子序列</strong> 指的是删除原数组的某些元素（可能一个元素都不删除），同时不改变其余元素的相对顺序得到的数组。比方说，<code>[2,7,4]</code> 是 <code>[4,<strong>2</strong>,3,<strong>7</strong>,2,1,<strong>4</strong>]</code> 的子序列（加粗元素），但 <code>[2,4,2]</code> 不是子序列。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>target = [5,1,3], <code>arr</code> = [9,4,2,3,4]
+<b>输出：</b>2
+<b>解释：</b>你可以添加 5 和 1 ，使得 arr 变为 [<strong>5</strong>,9,4,<strong>1</strong>,2,3,4] ，target 为 arr 的子序列。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>target = [6,4,8,1,3,2], <code>arr</code> = [4,7,6,2,3,8,6,1]
+<b>输出：</b>3
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= target.length, arr.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= target[i], arr[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>target</code> 不包含任何重复元素。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 149 ms</p>
+                    <p>内存: 40.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minOperations(self, target: List[int], arr: List[int]) -&gt; int:
+            
+        from bisect import bisect_left
+
+        # 将 target 的值和索引映射起来
+        target_index_map = {num: i for i, num in enumerate(target)}
+
+        # 仅保留 arr 中存在于 target 中的元素，并转换为 target 中的索引
+        lis = []
+        for num in arr:
+            if num in target_index_map:
+                lis.append(target_index_map[num])
+
+        # 通过贪心和二分查找方法求 LIS 的长度
+        dp = []
+        for i in lis:
+            if not dp or i &gt; dp[-1]:
+                dp.append(i)
+            else:
+                idx = bisect_left(dp, i)
+                dp[idx] = i
+
+        # 最少操作次数为 target 长度减去 LIS 的长度
+        return len(target) - len(dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了贪心算法和最长递增子序列（LIS）的概念。首先，创建一个映射将 target 中的值和其索引关联起来。然后，遍历 arr 数组，保留那些在 target 中出现的元素，并将它们转换为在 target 中的索引，存入一个新的数组 lis 中。接下来，利用贪心和二分查找的方法来找出 lis 中的最长递增子序列的长度。最后，由于 target 是一个没有重复元素的数组，且要求 arr 的子序列与 target 相同，因此 arr 至少需要添加的元素个数等于 target 的长度减去 lis 的最长递增子序列的长度。</p>
+                                <p>时间复杂度: O(n + m logk)</p>
+                                <p>空间复杂度: O(n + k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minOperations(self, target: List[int], arr: List[int]) -&gt; int:
+        
+        from bisect import bisect_left
+
+        # 将 target 的值和索引映射起来
+        target_index_map = {num: i for i, num in enumerate(target)}
+
+        # 仅保留 arr 中存在于 target 中的元素，并转换为 target 中的索引
+        lis = []
+        for num in arr:
+            if num in target_index_map:
+                lis.append(target_index_map[num])
+
+        # 通过贪心和二分查找方法求 LIS 的长度
+        dp = []
+        for i in lis:
+            if not dp or i &gt; dp[-1]:
+                dp.append(i)
+            else:
+                idx = bisect_left(dp, i)
+                dp[idx] = i
+
+        # 最少操作次数为 target 长度减去 LIS 的长度
+        return len(target) - len(dp)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用贪心算法和最长递增子序列（LIS）求解时，为什么首先需要将arr数组中的元素转换为它们在target中的索引？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此题解中，将arr数组中的元素转换为它们在target中的索引是为了简化问题，使其转变为寻找最长递增子序列的问题。这种转换是必要的，因为我们的目标是找到arr中与target相匹配的最长子序列。通过将target的元素映射到它们的索引，我们可以将问题转化为在这些索引上寻找最长递增子序列。这样一来，任何在arr中以递增顺序排列的索引序列都直接对应于target中的一个有效子序列，这样可以有效地利用已有的LIS算法来解决问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理LIS时选择使用二分查找方法，直接追加到dp数组的尾部或替换已存在的最小可能值有什么优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理LIS问题时，使用二分查找方法来更新dp数组可以显著提高算法的效率。传统的LIS算法通过遍历每个元素并与dp数组中的所有元素进行比较，其时间复杂度为O(n^2)。然而，通过使用二分查找来确定元素插入的位置，可以将每个元素的更新时间减少到O(log n)，从而将整体时间复杂度降低到O(n log n)。这种方法允许我们快速找到并更新dp数组中的最小可能值，以保持dp数组长度的有效性，即随时维护最长递增子序列的最优长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            给定的解法中，dp数组的最终长度代表了什么？它如何决定需要的最小操作次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在给定的解法中，dp数组的最终长度代表了在arr中找到的最长递增子序列（该子序列对应于target中的索引）的长度。这个长度是关键，因为它直接决定了为使arr的子序列与target相匹配所需的最少操作次数。具体来说，最少操作次数等于target的长度减去dp数组的长度。这是因为dp数组的长度表示无需任何修改即可从arr中得到的与target相匹配的最大子序列长度，因此剩余的元素需要通过添加操作来补齐以形成完整的target序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果arr数组完全不包含target数组中的任何元素，该算法的行为将如何变化？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果arr数组完全不包含target数组中的任何元素，那么在将arr元素转换为target索引的过程中，lis数组将为空，因为没有任何arr元素可以映射到target的索引上。因此，dp数组也将为空，因为没有元素可以用来形成递增序列。在这种情况下，dp数组的长度为0，根据算法的逻辑，最少操作次数将等于target的长度（即len(target) - 0），因为需要将整个target数组作为子序列插入到arr中以满足题目要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-operations-to-make-a-subsequence')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-operations-to-make-a-subsequence/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

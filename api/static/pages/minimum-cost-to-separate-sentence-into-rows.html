@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>将句子分隔成行的最低成本</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>将句子分隔成行的最低成本</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumCost(self, sentence: str, k: int) -&gt; int:
+        words = sentence.split(&#39; &#39;)
+        endings = [-1]*(len(words)+1)
+        for i, w in enumerate(words):
+            endings[i+1] = endings[i] + 1 + len(w)
+        N = len(words)
+        dp = [inf]*N
+        for i in range(N-1, -1, -1):
+            if endings[-1] - endings[i] - 1 &lt;= k:
+                dp[i] = 0
+            else:
+                dp[i] = min((k-endings[j+1]+endings[i]+1)**2 + dp[j+1] 
+                    for j in takewhile(lambda j: endings[j+1] - endings[i] - 1 &lt;= k, range(i,N))
+                    )
+        return dp[0]
+            
+        # m-i-1 + 
+        # S[i] = min(S[m] + (k-L[i..m])
+        # L[i,j] = N[j] - N[i-1] - 1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用动态规划方法来解决问题。首先，通过`endings`数组计算每个词到句首的累积长度，包括空格。`dp[i]`表示从单词i开始到句子末尾的最小成本。从句子的末尾开始计算dp值，逐步向前推进。如果从当前单词i到句尾的所有单词长度和小于等于k，则dp[i]为0（因为所有单词都可以放在一行）。否则，需要计算将单词分成多行时的最小成本，即考虑每一个可能的断点j，计算从i到j的单词放在一行时的剩余空间的平方（作为成本），加上从j+1开始的最小成本。最终，dp[0]将给出整个句子的最低分隔成本。</p>
+                                <p>时间复杂度: O(N^2)</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumCost(self, sentence: str, k: int) -&gt; int:
+        words = sentence.split(&#39; &#39;)  # 分割句子为单词列表
+        endings = [-1]*(len(words)+1)  # 初始化endings数组
+        for i, w in enumerate(words):  # 计算每个位置的累积长度
+            endings[i+1] = endings[i] + 1 + len(w)
+        N = len(words)
+        dp = [float(&#39;inf&#39;)]*N  # 初始化dp数组，用无穷大表示尚未计算的状态
+        for i in range(N-1, -1, -1):  # 从后向前计算dp值
+            if endings[-1] - endings[i] - 1 &lt;= k:  # 如果当前位置到句尾的所有单词长度和小于等于k
+                dp[i] = 0  # dp[i]设为0
+            else:  # 计算分割成本
+                dp[i] = min((k-endings[j+1]+endings[i]+1)**2 + dp[j+1] 
+                    for j in takewhile(lambda j: endings[j+1] - endings[i] - 1 &lt;= k, range(i,N)))
+        return dp[0]  # 返回从第一个单词开始的最小成本</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划中，`dp[i]`数组是如何初始化的，为什么初始值设置为无穷大？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，`dp[i]`数组用于存储从第i个单词开始到句子末尾的最小成本。初始化为无穷大是因为在计算之前，我们不知道具体的成本值，而无穷大可以保证在后续的最小值比较过程中，任何实际计算出的成本都会被选为更小值。这是一种常见的动态规划初始化方法，用以确保正确地更新成本值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何确保`endings`数组正确计算了每个词到句首的累积长度，包括空格？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`endings`数组通过累加每个单词的长度及其之前的空格来构建。初始化`endings[0]`为-1，因为第一个单词前没有空格。对于每个单词，`endings[i+1]`等于`endings[i]`加上当前单词的长度加1（代表单词前的空格）。这样，`endings`数组能够准确反映从句首到当前单词的累积长度，包括单词间的空格。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            循环中使用的`takewhile`函数是如何工作的，它在这里起到了什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`takewhile`函数从一个迭代器中取元素直到指定的条件不再满足。在这个算法中，它用来迭代所有可能的断点j，条件是单词i到单词j的长度总和（包括空格）不超过k。这样，使用`takewhile`可以有效地限制循环范围，避免不必要的计算，提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法在处理边界情况，如单个单词长度超过k，或所有单词长度和刚好等于k时的表现如何？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当单个单词长度超过k时，由于在计算dp时检查了从i到N的长度是否小于等于k，若没有满足这一条件的j存在，dp[i]将保持为初始的无穷大，表示无法在不超过k的限制下将这些单词放在一行内。当所有单词的长度和刚好等于k时，从dp的计算逻辑中可以看出，由于整体长度等于k，dp[i]会被设置为0，表示无额外成本，所有单词恰好放在一行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-separate-sentence-into-rows')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-separate-sentence-into-rows/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

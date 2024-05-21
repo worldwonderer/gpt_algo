@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>重复的DNA序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>重复的DNA序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><strong>DNA序列</strong>&nbsp;由一系列核苷酸组成，缩写为<meta charset="UTF-8" />&nbsp;<code>'A'</code>,&nbsp;<code>'C'</code>,&nbsp;<code>'G'</code>&nbsp;和<meta charset="UTF-8" />&nbsp;<code>'T'</code>.。</p>
+
+<ul>
+	<li>例如，<meta charset="UTF-8" /><code>"ACGAATTCCG"</code>&nbsp;是一个 <strong>DNA序列</strong> 。</li>
+</ul>
+
+<p>在研究 <strong>DNA</strong> 时，识别 DNA 中的重复序列非常有用。</p>
+
+<p>给定一个表示 <strong>DNA序列</strong> 的字符串 <code>s</code> ，返回所有在 DNA 分子中出现不止一次的&nbsp;<strong>长度为&nbsp;<code>10</code></strong>&nbsp;的序列(子字符串)。你可以按 <strong>任意顺序</strong> 返回答案。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
+<strong>输出：</strong>["AAAAACCCCC","CCCCCAAAAA"]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "AAAAAAAAAAAAA"
+<strong>输出：</strong>["AAAAAAAAAA"]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s[i]</code><code>==</code><code>'A'</code>、<code>'C'</code>、<code>'G'</code>&nbsp;or&nbsp;<code>'T'</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 38 ms</p>
+                    <p>内存: 26.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import defaultdict
+class Solution:
+    def findRepeatedDnaSequences(self, s: str) -&gt; List[str]:
+        n = len(s)
+        if n &lt; 10:
+            return []
+        counter = defaultdict(int)
+        mapping = {&#39;A&#39;:0, &#39;C&#39;:1, &#39;G&#39;:2, &#39;T&#39;:3}
+        res = []
+        curr = 0
+        for i in range(9):
+            curr = (curr &lt;&lt; 2) | mapping[s[i]]
+        for i in range(9, n):
+            curr = ((curr &lt;&lt; 2) | mapping[s[i]]) &amp; ((1 &lt;&lt; 20) - 1)
+            counter[curr] += 1
+            if counter[curr] == 2:
+                res.append(s[(i - 9):(i + 1)])
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用滑动窗口和位操作的方法来寻找重复的DNA序列。首先，将四个可能的字符（&#39;A&#39;, &#39;C&#39;, &#39;G&#39;, &#39;T&#39;）映射到2位的整数（分别是0, 1, 2, 3），以便使用位操作来更新当前窗口的哈希值。使用一个长度为10的滑动窗口，遍历字符串，每向右移动窗口一位，就更新当前窗口表示的数字（通过左移两位并添加新字符的映射值，同时确保数字长度不超过20位，即10个字符的长度）。每个窗口的数字作为哈希表的键，记录每个序列出现的次数。当某个序列第二次出现时，将其添加到结果列表中。这种方法避免了直接使用字符串子串比较，而是通过计算较小的整数值来优化比较过程。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">from collections import defaultdict
+
+class Solution:
+    def findRepeatedDnaSequences(self, s: str) -&gt; List[str]:
+        n = len(s)
+        if n &lt; 10:
+            return [] # 如果长度小于10，直接返回空列表
+        counter = defaultdict(int) # 用来计数每个序列出现的次数
+        mapping = {&#39;A&#39;:0, &#39;C&#39;:1, &#39;G&#39;:2, &#39;T&#39;:3} # 字符到数字的映射
+        res = [] # 用来存储结果的列表
+        curr = 0 # 当前窗口对应的数字
+        for i in range(9):
+            curr = (curr &lt;&lt; 2) | mapping[s[i]] # 初始化当前数字，对前9个字符进行编码
+        for i in range(9, n):
+            curr = ((curr &lt;&lt; 2) | mapping[s[i]]) &amp; ((1 &lt;&lt; 20) - 1) # 更新当前数字，并保持长度为20位
+            counter[curr] += 1 # 增加当前序列的计数
+            if counter[curr] == 2: # 如果某个序列出现了第二次
+                res.append(s[(i - 9):(i + 1)]) # 将其添加到结果列表
+        return res # 返回结果列表</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择长度为10的窗口来寻找重复的DNA序列？是否有特定的生物学或算法上的原因？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择长度为10的窗口来寻找重复的DNA序列主要是因为这个长度在生物学研究中具有特定的实用意义，同时也是一个在计算上可行的长度。在生物学中，长度为10的DNA序列足够显示遗传信息的重复模式，这对于识别基因的某些特性和功能非常重要。此外，在算法设计上，长度为10使得通过位操作处理DNA序列变得高效，因为整个序列可以压缩到一个20位的整数内，这样可以使用标准的数据类型（如整型）进行快速处理，而不需要使用更复杂的数据结构。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在位操作中，你如何确保通过左移和添加新字符的值时，数字长度不会超过20位？详细解释使用的位操作和掩码。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在位操作中，以确保数字长度不超过20位，使用的关键技术是位掩码。在更新当前窗口表示的数字时，首先通过将当前值左移两位来为新字符留出空间，然后通过位或操作（|）添加新字符的映射值。为了确保这个数字不超过20位，使用一个位掩码将数字的长度限制在20位。具体操作为对数字进行与操作（&amp;）与掩码 `((1 &lt;&lt; 20) - 1)`。这个掩码是一个20位全为1的二进制数，这样可以确保在添加新字符后，数字的最高位（超出20位的部分）被清零，从而保持数字总是在20位以内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在DNA序列映射时选择将&#39;A&#39;, &#39;C&#39;, &#39;G&#39;, &#39;T&#39;映射到2位的整数，而不是其他位数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择将&#39;A&#39;, &#39;C&#39;, &#39;G&#39;, &#39;T&#39;映射到2位的整数是因为这四个字符是DNA序列的全部可能字符，而2位二进制数正好可以表示4种不同的状态（00, 01, 10, 11）。这样的映射是最为紧凑和高效的方式，因为它刚好利用了2位二进制数的全部编码能力，没有浪费。如果使用更多位数进行映射，如3位或4位，将会产生额外的未使用状态，这不仅增加了处理的复杂性，还可能导致存储效率的下降。因此，使用2位整数进行映射是一种既简洁又高效的方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/repeated-dna-sequences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/repeated-dna-sequences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

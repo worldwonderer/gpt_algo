@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>易混淆数 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>易混淆数 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 47 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def confusingNumberIII(self, n: int) -&gt; int:
+        ret = 0
+        for i in range(1, n + 1):
+            s = str(i)
+            if &#39;2&#39; in s:
+                continue
+            if &#39;3&#39; in s:
+                continue
+            if &#39;4&#39; in s:
+                continue
+            if &#39;5&#39; in s:
+                continue
+            if &#39;7&#39; in s:
+                continue
+            s = s.replace(&#39;6&#39;, &#39;z&#39;)
+            s = s.replace(&#39;9&#39;, &#39;6&#39;)
+            s = s.replace(&#39;z&#39;, &#39;9&#39;)
+            s = s[::-1]
+            if s != str(i):
+                ret += 1
+        return ret
+    def confusingNumberII(self, n: int) -&gt; int:
+        invalid = 0
+        try:
+            for l in range(1, len(str(n)) + 1):
+                hl = (l + 1) // 2
+                for i in product(&#39;01689&#39;, repeat=hl):
+                    if i[0] == &#39;0&#39;:
+                        continue
+                    if i[-1] == &#39;6&#39; or i[-1] == &#39;9&#39;:
+                        if l % 2:
+                            continue
+                    i = &#39;&#39;.join(i)
+                    if l % 2:
+                        s = i + i[:-1][::-1].replace(&#39;6&#39;, &#39;a&#39;).replace(&#39;9&#39;, &#39;6&#39;).replace(&#39;a&#39;, &#39;9&#39;)
+                    else:
+                        s = i + i[::-1].replace(&#39;6&#39;, &#39;a&#39;).replace(&#39;9&#39;, &#39;6&#39;).replace(&#39;a&#39;, &#39;9&#39;)
+                    if int(s) &gt;n:
+                        raise ValueError()
+                    invalid += 1
+        except ValueError:
+            pass
+        x = []
+        flag = False
+        for c in str(n):
+            if flag:
+                x.append(&#39;9&#39;)
+            else:
+                if c in &#39;01689&#39;:
+                    x.append(c)
+                else:
+                    x.append({&#39;7&#39;:&#39;6&#39;, &#39;5&#39;:&#39;1&#39;, &#39;4&#39;:&#39;1&#39;, &#39;3&#39;:&#39;1&#39;, &#39;2&#39;:&#39;1&#39;,}[c])
+                    flag = True
+        x = &#39;&#39;.join(x)
+        x = x.replace(&#39;6&#39;, &#39;2&#39;).replace(&#39;8&#39;, &#39;3&#39;).replace(&#39;9&#39;, &#39;4&#39;)
+        x = int(x, 5)
+        #print(x, invalid)
+
+        return x - invalid
+                </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目要求找到不超过给定数字 n 的所有&#39;易混淆数&#39;的数量。&#39;易混淆数&#39;是指当一个数字旋转 180 度后，形成一个不同的有效数字。题解中定义了两个方法：confusingNumberIII 和 confusingNumberII。
+
+confusingNumberIII 方法遍历从 1 到 n 的所有数字，首先将包含不可翻转的数字（2, 3, 4, 5, 7）的数字排除。然后，将剩余的数字进行转换：6 和 9 互换，最后将数字翻转。如果翻转后的数字与原数字不同，则是一个易混淆数。
+
+confusingNumberII 方法使用了一种生成方法来直接构造可能的易混淆数，并且计算它们的数量。通过固定数字的一半长度，然后生成所有可能的组合，并将它们翻转拼接来形成完整的数字。然后根据生成的数字是否有效和是否大于 n 来决定是否停止。这种方法更有效地使用了数位的特性来直接计算易混淆数的数量。</p>
+                                <p>时间复杂度: confusingNumberIII: O(n * k), confusingNumberII: O(5^L)</p>
+                                <p>空间复杂度: confusingNumberIII: O(k), confusingNumberII: O(L)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def confusingNumberIII(self, n: int) -&gt; int:
+        ret = 0
+        for i in range(1, n + 1):
+            s = str(i)
+            # 排除含有2,3,4,5,7的数字
+            if any(c in s for c in &#39;23457&#39;):
+                continue
+            # 6和9互换
+            s = s.replace(&#39;6&#39;, &#39;z&#39;).replace(&#39;9&#39;, &#39;6&#39;).replace(&#39;z&#39;, &#39;9&#39;)
+            # 反转字符串
+            s = s[::-1]
+            # 检查翻转后是否与原字符串不同
+            if s != str(i):
+                ret += 1
+        return ret
+    def confusingNumberII(self, n: int) -&gt; int:
+        invalid = 0
+        try:
+            for l in range(1, len(str(n)) + 1):
+                hl = (l + 1) // 2
+                # 生成长度为 hl 的数字串
+                for i in product(&#39;01689&#39;, repeat=hl):
+                    if i[0] == &#39;0&#39;:
+                        continue
+                    if i[-1] == &#39;6&#39; or i[-1] == &#39;9&#39;:
+                        if l % 2:
+                            continue
+                    i = &#39;&#39;.join(i)
+                    # 根据是否是中间数字调整生成策略
+                    if l % 2:
+                        s = i + i[:-1][::-1].replace(&#39;6&#39;, &#39;a&#39;).replace(&#39;9&#39;, &#39;6&#39;).replace(&#39;a&#39;, &#39;9&#39;)
+                    else:
+                        s = i + i[::-1].replace(&#39;6&#39;, &#39;a&#39;).replace(&#39;9&#39;, &#39;6&#39;).replace(&#39;a&#39;, &#39;9&#39;)
+                    # 如果生成的数字超过 n，停止
+                    if int(s) &gt; n:
+                        raise ValueError()
+                    invalid += 1
+        except ValueError:
+            pass
+        x = []
+        flag = False
+        for c in str(n):
+            if flag:
+                x.append(&#39;9&#39;)
+            else:
+                if c in &#39;01689&#39;:
+                    x.append(c)
+                else:
+                    x.append({&#39;7&#39;:&#39;6&#39;, &#39;5&#39;:&#39;1&#39;, &#39;4&#39;:&#39;1&#39;, &#39;3&#39;:&#39;1&#39;, &#39;2&#39;:&#39;1&#39;,}[c])
+                    flag = True
+        x = &#39;&#39;.join(x)
+        # 使用不同的替换策略来减少无效数的影响
+        x = x.replace(&#39;6&#39;, &#39;2&#39;).replace(&#39;8&#39;, &#39;3&#39;).replace(&#39;9&#39;, &#39;4&#39;)
+        x = int(x, 5)
+        #print(x, invalid)
+
+        return x - invalid
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在`confusingNumberIII`方法中，为什么选择通过字符串操作来检测数字是否为易混淆数，而不是直接使用数学运算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`confusingNumberIII`方法中，选择通过字符串操作来检测数字是否为易混淆数主要是因为字符串操作在处理数字的各个位上的替换和反转时更直观和简单。数学运算处理这类问题需要额外的逻辑来分解数字并逐位进行替换，这不仅增加了实现的复杂性，还可能导致错误率增加。而字符串提供了内置的方法来直接进行字符替换和反转，使得代码更简洁、易于理解和维护。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`confusingNumberII`方法中，如何确保生成的数字不会重复计算，并且如何处理大于n的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`confusingNumberII`方法中，通过使用递归或迭代的方式生成数字，并在生成过程中遵循特定的序列（如&#39;01689&#39;），从而避免重复。生成的数字是基于组合的方式构造，确保每种组合只被使用一次。处理大于n的情况是通过在生成数字后立即进行检查，如果生成的数字超过n，则使用`raise ValueError()`来中断所有进一步的数字生成，这样可以有效地停止不必要的计算和迭代。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于`confusingNumberII`方法中的异常处理（`raise ValueError()`），这种方式在什么情况下会触发，以及为什么选择使用异常来控制流程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`confusingNumberII`方法中，异常处理（`raise ValueError()`）会在生成的数字超过给定的上限n时触发。这种异常用来立即中断当前的数字生成过程，避免进一步的无效计算。选择使用异常来控制流程是因为它提供了一种简洁有效的方式来从多层嵌套的循环中直接退出，特别是在深度递归或多层迭代的场景中，传统的控制结构如break或return可能不足以直接跳出所有层级。异常处理在这种情况下能够立刻响应错误情况，并将控制权返回到上层逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在`confusingNumberII`方法中，为什么在数字的最后一位使用6或9的时候，需要特别处理奇数长度的数字串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`confusingNumberII`方法中，数字的最后一位使用6或9时需要特别处理奇数长度的数字串，是因为在生成对称数字时，中间的数字必须是能够自我翻转的（即0、1、8），这样翻转后的数字才是有效的。如果中间的数字是6或9，翻转后会变成另一个数字（9变6，6变9），这会导致整个数字不再对称。因此，在奇数长度的数字串中，最中间的位不能是6或9，以确保翻转后数字的有效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/confusing-number" class="list-group-item list-group-item-action">
+                                易混淆数
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/confusing-number-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/confusing-number-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

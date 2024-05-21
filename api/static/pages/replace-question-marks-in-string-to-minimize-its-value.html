@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>替换字符串中的问号使分数最小</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>替换字符串中的问号使分数最小</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>s</code>&nbsp;。<code>s[i]</code>&nbsp;要么是小写英文字母，要么是问号&nbsp;<code>'?'</code>&nbsp;。</p>
+
+<p>对于长度为 <code>m</code>&nbsp;且 <strong>只</strong>&nbsp;含有小写英文字母的字符串 <code>t</code>&nbsp;，我们定义函数&nbsp;<code>cost(i)</code>&nbsp;为下标 <code>i</code>&nbsp;之前（也就是范围 <code>[0, i - 1]</code>&nbsp;中）出现过与&nbsp;<code>t[i]</code>&nbsp;<strong>相同</strong>&nbsp;字符出现的次数。</p>
+
+<p>字符串 <code>t</code>&nbsp;的&nbsp;<strong>分数</strong>&nbsp;为所有下标&nbsp;<code>i</code>&nbsp;的&nbsp;<code>cost(i)</code>&nbsp;之 <strong>和</strong>&nbsp;。</p>
+
+<p>比方说，字符串&nbsp;<code>t = "aab"</code>&nbsp;：</p>
+
+<ul>
+	<li><code>cost(0) = 0</code></li>
+	<li><code>cost(1) = 1</code></li>
+	<li><code>cost(2) = 0</code></li>
+	<li>所以，字符串&nbsp;<code>"aab"</code>&nbsp;的分数为&nbsp;<code>0 + 1 + 0 = 1</code>&nbsp;。</li>
+</ul>
+
+<p>你的任务是用小写英文字母&nbsp;<strong>替换</strong> <code>s</code>&nbsp;中 <strong>所有</strong> 问号，使 <code>s</code>&nbsp;的 <strong>分数</strong><strong>最小&nbsp;</strong>。</p>
+
+<p>请你返回替换所有问号<em>&nbsp;</em><code>'?'</code>&nbsp;之后且分数最小的字符串。如果有多个字符串的&nbsp;<strong>分数最小</strong>&nbsp;，那么返回字典序最小的一个。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<div class="example-block" style="border-color: var(--border-tertiary); border-left-width: 2px; color: var(--text-secondary); font-size: .875rem; margin-bottom: 1rem; margin-top: 1rem; overflow: visible; padding-left: 1rem;">
+<p><strong>输入：</strong><span class="example-io" style="font-family: Menlo,sans-serif; font-size: 0.85rem;">s = "???" </span></p>
+
+<p><strong>输出：</strong>&nbsp;<span class="example-io" style="font-family: Menlo,sans-serif; font-size: 0.85rem;">"abc" </span></p>
+
+<p><strong>解释：</strong>这个例子中，我们将 <code>s</code>&nbsp;中的问号&nbsp;<code>'?'</code>&nbsp;替换得到&nbsp;<code>"abc"</code>&nbsp;。</p>
+
+<p>对于字符串&nbsp;<code>"abc"</code>&nbsp;，<code>cost(0) = 0</code>&nbsp;，<code>cost(1) = 0</code>&nbsp;和&nbsp;<code>cost(2) = 0</code>&nbsp;。</p>
+
+<p><code>"abc"</code>&nbsp;的分数为&nbsp;<code>0</code>&nbsp;。</p>
+
+<p>其他修改 <code>s</code>&nbsp;得到分数 <code>0</code>&nbsp;的字符串为&nbsp;<code>"cba"</code>&nbsp;，<code>"abz"</code>&nbsp;和&nbsp;<code>"hey"</code>&nbsp;。</p>
+
+<p>这些字符串中，我们返回字典序最小的。</p>
+</div>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<div class="example-block" style="border-color: var(--border-tertiary); border-left-width: 2px; color: var(--text-secondary); font-size: .875rem; margin-bottom: 1rem; margin-top: 1rem; overflow: visible; padding-left: 1rem;">
+<p><strong>输入：</strong> <span class="example-io" style="font-family: Menlo,sans-serif; font-size: 0.85rem;">s = "a?a?"</span></p>
+
+<p><strong>输出：</strong> <span class="example-io" style="font-family: Menlo,sans-serif; font-size: 0.85rem;">"abac"</span></p>
+
+<p><strong>解释：</strong>这个例子中，我们将&nbsp;<code>s</code>&nbsp;中的问号&nbsp;<code>'?'</code>&nbsp;替换得到&nbsp;<code>"abac"</code>&nbsp;。</p>
+
+<p>对于字符串&nbsp;<code>"abac"</code>&nbsp;，<code>cost(0) = 0</code>&nbsp;，<code>cost(1) = 0</code>&nbsp;，<code>cost(2) = 1</code>&nbsp;和&nbsp;<code>cost(3) = 0</code>&nbsp;。</p>
+
+<p><code>"abac"</code>&nbsp;的分数为&nbsp;<code>1</code>&nbsp;。</p>
+</div>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s[i]</code>&nbsp;要么是小写英文字母，要么是&nbsp;<code>'?'</code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 157 ms</p>
+                    <p>内存: 18.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">chars = &#34;abcdefghijklmnopqrstuvwxyz?&#34;
+uni2chr = [ch for ch in chars]
+chr2uni = {ch:i for i,ch in enumerate(uni2chr)}
+
+class Solution:
+    def minimizeStringValue(self, s: str) -&gt; str:
+
+        # 统计字符数量
+        cntS = Counter(s)
+        cnt = [0] * 26
+        anums = cntS[&#34;?&#34;]
+        if anums == 0: return s
+        for ch, nums in cntS.items():
+            if ch != &#34;?&#34;: cnt[ord(ch) - 97] = nums
+
+        # 计算出最不可能填入的最大数量
+        queue = sorted(range(26), key=lambda it: cnt[it])
+
+        index = 0
+        highs = 0
+        total = 0
+        while index &lt; 26 and cnt[queue[index]] * index - highs &lt; anums:
+            highs += cnt[queue[index]]
+            index += 1
+
+        # 计算出前一个高度下，需要填入的面积和最后一个高度
+        lastH = cnt[queue[index - 1]]
+        lastAll = anums - (lastH * index - highs)
+        lower = lastAll // index + lastH
+        preW = lastAll % index
+
+        # 再次排序并根据最后一个高度计算具体需要填入的数量
+        finalChar = []
+        finalNums = []
+        queue = sorted(queue[:index])
+        for j in queue[:preW]:
+            # j = queue[i]
+            if lower + 1 - cnt[j] &gt; 0:
+                finalChar.append(chr(97 + j))
+                finalNums.append(lower + 1 - cnt[j])
+        for j in queue[preW:]:
+        # for i in range(preW, index):
+        #     j = queue[i]
+            if lower - cnt[j] &gt; 0:
+                finalChar.append(chr(97 + j))
+                finalNums.append(lower - cnt[j])
+
+        # 依次填入
+        ans = list(s)
+        index = 0
+        curChar = &#34;&#34;
+        curNums = 0
+        for i, ch in enumerate(ans):
+            if ch != &#34;?&#34;: continue
+            if curNums == 0:
+                curChar = finalChar[index]
+                curNums = finalNums[index]
+                index += 1
+            ans[i] = curChar
+            curNums -= 1
+        return &#34;&#34;.join(ans)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解通过计算每个字符出现的频率来确定替换问号时最优的字符选择，以确保总分数最小。首先，统计字符串s中每个字符的数量，然后根据字符出现的频率排序，这样可以先填入出现次数少的字符，确保增加的分数最小。通过计算需要替换的问号数量和每个字母的出现次数，来确定每个字母填充问号后能达到的最低可能高度，以及最后一个高度。最后根据这些计算结果，构建最终的字符串，替换所有问号。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">
+chars = &#39;abcdefghijklmnopqrstuvwxyz?&#39;
+uni2chr = [ch for ch in chars]
+chr2uni = {ch:i for i,ch in enumerate(uni2chr)}
+
+class Solution:
+    def minimizeStringValue(self, s: str) -&gt; str:
+        from collections import Counter
+        # 统计字符数量
+        cntS = Counter(s)
+        cnt = [0] * 26
+        anums = cntS[&#39;?&#39;]
+        if anums == 0: return s
+        for ch, nums in cntS.items():
+            if ch != &#39;?&#39;: cnt[ord(ch) - 97] = nums
+
+        # 计算出最不可能填入的最大数量
+        queue = sorted(range(26), key=lambda it: cnt[it])
+
+        index = 0
+        highs = 0
+        total = 0
+        while index &lt; 26 and cnt[queue[index]] * index - highs &lt; anums:
+            highs += cnt[queue[index]]
+            index += 1
+
+        # 计算出前一个高度下，需要填入的面积和最后一个高度
+        lastH = cnt[queue[index - 1]]
+        lastAll = anums - (lastH * index - highs)
+        lower = lastAll // index + lastH
+        preW = lastAll % index
+
+        # 再次排序并根据最后一个高度计算具体需要填入的数量
+        finalChar = []
+        finalNums = []
+        queue = sorted(queue[:index])
+        for j in queue[:preW]:
+            if lower + 1 - cnt[j] &gt; 0:
+                finalChar.append(chr(97 + j))
+                finalNums.append(lower + 1 - cnt[j])
+        for j in queue[preW:]:
+            if lower - cnt[j] &gt; 0:
+                finalChar.append(chr(97 + j))
+                finalNums.append(lower - cnt[j])
+
+        # 依次填入
+        ans = list(s)
+        index = 0
+        curChar = &#39;&#39;
+        curNums = 0
+        for i, ch in enumerate(ans):
+            if ch != &#39;?&#39;: continue
+            if curNums == 0:
+                curChar = finalChar[index]
+                curNums = finalNums[index]
+                index += 1
+            ans[i] = curChar
+            curNums -= 1
+        return &#39;&#39;.join(ans)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算填充问号的过程中，具体是如何根据已有字符的出现频率来确定最优的字符选择的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法首先统计了所有非问号字符的出现频率，并将这些频率存储在一个数组中。接着，算法通过一个`queue`列表，这个列表基于字符出现的次数进行排序，使得出现次数最少的字符排在前面。根据这个排序，算法尝试填充问号，优先填充出现次数少的字符。这是因为填充出现次数少的字符可以最小化可能的分数增加，即增加分布的均匀性，从而尽可能减少最高频率字符的出现次数，使总分数尽可能低。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中的`queue = sorted(range(26), key=lambda it: cnt[it])`这一步骤是如何影响字母填充问号的顺序的？为什么要选择出现次数少的字符填充？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这一步骤通过将字符按照出现次数进行升序排序，决定了填充问号的顺序。排序结果`queue`中，索引最低的是出现次数最少的字符。选择出现次数少的字符填充问号的原因是，这样可以在尽量不增加已经频繁出现的字符的同时，增加字符串中的字符多样性。这种策略有助于保持字符出现频率的平衡，从而达到最小化最终字符串中任何字符达到过高频率的风险，这是因为高频率的字符出现次数如果过多，会导致总分数增加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在处理最后一个高度和前一个高度时，`lastAll = anums - (lastH * index - highs)`这个计算是如何得出的，它代表什么含义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个计算步骤是为了确定在达到最后一个高度之前，还需要填充多少问号。其中`lastH`是当前已处理字符中出现次数最多的字符的数量，`index`是参与排序并计算的字符数，`highs`是到目前为止已处理的所有字符的累计出现次数。`lastAll`计算的是在达到最后一个高度前，还需要填充的问号数量。这个值是通过从总问号数`anums`中减去已经通过较低高度字符填充的区域面积来得出的。这个计算有助于确定如何分配剩余的问号，以确保填充后的字符串字符频率尽可能平衡。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/replace-question-marks-in-string-to-minimize-its-value')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/replace-question-marks-in-string-to-minimize-its-value/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

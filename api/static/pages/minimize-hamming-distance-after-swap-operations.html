@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>执行交换操作后的最小汉明距离</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>执行交换操作后的最小汉明距离</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数数组 <code>source</code> 和 <code>target</code> ，长度都是 <code>n</code> 。还有一个数组 <code>allowedSwaps</code> ，其中每个 <code>allowedSwaps[i] = [a<sub>i</sub>, b<sub>i</sub>]</code> 表示你可以交换数组 <code>source</code> 中下标为 <code>a<sub>i</sub></code> 和 <code>b<sub>i</sub></code>（<strong>下标从 0 开始</strong>）的两个元素。注意，你可以按 <strong>任意</strong> 顺序 <strong>多次</strong> 交换一对特定下标指向的元素。</p>
+
+<p>相同长度的两个数组 <code>source</code> 和 <code>target</code> 间的 <strong>汉明距离</strong> 是元素不同的下标数量。形式上，其值等于满足 <code>source[i] != target[i]</code> （<strong>下标从 0 开始</strong>）的下标 <code>i</code>（<code>0 &lt;= i &lt;= n-1</code>）的数量。</p>
+
+<p>在对数组 <code>source</code> 执行 <strong>任意</strong> 数量的交换操作后，返回 <code>source</code> 和 <code>target</code> 间的 <strong>最小汉明距离</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>source = [1,2,3,4], target = [2,1,4,5], allowedSwaps = [[0,1],[2,3]]
+<strong>输出：</strong>1
+<strong>解释：</strong>source 可以按下述方式转换：
+- 交换下标 0 和 1 指向的元素：source = [<strong>2</strong>,<strong>1</strong>,3,4]
+- 交换下标 2 和 3 指向的元素：source = [2,1,<strong>4</strong>,<strong>3</strong>]
+source 和 target 间的汉明距离是 1 ，二者有 1 处元素不同，在下标 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>source = [1,2,3,4], target = [1,3,2,4], allowedSwaps = []
+<strong>输出：</strong>2
+<strong>解释：</strong>不能对 source 执行交换操作。
+source 和 target 间的汉明距离是 2 ，二者有 2 处元素不同，在下标 1 和下标 2 。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>source = [5,1,2,4,3], target = [1,5,4,2,3], allowedSwaps = [[0,4],[4,2],[1,3],[1,4]]
+<strong>输出：</strong>0
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == source.length == target.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= source[i], target[i] &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= allowedSwaps.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>allowedSwaps[i].length == 2</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 226 ms</p>
+                    <p>内存: 51.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumHammingDistance(self, source: List[int], target: List[int], allowedSwaps: List[List[int]]) -&gt; int:
+        n = len(source)
+        parent = list(range(n))  # Initialize parent array for union-find
+
+        def find(x):
+            if x != parent[x]:
+                parent[x] = find(parent[x])
+            return parent[x]
+
+        def union(x, y):
+            root_x = find(x)
+            root_y = find(y)
+            if root_x != root_y:
+                parent[root_x] = root_y
+
+        # Build union-find data structure based on allowed swaps
+        for swap in allowedSwaps:
+            union(swap[0], swap[1])
+
+        # Create a dictionary to map root indices to sets of elements
+        groups = {}
+        for i in range(n):
+            root = find(i)
+            if root not in groups:
+                groups[root] = set()
+            groups[root].add(source[i])
+
+        # Iterate over target array and remove elements from sets
+        hamming_distance = 0
+        for i in range(n):
+            root = find(i)
+            if target[i] not in groups[root]:
+                hamming_distance += 1
+            else:
+                groups[root].remove(target[i])
+
+        return hamming_distance
+
+class Solution:
+    def minimumHammingDistance(self, source: List[int], target: List[int], allowedSwaps: List[List[int]]) -&gt; int:
+        n = len(source)
+        parent = list(range(n))  # Initialize parent array for union-find
+
+        def find(x):
+            if x != parent[x]:
+                parent[x] = find(parent[x])
+            return parent[x]
+
+        def union(x, y):
+            root_x = find(x)
+            root_y = find(y)
+            if root_x != root_y:
+                parent[root_x] = root_y
+
+        # Build union-find data structure based on allowed swaps
+        for swap in allowedSwaps:
+            union(swap[0], swap[1])
+
+        # Create a dictionary to map root indices to dictionaries of elements and their frequencies
+        groups = {}
+        for i in range(n):
+            root = find(i)
+            if root not in groups:
+                groups[root] = {}
+            groups[root][source[i]] = groups[root].get(source[i], 0) + 1
+
+        # Iterate over target array and remove elements from dictionaries
+        hamming_distance = 0
+        for i in range(n):
+            root = find(i)
+            if target[i] not in groups[root] or groups[root][target[i]] == 0:
+                hamming_distance += 1
+            else:
+                groups[root][target[i]] -= 1
+
+        return hamming_distance
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了并查集（union-find）数据结构来管理元素交换的可能性。首先，通过allowedSwaps提供的索引对，构建并查集，以此确定source中哪些元素可以通过交换被重新组织。接着，使用一个映射（字典）来记录每个并查集根节点下所有元素的出现频率。最后，遍历target数组，并尝试从相对应的并查集根节点的字典中删除target中的元素。如果在字典中找不到相应元素，汉明距离就增加1。这样，最终的汉明距离就是source和target在所有允许的交换操作后，仍然不匹配的元素总数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumHammingDistance(self, source: List[int], target: List[int], allowedSwaps: List[List[int]]) -&gt; int:
+        n = len(source)  # 数组长度
+        parent = list(range(n))  # 初始化并查集的父节点数组
+
+        def find(x):
+            if x != parent[x]:
+                parent[x] = find(parent[x])  # 路径压缩
+            return parent[x]
+
+        def union(x, y):
+            root_x = find(x)
+            root_y = find(y)
+            if root_x != root_y:
+                parent[root_x] = root_y  # 合并两个集合
+
+        # 根据allowedSwaps构建并查集
+        for swap in allowedSwaps:
+            union(swap[0], swap[1])
+
+        # 为每个根节点构建元素频率字典
+        groups = {}
+        for i in range(n):
+            root = find(i)
+            if root not in groups:
+                groups[root] = {}
+            groups[root][source[i]] = groups[root].get(source[i], 0) + 1
+
+        # 计算汉明距离
+        hamming_distance = 0
+        for i in range(n):
+            root = find(i)
+            if target[i] not in groups[root] or groups[root][target[i]] == 0:
+                hamming_distance += 1  # 找不到匹配元素，增加距离
+            else:
+                groups[root][target[i]] -= 1  # 找到匹配元素，减少频率
+
+        return hamming_distance</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            并查集在这个问题中如何确保元素可以自由交换？它是如何处理多个允许交换的组合的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>并查集通过将可以互相交换的元素组织成一个集合来确保这些元素可以自由重组。每次调用union操作，它将两个元素的根节点合并，这样所有连接的元素最终都会共享同一个根节点。当多个交换操作涉及相互连接的元素时，这些元素通过不断的union操作最终都会归属于同一个根节点下，从而形成一个可以自由交换元素的大集合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到构建元素频率字典，这个字典是在并查集的哪个阶段构建的？为什么选择在那个特定的时刻构建？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>元素频率字典是在构建并查集之后、计算汉明距离之前构建的。在所有的union操作完成后，每个元素都已经被分配到一个确定的集合中，此时构建频率字典可以准确地记录下每个集合中不同元素的出现次数。这样做的原因是，只有在集合构建完成后，我们才能得到每个元素最终所属的集合，进而正确统计和利用这些信息来与target数组进行比较和匹配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何处理当source和target数组中存在重复元素时的匹配问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中通过构建每个集合的元素频率字典来处理重复元素的匹配问题。这个字典记录了每个集合中每种元素出现的次数。在计算汉明距离时，对于target中的每个元素，程序会尝试从相应集合的字典中减少这个元素的计数。如果字典中该元素的计数已经为零或者元素不存在于字典中，就增加汉明距离。这种方法确保了即使在source和target中元素有重复时，也能正确地匹配相同元素的数量，只有无法匹配的元素才会增加汉明距离。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在计算最小汉明距离时，如果target中的元素在对应的并查集组中不存在，为什么直接增加汉明距离？会有什么潜在的遗漏吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当target中的元素在对应的并查集组中不存在时，直接增加汉明距离是因为这表示source数组中的元素，即使经过所有允许的交换，仍无法匹配target中的该元素。增加汉明距离是为了反映这种不匹配的情况。潜在的遗漏可能发生在错误地管理并查集或元素频率字典时，例如并查集的合并操作没有正确执行，或者频率统计有误。但如果这些数据结构和操作都正确无误，直接增加汉明距离是合理且必要的，因为它确实反映了两个数组在经过所有可能的合法交换后的差异。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimize-hamming-distance-after-swap-operations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimize-hamming-distance-after-swap-operations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

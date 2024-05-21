@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>文件组合</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>文件组合</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>待传输文件被切分成多个部分，按照原排列顺序，每部分文件编号均为一个 <strong>正整数</strong>（至少含有两个文件）。传输要求为：连续文件编号总和为接收方指定数字 <code>target</code> 的所有文件。请返回所有符合该要求的文件传输组合列表。</p>
+
+<p><strong>注意</strong>，返回时需遵循以下规则：</p>
+
+<ul>
+	<li>每种组合按照文件编号 <strong>升序</strong> 排列；</li>
+	<li>不同组合按照第一个文件编号 <strong>升序</strong> 排列。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>target = 12
+<strong>输出：</strong>[[3, 4, 5]]
+<strong>解释：</strong>在上述示例中，存在一个连续正整数序列的和为 12，为 [3, 4, 5]。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>target = 18
+<strong>输出：</strong>[[3,4,5,6],[5,6,7]]
+<strong>解释：</strong>在上述示例中，存在两个连续正整数序列的和分别为 18，分别为 [3, 4, 5, 6] 和 [5, 6, 7]。
+</pre>
+
+
+
+<p><b>提示：</b></p>
+
+<ul>
+	<li><code>1 &lt;= target &lt;= 10^5</code></li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 172 ms</p>
+                    <p>内存: 14.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+
+class Solution:
+    def findContinuousSequence(self, target: int) -&gt; List[List[int]]:
+        left = 0
+        right = 0
+        window = 0
+        l = range(1, target//2+2)
+        res = list()
+
+        while right &lt; len(l):
+            c = l[right]
+            right += 1
+            window += c
+            while window &gt;= target:
+                if window == target:
+                    res.append(list(l[left:right]))
+
+                d = l[left]
+                left += 1
+                window -= d
+        return res
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.findContinuousSequence(15))
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目使用了滑动窗口的方法来解决。定义两个指针left和right，初始都指向序列的开始。然后逐步向右移动right指针，将对应的数加到当前窗口的和中（window）。如果窗口和大于目标值target，则逐步右移left指针，同时从window中减去相应的值，直到window小于等于target。如果在某一刻window等于target，当前的[left, right)范围内的数字就是一个有效的连续序列，我们将其记录下来。重复这个过程直到right到达序列的末尾。通过这种方式，可以找到所有符合条件的连续文件序列。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+
+class Solution:
+    def findContinuousSequence(self, target: int) -&gt; List[List[int]]:
+        left = 0  # 初始化左指针
+        right = 0  # 初始化右指针
+        window = 0  # 当前窗口的数字和
+        l = range(1, target//2+2)  # 可能的数字范围
+        res = list()  # 存储结果的列表
+
+        while right &lt; len(l):  # 当右指针没有超出范围时
+            c = l[right]  # 取得当前右指针指向的值
+            right += 1  # 右指针右移
+            window += c  # 更新窗口和
+            while window &gt;= target:  # 当窗口和不小于目标时调整左指针
+                if window == target:
+                    res.append(list(l[left:right]))  # 如果窗口和等于目标，则记录结果
+
+                d = l[left]  # 取得当前左指针指向的值
+                left += 1  # 左指针右移
+                window -= d  # 更新窗口和
+        return res  # 返回结果
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.findContinuousSequence(15))  # 测试示例</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在滑动窗口算法中，只需要考虑数字的范围到 target/2 + 1，更大的数字有没有可能成为解的一部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在寻找连续整数序列的和等于target的情况下，考虑数字范围到 target/2 + 1 是因为任何超过 target/2 的数字无法与其它数字组成和为 target 的序列（最小的连续序列至少包含两个数字）。例如，如果 target 是 9，那么任何大于 4.5 的数字（即5及以上）将不能与其它数字组成和为 9 的序列。因此，将数字范围限制为 target/2 + 1 是为了确保所有可能的连续序列都被考虑到，同时避免不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在滑动窗口中，当窗口和大于目标值时，为什么选择右移左指针而不是右指针？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当窗口和大于目标值时，意味着当前窗口包含的数字总和已经超出了目标值。此时，为了尝试减少总和以寻找可能的匹配，我们需要从窗口的左侧开始移除数字，即右移左指针。这样做是因为我们的目标是找到和为 target 的连续序列，而不是单个数字，因此需要通过调整窗口的大小（通过移动左指针）来找到可能的匹配序列。如果移动右指针，则会增加更多的数字到窗口中，使得窗口和更加超过目标值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你提到每个数字最多被访问两次，能否详细解释这个过程是如何保证算法的效率的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在滑动窗口算法中，每个数字最多被访问两次，一次是当它被添加到窗口中（即当右指针移到该数字上时），另一次是当它从窗口中移除（即当左指针移到该数字上时）。这种机制保证了每个数字只处理两次，从而使算法的时间复杂度为 O(n)，其中 n 是序列的长度。这种高效的遍历方式确保算法能够快速地找到所有符合条件的序列，而不会重复计算或进行不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果 target 是一个较小的数，例如 2 或 3，你的算法是否仍然正确运行？能否给出这些特殊情况下的输出示例？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果 target 是一个较小的数，例如 2 或 3，该算法仍然可以正确运行。例如，对于 target=2，可能的连续序列只有一个：[1, 2]，其和为 2。对于 target=3，可能的连续序列也只有一个：[1, 2]，其和为 3。这些情况表明，算法也适用于较小的 target 值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/he-wei-sde-lian-xu-zheng-shu-xu-lie-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/he-wei-sde-lian-xu-zheng-shu-xu-lie-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

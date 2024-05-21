@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>安排邮筒</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>安排邮筒</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个房屋数组<code>houses</code>&nbsp;和一个整数&nbsp;<code>k</code>&nbsp;，其中&nbsp;<code>houses[i]</code>&nbsp;是第 <code>i</code>&nbsp;栋房子在一条街上的位置，现需要在这条街上安排 <code>k</code>&nbsp;个邮筒。</p>
+
+<p>请你返回每栋房子与离它最近的邮筒之间的距离的 <strong>最小 </strong>总和。</p>
+
+<p>答案保证在 32 位有符号整数范围以内。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/06/13/sample_11_1816.png" style="height: 154px; width: 454px;"></p>
+
+<pre><strong>输入：</strong>houses = [1,4,8,10,20], k = 3
+<strong>输出：</strong>5
+<strong>解释：</strong>将邮筒分别安放在位置 3， 9 和 20 处。
+每个房子到最近邮筒的距离和为 |3-1| + |4-3| + |9-8| + |10-9| + |20-20| = 5 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/06/13/sample_2_1816.png" style="height: 154px; width: 433px;"></strong></p>
+
+<pre><strong>输入：</strong>houses = [2,3,5,12,18], k = 2
+<strong>输出：</strong>9
+<strong>解释：</strong>将邮筒分别安放在位置 3 和 14 处。
+每个房子到最近邮筒距离和为 |2-3| + |3-3| + |5-3| + |12-14| + |18-14| = 9 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>houses = [7,4,6,1], k = 1
+<strong>输出：</strong>8
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>houses = [3,6,14,10], k = 4
+<strong>输出：</strong>0
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == houses.length</code></li>
+	<li><code>1 &lt;= n&nbsp;&lt;= 100</code></li>
+	<li><code>1 &lt;= houses[i] &lt;= 10^4</code></li>
+	<li><code>1 &lt;= k &lt;= n</code></li>
+	<li>数组&nbsp;<code>houses</code>&nbsp;中的整数互不相同。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 73 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minDistance(self, houses: List[int], k: int) -&gt; int:
+        houses.sort()
+        #print(houses)
+        n = len(houses)
+
+        dp = [[inf] * (k + 1) for _ in range(n)]
+        
+        one = [[0] * n for _ in range(n)]
+
+        p = [[0] * (k + 1) for _ in range(n)]
+        
+        dp[0][0] = 0
+
+        pre = [0]
+        for i in range(n):
+            pre.append(pre[-1] + houses[i])
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                m = (i + j) // 2
+                p1 = (m - i + 1) * houses[m] - (pre[m + 1] - pre[i])
+                p2 = pre[j+1] - pre[m + 1] - (j - m) * houses[m]   
+                one[i][j] = p1 + p2
+
+        for i in range(n):
+            dp[i][1] = one[0][i]
+            p[i][1] = 0
+        #print(p)
+        for kk in range(2, k + 1):
+            for i in range(n - 1, -1, -1):
+                #if i + 1 &lt;= kk:
+                #    dp[i][kk] =  0
+                #    p[i][kk] = i // 2
+                #    continue
+                if i == n - 1:
+                    maxNum = n - 1
+                else:
+                    maxNum = p[i+1][kk]
+
+                minNum = p[i][kk-1]
+                #if i == n - 1 and kk == 3:
+                #    print(&#34;haha: &#34;, minNum, maxNum)
+                for j in range(minNum, maxNum + 1):
+                    #print(i, j, kk)
+                    cost = (dp[j-1][kk - 1] if j &gt; 0 else 0) + one[j][i]
+                    #if i == n - 1 and kk == 3:
+                    #    print(&#34;haha: &#34;, minNum, maxNum)
+                    #    print(&#34;前面：&#34;, dp[j-1][kk-1])
+                    #    print(&#34;cost: &#34;, cost)
+                    
+                    if cost &lt;= dp[i][kk]:
+                        dp[i][kk] = cost
+                        p[i][kk] = j
+                    
+        #print(p)
+        #print(dp)
+
+        return dp[-1][-1]
+
+
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个问题可以通过动态规划来解决。首先，我们对房屋位置进行排序，使得问题变得更容易处理。定义dp[i][j]表示前i+1个房屋安排j个邮筒的最小距离总和。数组one[i][j]用于存储从i到j的房子只用一个邮筒时的最小总距离，其中邮筒放在中位数位置能够达到最小距离。我们首先计算所有可能的one[i][j]值。然后，使用动态规划填充dp数组。对于每个dp[i][j]，我们尝试所有可能的前一个状态dp[k][j-1]（其中k &lt; i），并加上从k+1到i的房屋使用一个邮筒的距离，即one[k+1][i]。通过这种方式，我们可以构建出所有房屋和邮筒配置的最小距离总和。</p>
+                                <p>时间复杂度: O(n^2 * k)</p>
+                                <p>空间复杂度: O(n^2 + n * k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minDistance(self, houses: List[int], k: int) -&gt; int:
+        houses.sort()
+        n = len(houses)
+
+        # 初始化dp数组和one数组
+        dp = [[float(&#39;inf&#39;)] * (k + 1) for _ in range(n)]
+        one = [[0] * n for _ in range(n)]
+
+        # 计算房屋位置的前缀和
+        pre = [0]
+        for i in range(n):
+            pre.append(pre[-1] + houses[i])
+
+        # 计算所有one[i][j]值
+        for i in range(n):
+            for j in range(i + 1, n):
+                m = (i + j) // 2
+                p1 = (m - i + 1) * houses[m] - (pre[m + 1] - pre[i])
+                p2 = pre[j+1] - pre[m + 1] - (j - m) * houses[m]
+                one[i][j] = p1 + p2
+
+        # 使用动态规划求解最小距离总和
+        for i in range(n):
+            dp[i][1] = one[0][i]
+        for kk in range(2, k + 1):
+            for i in range(n - 1, -1, -1):
+                if i == n - 1:
+                    maxNum = n - 1
+                else:
+                    maxNum = p[i+1][kk]
+                minNum = p[i][kk-1]
+                for j in range(minNum, maxNum + 1):
+                    cost = (dp[j-1][kk - 1] if j &gt; 0 else 0) + one[j][i]
+                    if cost &lt;= dp[i][kk]:
+                        dp[i][kk] = cost
+                        p[i][kk] = j
+        return dp[-1][-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解题中首先需要对房屋的位置进行排序？排序的目的和效果是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对房屋位置进行排序的目的是为了简化计算和优化算法的实现。在已排序的房屋位置列表中，任意子区间[i, j]（i &lt;= j）的房屋都是连续的，并且位置是递增的。这样便于计算这些房屋到一个邮筒的最短距离，因为邮筒放在中位数位置时能达到最小总距离，而中位数很容易从排序后的列表中得到。此外，排序后的列表也便于使用动态规划方法计算不同房屋分组的最小距离，因为每次分割都是基于连续的子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算one数组时，为什么选择邮筒放在中位数位置能达到最小总距离，这个逻辑是如何得出的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当邮筒放在一组房屋的中位数位置时，可以最小化到所有房屋的距离总和。这是因为中位数的特性是它将数据集分成两个数量大致相等的部分，从而使得左边和右边房屋到邮筒的距离总和达到最小。具体来说，将邮筒置于中位数位置，对于中位数左侧的每一步向左移动，左侧房屋到邮筒的距离会增加，但右侧的会减少；由于右侧房屋数量不少于左侧，总距离因此减少。同理，向右移动邮筒也遵循类似的逻辑。因此，中位数是最优位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            one数组中的p1和p2的计算公式是如何推导出来的，能否详细解释一下它们的含义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算one数组时，p1和p2的计算关键在于确定中位数房屋左侧和右侧房屋到邮筒的距离总和。具体来说，p1计算的是从i到m（中位数）房屋的距离总和，p2计算的是从m+1到j房屋的距离总和。公式中，(m - i + 1) * houses[m] 表示中位数到所有左侧房屋（包括中位数本身）的距离乘以房屋数量，pre数组用于快速计算区间和，即pre[m+1] - pre[i]是i到m的房屋位置和。同理，p2中的pre[j+1] - pre[m+1]表示m+1到j的房屋位置和，(j - m) * houses[m]则是这些房屋到中位数的距离乘以房屋数量。这样，p1 + p2就给出了所有房屋到中位数邮筒的总距离。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/allocate-mailboxes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/allocate-mailboxes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

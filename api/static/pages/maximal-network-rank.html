@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大网络秩</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大网络秩</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p><code>n</code> 座城市和一些连接这些城市的道路 <code>roads</code> 共同组成一个基础设施网络。每个 <code>roads[i] = [a<sub>i</sub>, b<sub>i</sub>]</code> 都表示在城市 <code>a<sub>i</sub></code> 和 <code>b<sub>i</sub></code> 之间有一条双向道路。</p>
+
+<p>两座不同城市构成的 <strong>城市对</strong> 的 <strong>网络秩</strong> 定义为：与这两座城市 <strong>直接</strong> 相连的道路总数。如果存在一条道路直接连接这两座城市，则这条道路只计算 <strong>一次</strong> 。</p>
+
+<p>整个基础设施网络的 <strong>最大网络秩</strong> 是所有不同城市对中的 <strong>最大网络秩</strong> 。</p>
+
+<p>给你整数 <code>n</code> 和数组 <code>roads</code>，返回整个基础设施网络的 <strong>最大网络秩</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/10/11/ex1.png" style="width: 292px; height: 172px;" /></strong></p>
+
+<pre>
+<strong>输入：</strong>n = 4, roads = [[0,1],[0,3],[1,2],[1,3]]
+<strong>输出：</strong>4
+<strong>解释：</strong>城市 0 和 1 的网络秩是 4，因为共有 4 条道路与城市 0 或 1 相连。位于 0 和 1 之间的道路只计算一次。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/10/11/ex2.png" style="width: 292px; height: 172px;" /></strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, roads = [[0,1],[0,3],[1,2],[1,3],[2,3],[2,4]]
+<strong>输出：</strong>5
+<strong>解释：</strong>共有 5 条道路与城市 1 或 2 相连。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 8, roads = [[0,1],[1,2],[2,3],[2,4],[5,6],[5,7]]
+<strong>输出：</strong>5
+<strong>解释：</strong>2 和 5 的网络秩为 5，注意并非所有的城市都需要连接起来。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 <= n <= 100</code></li>
+	<li><code>0 <= roads.length <= n * (n - 1) / 2</code></li>
+	<li><code>roads[i].length == 2</code></li>
+	<li><code>0 <= a<sub>i</sub>, b<sub>i</sub> <= n-1</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li>每对城市之间 <strong>最多只有一条</strong> 道路相连</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 43 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximalNetworkRank(self, n: int, roads: List[List[int]]) -&gt; int:
+        # 实际只要枚举最大和次大即可,分为两类
+        point = [[False] * n for _ in range(n)]
+        cnt = [0] * n
+        for x, y in roads:
+            cnt[x] += 1
+            cnt[y] += 1
+            point[x][y] = True
+            point[y][x] = True
+        first = second = 0
+        farr = sarr = []
+        for i in range(n):
+            if cnt[i] &gt; first:
+                farr, sarr = [i], farr
+                first, second = cnt[i], first
+            elif cnt[i] == first:
+                farr.append(i)
+            elif cnt[i] &gt; second:
+                sarr = [i]
+                second = cnt[i]
+            elif cnt[i] == second:
+                sarr.append(i)
+        t = len(farr)
+        if t == 1:  # 只有一个最大
+            i = farr.pop()
+            return first + second - all(point[i][j] for j in sarr)  # 剩下从次大选
+        else:  # 两个都从最大选
+            for i in range(t):
+                for j in range(i + 1, t):
+                    if not point[farr[i]][farr[j]]:
+                        return 2 * first
+            return 2 * first - 1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解通过计算每座城市连接的道路数量并使用两个数组来追踪每个城市的道路数（cnt数组）以及是否有直接连接两座城市的道路（point矩阵）。首先，它记录了所有城市的道路数量，并识别出连接最多道路的城市（&#39;first&#39;）和次多的城市（&#39;second&#39;）。如果最多道路的城市有超过一个，则检查这些城市之间是否有直接连接的道路。如果没有直接连接，则它们的网络秩是两倍的&#39;first&#39;值。如果有直接连接的城市，则减去一，因为这条路被重复计算了一次。如果最大道路数的城市只有一个，那么需要检查与次大道路数城市之间的直接连接情况，并相应调整计算结果。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximalNetworkRank(self, n: int, roads: List[List[int]]) -&gt; int:
+        # 初始化每个城市的连接矩阵和道路计数数组
+        point = [[False] * n for _ in range(n)]
+        cnt = [0] * n
+        # 填充道路计数和直接连接的矩阵
+        for x, y in roads:
+            cnt[x] += 1
+            cnt[y] += 1
+            point[x][y] = True
+            point[y][x] = True
+        # 寻找连接最多和次多的城市
+        first = second = 0
+        farr = sarr = []
+        for i in range(n):
+            if cnt[i] &gt; first:
+                farr, sarr = [i], farr
+                first, second = cnt[i], first
+            elif cnt[i] == first:
+                farr.append(i)
+            elif cnt[i] &gt; second:
+                sarr = [i]
+                second = cnt[i]
+            elif cnt[i] == second:
+                sarr.append(i)
+        t = len(farr)
+        if t == 1:  # 只有一个城市连接最多
+            i = farr.pop()
+            # 判断次大连接城市组是否有直接连接到该城市
+            return first + second - all(point[i][j] for j in sarr)
+        else:  # 从最大连接城市组中选择两个城市
+            for i in range(t):
+                for j in range(i + 1, t):
+                    if not point[farr[i]][farr[j]]:
+                        return 2 * first  # 无直接连接，直接返回双倍
+            return 2 * first - 1  # 有直接连接，减去重复计数的道路</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到使用`cnt数组`和`point矩阵`来追踪城市的道路数和直接连接情况，请问这种数据结构的选择对算法的效率有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`cnt数组`和`point矩阵`这两种数据结构提高了算法的效率。`cnt数组`通过索引直接存储每个城市的道路数量，使得更新和查询道路数都是O(1)的时间复杂度。`point矩阵`作为二维布尔数组，直接记录任意两个城市之间是否存在直接连接，这使得查询两城市间的连接状态也是O(1)时间复杂度。整体上，这种数据结构的选择使得算法在处理连接查询和更新时非常高效，尤其是在频繁查询和少量更新的情况下，能够快速响应。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到如果`最多道路的城市有超过一个`，则需要检查这些城市之间是否有直接连接的道路。请问为什么要特别检查这些城市之间的直接连接情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当有多个城市拥有相同的最高道路数时，这些城市之间的直接连接情况会直接影响网络秩的计算。如果这些城市之间没有直接连接，那么选择这两个城市作为网络的一部分将不会重复计算任何道路，因此网络秩是两者道路数的简单相加。然而，如果这些城市之间有直接连接的道路，选择这两个城市会导致这条道路被重复计算，因此需要从总和中减去这条重复的道路。这是为了确保网络秩的计算准确无误，避免重复计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当最多道路的城市只有一个时，算法需要检查与次大道路数城市之间的直接连接情况。这种情况下，为什么结果是`first + second - all(point[i][j] for j in sarr)`，特别是`all`函数在这里是如何应用的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，算法需要确定最大道路数的城市和次大道路数的城市之间是否存在直接连接。`all`函数在这里用于检查是否所有次大道路数城市与最大道路数城市之间都有直接连接。如果`all(point[i][j] for j in sarr)`返回`True`，这意味着每个次大道路数城市都与最大道路数的城市有直接连接，因此需要从总和`first + second`中减去1，避免重复计数道路。如果返回`False`，则表示至少有一个次大道路数城市与最大道路数城市没有直接连接，此时网络秩应为`first + second`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximal-network-rank')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximal-network-rank/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

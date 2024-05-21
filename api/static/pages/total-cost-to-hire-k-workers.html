@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>雇佣 K 位工人的总代价</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>雇佣 K 位工人的总代价</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>costs</code>&nbsp;，其中&nbsp;<code>costs[i]</code>&nbsp;是雇佣第 <code>i</code>&nbsp;位工人的代价。</p>
+
+<p>同时给你两个整数&nbsp;<code>k</code> 和&nbsp;<code>candidates</code>&nbsp;。我们想根据以下规则恰好雇佣&nbsp;<code>k</code>&nbsp;位工人：</p>
+
+<ul>
+	<li>总共进行&nbsp;<code>k</code>&nbsp;轮雇佣，且每一轮恰好雇佣一位工人。</li>
+	<li>在每一轮雇佣中，从最前面 <code>candidates</code>&nbsp;和最后面 <code>candidates</code>&nbsp;人中选出代价最小的一位工人，如果有多位代价相同且最小的工人，选择下标更小的一位工人。
+	<ul>
+		<li>比方说，<code>costs = [3,2,7,7,1,2]</code> 且&nbsp;<code>candidates = 2</code>&nbsp;，第一轮雇佣中，我们选择第&nbsp;<code>4</code>&nbsp;位工人，因为他的代价最小&nbsp;<code>[<em>3,2</em>,7,7,<em><strong>1</strong>,2</em>]</code>&nbsp;。</li>
+		<li>第二轮雇佣，我们选择第&nbsp;<code>1</code>&nbsp;位工人，因为他们的代价与第&nbsp;<code>4</code>&nbsp;位工人一样都是最小代价，而且下标更小，<code>[<em>3,<strong>2</strong></em>,7,<em>7,2</em>]</code>&nbsp;。注意每一轮雇佣后，剩余工人的下标可能会发生变化。</li>
+	</ul>
+	</li>
+	<li>如果剩余员工数目不足 <code>candidates</code>&nbsp;人，那么下一轮雇佣他们中代价最小的一人，如果有多位代价相同且最小的工人，选择下标更小的一位工人。</li>
+	<li>一位工人只能被选择一次。</li>
+</ul>
+
+<p>返回雇佣恰好<em>&nbsp;</em><code>k</code>&nbsp;位工人的总代价。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>costs = [17,12,10,2,7,2,11,20,8], k = 3, candidates = 4
+<b>输出：</b>11
+<b>解释：</b>我们总共雇佣 3 位工人。总代价一开始为 0 。
+- 第一轮雇佣，我们从 [<strong><em>17,12,10,2</em></strong>,7,<strong><em>2,11,20,8</em></strong>] 中选择。最小代价是 2 ，有两位工人，我们选择下标更小的一位工人，即第 3 位工人。总代价是 0 + 2 = 2 。
+- 第二轮雇佣，我们从 [<strong><em>17,12,10,7</em></strong>,<strong><em>2,11,20,8</em></strong>] 中选择。最小代价是 2 ，下标为 4 ，总代价是 2 + 2 = 4 。
+- 第三轮雇佣，我们从 [<strong><em>17,12,10,7,11,20,8</em></strong>] 中选择，最小代价是 7 ，下标为 3 ，总代价是 4 + 7 = 11 。注意下标为 3 的工人同时在最前面和最后面 4 位工人中。
+总雇佣代价是 11 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>costs = [1,2,4,1], k = 3, candidates = 3
+<b>输出：</b>4
+<b>解释：</b>我们总共雇佣 3 位工人。总代价一开始为 0 。
+- 第一轮雇佣，我们从 [<strong><em>1,2,4,1</em></strong>] 中选择。最小代价为 1 ，有两位工人，我们选择下标更小的一位工人，即第 0 位工人，总代价是 0 + 1 = 1 。注意，下标为 1 和 2 的工人同时在最前面和最后面 3 位工人中。
+- 第二轮雇佣，我们从 [<strong><em>2,4,1</em></strong>] 中选择。最小代价为 1 ，下标为 2 ，总代价是 1 + 1 = 2 。
+- 第三轮雇佣，少于 3 位工人，我们从剩余工人 [<strong><em>2,4</em></strong>] 中选择。最小代价是 2 ，下标为 0 。总代价为 2 + 2 = 4 。
+总雇佣代价是 4 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= costs.length &lt;= 10<sup>5 </sup></code></li>
+	<li><code>1 &lt;= costs[i] &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= k, candidates &lt;= costs.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 107 ms</p>
+                    <p>内存: 24.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def totalCost(self, costs: List[int], k: int, candidates: int) -&gt; int:
+        left = 0
+        right = len(costs)-1
+        cost_sum = 0
+
+        left_heap = copy.deepcopy(costs[0:candidates])
+        left = candidates-1
+        right_heap = copy.deepcopy(costs[max(candidates,len(costs)-candidates):])
+        right = max(candidates,len(costs)-candidates)
+        
+
+        heapify(left_heap)
+        heapify(right_heap)
+        
+        for i in range(k):
+            left_min = 1e5 + 1
+            right_min = 1e5+1
+            if len(left_heap):
+                left_min = left_heap[0]
+            if len(right_heap):
+                right_min = right_heap[0]
+            if left_min &lt;= right_min:
+                cost_sum += left_min
+                heappop(left_heap)
+                if left &lt; right-1:
+                    left+=1
+                    heappush(left_heap, costs[left])
+            else:
+                cost_sum += right_min
+                heappop(right_heap)
+                if right &gt; left + 1:
+                    right -= 1
+                    heappush(right_heap, costs[right])
+        return cost_sum
+
+
+
+            
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是使用两个最小堆（left_heap和right_heap）来分别管理数组costs中的前candidates个元素和后candidates个元素。每次迭代中，从这两个堆中找出最小的元素，然后将其从堆中移除，并将其加入到总的代价中。同时，堆从costs中继续添加新的元素以保持堆的大小为candidates，直到完成k次选择。通过这种方式，可以有效地在每一轮中找到最小代价的工人并加以雇佣。</p>
+                                <p>时间复杂度: O(k log(candidates))</p>
+                                <p>空间复杂度: O(candidates)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def totalCost(self, costs: List[int], k: int, candidates: int) -&gt; int:
+        left = 0
+        right = len(costs)-1
+        cost_sum = 0
+
+        # 初始化两个堆，分别存储前candidates个和后candidates个元素
+        left_heap = copy.deepcopy(costs[0:candidates])
+        left = candidates-1
+        right_heap = copy.deepcopy(costs[max(candidates,len(costs)-candidates):])
+        right = max(candidates,len(costs)-candidates)
+        
+
+        # 对两个堆进行堆化处理
+        heapify(left_heap)
+        heapify(right_heap)
+        
+        for i in range(k):
+            left_min = 1e5 + 1
+            right_min = 1e5+1
+            if len(left_heap):
+                left_min = left_heap[0]
+            if len(right_heap):
+                right_min = right_heap[0]
+            if left_min &lt;= right_min:
+                cost_sum += left_min
+                heappop(left_heap)
+                if left &lt; right-1:
+                    left+=1
+                    heappush(left_heap, costs[left])
+            else:
+                cost_sum += right_min
+                heappop(right_heap)
+                if right &gt; left + 1:
+                    right -= 1
+                    heappush(right_heap, costs[right])
+        return cost_sum</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在`totalCost`函数中，为什么选择使用两个最小堆来管理`costs`数组的前后`candidates`个元素？是否有其他数据结构可行？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用两个最小堆是为了能够高效地从`candidates`个候选者中选出最小的元素。最小堆可以在常数时间O(1)内得到最小元素，并且在对数时间O(log n)内进行插入和删除操作。这使得每次选择操作都能快速进行。虽然也可以考虑使用排序数组或平衡二叉搜索树，但在动态更新（即添加或删除元素）时，最小堆提供了更优的性能。排序数组虽然可以快速访问最小元素，但插入和删除操作平均需要O(n)时间。平衡二叉搜索树虽然提供了O(log n)的插入、删除和查找时间，但实现复杂度高于最小堆。因此，最小堆在本问题中是最合适的选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            堆的初始化和更新是如何确保每一轮都能从最前面`candidates`和最后面`candidates`人中选出代价最小的工人？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>堆的初始化首先将`costs`数组中前`candidates`个元素和后`candidates`个元素分别放入两个最小堆中，并进行堆化处理。这样，两个堆的根节点即是各自堆中的最小值。在每次选择工人时，比较两个堆的根节点，选择其中较小的一个，然后将其从堆中移除。移除操作后，为保持堆的大小为`candidates`，会从`costs`数组中相应地向堆中添加新的元素。这种方式确保了每轮都可以从当前候选的前`candidates`和后`candidates`中选出最小代价的工人。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何处理`costs`数组长度小于两倍`candidates`的情况，即当前后`candidates`有重叠时的特殊处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`costs`数组长度小于两倍`candidates`时，前`candidates`个元素和后`candidates`个元素会有重叠。在这种情况下，可以选择将整个`costs`数组放入一个最小堆中。由于数组长度小于两倍`candidates`，这意味着所有元素都是候选元素。因此，每次从堆中取出最小元素即可，直到完成k次选择。这种方法简化了处理过程，同时依旧保证了每次都能选出当前代价最小的工人。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/total-cost-to-hire-k-workers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/total-cost-to-hire-k-workers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

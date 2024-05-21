@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>好子数组的最大分数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>好子数组的最大分数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> <strong>（下标从 0 开始）</strong>和一个整数 <code>k</code> 。</p>
+
+<p>一个子数组 <code>(i, j)</code> 的 <strong>分数</strong> 定义为 <code>min(nums[i], nums[i+1], ..., nums[j]) * (j - i + 1)</code> 。一个 <strong>好</strong> 子数组的两个端点下标需要满足 <code>i &lt;= k &lt;= j</code> 。</p>
+
+<p>请你返回 <strong>好</strong> 子数组的最大可能 <strong>分数</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums = [1,4,3,7,4,5], k = 3
+<b>输出：</b>15
+<b>解释：</b>最优子数组的左右端点下标是 (1, 5) ，分数为 min(4,3,7,4,5) * (5-1+1) = 3 * 5 = 15 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [5,5,4,5,4,1,1,1], k = 0
+<b>输出：</b>20
+<b>解释：</b>最优子数组的左右端点下标是 (0, 4) ，分数为 min(5,5,4,5,4) * (4-0+1) = 4 * 5 = 20 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= k &lt; nums.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 71 ms</p>
+                    <p>内存: 25.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximumScore(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        nums.append(0)
+        ans = m = nums[k]
+        i = k
+        while ans &lt; m * n:
+            while nums[i] &gt;= m:
+                i -= 1
+            while nums[k] &gt;= m:
+                k += 1
+            ans = max(ans, m * (k - i - 1))
+            m = max(nums[i], nums[k])
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用双指针法，以 k 为中心向两边扩展。维护一个变量 m 来记录当前考虑的最小值，初始为 nums[k]。向左右两边扩展时，若当前指针指向的元素大于等于 m，则继续移动指针，直到遇到更小的元素或边界。每次移动指针后，更新最大分数 ans 和 m 的值。当 ans 大于等于 m 乘以数组长度 n 时，结束循环。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximumScore(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        nums.append(0)  # 在数组末尾添加一个0，方便处理边界情况
+        ans = m = nums[k]  # 初始化答案和当前最小值
+        i = k  # 初始化左指针
+        while ans &lt; m * n:  # 当当前分数小于最小值乘以数组长度时继续循环
+            while nums[i] &gt;= m:  # 向左移动指针，直到找到更小的元素
+                i -= 1
+            while nums[k] &gt;= m:  # 向右移动指针，直到找到更小的元素
+                k += 1
+            ans = max(ans, m * (k - i - 1))  # 更新最大分数
+            m = max(nums[i], nums[k])  # 更新当前最小值
+        return ans  # 返回最大分数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            解题思路中提到的双指针法在更新最小值`m`的逻辑为何选择使用`max(nums[i], nums[k])`，而不是继续使用`nums[k]`作为最小值的参考？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当双指针向两边扩展时，为了确保子数组的最小值正确，需要考虑新扩展到的边界值。如果只使用`nums[k]`作为最小值，那么当指针移动到新的位置，即使新位置的值小于`nums[k]`，也不会反映这一变化，从而导致最小值`m`不准确。使用`max(nums[i], nums[k])`是因为在每次扩展后，两边的边界可能已变，必须重新评估以确保`m`是两个扩展边界的最大值。这样可以确保在计算子数组的最大分数时，使用的`m`确实是子数组中的最小值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中，为什么要在数组`nums`末尾添加一个0，这样的处理会对算法的结果产生什么样的影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数组`nums`末尾添加一个0的主要目的是为了简化边界条件的处理。当双指针向数组的两端移动时，可能会超出原有数组的边界。添加一个0可以自然地停止指针的移动，因为0作为一个非正数，保证了当指针超过数组的实际元素时，可以在扩展到0时停止，从而避免数组越界的错误。同时，由于0小于任何正数，它能有效地表示超出了有效子数组的范围，这在计算子数组的最小值时特别有用，因为它确保了只有包含有效元素的子数组被考虑在内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到当`ans &lt; m * n`时继续循环，为什么选择这样的循环结束条件，它是基于什么样的考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>设置循环条件为`ans &lt; m * n`是基于对问题的最优性质的考虑。这个条件意味着只要当前已知的最大分数`ans`还小于理论上可能的最大分数`m * n`（即用当前的最小值`m`乘以数组的长度`n`），循环就应该继续。这种方式确保了算法能够在可能存在更大分数的情况下继续寻找，直到确认没有更大的可能性为止。这是一种确保找到真正的最大分数的方法，同时也防止了算法过早停止导致未能找到最大分数的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-score-of-a-good-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-score-of-a-good-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

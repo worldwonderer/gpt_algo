@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>大礼包</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>大礼包</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在 LeetCode 商店中， 有 <code>n</code> 件在售的物品。每件物品都有对应的价格。然而，也有一些大礼包，每个大礼包以优惠的价格捆绑销售一组物品。</p>
+
+<p>给你一个整数数组 <code>price</code> 表示物品价格，其中 <code>price[i]</code> 是第 <code>i</code> 件物品的价格。另有一个整数数组 <code>needs</code> 表示购物清单，其中 <code>needs[i]</code> 是需要购买第 <code>i</code> 件物品的数量。</p>
+
+<p>还有一个数组 <code>special</code> 表示大礼包，<code>special[i]</code> 的长度为 <code>n + 1</code> ，其中 <code>special[i][j]</code> 表示第 <code>i</code> 个大礼包中内含第 <code>j</code> 件物品的数量，且 <code>special[i][n]</code> （也就是数组中的最后一个整数）为第 <code>i</code> 个大礼包的价格。</p>
+
+<p>返回<strong> 确切 </strong>满足购物清单所需花费的最低价格，你可以充分利用大礼包的优惠活动。你不能购买超出购物清单指定数量的物品，即使那样会降低整体价格。任意大礼包可无限次购买。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>price = [2,5], special = [[3,0,5],[1,2,10]], needs = [3,2]
+<strong>输出：</strong>14
+<strong>解释：</strong>有 A 和 B 两种物品，价格分别为 ¥2 和 ¥5 。 
+大礼包 1 ，你可以以 ¥5 的价格购买 3A 和 0B 。 
+大礼包 2 ，你可以以 ¥10 的价格购买 1A 和 2B 。 
+需要购买 3 个 A 和 2 个 B ， 所以付 ¥10 购买 1A 和 2B（大礼包 2），以及 ¥4 购买 2A 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>price = [2,3,4], special = [[1,1,0,4],[2,2,1,9]], needs = [1,2,1]
+<strong>输出：</strong>11
+<strong>解释：</strong>A ，B ，C 的价格分别为 ¥2 ，¥3 ，¥4 。
+可以用 ¥4 购买 1A 和 1B ，也可以用 ¥9 购买 2A ，2B 和 1C 。 
+需要买 1A ，2B 和 1C ，所以付 ¥4 买 1A 和 1B（大礼包 1），以及 ¥3 购买 1B ， ¥4 购买 1C 。 
+不可以购买超出待购清单的物品，尽管购买大礼包 2 更加便宜。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == price.length</code></li>
+	<li><code>n == needs.length</code></li>
+	<li><code>1 <= n <= 6</code></li>
+	<li><code>0 <= price[i] <= 10</code></li>
+	<li><code>0 <= needs[i] <= 10</code></li>
+	<li><code>1 <= special.length <= 100</code></li>
+	<li><code>special[i].length == n + 1</code></li>
+	<li><code>0 <= special[i][j] <= 50</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 16.9 MB</p>
+                    <pre class="bg-light p-2 code-pre"># class Solution:
+#     def shoppingOffers(self, price: List[int], special: List[List[int]], needs: List[int]) -&gt; int:
+#         special.sort(key = lambda x: x[-1])
+#         check = set()
+#         for s in special.copy():
+#             if tuple(s[:-1]) in check:
+#                 special.remove(s)
+#             check.add(tuple(s[:-1]))
+
+#         n = len(needs)
+
+#         def dfs(p):
+#             nonlocal needs
+#             if p == len(special):
+#                 return sum([needs[i] * price[i] for i in range(n)])
+
+#             m = min([needs[x] // special[p][x] if special[p][x] else inf for x in range(n)])
+
+#             res = dfs(p + 1)
+#             for i in range(1, m + 1):
+#                 t = [needs[j] - special[p][j] * i for j in range(n)]
+#                 needs, t = t, needs
+#                 if (tmp := i * special[p][-1] + dfs(p + 1)) &lt; res:
+#                     res = tmp
+#                 needs, t = t, needs
+
+#             return res
+    
+#         return dfs(0)
+
+class Solution:
+    def shoppingOffers(self, price: List[int], special: List[List[int]], needs: List[int]) -&gt; int:
+        result = float(&#39;inf&#39;)
+        filtered_special = []
+        n = len(needs)
+        for sp in special:
+            if sum(sp[i] for i in range(n)) &gt; 0 and sum(sp[i] * price[i] for i in range(n)) &gt; sp[-1]:
+                filtered_special.append(sp)
+
+        def backtrack(totalPrice, special_idx, remainder):
+            nonlocal result
+            if totalPrice &gt;= result:
+                return
+
+            for i in range(special_idx, len(filtered_special)):
+                updated_remainder = [num for num in remainder]
+                for j in range(len(remainder)):
+                    if filtered_special[i][j] &gt; remainder[j]:
+                        flag = False
+                        break
+                else:
+                    for k in range(len(updated_remainder)):
+                        updated_remainder[k] -= filtered_special[i][k]
+                    backtrack(totalPrice + filtered_special[i][-1], i, updated_remainder)
+
+            for k in range(len(remainder)):
+                totalPrice += price[k] * remainder[k]
+
+            result = min(result, totalPrice)
+
+        backtrack(0, 0, needs)
+        return result</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用回溯法来寻找最低花费的购买方案。首先，它过滤出那些实际可以节省费用的特殊包裹（即大礼包的总价值小于单独购买包含商品的价格）。然后，从每一个有效的大礼包开始递归尝试，同时更新剩余需要的物品数量和总花费。如果当前尝试的总价已经超过已知的最低价格，则提前结束该路径的探索。此外，如果不能再使用当前大礼包，它会尝试单独购买剩余的每种商品，并更新总花费。</p>
+                                <p>时间复杂度: O(2^m * n) 其中 m 是有效大礼包的数量，n 是物品种类的数量</p>
+                                <p>空间复杂度: O(m + n) 其中 m 是大礼包的数量，n 是物品种类的数量</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def shoppingOffers(self, price: List[int], special: List[List[int]], needs: List[int]) -&gt; int:
+#         result = float(&#39;inf&#39;)  # 最低花费的初始值设为无穷大
+#         filtered_special = []  # 过滤掉无法带来节省的大礼包
+#         n = len(needs)  # 物品种类数量
+#         for sp in special:
+#             if sum(sp[i] for i in range(n)) &gt; 0 and sum(sp[i] * price[i] for i in range(n)) &gt; sp[-1]:
+#                 filtered_special.append(sp)  # 只保留可以节省成本的大礼包
+
+#         def backtrack(totalPrice, special_idx, remainder):
+#             nonlocal result
+#             if totalPrice &gt;= result:
+#                 return  # 如果当前花费已经不是最优，停止当前路径的搜索
+
+#             for i in range(special_idx, len(filtered_special)):
+#                 updated_remainder = [num for num in remainder]  # 创建当前需要的物品数量的副本
+#                 for j in range(len(remainder)):
+#                     if filtered_special[i][j] &gt; remainder[j]:
+#                         flag = False
+#                         break
+#                 else:
+#                     for k in range(len(updated_remainder)):
+#                         updated_remainder[k] -= filtered_special[i][k]  # 更新剩余需求
+#                     backtrack(totalPrice + filtered_special[i][-1], i, updated_remainder)  # 递归尝试下一种大礼包
+
+#             for k in range(len(remainder)):
+#                 totalPrice += price[k] * remainder[k]  # 计算剩余物品的单独购买成本
+
+#             result = min(result, totalPrice)  # 更新最低花费
+
+#         backtrack(0, 0, needs)
+#         return result</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在过滤大礼包时，为什么要检查`sum(sp[i] * price[i] for i in range(n)) &gt; sp[-1]`？这个条件是怎样帮助确保节省成本的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件用来确保大礼包的购买成本低于单独购买包裹内所有商品的总成本。这里，`sum(sp[i] * price[i] for i in range(n))`计算的是如果单独购买大礼包中的每个商品需要支付的总价格，而`sp[-1]`是购买整个大礼包的价格。如果大礼包的价格低于单独购买所有商品的价格，那么购买大礼包就能节省开支。通过过滤掉那些不具备节省成本优势的大礼包，算法可以专注于那些真正能够减少总支出的购买方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            回溯函数中的`special_idx`参数具体是用来做什么的？如何影响递归过程中大礼包的选择？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`special_idx`参数在回溯函数中用于控制从哪个大礼包开始尝试，以避免重复尝试相同的大礼包组合。在递归过程中，每次调用`backtrack`都会从`special_idx`指定的索引开始，这样可以确保每一层递归都考虑所有未尝试过的大礼包。这种策略不仅避免了不必要的重复计算，还能确保算法能够探索所有可能的大礼包组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在尝试每个大礼包时需要创建`updated_remainder`的副本而不是直接修改`remainder`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回溯算法中，创建`updated_remainder`的副本是为了保持每一次函数调用的独立性和状态的不变，这样可以正确地返回上一层递归状态进行其他可能的尝试。如果直接修改`remainder`，那么在递归返回后，`remainder`的状态会被改变，这将影响其他递归路径的正确性和结果。使用副本可以确保每次尝试都是基于相同的初始状态，从而正确地探索所有可能的购买方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到如果当前花费已经不是最优则停止搜索，这种策略是如何帮助优化算法性能的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种策略是基于剪枝优化的一种实现。当在递归过程中发现当前总花费已经超过了已知的最低花费时，继续探索当前路径是没有意义的，因为它不可能产生更好的结果。通过提前终止这些不可能是最优解的搜索路径，可以显著减少不必要的计算量，从而提高算法的效率和性能。这种方法确保只有有希望成为最优解的路径才会被完全探索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/shopping-offers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/shopping-offers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>恢复二叉搜索树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>恢复二叉搜索树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-search-tree" class="badge bg-secondary tag-link">二叉搜索树</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你二叉搜索树的根节点 <code>root</code> ，该树中的 <strong>恰好</strong> 两个节点的值被错误地交换。<em>请在不改变其结构的情况下，恢复这棵树&nbsp;</em>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/10/28/recover1.jpg" style="width: 300px;" />
+<pre>
+<strong>输入：</strong>root = [1,3,null,null,2]
+<strong>输出：</strong>[3,1,null,null,2]
+<strong>解释：</strong>3 不能是 1 的左孩子，因为 3 &gt; 1 。交换 1 和 3 使二叉搜索树有效。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/10/28/recover2.jpg" style="height: 208px; width: 400px;" />
+<pre>
+<strong>输入：</strong>root = [3,1,4,null,null,2]
+<strong>输出：</strong>[2,1,4,null,null,3]
+<strong>解释：</strong>2 不能在 3 的右子树中，因为 2 &lt; 3 。交换 2 和 3 使二叉搜索树有效。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树上节点的数目在范围 <code>[2, 1000]</code> 内</li>
+	<li><code>-2<sup>31</sup> &lt;= Node.val &lt;= 2<sup>31</sup> - 1</code></li>
+</ul>
+
+
+
+<p><strong>进阶：</strong>使用 <code>O(n)</code> 空间复杂度的解法很容易实现。你能想出一个只使用&nbsp;<code>O(1)</code> 空间的解决方案吗？</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 68 ms</p>
+                    <p>内存: 15.3 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def recoverTree(self, root: Optional[TreeNode]) -&gt; None:
+        &#34;&#34;&#34;
+        Do not return anything, modify root in-place instead.
+        &#34;&#34;&#34;
+        lastNode = None
+        n1 = None
+        n2 = None
+
+        def helper(root):
+            nonlocal lastNode, n1, n2
+
+            if root is None:
+                return
+            helper(root.left)
+            if lastNode is not None and lastNode.val &gt; root.val:
+                if n1 is None:
+                    n1 = lastNode
+                n2 = root
+            lastNode = root
+            helper(root.right)
+        
+        helper(root)
+        n1.val, n2.val = n2.val, n1.val</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用中序遍历的方法来恢复二叉搜索树。在中序遍历二叉搜索树时，正常情况下节点值应该是递增的。如果出现节点值减小的情况，说明找到了被错误交换的两个节点。第一个错误节点是第一次发现节点值减小时的前一个节点，第二个错误节点是最后一次发现节点值减小时的当前节点。找到这两个节点后，交换它们的值即可恢复二叉搜索树。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def recoverTree(self, root: Optional[TreeNode]) -&gt; None:
+        &#34;&#34;&#34;
+        Do not return anything, modify root in-place instead.
+        &#34;&#34;&#34;
+        lastNode = None # 记录中序遍历的上一个节点
+        n1 = None # 第一个错误节点
+        n2 = None # 第二个错误节点
+
+        def helper(root):
+            nonlocal lastNode, n1, n2
+
+            if root is None:
+                return
+            helper(root.left) # 递归遍历左子树
+            if lastNode is not None and lastNode.val &gt; root.val: # 如果当前节点值小于上一个节点值
+                if n1 is None: # 如果是第一次发现错误，记录第一个错误节点
+                    n1 = lastNode 
+                n2 = root # 更新第二个错误节点为当前节点
+            lastNode = root # 更新上一个节点为当前节点
+            helper(root.right) # 递归遍历右子树
+        
+        helper(root) # 中序遍历二叉搜索树
+        n1.val, n2.val = n2.val, n1.val # 交换两个错误节点的值以恢复二叉搜索树</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在中序遍历中，如何准确地识别出第一个和第二个错误节点？请详细解释这两个节点的确定逻辑。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在中序遍历二叉搜索树时，节点的值应该连续递增。当发现一个节点的值小于前一个节点的值时，说明发生了逆序，这是错误节点的一个标志。第一次出现逆序时，前一个节点是第一个错误节点（因为它本应比后面的值小），而当前节点是一个疑似的第二个错误节点。如果之后再次发现逆序，那么更新当前节点为第二个错误节点。这种方式有效地识别出了两个位置错误的节点，第一次逆序的前一个节点和最后一次逆序的当前节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么可以确定只交换这两个节点的值就能恢复整个二叉搜索树的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二叉搜索树中，如果只有两个节点的位置被错误交换，那么这将导致中序遍历中出现一至两处逆序。通过交换这两个节点，原本被破坏的顺序被恢复，使得所有节点重新满足二叉搜索树的性质：每个节点的左子树中的所有值都小于该节点的值，并且其右子树的所有值都大于该节点的值。这样的交换足以修复由两个节点交换引起的任何顺序错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到在最坏的情况下，二叉搜索树可能退化为一条链。在这种情况下，递归方法的效率如何？是否有更优的方法来处理这种极端情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当二叉搜索树退化为一条链时，树的高度等于节点数，这意味着递归方法的空间复杂度为O(n)，因为需要相应的递归调用栈空间。这种情况下，递归方法效率较低。一种更优的方法是使用迭代的中序遍历，配合显式栈来控制空间复杂度。迭代方法可以有效地管理遍历过程，减少系统调用栈的使用，从而优化在极端情况下的空间效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果在中序遍历过程中只发现一次逆序，请问这种情况下如何处理？是否也是交换这一次逆序中涉及的两个节点的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果在中序遍历中只发现一次逆序，那么这次逆序涉及的两个节点就是错误交换的节点。在这种情况下，直接交换这两个节点的值就可以恢复树的正确性。这是因为只有一次逆序意味着只有这两个节点的位置是错误的，其余部分的顺序是正确的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/recover-binary-search-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/recover-binary-search-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>补给马车</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>补给马车</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        远征队即将开启未知的冒险之旅，不过在此之前，将对补给车队进行最后的检查。`supplies[i]` 表示编号为 `i` 的补给马车装载的物资数量。
+考虑到车队过长容易被野兽偷袭，他们决定将车队的长度变为原来的一半（向下取整），计划为：
+- 找出车队中 **物资之和最小** 两辆 **相邻** 马车，将它们车辆的物资整合为一辆。若存在多组物资之和相同的马车，则取编号最小的两辆马车进行整合；
+- 重复上述操作直到车队长度符合要求。
+
+请返回车队长度符合要求后，物资的分布情况。
+
+**示例 1：**
+>输入：`supplies = [7,3,6,1,8]`
+>
+>输出：`[10,15]`
+>
+>解释：
+> 第 1 次合并，符合条件的两辆马车为 6,1，合并后的车队为 [7,3,7,8]；
+> 第 2 次合并，符合条件的两辆马车为 (7,3) 和 (3,7)，取编号最小的 (7,3)，合并后的车队为 [10,7,8]；
+> 第 3 次合并，符合条件的两辆马车为 7,8，合并后的车队为 [10,15]；
+>返回 `[10,15]`
+
+**示例 2：**
+>输入：`supplies = [1,3,1,5]`
+>
+>输出：`[5,5]`
+
+**解释：**
+- `2 <= supplies.length <= 1000`
+- `1 <= supplies[i] <= 1000`
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 69 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">import heapq
+class Solution:
+    def supplyWagon(self, supplies: List[int]) -&gt; List[int]:
+        # m = {}
+        # for i in range(len(supplies)):
+        #     m[i] = supplies[i]
+        # def findNext(m, i, l):
+        #     r = i + 1
+        #     while r &lt; l and r not in m:
+        #         r += 1
+        #     return r
+        # l = len(supplies)
+        # bound = l
+        # while l != (len(supplies) &gt;&gt; 1):
+        #     i1 = 0
+        #     i2 = 0
+        #     r1 = 0
+        #     r2 = 0
+        #     ma = 100000
+        #     while i1 != bound - 1:
+        #         i2 = findNext(m, i1, bound)
+        #         if m[i1] + m[i2] &lt; ma:
+        #             ma = m[i1] + m[i2]
+        #             r1 = i1
+        #             r2 = i2
+        #         i1 = i2
+        #     m[r1] += m[r2]
+        #     del m[r2]
+        #     if r2 == bound - 1:
+        #         bound = r1 + 1
+        #     l -= 1
+        # arr = []
+        # for i, j in m.items():
+        #     arr.append([i,j])
+        # arr.sort(key=lambda x:x[0])
+        # r = [x[1] for x in arr]
+        # return r
+        def findPrev(supplies, i):
+            i -= 1
+            while i &gt;= 0 and supplies[i] == -1:
+                i -= 1
+            return i
+        def findNext(supplies, i):
+            i += 1
+            while i &lt; len(supplies) and supplies[i] == -1:
+                i += 1
+            return i
+        arr = [[supplies[i] + supplies[i + 1], i, i + 1] for i in range(len(supplies) - 1)]
+        heapq.heapify(arr)
+        l = (len(supplies) + 1) &gt;&gt; 1
+        i = 0
+        while i &lt; l:
+            t = heapq.heappop(arr)
+            while supplies[t[1]] + supplies[t[2]] != t[0]:
+                t = heapq.heappop(arr)
+            supplies[t[1]] += supplies[t[2]]
+            supplies[t[2]] = -1
+            prev = findPrev(supplies, t[1])
+            next = findNext(supplies, t[2])
+            if prev != -1:
+                heapq.heappush(arr, [supplies[prev] + supplies[t[1]], prev, t[1]])
+            if next != len(supplies):
+                heapq.heappush(arr, [supplies[next] + supplies[t[1]], t[1], next])
+            i += 1
+        r = []
+        for s in supplies:
+            if s != -1:
+                r.append(s)
+        return r</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了堆(heap)数据结构来优化寻找最小相邻马车对的过程。首先，创建一个列表，列表中的每个元素是一个包含两个相邻马车物资之和和它们的索引的元组。然后将这个列表转为一个堆结构，以便快速获取最小元素。在每次合并过程中，从堆中弹出最小元素(即物资之和最小的两个相邻马车)，然后进行合并操作。合并后，需要更新相关的马车对信息并重新加入堆中以保持堆的性质。合并过程持续进行直到车队长度减半。在整个过程中，使用-1标记已合并的马车，以便在计算过程中跳过它们。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">import heapq
+class Solution:
+    def supplyWagon(self, supplies: List[int]) -&gt; List[int]:
+        # Helper function to find the previous non-merged wagon
+        def findPrev(supplies, i):
+            i -= 1
+            while i &gt;= 0 and supplies[i] == -1:
+                i -= 1
+            return i
+        # Helper function to find the next non-merged wagon
+        def findNext(supplies, i):
+            i += 1
+            while i &lt; len(supplies) and supplies[i] == -1:
+                i += 1
+            return i
+        # Initialize the min-heap with the sum of every two adjacent wagons
+        arr = [[supplies[i] + supplies[i + 1], i, i + 1] for i in range(len(supplies) - 1)]
+        heapq.heapify(arr)
+        # Calculate the target length after all merges
+        l = (len(supplies) + 1) &gt;&gt; 1
+        i = 0
+        while i &lt; l:
+            # Get the smallest pair from the heap
+            t = heapq.heappop(arr)
+            # Check if the pair is still valid
+            while supplies[t[1]] + supplies[t[2]] != t[0]:
+                t = heapq.heappop(arr)
+            # Merge the two wagons
+            supplies[t[1]] += supplies[t[2]]
+            supplies[t[2]] = -1
+            # Update the heap with new possible pairs
+            prev = findPrev(supplies, t[1])
+            next = findNext(supplies, t[2])
+            if prev != -1:
+                heapq.heappush(arr, [supplies[prev] + supplies[t[1]], prev, t[1]])
+            if next != len(supplies):
+                heapq.heappush(arr, [supplies[next] + supplies[t[1]], t[1], next])
+            i += 1
+        # Collect non-merged wagons for the result
+        r = []
+        for s in supplies:
+            if s != -1:
+                r.append(s)
+        return r</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在您的解决方案中，如何确保每次从堆中取出的元素依然代表当前未合并车队中的最小相邻马车对？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解决方案中，每次从堆中取出元素后，都会进行验证以确保这些马车未被合并，并且它们的物资之和仍然是最新的。验证过程中，如果发现取出的马车对的物资之和已经变化（可能由于其中一个马车已经与其他马车合并），则继续从堆中取出下一个元素，并进行同样的验证。这个过程一直持续到找到一个有效的、当前最小的相邻马车对。这种办法通过循环验证来确保每次处理的马车对都是当前未合并车队中的最小对。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在合并过程中，如果一个已经合并的马车对紧邻另一对需要合并的马车，这种情况下如何处理并确保数据的准确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>合并过程中，当发现一个已经合并的马车紧邻另一对需要合并的马车时，解决方案中使用了两个辅助函数（findPrev和findNext）来找到任一马车左边或右边最近的未合并马车。这样，在每次合并后，通过这些辅助函数更新相邻的马车对，并将这些新的马车对重新加入堆中。这确保了数据的准确性，避免了因已合并的马车对干扰合并逻辑从而引发错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            程序中提到使用-1来标记已合并的马车，这种方法在某些情况下是否可能导致错误的跳过或重复计算？具体是在哪些情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用-1标记已合并的马车是一种常见的方法来标识某些元素不应被进一步处理。在本程序中，如果没有正确使用辅助函数findPrev和findNext来找到有效的未合并马车，可能会导致重复计算或错误跳过。例如，如果直接访问数组中的前一个或下一个元素而没有检查它是否标记为-1，就可能错误地对已合并的马车进行操作。因此，正确地实现和使用这些辅助函数是确保程序准确性的关键。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/hqCnmP')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/hqCnmP/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

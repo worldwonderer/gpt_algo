@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最佳运动员的比拼回合</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最佳运动员的比拼回合</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p><code>n</code> 名运动员参与一场锦标赛，所有运动员站成一排，并根据 <strong>最开始的</strong> 站位从 <code>1</code> 到 <code>n</code> 编号（运动员 <code>1</code> 是这一排中的第一个运动员，运动员 <code>2</code> 是第二个运动员，依此类推）。</p>
+
+<p>锦标赛由多个回合组成（从回合 <code>1</code> 开始）。每一回合中，这一排从前往后数的第 <code>i</code> 名运动员需要与从后往前数的第 <code>i</code> 名运动员比拼，获胜者将会进入下一回合。如果当前回合中运动员数目为奇数，那么中间那位运动员将轮空晋级下一回合。</p>
+
+<ul>
+	<li>例如，当前回合中，运动员 <code>1, 2, 4, 6, 7</code> 站成一排
+
+	<ul>
+		<li>运动员 <code>1</code> 需要和运动员 <code>7</code> 比拼</li>
+		<li>运动员 <code>2</code> 需要和运动员 <code>6</code> 比拼</li>
+		<li>运动员 <code>4</code> 轮空晋级下一回合</li>
+	</ul>
+	</li>
+</ul>
+
+<p>每回合结束后，获胜者将会基于最开始分配给他们的原始顺序（升序）重新排成一排。</p>
+
+<p>编号为 <code>firstPlayer</code> 和 <code>secondPlayer</code> 的运动员是本场锦标赛中的最佳运动员。在他们开始比拼之前，完全可以战胜任何其他运动员。而任意两个其他运动员进行比拼时，其中任意一个都有获胜的可能，因此你可以 <strong>裁定</strong> 谁是这一回合的获胜者。</p>
+
+<p>给你三个整数 <code>n</code>、<code>firstPlayer</code> 和 <code>secondPlayer</code> 。返回一个由两个值组成的整数数组，分别表示两位最佳运动员在本场锦标赛中比拼的 <strong>最早</strong> 回合数和 <strong>最晚</strong> 回合数。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>n = 11, firstPlayer = 2, secondPlayer = 4
+<strong>输出：</strong>[3,4]
+<strong>解释：</strong>
+一种能够产生最早回合数的情景是：
+回合 1：1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+回合 2：2, 3, 4, 5, 6, 11
+回合 3：2, 3, 4
+一种能够产生最晚回合数的情景是：
+回合 1：1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+回合 2：1, 2, 3, 4, 5, 6
+回合 3：1, 2, 4
+回合 4：2, 4
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>n = 5, firstPlayer = 1, secondPlayer = 5
+<strong>输出：</strong>[1,1]
+<strong>解释：</strong>两名最佳运动员 1 和 5 将会在回合 1 进行比拼。
+不存在使他们在其他回合进行比拼的可能。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 28</code></li>
+	<li><code>1 &lt;= firstPlayer &lt; secondPlayer &lt;= n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def earliestAndLatest(self, n: int, firstPlayer: int, secondPlayer: int) -&gt; List[int]:
+        @cache
+        def f(n,a,b):
+            if a+b==n+1:
+                return [1,1]
+            if a&gt;n//2 and b&gt;n//2:
+                a=n+1-a 
+                b=n+1-b 
+            if a&gt;b:
+                a,b=b,a
+            if a&gt;n+1-b:
+                a,b=n+1-b,n+1-a
+            mi=inf 
+            ma=0
+            low=0
+            up=b-a
+            if b&gt;(n+1)//2:
+                low=b-(n+1)//2
+                up=low+n+1-b-a
+            for i in range(a):
+                for j in range(low,up):
+                    x,y=f((n+1)//2,a-i,b-i-j)
+                    mi=min(mi,x+1)
+                    ma=max(ma,y+1)
+            return mi,ma 
+        return f(n,firstPlayer,secondPlayer)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了记忆化搜索的方法。函数f(n, a, b)表示在n个运动员中，编号为a和b的两个最佳运动员比拼的最早和最晚回合数。函数首先处理一些边界情况，然后枚举a和b之间的其他运动员，递归计算子问题的结果，最后返回最早和最晚回合数。通过记忆化搜索避免了重复计算相同子问题，提高了效率。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def earliestAndLatest(self, n: int, firstPlayer: int, secondPlayer: int) -&gt; List[int]:
+        @cache
+        def f(n, a, b):
+            # 如果a和b的编号之和等于n+1，说明他们是最后两个运动员，直接比拼，回合数为1
+            if a + b == n + 1:
+                return [1, 1]
+            
+            # 如果a和b都在后半部分，可以将问题转化为前半部分的等价问题
+            if a &gt; n // 2 and b &gt; n // 2:
+                a = n + 1 - a 
+                b = n + 1 - b
+            
+            # 确保a的编号小于b
+            if a &gt; b:
+                a, b = b, a
+            
+            # 如果a和n+1-b之间的运动员数量较少，可以交换a和n+1-b，减少枚举次数
+            if a &gt; n + 1 - b:
+                a, b = n + 1 - b, n + 1 - a
+            
+            mi = inf 
+            ma = 0
+            low = 0
+            up = b - a
+            
+            # 确定枚举的范围
+            if b &gt; (n + 1) // 2:
+                low = b - (n + 1) // 2
+                up = low + n + 1 - b - a
+            
+            # 枚举a和b之间的其他运动员，递归计算子问题的结果
+            for i in range(a):
+                for j in range(low, up):
+                    x, y = f((n + 1) // 2, a - i, b - i - j)
+                    mi = min(mi, x + 1)
+                    ma = max(ma, y + 1)
+            
+            return mi, ma
+        
+        return f(n, firstPlayer, secondPlayer)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在比拼中最佳运动员总是可以赢过其他运动员，但其他运动员之间获胜的可能性却是随机的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个假设通常用于简化问题模型，使得某些特定运动员（即最佳运动员）的比较结果可预测，而不需要涉及更复杂的随机或概率计算。这样的设定减少了问题的复杂性，使得可以聚焦于算法逻辑和策略的设计，而不是每个运动员之间的具体比拼结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当运动员数目为偶数时，为什么没有运动员轮空，这对比赛结果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当运动员数目为偶数时，每个回合中所有运动员都可以找到对手进行比拼，因此没有运动员需要轮空。这意味着比赛可以更公平地进行，每位运动员都有相同数量的比赛机会。不存在轮空的情况有助于确保比赛的连续性和公正性，每个回合所有运动员都参与比赛，保持比赛的活跃和竞争性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到当`a + b == n + 1`时，a和b直接比拼，能否解释一下为什么这种情况下他们必定是最后两个运动员？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题的上下文中，如果`a + b == n + 1`，这意味着a和b的位置正好是相对的，即一个在赛程的开始，另一个在赛程的结束。例如，如果有5个运动员，第1个和第5个（1 + 5 = 6 = 5 + 1）是对立面。在进行比赛时，按照这种配对方式，他们会在所有其他可能的比拼都完成后才会相遇，因此他们是最后两个进行比赛的运动员。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在处理边界情况时，需要将运动员a和b的位置调换保证a &lt; b？这样做的具体好处是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将运动员a和b的位置调换来保证a &lt; b的主要原因是为了简化问题处理过程。这样做可以减少需要考虑的情况数，使得算法可以统一处理所有情况而无需分别考虑a和b的大小关系。这对于提高代码的可读性和减少错误非常有帮助，同时也简化了递归函数的设计，因为只需要考虑一种情况（a &lt; b）即可。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-earliest-and-latest-rounds-where-players-compete')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-earliest-and-latest-rounds-where-players-compete/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

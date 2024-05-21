@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>按递增顺序显示卡牌</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>按递增顺序显示卡牌</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>牌组中的每张卡牌都对应有一个唯一的整数。你可以按你想要的顺序对这套卡片进行排序。</p>
+
+<p>最初，这些卡牌在牌组里是正面朝下的（即，未显示状态）。</p>
+
+<p>现在，重复执行以下步骤，直到显示所有卡牌为止：</p>
+
+<ol>
+	<li>从牌组顶部抽一张牌，显示它，然后将其从牌组中移出。</li>
+	<li>如果牌组中仍有牌，则将下一张处于牌组顶部的牌放在牌组的底部。</li>
+	<li>如果仍有未显示的牌，那么返回步骤 1。否则，停止行动。</li>
+</ol>
+
+<p>返回能以<strong>递增顺序</strong>显示卡牌的牌组顺序。</p>
+
+<p>答案中的第一张牌被认为处于牌堆顶部。</p>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>[17,13,11,2,3,5,7]
+<strong>输出：</strong>[2,13,3,11,5,17,7]
+<strong>解释：
+</strong>我们得到的牌组顺序为 [17,13,11,2,3,5,7]（这个顺序不重要），然后将其重新排序。
+重新排序后，牌组以 [2,13,3,11,5,17,7] 开始，其中 2 位于牌组的顶部。
+我们显示 2，然后将 13 移到底部。牌组现在是 [3,11,5,17,7,13]。
+我们显示 3，并将 11 移到底部。牌组现在是 [5,17,7,13,11]。
+我们显示 5，然后将 17 移到底部。牌组现在是 [7,13,11,17]。
+我们显示 7，并将 13 移到底部。牌组现在是 [11,17,13]。
+我们显示 11，然后将 17 移到底部。牌组现在是 [13,17]。
+我们展示 13，然后将 17 移到底部。牌组现在是 [17]。
+我们显示 17。
+由于所有卡片都是按递增顺序排列显示的，所以答案是正确的。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ol>
+	<li><code>1 &lt;= A.length &lt;= 1000</code></li>
+	<li><code>1 &lt;= A[i] &lt;= 10^6</code></li>
+	<li>对于所有的&nbsp;<code>i != j</code>，<code>A[i] != A[j]</code></li>
+</ol>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def deckRevealedIncreasing(self,nums: List[int]) -&gt; List[int]:
+        n=len(nums)
+        nums.sort()
+        ans=[0]*n
+        d=deque(range(n))
+        for v in nums:
+            ans[d.popleft()]=v
+            if d:
+                d.append(d.popleft())
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的核心思想是模拟牌组的重排过程，但是反向操作。首先对数组进行排序，确保最终的顺序是递增的。然后使用一个双端队列（deque）来模拟牌组的索引。队列的每个元素代表牌组中卡牌的位置，初始状态是0到n-1的顺序。对于排序后的数组，我们按顺序取出每个元素：1) 将队列的前端元素（当前顶部的卡牌位置）弹出并填充到结果数组的相应位置；2) 如果队列还有元素，则将队列的新前端元素（下一个顶部的卡牌位置）移动到队列的尾部，模拟将牌放到底部的动作。重复这个过程直到所有的卡牌都被处理过。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def deckRevealedIncreasing(self, nums: List[int]) -&gt; List[int]:
+        n = len(nums)  # 获取牌的数量
+        nums.sort()  # 对卡牌排序以确保最终展示顺序为递增
+        ans = [0] * n  # 初始化结果数组
+        d = deque(range(n))  # 使用deque模拟卡牌的索引
+        for v in nums:  # 遍历排序后的卡牌值
+            ans[d.popleft()] = v  # 将当前最小的卡牌放到正确的位置
+            if d:  # 如果还有卡牌在队列中
+                d.append(d.popleft())  # 模拟将下一张卡牌放到牌组底部的操作
+        return ans  # 返回最终的牌组顺序</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到了使用双端队列（deque）来模拟牌组的索引，双端队列在这个算法中的作用是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双端队列（deque）在这个算法中的主要作用是模拟和管理牌的索引，以便按照题目要求的顺序来重新排列卡牌。通过使用双端队列，算法可以轻松地从两端添加或删除元素。在这个特定的算法中，deque允许我们有效地从队列前端移除元素，用于确定当前卡牌的位置，并且可以将元素从前端移除后再添加到尾端，这模拟了将牌放到堆的底部的操作。这种操作是必要的，因为题目要求按照特定方式展示卡牌，而双端队列提供了实现这一逻辑的简洁方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么需要将队列的新前端元素移动到队列的尾部，这个操作与实际的牌组操作有什么关联？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将队列的新前端元素移动到队列的尾部的操作模拟了现实中将牌的顶部卡牌放到牌堆底部的动作。在题目的牌组重排过程中，每次展示一张牌后，下一张位于顶部的牌被放到底部，这样可以确保下次抽取牌时，顶部的牌是正确的。这个操作是重现题目要求的卡牌展示顺序的关键步骤，确保每次揭示的顺序符合题目要求的递增顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解的算法中，对于排序后的数组，为什么可以通过简单地按顺序取出元素并调整队列来达到题目要求的输出？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的算法首先将数组排序，确保数字的递增顺序。这样，当数组元素按排序顺序被放置到结果数组中时，可以保证结果数组是递增的。通过使用双端队列来调整每次揭示卡牌后牌的顺序，算法模拟了一个循环过程，其中每次揭示后顶部的卡牌移动到底部。这种循环和排列方法确保了每次从队列中移除的顶部元素正好是下次应当揭示的位置。因此，排序数组的元素可以按照这种方式逐一正确放置，满足题目的输出要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/reveal-cards-in-increasing-order')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/reveal-cards-in-increasing-order/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

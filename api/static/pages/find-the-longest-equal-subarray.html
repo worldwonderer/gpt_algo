@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找出最长等值子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找出最长等值子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code> 和一个整数 <code>k</code> 。</p>
+
+<p>如果子数组中所有元素都相等，则认为子数组是一个 <strong>等值子数组</strong> 。注意，空数组是 <strong>等值子数组</strong> 。</p>
+
+<p>从 <code>nums</code> 中删除最多 <code>k</code> 个元素后，返回可能的最长等值子数组的长度。</p>
+
+<p><strong>子数组</strong> 是数组中一个连续且可能为空的元素序列。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,3,2,3,1,3], k = 3
+<strong>输出：</strong>3
+<strong>解释：</strong>最优的方案是删除下标 2 和下标 4 的元素。
+删除后，nums 等于 [1, 3, 3, 3] 。
+最长等值子数组从 i = 1 开始到 j = 3 结束，长度等于 3 。
+可以证明无法创建更长的等值子数组。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,1,2,2,1,1], k = 2
+<strong>输出：</strong>4
+<strong>解释：</strong>最优的方案是删除下标 2 和下标 3 的元素。 
+删除后，nums 等于 [1, 1, 1, 1] 。 
+数组自身就是等值子数组，长度等于 4 。 
+可以证明无法创建更长的等值子数组。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= nums.length</code></li>
+	<li><code>0 &lt;= k &lt;= nums.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 311 ms</p>
+                    <p>内存: 36.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def longestEqualSubarray(self, nums: List[int], k: int) -&gt; int:
+        D = defaultdict(list)
+        for i in range(len(nums)):
+            D[nums[i]].append(i)
+        res = 0
+        for x in D.keys():
+            d = D[x]
+            if len(d) &lt;= res: continue
+            j = 0
+            for i in range(len(d)):
+                if d[i]-d[j]+1 - (i-j+1) &gt; k:
+                    j+= 1
+                res = max(res, i - j + 1)
+        return res
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的基本思路是使用一个哈希表（通过defaultdict实现）来存储数组中每个元素的所有索引。接着，对于哈希表中的每个元素，使用一个滑动窗口的方法来找到包含最多k个非该元素的最长子数组。具体来说，哈希表的键是元素值，值是该元素在数组中出现的所有位置的索引列表。然后，对于每个键值对，使用双指针技术（滑动窗口）来计算在最多删除k个其他元素的条件下，可以形成的最长等值子数组的长度。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def longestEqualSubarray(self, nums: List[int], k: int) -&gt; int:
+        D = defaultdict(list) # 创建一个默认字典，用于存储每个元素及其对应的索引列表
+        for i in range(len(nums)): # 遍历数组，填充字典
+            D[nums[i]].append(i)
+        res = 0 # 初始化结果变量
+        for x in D.keys(): # 遍历字典的每个键
+            d = D[x] # 获取当前元素的索引列表
+            if len(d) &lt;= res: continue # 如果当前元素的出现次数小于或等于已找到的最长长度，则跳过
+            j = 0 # 初始化滑动窗口的起始指针
+            for i in range(len(d)): # 遍历索引列表
+                while d[i]-d[j]+1 - (i-j+1) &gt; k: # 如果当前窗口内非x元素的数量超过k，则移动起始指针
+                    j += 1
+                res = max(res, i - j + 1) # 更新最长等值子数组的长度
+        return res # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决这个问题时，为什么选择使用哈希表来存储元素及其索引，而不是其他数据结构如数组或链表？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表（或字典）提供高效的查找和插入操作，平均时间复杂度为O(1)。使用哈希表可以快速访问任何元素的所有索引，这对于算法中频繁的元素查找和索引访问非常有用。相比之下，如果使用数组或链表，查找特定值的所有出现或其索引可能需要O(n)的时间复杂度，这会显著增加算法的总体运行时间。因此，哈希表是一种更优的数据结构选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            哈希表中的键是元素值，值是索引列表。在实现滑动窗口时，如何有效处理索引列表以确保窗口内最多只有k个非当前元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在滑动窗口实现中，维护两个指针i和j，分别代表窗口的结束和开始位置。通过遍历索引列表，指针i逐步向右移动，扩大窗口。当窗口中非当前元素的数量超过k时（计算方法是窗口长度减去窗口中当前元素的数量，即d[i]-d[j]+1 - (i-j+1)），开始移动指针j以缩小窗口，直到非当前元素的数量不超过k为止。这种方法确保了每次计算窗口长度时，窗口内最多包含k个非当前元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新最长等值子数组长度时，为什么选择使用`max(res, i - j + 1)`来计算长度？这里的计算逻辑是怎样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`max(res, i - j + 1)`这个表达式用于更新并保持最长等值子数组的最大长度。这里，`i - j + 1`计算的是当前考虑的等值子数组的长度，从索引j到i。每次遍历新的索引i时，都会用当前子数组的长度与之前记录的最大长度res进行比较，并更新res为两者之间的较大值。这确保了res始终保持为遍历过程中遇到的最长等值子数组的长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际编码中，如果数组`nums`中存在重复元素的索引列表长度远小于数组长度，这种情况是否会影响算法的效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果某个元素的出现次数较少，那么其索引列表长度较小，这对算法的效率是有利的。因为对于这些元素，滑动窗口操作需要处理的数据量减少，从而减少了计算量。然而，如果数组中大部分元素都是这种情况，那么虽然单个元素处理速度快，但需要处理的元素种类可能很多，从而增加总的处理时间。总体来说，算法的效率与数组中元素的分布和重复情况有关，索引列表较短通常有助于提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-longest-equal-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-longest-equal-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>戳气球</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>戳气球</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有 <code>n</code> 个气球，编号为<code>0</code> 到 <code>n - 1</code>，每个气球上都标有一个数字，这些数字存在数组&nbsp;<code>nums</code>&nbsp;中。</p>
+
+<p>现在要求你戳破所有的气球。戳破第 <code>i</code> 个气球，你可以获得&nbsp;<code>nums[i - 1] * nums[i] * nums[i + 1]</code> 枚硬币。&nbsp;这里的 <code>i - 1</code> 和 <code>i + 1</code> 代表和&nbsp;<code>i</code>&nbsp;相邻的两个气球的序号。如果 <code>i - 1</code>或 <code>i + 1</code> 超出了数组的边界，那么就当它是一个数字为 <code>1</code> 的气球。</p>
+
+<p>求所能获得硬币的最大数量。</p>
+
+
+<strong>示例 1：</strong>
+
+<pre>
+<strong>输入：</strong>nums = [3,1,5,8]
+<strong>输出：</strong>167
+<strong>解释：</strong>
+nums = [3,1,5,8] --&gt; [3,5,8] --&gt; [3,8] --&gt; [8] --&gt; []
+coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,5]
+<strong>输出：</strong>10
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>1 &lt;= n &lt;= 300</code></li>
+	<li><code>0 &lt;= nums[i] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1095 ms</p>
+                    <p>内存: 17.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxCoins(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        nums += [1, 1]
+        dp = [[0] * (n + 2) for _ in range(n + 2)]
+        for i in range(n - 2, -2, -1):
+            for j in range(i + 2, n + 1):
+                numsij = nums[i] * nums[j]
+                dpij = 0
+                for k in range(i + 1, j):
+                    ikj = dp[i][k] + dp[k][j] + numsij * nums[k]
+                    if ikj &gt; dpij:
+                        dpij = ikj
+                dp[i][j] = dpij
+        return dp[-1][n]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用动态规划来解决戳气球问题。主要思路是：考虑最后戳破的气球是哪个，假设是第 k 个气球，那么状态转移方程就是 dp[i][j] = max(dp[i][k] + dp[k][j] + nums[i] * nums[k] * nums[j])，其中 dp[i][j] 表示戳破 (i, j) 范围内的所有气球能得到的最大硬币数，k 是 (i, j) 范围内最后一个戳破的气球。根据状态转移方程写出代码即可。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxCoins(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        nums += [1, 1]  # 在原数组左右各加一个1，简化边界条件判断
+        dp = [[0] * (n + 2) for _ in range(n + 2)]  # 初始化dp数组
+        for i in range(n - 2, -2, -1):  # 开区间(i, j)从下往上遍历
+            for j in range(i + 2, n + 1):
+                numsij = nums[i] * nums[j]  # 提前计算 nums[i]*nums[j]，避免重复计算
+                dpij = 0
+                for k in range(i + 1, j):  # k作为(i, j)范围内最后戳破的气球
+                    ikj = dp[i][k] + dp[k][j] + numsij * nums[k]  # 状态转移方程
+                    if ikj &gt; dpij:
+                        dpij = ikj
+                dp[i][j] = dpij
+        return dp[-1][n]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解题时选择动态规划方法而非贪心或回溯算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择动态规划方法是因为戳气球问题涉及到多个选择与决策的顺序，这些决策之间存在重叠的子问题，并且具有最优子结构特性。贪心算法虽然在某些步骤可能找到局部最优解，但它不能保证全局最优解，因为戳破一个气球的决策会影响后续的选择。回溯算法能够遍历所有可能的选择，但其时间复杂度通常非常高，不适合解决问题规模较大的情况。动态规划通过建立状态转移方程，逐步求解，避免了重复计算，因此在时间和空间效率上更优。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划的过程中，如何确保所有情况都被考虑到，特别是在选择最后一个戳破的气球k时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划过程中，确保所有情况都被考虑到的关键是通过妥善的循环结构来遍历所有可能的状态。对于每一对(i, j)，我们考虑所有可能的k（i &lt; k &lt; j），使得k是(i, j)区间内最后一个被戳破的气球。通过从较小的子区间开始计算，逐步扩展到更大的子区间，我们可以确保在计算dp[i][j]时，dp[i][k]和dp[k][j]已经被计算过，从而保证了计算的正确性和完整性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            动态规划数组`dp`的初始化为什么是0，这是否意味着在任何开始和结束位置之间没有气球的情况下硬币数为0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，dp数组初始化为0的确是因为在任何开始(i)和结束(j)位置之间，如果没有气球存在（即i直接连接到j，中间没有k可以选择），那么该区间能够获得的硬币数自然为0。这种初始化方式简化了边界条件的处理，并且符合问题的逻辑，即没有气球可以戳破时，收益为零。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到加入两个值为1的气球来简化边界条件，这种处理方式是否会影响最终的最大硬币计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>加入两个值为1的气球是为了简化边界条件处理，这些边界气球不会影响最终计算的结果。加入这些气球后，我们可以假设所有的戳气球操作都是在一个完整的框架内执行的，即每个子问题的边界都有气球存在。这样可以避免在实现时对边界情况进行特殊处理，简化代码逻辑。实际上，这些边界气球的戳破只会在最初和最后发生，且它们的值设为1，所以对于计算其他气球带来的硬币总数没有直接影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/minimum-cost-to-merge-stones" class="list-group-item list-group-item-action">
+                                合并石头的最低成本
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/burst-balloons')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/burst-balloons/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

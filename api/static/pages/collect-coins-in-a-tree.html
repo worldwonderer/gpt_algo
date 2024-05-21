@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>收集树中金币</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>收集树中金币</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>n</code>&nbsp;个节点的无向无根树，节点编号从&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;。给你整数&nbsp;<code>n</code>&nbsp;和一个长度为 <code>n - 1</code>&nbsp;的二维整数数组 <code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>]</code>&nbsp;表示树中节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code>&nbsp;之间有一条边。再给你一个长度为 <code>n</code>&nbsp;的数组&nbsp;<code>coins</code>&nbsp;，其中&nbsp;<code>coins[i]</code> 可能为&nbsp;<code>0</code>&nbsp;也可能为&nbsp;<code>1</code>&nbsp;，<code>1</code>&nbsp;表示节点 <code>i</code>&nbsp;处有一个金币。</p>
+
+<p>一开始，你需要选择树中任意一个节点出发。你可以执行下述操作任意次：</p>
+
+<ul>
+	<li>收集距离当前节点距离为 <code>2</code>&nbsp;以内的所有金币，或者</li>
+	<li>移动到树中一个相邻节点。</li>
+</ul>
+
+<p>你需要收集树中所有的金币，并且回到出发节点，请你返回最少经过的边数。</p>
+
+<p>如果你多次经过一条边，每一次经过都会给答案加一。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/03/01/graph-2.png" style="width: 522px; height: 522px;"></p>
+
+<pre><b>输入：</b>coins = [1,0,0,0,0,1], edges = [[0,1],[1,2],[2,3],[3,4],[4,5]]
+<b>输出：</b>2
+<b>解释：</b>从节点 2 出发，收集节点 0 处的金币，移动到节点 3 ，收集节点 5 处的金币，然后移动回节点 2 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/03/02/graph-4.png" style="width: 522px; height: 522px;"></p>
+
+<pre><b>输入：</b>coins = [0,0,0,1,1,0,0,1], edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[5,6],[5,7]]
+<b>输出：</b>2
+<b>解释：</b>从节点 0 出发，收集节点 4 和 3 处的金币，移动到节点 2 处，收集节点 7 处的金币，移动回节点 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == coins.length</code></li>
+	<li><code>1 &lt;= n &lt;= 3 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= coins[i] &lt;= 1</code></li>
+	<li><code>edges.length == n - 1</code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt; n</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li><code>edges</code>&nbsp;表示一棵合法的树。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 197 ms</p>
+                    <p>内存: 28.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def collectTheCoins(self, coins: List[int], edges: List[List[int]]) -&gt; int:
+        # 拓扑排序去掉所有没有金币的叶子节点
+
+        # 跑两轮拓扑排序，相当于去掉距离为2以内的点（选取这些点一定不是最优的）
+
+        n=len(coins)
+        e=[[]for _ in range(n)];ni=[0]*n
+
+        for a,b in edges:
+            e[a].append(b)
+            e[b].append(a)
+            ni[a]+=1
+            ni[b]+=1
+        
+        has_bian=n-1
+
+        #拓扑排序去无金币叶子节点
+        q=deque()
+        for i in range(n):
+            if coins[i]==0 and ni[i]==1:    #既没有金币也是叶子节点的点去掉（加入队列）
+                q.append(i)
+                has_bian-=1
+        
+        while q:
+            node=q.popleft()
+            for j in e[node]:
+                ni[j]-=1
+                if coins[j]==0 and ni[j]==1:    #满足条件，加入队列
+                    q.append(j)
+                    has_bian-=1
+        
+        #跑两遍拓扑排序，剩余边数乘2就是答案（一来一回就2遍），q已经是空的了，可以再用
+        # 可以等价于bfs再遍历该点的邻居
+        for i in range(n):
+            if ni[i]==1 and coins[i]==1:    #要去除的是有金币的叶子节点，不要重复统计已删掉的    
+                q.append(i)
+                has_bian-=1
+
+        for ix in q:
+            for jx in e[ix]:
+                ni[jx]-=1
+                if ni[jx]==1:           #这个点是第二轮的叶子，删掉
+                    has_bian-=1
+        
+        return max(0,has_bian)*2          #最多可删除所有点，会得到负数，与0取一个max</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的思路是通过拓扑排序来去除树中那些对解决问题没有直接帮助的节点，即那些没有金币且只有一个邻居（叶节点）的节点。首先，构建邻接表和每个节点的邻居数。然后，将所有没有金币的叶子节点加入队列，并通过拓扑排序逐个移除这些节点。经过一轮拓扑排序后，对剩下的树再进行一轮拓扑排序，特别处理有金币的叶子节点。最后，根据剩余的边数计算答案（来回各一次，所以乘以2），返回需要经过的最少边数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def collectTheCoins(self, coins: List[int], edges: List[List[int]]) -&gt; int:
+        # 初始化邻接表和节点入度计数器
+        n = len(coins)
+        e = [[] for _ in range(n)]
+        ni = [0] * n
+        # 构建图的邻接表和更新节点的邻接数
+        for a, b in edges:
+            e[a].append(b)
+            e[b].append(a)
+            ni[a] += 1
+            ni[b] += 1
+        # 拓扑排序初始化
+        q = deque()
+        # 查找并移除没有金币的叶子节点
+        for i in range(n):
+            if coins[i] == 0 and ni[i] == 1:
+                q.append(i)
+        # 进行拓扑排序，移除这些节点
+        while q:
+            node = q.popleft()
+            for j in e[node]:
+                ni[j] -= 1
+                if coins[j] == 0 and ni[j] == 1:
+                    q.append(j)
+        # 对有金币的叶子节点进行特别处理
+        for i in range(n):
+            if ni[i] == 1 and coins[i] == 1:
+                q.append(i)
+        # 再次拓扑排序处理
+        while q:
+            ix = q.popleft()
+            for jx in e[ix]:
+                ni[jx] -= 1
+                if ni[jx] == 1:
+                    q.append(jx)
+        # 计算剩余边数的两倍作为结果
+        has_bian = max(0, sum(ni)) # 计算剩余的边数
+        return has_bian * 2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，你是如何确定哪些节点是&#39;没有直接帮助的节点&#39;？是否有一些特定的标准或条件来定义这些节点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，被定义为&#39;没有直接帮助的节点&#39;的是那些没有金币且只有一个邻居（即叶节点）的节点。这些节点被认为对收集金币的最终目标没有贡献。因此，在拓扑排序的过程中，首先将这些节点识别并从图中移除，这样可以简化问题规模，同时减少不必要的遍历。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            拓扑排序通常用于处理有向图中的依赖关系。在这个无向树的问题中，拓扑排序是如何应用的？具体是如何操作的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>虽然拓扑排序通常用于有向图，但在这个问题中，它被用来逐层剥离无向树的外围叶节点。具体操作是，首先建立每个节点的邻接关系和邻居计数。然后，将所有无金币的叶节点（只有一个邻居的节点）加入队列，并逐一从队列中移除这些节点，同时更新其邻居的邻居计数。如果邻居节点因此变成了新的叶节点，且也没有金币，它们也会被加入队列进行后续移除。这种方法可以看作是树的层次剥离过程，逐步减少树的大小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到了&#39;对有金币的叶子节点进行特别处理&#39;，能详细解释一下这种处理的具体逻辑和必要性吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在拓扑排序后，对于那些依然保留有金币的叶节点，需要进行特别处理。这些节点是收集金币过程中的关键节点，因为它们是路径的必经之地。特别处理的逻辑是，将这些有金币的叶节点视为新的起点，再次执行拓扑排序，继续移除那些因为这个过程变成新的叶节点的节点。这是必要的，因为它确保了所有有金币的节点都被考虑在内，并且优化了必须经过的路径长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在进行拓扑排序时，如果一个节点既有金币又只有一个邻居，这种情况下的处理策略是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果一个节点既有金币又只有一个邻居，这个节点不会在初次拓扑排序中被移除，因为它含有金币是必需的。在后续处理中，这类节点会被保留，并作为重要节点对待，因为它们是搜集路径的关键部分。即使它们是叶节点，也需要保留，因为它们对整体任务来说是价值节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/collect-coins-in-a-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/collect-coins-in-a-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

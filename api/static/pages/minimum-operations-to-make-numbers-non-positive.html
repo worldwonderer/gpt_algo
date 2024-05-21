@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>使数字变为非正数的最小操作次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>使数字变为非正数的最小操作次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 460 ms</p>
+                    <p>内存: 30.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minOperations(self, nums: List[int], x: int, y: int) -&gt; int:
+        def check(k):
+            ans = 0
+            for a in nums:
+                a -= k*y
+                if a&gt;0:
+                    ans += (a-1)//(x-y)+1
+                    if ans&gt;k:
+                        return False
+            return True
+
+        return bisect_left(range(max(nums)//y+1),True,key=check)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用了二分查找和贪心算法的结合。首先，定义一个内部函数 check(k)，该函数用于检查是否可以通过至多 k 次操作将所有数字减至不大于 0。在每次操作中，可以选择将任一数字减去 y 或 x-y（如果 x&gt;y）。函数 check 遍历每个数字，首先将数字减去 k*y，然后根据剩余的正数部分计算需要多少次 x-y 的减法操作，如果总操作次数超过 k，则返回 False。主函数中，使用二分查找确定最小的满足条件的 k 值，即查找第一个使 check 函数返回 True 的 k 值。</p>
+                                <p>时间复杂度: O(n log(max(nums)/y))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minOperations(self, nums: List[int], x: int, y: int) -&gt; int:
+        # 检查是否可通过至多 k 次操作使所有数字非正
+        def check(k):
+            ans = 0
+            for a in nums:
+                a -= k * y  # 对每个数减去 k 次 y
+                if a &gt; 0:
+                    # 如果仍为正数，则计算减去 x-y 需要的次数
+                    ans += (a - 1) // (x - y) + 1
+                    # 如果操作次数超过 k，则返回 False
+                    if ans &gt; k:
+                        return False
+            return True
+
+        # 二分查找最小的 k 值
+        return bisect_left(range(max(nums) // y + 1), True, key=check)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用二分查找方法时，为什么选择`max(nums) // y + 1`作为搜索范围的上界？是否有可能存在更小的搜索范围？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择`max(nums) // y + 1`作为搜索范围的上界是因为在最极端的情况下，即每次操作只减去`y`而不使用`x-y`的情况下，要使最大的数字变为非正数至少需要`max(nums) // y`次操作。加1是因为二分查找的范围需要覆盖可能的边界情况。理论上，这是一个保守的估计，实际上可能存在更小的`k`值，因为在一些情况下使用`x-y`操作可以更高效地减少数字，从而减少操作次数。这是初步设定的上界，二分查找将在这个范围内找到实际的最小`k`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`check`函数中，为什么在每个数字减去`k*y`后，仅当数值仍然大于0时才考虑进一步的`x-y`操作？如果`x-y`为负数如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`check`函数中，只有当数字减去`k*y`后仍然大于0时，才需要进一步考虑使用`x-y`操作，因为如果数字已经非正，则不需要进一步操作。如果`x-y`为负数，实际上这种情况在题目设定中不应存在，因为这会使问题变得无意义（即无法通过减去一个负数使数字变小）。通常，我们假定`x &gt; y`以确保`x-y`为正，从而使得每次操作都有效地减少数字。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`check`函数中计算`x-y`操作次数时，使用的是`(a - 1) // (x - y) + 1`，这种计算方式是否能正确处理所有情况，特别是当`a`正好是`x-y`的倍数时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`(a - 1) // (x - y) + 1`的计算方式是为了处理任何正整数`a`的情况，确保能够正确计算出将`a`减至0或以下所需的最小操作次数。当`a`正好是`x-y`的倍数时，这种计算方式依然有效。例如，如果`a = (x-y) * 2`，那么`(a - 1) // (x - y) + 1`计算结果将是3，但由于我们是从`a-1`开始计算的，所以实际上我们只需要2次操作，这正符合预期的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解中没有提到`x`、`y`的相对大小，`x`小于`y`的情况下，题解的逻辑是否还适用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果`x`小于`y`，题解中的逻辑将不适用，因为在这种情况下，`x-y`将是负数，这意味着操作会增加数字而不是减少，与题目要求相矛盾。题解假设`x &gt; y`以确保每次操作都能有效地减少数值。如果`x &lt; y`，则需要重新考虑问题的设定和解决方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-operations-to-make-numbers-non-positive')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-operations-to-make-numbers-non-positive/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

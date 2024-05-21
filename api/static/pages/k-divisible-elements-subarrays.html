@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>含最多 K 个可整除元素的子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>含最多 K 个可整除元素的子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> 和两个整数 <code>k</code> 和 <code>p</code> ，找出并返回满足要求的不同的子数组数，要求子数组中最多 <code>k</code> 个可被 <code>p</code> 整除的元素。</p>
+
+<p>如果满足下述条件之一，则认为数组 <code>nums1</code> 和 <code>nums2</code> 是 <strong>不同</strong> 数组：</p>
+
+<ul>
+	<li>两数组长度 <strong>不同</strong> ，或者</li>
+	<li>存在 <strong>至少 </strong>一个下标 <code>i</code> 满足 <code>nums1[i] != nums2[i]</code> 。</li>
+</ul>
+
+<p><strong>子数组</strong> 定义为：数组中的连续元素组成的一个 <strong>非空</strong> 序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [<em><strong>2</strong></em>,3,3,<em><strong>2</strong></em>,<em><strong>2</strong></em>], k = 2, p = 2
+<strong>输出：</strong>11
+<strong>解释：</strong>
+位于下标 0、3 和 4 的元素都可以被 p = 2 整除。
+共计 11 个不同子数组都满足最多含 k = 2 个可以被 2 整除的元素：
+[2]、[2,3]、[2,3,3]、[2,3,3,2]、[3]、[3,3]、[3,3,2]、[3,3,2,2]、[3,2]、[3,2,2] 和 [2,2] 。
+注意，尽管子数组 [2] 和 [3] 在 nums 中出现不止一次，但统计时只计数一次。
+子数组 [2,3,3,2,2] 不满足条件，因为其中有 3 个元素可以被 2 整除。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,2,3,4], k = 4, p = 1
+<strong>输出：</strong>10
+<strong>解释：</strong>
+nums 中的所有元素都可以被 p = 1 整除。
+此外，nums 中的每个子数组都满足最多 4 个元素可以被 1 整除。
+因为所有子数组互不相同，因此满足所有限制条件的子数组总数为 10 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 200</code></li>
+	<li><code>1 &lt;= nums[i], p &lt;= 200</code></li>
+	<li><code>1 &lt;= k &lt;= nums.length</code></li>
+</ul>
+
+
+
+<p><strong>进阶：</strong></p>
+
+<p>你可以设计并实现时间复杂度为 <code>O(n<sup>2</sup>)</code> 的算法解决此问题吗？</p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 52 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class SuffixArray:
+
+    def __init__(self):
+        return
+
+    @staticmethod
+    def build(s, sig):
+        # sa: index is rank and value is pos
+        # rk: index if pos and value is rank
+        # height: lcp of rank i-th suffix and (i-1)-th suffix
+        # sum(height): is count of same substring of s
+        # n*(n+1)//2 - sum(height): is count of different substring of s
+        # max(height): is the longest duplicate substring
+        # sig: number of unique rankings which initially is the size of the character set
+
+        n = len(s)
+        sa = list(range(n))
+        rk = s[:]
+        ll = 0  # ll is the length that has already been sorted, and now it needs to be sorted by 2ll length
+        tmp = [0] * n
+        while True:
+            p = [i for i in range(n - ll, n)] + [x - ll for i, x in enumerate(sa) if x &gt;= ll]
+            # for suffixes with a length less than l, their second keyword ranking is definitely
+            # the smallest because they are all empty
+            # for suffixes of other lengths, suffixes starting at &#39;sa [i]&#39; rank i-th, and their
+            # first ll characters happen to be the second keyword of suffixes starting at &#39;sa[i] - ll&#39;
+            # start cardinality sorting, and first perform statistics on the first keyword
+            # first, count how many values each has
+            cnt = [0] * sig
+            for i in range(n):
+                cnt[rk[i]] += 1
+            # make a prefix and for easy cardinality sorting
+            for i in range(1, sig):
+                cnt[i] += cnt[i - 1]
+
+            # then use cardinality sorting to calculate the new sa
+            for i in range(n - 1, -1, -1):
+                w = rk[p[i]]
+                cnt[w] -= 1
+                sa[cnt[w]] = p[i]
+
+            # new_sa to check new_rk
+            def equal(ii, jj, lll):
+                if rk[ii] != rk[jj]:
+                    return False
+                if ii + lll &gt;= n and jj + lll &gt;= n:
+                    return True
+                if ii + lll &lt; n and jj + lll &lt; n:
+                    return rk[ii + lll] == rk[jj + lll]
+                return False
+
+            sig = -1
+            for i in range(n):
+                tmp[i] = 0
+
+            for i in range(n):
+                # compute the lcp
+                if i == 0 or not equal(sa[i], sa[i - 1], ll):
+                    sig += 1
+                tmp[sa[i]] = sig
+
+            for i in range(n):
+                rk[i] = tmp[i]
+            sig += 1
+            if sig == n:
+                break
+            ll = ll &lt;&lt; 1 if ll &gt; 0 else 1
+
+        # height
+        k = 0
+        height = [0] * n
+        for i in range(n):
+            if rk[i] &gt; 0:
+                j = sa[rk[i] - 1]
+                while i + k &lt; n and j + k &lt; n and s[i + k] == s[j + k]:
+                    k += 1
+                height[rk[i]] = k
+                k = 0 if k - 1 &lt; 0 else k - 1
+        return sa, rk, height
+
+
+class Solution:
+    def countDistinct(self, nums: List[int], k: int, p: int) -&gt; int:
+        cnt = res = 0
+        n = len(nums)
+        j = 0
+        right = [0] * n
+        for i in range(n):
+            while j &lt; n and cnt + (nums[j] % p == 0) &lt;= k:
+                cnt += (nums[j] % p == 0)
+                j += 1
+            res += j - i
+            right[i] = j
+            cnt -= (nums[i] % p == 0)
+        sa, rk, height = SuffixArray().build(nums, max(nums)+1)
+        dup = sum(min(height[i], right[sa[i]] - sa[i]) for i in range(1, n))
+        res -= dup
+        return res
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解利用了两步主要的算法技巧来解决问题：首先，它使用了双指针技术来计算所有可能的符合条件的子数组的数量。具体来说，外层循环遍历数组，内层循环扩展直到子数组中可以被p整除的元素数量超过k为止。在每次外层循环中，计算从当前索引起始的、满足条件的子数组数量，并逐步减少被p整除的元素的计数。其次，利用后缀数组来识别重复的子数组。构建后缀数组并计算最长公共前缀（LCP），从而可以快速确定哪些子数组是重复的。最后，将找到的总子数组数减去重复的子数组数，得到答案。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class SuffixArray:
+    def __init__(self):
+        return
+
+    @staticmethod
+    def build(s, sig):
+        n = len(s)
+        sa = list(range(n))  # 后缀数组初始化
+        rk = s[:]  # 初始化排名数组为字符数组
+        ll = 0  # 已排序的长度
+        tmp = [0] * n  # 临时数组，用于交换
+        while True:
+            # 合并排序的核心部分
+            p = [i for i in range(n - ll, n)] + [x - ll for i, x in enumerate(sa) if x &gt;= ll]
+            cnt = [0] * sig
+            for i in range(n):
+                cnt[rk[i]] += 1
+            for i in range(1, sig):
+                cnt[i] += cnt[i - 1]
+            for i in range(n - 1, -1, -1):
+                w = rk[p[i]]
+                cnt[w] -= 1
+                sa[cnt[w]] = p[i]
+            sig = -1
+            for i in range(n):
+                if i == 0 or not equal(sa[i], sa[i - 1], ll):
+                    sig += 1
+                tmp[sa[i]] = sig
+            for i in range(n):
+                rk[i] = tmp[i]
+            sig += 1
+            if sig == n:
+                break
+            ll = ll &lt;&lt; 1 if ll &gt; 0 else 1
+        k = 0
+        height = [0] * n
+        for i in range(n):
+            if rk[i] &gt; 0:
+                j = sa[rk[i] - 1]
+                while i + k &lt; n and j + k &lt; n and s[i + k] == s[j + k]:
+                    k += 1
+                height[rk[i]] = k
+                k = 0 if k - 1 &lt; 0 else k - 1
+        return sa, rk, height
+
+class Solution:
+    def countDistinct(self, nums: List[int], k: int, p: int) -&gt; int:
+        cnt = res = 0
+        n = len(nums)
+        j = 0
+        right = [0] * n
+        for i in range(n):
+            while j &lt; n and cnt + (nums[j] % p == 0) &lt;= k:
+                cnt += (nums[j] % p == 0)
+                j += 1
+            res += j - i
+            right[i] = j
+            cnt -= (nums[i] % p == 0)
+        sa, rk, height = SuffixArray().build(nums, max(nums)+1)
+        dup = sum(min(height[i], right[sa[i]] - sa[i]) for i in range(1, n))
+        res -= dup
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在双指针技术中，如何确保在移动内层循环的指针j时，正确地更新和管理可被p整除的元素的计数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在双指针技术中，指针 j 负责扩展子数组的长度直到子数组中可以被 p 整除的元素数量超过 k 为止。为了准确地管理可被 p 整除的元素计数（cnt），每次 j 向右移动一个位置时，首先检查即将包含进子数组的元素 nums[j] 是否能被 p 整除。如果可以，cnt 增加 1。当指针 i 向右移动，即准备考虑下一个新的子数组起点时，需要从 cnt 中减去 nums[i] 的贡献（如果 nums[i] % p == 0，则减 1）。这样，通过逐步调整 cnt，保证了每次内层循环中 cnt 的值都正确地反映了从 i 到 j 子数组中可以被 p 整除的元素数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用后缀数组来识别重复的子数组，请问如何通过后缀数组和最长公共前缀（LCP）来识别和计算重复的子数组数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用后缀数组和最长公共前缀（LCP）来识别重复的子数组时，首先通过构建后缀数组（suffix array）对所有子数组的起点进行排序。然后，计算相邻后缀（即排序后的子数组）之间的最长公共前缀（LCP）。LCP 数组中的每个值表示排序后相邻的两个子数组的最长公共前缀的长度。为了计算重复的子数组数量，我们考虑后缀数组中的每个元素 sa[i] 和它的右边界 right[sa[i]]（即从 sa[i] 开始的子数组能延伸到的最远位置）。重复子数组的长度至少为 min(height[i], right[sa[i]] - sa[i])，其中 height[i] 是 sa[i] 与 sa[i-1] 的 LCP。通过累加这些值，可以得到所有重复子数组的总长度，从而计算出重复的子数组数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用后缀数组处理时，初始化排名数组为字符数组时，如何处理整数数组？是否需要将整数转换为字符，或是使用其他方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理整数数组时，不需要将整数转换为字符。排名数组（rank array）初始化时通常是基于数组元素的值来排序。对于整数数组来说，可以直接使用整数的值作为排名。初始排名可以通过将数组元素及其索引位置放入一个列表，然后根据元素的值对此列表进行排序来得到。排序后，元素的新位置（索引）在列表中即代表了它的排名。这种方法避免了将整数转换为字符的步骤，直接利用整数本身的值进行操作，更为直接和高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/k-divisible-elements-subarrays')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/k-divisible-elements-subarrays/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

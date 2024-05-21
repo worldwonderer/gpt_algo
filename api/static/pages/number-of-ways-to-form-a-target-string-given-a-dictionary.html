@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>通过给定词典构造目标字符串的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>通过给定词典构造目标字符串的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串列表 <code>words</code> 和一个目标字符串 <code>target</code> 。<code>words</code> 中所有字符串都 <strong>长度相同</strong>  。</p>
+
+<p>你的目标是使用给定的 <code>words</code> 字符串列表按照下述规则构造 <code>target</code> ：</p>
+
+<ul>
+	<li>从左到右依次构造 <code>target</code> 的每一个字符。</li>
+	<li>为了得到 <code>target</code> 第 <code>i</code> 个字符（下标从 <strong>0</strong> 开始），当 <code>target[i] = words[j][k]</code> 时，你可以使用 <code>words</code> 列表中第 <code>j</code> 个字符串的第 <code>k</code> 个字符。</li>
+	<li>一旦你使用了 <code>words</code> 中第 <code>j</code> 个字符串的第 <code>k</code> 个字符，你不能再使用 <code>words</code> 字符串列表中任意单词的第 <code>x</code> 个字符（<code>x <= k</code>）。也就是说，所有单词下标小于等于 <code>k</code> 的字符都不能再被使用。</li>
+	<li>请你重复此过程直到得到目标字符串 <code>target</code> 。</li>
+</ul>
+
+<p><strong>请注意</strong>， 在构造目标字符串的过程中，你可以按照上述规定使用 <code>words</code> 列表中 <strong>同一个字符串</strong> 的 <strong>多个字符</strong> 。</p>
+
+<p>请你返回使用 <code>words</code> 构造 <code>target</code> 的方案数。由于答案可能会很大，请对 <code>10<sup>9</sup> + 7</code> <strong>取余</strong> 后返回。</p>
+
+<p>（译者注：此题目求的是有多少个不同的 <code>k</code> 序列，详情请见示例。）</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["acca","bbbb","caca"], target = "aba"
+<b>输出：</b>6
+<b>解释：</b>总共有 6 种方法构造目标串。
+"aba" -> 下标为 0 ("<strong>a</strong>cca")，下标为 1 ("b<strong>b</strong>bb")，下标为 3 ("cac<strong>a</strong>")
+"aba" -> 下标为 0 ("<strong>a</strong>cca")，下标为 2 ("bb<strong>b</strong>b")，下标为 3 ("cac<strong>a</strong>")
+"aba" -> 下标为 0 ("<strong>a</strong>cca")，下标为 1 ("b<strong>b</strong>bb")，下标为 3 ("acc<strong>a</strong>")
+"aba" -> 下标为 0 ("<strong>a</strong>cca")，下标为 2 ("bb<strong>b</strong>b")，下标为 3 ("acc<strong>a</strong>")
+"aba" -> 下标为 1 ("c<strong>a</strong>ca")，下标为 2 ("bb<strong>b</strong>b")，下标为 3 ("acc<strong>a</strong>")
+"aba" -> 下标为 1 ("c<strong>a</strong>ca")，下标为 2 ("bb<strong>b</strong>b")，下标为 3 ("cac<strong>a</strong>")
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["abba","baab"], target = "bab"
+<b>输出：</b>4
+<b>解释：</b>总共有 4 种不同形成 target 的方法。
+"bab" -> 下标为 0 ("<strong>b</strong>aab")，下标为 1 ("b<strong>a</strong>ab")，下标为 2 ("ab<strong>b</strong>a")
+"bab" -> 下标为 0 ("<strong>b</strong>aab")，下标为 1 ("b<strong>a</strong>ab")，下标为 3 ("baa<strong>b</strong>")
+"bab" -> 下标为 0 ("<strong>b</strong>aab")，下标为 2 ("ba<strong>a</strong>b")，下标为 3 ("baa<strong>b</strong>")
+"bab" -> 下标为 1 ("a<strong>b</strong>ba")，下标为 2 ("ba<strong>a</strong>b")，下标为 3 ("baa<strong>b</strong>")
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["abcd"], target = "abcd"
+<b>输出：</b>1
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["abab","baba","abba","baab"], target = "abba"
+<b>输出：</b>16
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= words.length <= 1000</code></li>
+	<li><code>1 <= words[i].length <= 1000</code></li>
+	<li><code>words</code> 中所有单词长度相同。</li>
+	<li><code>1 <= target.length <= 1000</code></li>
+	<li><code>words[i]</code> 和 <code>target</code> 都仅包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 444 ms</p>
+                    <p>内存: 50.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numWays(self, words: List[str], target: str) -&gt; int:
+        n,m=len(words[0]),len(target)
+        graph=[defaultdict(int) for _ in range(n)]
+        #预处理一下,建图计数预处理
+        for x in words:
+            for i in range(n):
+                graph[i][x[i]]+=1
+        #graph[i][j]模式串下标为i,且字符为j的个数
+        MOD=10**9+7
+        #dfs(i,j)表示当前构造到target的下标i的字符,且从模式串的下标j开始使用的方案数
+        @cache
+        def dfs(i,j):
+            if i==m:
+                return 1
+            elif n-j&lt;m-i:
+                return 0
+            #可以跳过当前下标
+            ch=target[i]
+            return (dfs(i,j+1)+graph[j][ch]*dfs(i+1,j+1))%MOD
+        return dfs(0,0)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了动态规划的策略结合记忆化搜索，首先通过统计每个words中每个位置的字符出现频次来进行预处理，建立一个图（graph），其中graph[i][char]表示在words中所有字符串的第i个位置上字符char出现的次数。接着使用深度优先搜索（DFS）配合记忆化，定义dfs(i, j)为从target的第i个字符开始，尝试匹配words中从第j个位置开始的字符所产生的方案数。如果当前位置的字符可以匹配，则方案数为选择当前字符与跳过当前字符方案数之和。为了优化，如果剩余的words长度不足以匹配剩下的target，则直接返回0。最终，返回dfs(0, 0)即为结果。</p>
+                                <p>时间复杂度: O(k*n + m*n)</p>
+                                <p>空间复杂度: O(m*n + n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numWays(self, words: List[str], target: str) -&gt; int:
+        n, m = len(words[0]), len(target)
+        graph = [defaultdict(int) for _ in range(n)]
+        # 预处理，统计每个位置的字符出现频率
+        for x in words:
+            for i in range(n):
+                graph[i][x[i]] += 1
+        MOD = 10**9 + 7
+        @cache
+        def dfs(i, j):
+            # 如果已经匹配完target
+            if i == m:
+                return 1
+            # 如果剩余的words长度不足以匹配剩下的target
+            elif n - j &lt; m - i:
+                return 0
+            ch = target[i]
+            # 递归计算跳过当前字符或者匹配当前字符的方案数
+            return (dfs(i, j + 1) + graph[j][ch] * dfs(i + 1, j + 1)) % MOD
+        return dfs(0, 0)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，如何保证在使用words中字符时符合题目要求的&#39;一旦使用了words中某个字符串的字符，就不能再使用该字符串中该位置之前的所有字符&#39;的规则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中通过动态规划的方式来确保不违反这一规则。动态规划函数dfs(i, j)从target的第i个字符开始考虑，从words的第j个位置开始尝试匹配，这意味着当从words的第j位置尝试匹配时，自然不会再考虑第j位置之前的字符。每次递归调用dfs(i+1, j+1)都将i和j同时递增，这保证了一旦使用了words中某字符串的第j个位置的字符后，就不会再使用该字符串的第j位置之前的字符，从而满足题目的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在深度优先搜索过程中，如果剩余的words长度不足以匹配剩下的target就直接返回0，这个逻辑是如何确定的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个逻辑基于对问题所需条件的理解。如果在位置j处，剩余的words长度（即n-j）小于target剩余需要匹配的长度（即m-i），则不可能再形成有效匹配。因为每个target字符至少需要一个对应的words字符来匹配，如果words剩余的长度不足以为每个剩余的target字符提供一个匹配字符，就无法构成有效的匹配方案。因此，在这种情况下直接返回0是合理的，表示不存在有效的匹配方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在构建graph时，考虑到words中所有字符串长度相同，如何处理并计算每个位置的字符出现频率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建graph的过程中，首先初始化一个长度等于words中字符串长度的列表，列表中的每个元素是一个字典，用于存储每个位置字符的出现次数。然后遍历words中的每个字符串，对于每个字符串的每个字符，更新对应位置的字典，记录该字符出现的次数。这样，graph[i][char]最终存储的是在words中所有字符串的第i个位置字符char出现的总次数。这种预处理方式保证了在后续的深度优先搜索中能够快速获取任何位置上任何字符的出现频率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么递归函数dfs在处理时需要使用记忆化，记忆化在这里起到了什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归过程中，使用记忆化可以避免重复计算已经解决的子问题，从而大大提高算法的效率。由于在不同的递归调用中，相同的(i, j)参数对可能会多次出现，如果不使用记忆化，则每次都需要重新计算dfs(i, j)的结果，这将导致大量的重复计算和不必要的时间消耗。记忆化通过存储这些子问题的解（如使用装饰器@cache），确保每个子问题只计算一次，当再次遇到相同的子问题时，可以直接使用已经计算好的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-ways-to-form-a-target-string-given-a-dictionary')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-ways-to-form-a-target-string-given-a-dictionary/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

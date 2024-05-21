@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>无人机方阵</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>无人机方阵</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        在 「力扣挑战赛」 开幕式的压轴节目 「无人机方阵」中，每一架无人机展示一种灯光颜色。 无人机方阵通过两种操作进行颜色图案变换：
+- 调整无人机的位置布局
+- 切换无人机展示的灯光颜色
+
+
+给定两个大小均为 `N*M` 的二维数组 `source` 和 `target` 表示无人机方阵表演的两种颜色图案，由于无人机切换灯光颜色的耗能很大，请返回从 `source` 到 `target` 最少需要多少架无人机切换灯光颜色。
+
+
+**注意：** 调整无人机的位置布局时无人机的位置可以随意变动。
+
+
+**示例 1：**
+> 输入：`source = [[1,3],[5,4]], target = [[3,1],[6,5]]`
+>
+> 输出：`1`
+>
+> 解释：
+> 最佳方案为
+将 `[0,1]` 处的无人机移动至 `[0,0]` 处；
+将 `[0,0]` 处的无人机移动至 `[0,1]` 处；
+将 `[1,0]` 处的无人机移动至 `[1,1]` 处；
+将 `[1,1]` 处的无人机移动至 `[1,0]` 处，其灯光颜色切换为颜色编号为 `6` 的灯光；
+因此从`source` 到 `target` 所需要的最少灯光切换次数为 1。
+>![8819ccdd664e91c78cde3bba3c701986.gif](https://pic.leetcode-cn.com/1628823765-uCDaux-8819ccdd664e91c78cde3bba3c701986.gif){:height=300px}
+
+
+
+
+
+**示例 2：**
+> 输入：`source = [[1,2,3],[3,4,5]], target = [[1,3,5],[2,3,4]]`
+>
+> 输出：`0`
+> 解释：
+> 仅需调整无人机的位置布局，便可完成图案切换。因此不需要无人机切换颜色
+
+
+**提示：**
+`n == source.length == target.length`
+`m == source[i].length == target[i].length`
+`1 <= n, m <=100`
+`1 <= source[i][j], target[i][j] <=10^4`
+
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 65 ms</p>
+                    <p>内存: 17.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumSwitchingTimes(self, source: List[List[int]], target: List[List[int]]) -&gt; int:
+        ans = 0
+        count = [0] * 10001
+        for row in source:
+            for num in row:
+                count[num] += 1
+        for row in target:
+            for num in row:
+                # source中的数不够，要切换颜色
+                if count[num] == 0:
+                    ans += 1
+                else:
+                    count[num] -= 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解中采用了计数排序的思想来统计source和target中各数字的出现次数。首先，遍历source矩阵，利用一个计数数组记录每个数字的出现次数。接着，遍历target矩阵，对于每个数字，检查计数数组中该数字的计数。如果计数为0，说明source中没有足够的该数字以匹配target中的需求，因此需要切换灯光颜色。每次发现不匹配，将结果计数器加一，并逐步减少计数数组中对应数字的计数。这样最终得到的结果计数器即为最少的切换次数。</p>
+                                <p>时间复杂度: O(n*m)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumSwitchingTimes(self, source: List[List[int]], target: List[List[int]]) -&gt; int:
+        ans = 0  # 初始化需要切换的无人机数量
+        count = [0] * 10001  # 初始化计数数组
+        for row in source:
+            for num in row:
+                count[num] += 1  # 记录source中每个数字的出现次数
+        for row in target:
+            for num in row:
+                if count[num] == 0:  # 如果target中的数字在source中的计数为0，则需要切换
+                    ans += 1
+                else:
+                    count[num] -= 1  # 否则，减少该数字的计数
+        return ans  # 返回需要切换的次数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在题解中选择使用计数数组而不是哈希表来记录每个数字的出现次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中选择使用计数数组而不是哈希表主要是因为计数数组在处理有限范围内的整数时，可以提供更快的访问速度和更低的内存消耗。当已知元素的值域较小且连续时，使用计数数组可以直接通过索引访问，这比哈希表的哈希计算和潜在的冲突解决更为高效。此外，计数数组简化了实现，避免了哈希表中键的管理和动态内存的分配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中假设了元素值的上限为10000，这一假设是基于题目的哪些信息？如果元素的范围未知，这种方法还适用吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中假设元素值的上限为10000可能是基于题目给定的条件或示例中的数据范围。这种假设有助于确定使用计数数组的大小。如果元素的范围未知或非常大，直接使用计数数组可能不再适用，因为它可能导致极大的内存消耗或数组初始化的效率问题。在这种情况下，使用哈希表将是更好的选择，因为哈希表可以动态地处理不同的键值，并且内存使用量与元素的实际数量而非范围相关。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在减少计数数组中的计数时，为什么不需要检查count[num]的值是否小于0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在减少计数数组中的计数时不需要检查count[num]的值是否小于0，因为算法逻辑确保了这种情况不会发生。在遍历target矩阵并减少计数之前，我们已经通过遍历source矩阵来增加计数。这保证了，只要target中的某个数字在source中至少出现过一次，就不会将其计数减到负数。如果某个数字在source中不存在，那么在首次检测到该数字时计数为0，会直接增加答案计数器而不是继续减少计数，从而避免了负数的出现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/0jQkd0')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/0jQkd0/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

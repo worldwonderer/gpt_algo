@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>删列造序 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>删列造序 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定由 <code>n</code> 个字符串组成的数组 <code>strs</code>，其中每个字符串长度相等。</p>
+
+<p>选取一个删除索引序列，对于 <code>strs</code> 中的每个字符串，删除对应每个索引处的字符。</p>
+
+<p>比如，有 <code>strs = ["abcdef", "uvwxyz"]</code>，删除索引序列 <code>{0, 2, 3}</code>，删除后 <code>strs</code> 为<code>["bef", "vyz"]</code>。</p>
+
+<p>假设，我们选择了一组删除索引 <code>answer</code>，那么在执行删除操作之后，最终得到的数组的元素是按 <strong>字典序</strong>（<code>strs[0] <= strs[1] <= strs[2] ... <= strs[n - 1]</code>）排列的，然后请你返回 <code>answer.length</code> 的最小可能值。</p>
+
+<p> </p>
+
+<ol>
+</ol>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>strs = ["ca","bb","ac"]
+<strong>输出：</strong>1
+<strong>解释： </strong>
+删除第一列后，strs = ["a", "b", "c"]。
+现在 strs 中元素是按字典排列的 (即，strs[0] <= strs[1] <= strs[2])。
+我们至少需要进行 1 次删除，因为最初 strs 不是按字典序排列的，所以答案是 1。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>strs = ["xc","yb","za"]
+<strong>输出：</strong>0
+<strong>解释：</strong>
+strs 的列已经是按字典序排列了，所以我们不需要删除任何东西。
+注意 strs 的行不需要按字典序排列。
+也就是说，strs[0][0] <= strs[0][1] <= ... 不一定成立。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>strs = ["zyx","wvu","tsr"]
+<strong>输出：</strong>3
+<strong>解释：</strong>
+我们必须删掉每一列。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == strs.length</code></li>
+	<li><code>1 <= n <= 100</code></li>
+	<li><code>1 <= strs[i].length <= 100</code></li>
+	<li><code>strs[i]</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 35 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minDeletionSize(self, strs: List[str]) -&gt; int:
+        m, n, ans = len(strs), len(strs[0]), 0
+        seps = set()
+        for j in range(n):
+            f = set()
+            for i in range(m - 1):
+                if i not in seps:
+                    if strs[i][j] &gt; strs[i + 1][j]:
+                        ans += 1
+                        break
+                    if strs[i][j] &lt; strs[i + 1][j]:
+                        f.add(i)
+            else:
+                seps |= f
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是：遍历字符串数组每一列，判断当前列是否需要删除。具体做法是，用一个集合 seps 记录当前已经满足字典序的行索引。遍历每一列时，先初始化一个空集合 f，用于记录新增的满足字典序的行索引。然后遍历相邻两行，如果上一行的字符大于下一行，说明不满足字典序，直接将答案加1，并退出当前列的判断；如果上一行的字符小于下一行，则将上一行的索引加入 f 集合。如果内层遍历结束，说明当前列满足字典序，将 f 集合并入 seps。最后返回答案。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minDeletionSize(self, strs: List[str]) -&gt; int:
+        m, n, ans = len(strs), len(strs[0]), 0
+        seps = set()  # 记录已经满足字典序的行索引
+        for j in range(n):  # 遍历每一列
+            f = set()  # 记录新增的满足字典序的行索引
+            for i in range(m - 1):  # 遍历相邻两行
+                if i not in seps:  # 如果当前行还不满足字典序
+                    if strs[i][j] &gt; strs[i + 1][j]:  # 如果上一行字符大于下一行
+                        ans += 1  # 答案加1
+                        break  # 退出当前列的判断
+                    if strs[i][j] &lt; strs[i + 1][j]:  # 如果上一行字符小于下一行
+                        f.add(i)  # 将上一行索引加入f集合
+            else:  # 如果内层循环顺利结束，说明当前列满足字典序
+                seps |= f  # 将f集合并入seps
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，集合seps和f的具体作用是什么？为什么需要通过这两个集合来跟踪满足字典序的行索引？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>集合seps用于记录在之前的列检查中，已经确定满足字典序的行索引。这意味着对于在seps中的行索引，我们不需要再次确认它们在后续列的字典序关系。而集合f是用来记录在当前列检查过程中新确认满足字典序的行索引。它们帮助算法优化性能，避免重复检查已经满足条件的行，从而减少不必要的比较操作。使用这两个集合可以有效地跟踪和更新哪些行之间的顺序关系已经被字典序确定，这样在处理每一列时只关注未确定的行索引，提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中提到的&#39;如果上一行的字符大于下一行，则直接将答案加1并退出当前列的判断&#39;，这种处理方式是否可能导致忽略某些列在后续行中可能满足字典序的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式不会导致忽略后续行可能满足字典序的情况。因为如果在某一列中存在上一行的字符大于下一行的字符，这已经足以证明整列不满足字典序要求，无论后续行的字符如何。因此，直接增加删除计数并停止当前列的进一步检查是有效且必要的，确保算法的效率和简洁性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在内层循环中，只有当上一行字符小于下一行字符时，才将上一行的索引加入到集合f中？当字符相等时，这种情况如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当上一行字符小于下一行字符时，加入集合f是因为这确定了这两行在当前列的字典序关系。当字符相等时，当前列无法确定这两行的顺序关系，因此不将其加入f集合。这种情况下，我们需要在后续的列继续观察这两行来决定其字典序关系。这种处理保证了只有明确满足字典序的行索引被记录，而不确定的关系则留待后续列进行判断。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在算法实现中，为什么选择使用集合而不是其他数据结构，如列表或字典？集合在这里有什么特别的优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此算法中选择使用集合主要是因为集合提供了高效的成员检查和添加操作，特别是对于不重复元素的管理。集合能够快速地进行元素的查找、添加和合并操作，这些操作的平均时间复杂度通常是O(1)，这对于算法中频繁的检查和更新操作是非常有利的。与列表相比，集合避免了重复元素的问题并提供更快的查找速度；与字典相比，集合的操作更简单直接，因为这里只需要跟踪元素的存在性，而不需要存储额外的键值对信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/delete-columns-to-make-sorted-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/delete-columns-to-make-sorted-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

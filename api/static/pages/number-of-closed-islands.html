@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计封闭岛屿的数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计封闭岛屿的数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>二维矩阵 <code>grid</code>&nbsp;由 <code>0</code>&nbsp;（土地）和 <code>1</code>&nbsp;（水）组成。岛是由最大的4个方向连通的 <code>0</code>&nbsp;组成的群，封闭岛是一个&nbsp;<code>完全</code> 由1包围（左、上、右、下）的岛。</p>
+
+<p>请返回 <em>封闭岛屿</em> 的数目。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2019/10/31/sample_3_1610.png" style="height: 151px; width: 240px;" /></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1,1,1,1,1,1,1,0],[1,0,0,0,0,1,1,0],[1,0,1,0,1,1,1,0],[1,0,0,0,0,1,0,1],[1,1,1,1,1,1,1,0]]
+<strong>输出：</strong>2
+<strong>解释：</strong>
+灰色区域的岛屿是封闭岛屿，因为这座岛屿完全被水域包围（即被 1 区域包围）。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/11/07/sample_4_1610.png" style="height: 98px; width: 160px;" /></p>
+
+<pre>
+<strong>输入：</strong>grid = [[0,0,1,0,0],[0,1,0,1,0],[0,1,1,1,0]]
+<strong>输出：</strong>1
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1,1,1,1,1,1,1],
+&nbsp;            [1,0,0,0,0,0,1],
+&nbsp;            [1,0,1,1,1,0,1],
+&nbsp;            [1,0,1,0,1,0,1],
+&nbsp;            [1,0,1,1,1,0,1],
+&nbsp;            [1,0,0,0,0,0,1],
+             [1,1,1,1,1,1,1]]
+<strong>输出：</strong>2
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= grid.length, grid[0].length &lt;= 100</code></li>
+	<li><code>0 &lt;= grid[i][j] &lt;=1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 35 ms</p>
+                    <p>内存: 16.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+
+class Solution:
+    def closedIsland(self, grid: List[List[int]]) -&gt; int:
+        m, n = len(grid), len(grid[0])
+        helper = [0, 0]  # 是否飞地, num
+
+        def dfs(i, j):
+            if i &lt; 0 or j &lt; 0 or i &gt;= m or j &gt;= n or grid[i][j] == 1:
+                return
+            grid[i][j] = 1
+            helper[1] += 1
+            if i == 0 or i == m - 1 or j == 0 or j == n - 1:
+                helper[0] = 0  # 不是飞地
+            dfs(i - 1, j)
+            dfs(i + 1, j)
+            dfs(i, j - 1)
+            dfs(i, j + 1)
+
+        res = 0
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 0:
+                    helper = [1, 0]  # 初始飞地
+                    dfs(i, j)
+                    res += helper[0]
+
+        return res
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用深度优先搜索（DFS）来遍历矩阵中的每个元素，寻找封闭岛屿。封闭岛屿定义为完全被1包围的0区域。解决方案中，首先通过遍历整个矩阵，每当遇到一个0，即尝试从该点出发进行DFS。在DFS过程中，首先标记当前节点为已访问（将其值置为1），然后检查其是否位于边界，若是，则当前岛屿不是封闭岛屿。DFS会递归地访问当前节点的上下左右节点。在DFS完成后，如果此岛屿是封闭的，则对结果计数器加一。通过这种方式，可以遍历整个矩阵，找出所有封闭岛屿并计数。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+
+class Solution:
+    def closedIsland(self, grid: List[List[int]]) -&gt; int:
+        m, n = len(grid), len(grid[0])
+        helper = [0, 0]  # [是否封闭岛屿, 岛屿大小]
+
+        def dfs(i, j):
+            if i &lt; 0 or j &lt; 0 or i &gt;= m or j &gt;= n or grid[i][j] == 1:
+                return
+            grid[i][j] = 1  # 标记访问过的土地
+            helper[1] += 1  # 增加岛屿大小计数
+            if i == 0 or i == m - 1 or j == 0 or j == n - 1:
+                helper[0] = 0  # 若节点在边界上, 则不是封闭岛屿
+            dfs(i - 1, j)  # 向上移动
+            dfs(i + 1, j)  # 向下移动
+            dfs(i, j - 1)  # 向左移动
+            dfs(i, j + 1)  # 向右移动
+
+        res = 0
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 0:  # 发现未访问的土地
+                    helper = [1, 0]  # 初始化为封闭岛屿
+                    dfs(i, j)
+                    res += helper[0]  # 若为封闭岛屿, 增加计数
+
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在深度优先搜索（DFS）中，你是如何处理边界条件以确保不会访问矩阵外的元素？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS的实现中，每次调用函数前都检查当前坐标(i, j)是否越界，即是否满足0 &lt;= i &lt; m和0 &lt;= j &lt; n的条件。如果任一条件不满足，函数立即返回，不进行任何进一步的处理。这确保了DFS过程只在矩阵的有效范围内进行，从而防止了对矩阵外元素的访问。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在发现一个点属于边界时立即认定这个岛屿不是封闭岛屿？会不会有其他部分依然被水完全包围的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，如果一个岛屿的任何部分触及到矩阵的边界，此岛屿就不能被认为是封闭的。这是因为边界外被默认为水域，所以如果岛屿触及边界，它实际上是与无限大的水域相连的，因此不是完全被水包围的封闭岛屿。虽然其它部分可能仍然被水包围，但整体而言，岛屿不满足封闭岛屿的定义。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在DFS中，你如何确保不会重复访问同一个节点，从而避免无限递归？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中，一旦访问一个节点，我立即将其标记为已访问，即将该节点的值设为1。这种标记确保每个节点在整个DFS过程中只被访问一次，防止了无限递归的发生。因此，每次递归调用前都会检查当前节点是否已被标记为1，如果是，则直接返回，不再进行进一步的DFS。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            岛屿大小的计数是否对解决问题有直接帮助，还是仅仅用于辅助分析或其他目的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个特定的问题（统计封闭岛屿的数目）中，岛屿的大小并不直接影响问题的解决，因为我们只需要知道岛屿是否封闭。岛屿大小的计数更多地用于可能的辅助分析，例如，分析岛屿的分布或大小范围。在其他上下文中，例如需要找出最大的封闭岛屿，岛屿大小的计数则会直接帮助解决问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-closed-islands')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-closed-islands/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

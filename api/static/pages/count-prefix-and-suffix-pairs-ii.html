@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计前后缀下标对 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计前后缀下标对 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=string-matching" class="badge bg-secondary tag-link">字符串匹配</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的字符串数组 <code>words</code> 。</p>
+
+<p>定义一个 <strong>布尔 </strong>函数 <code>isPrefixAndSuffix</code> ，它接受两个字符串参数 <code>str1</code> 和 <code>str2</code> ：</p>
+
+<ul>
+	<li>当 <code>str1</code> 同时是 <code>str2</code> 的前缀（<span data-keyword="string-prefix">prefix</span>）和后缀（<span data-keyword="string-suffix">suffix</span>）时，<code>isPrefixAndSuffix(str1, str2)</code> 返回 <code>true</code>，否则返回 <code>false</code>。</li>
+</ul>
+
+<p>例如，<code>isPrefixAndSuffix("aba", "ababa")</code> 返回 <code>true</code>，因为 <code>"aba"</code> 既是 <code>"ababa"</code> 的前缀，也是 <code>"ababa"</code> 的后缀，但是 <code>isPrefixAndSuffix("abc", "abcd")</code> 返回<code> false</code>。</p>
+
+<p>以整数形式，返回满足 <code>i &lt; j</code> 且 <code>isPrefixAndSuffix(words[i], words[j])</code> 为 <code>true</code> 的下标对 <code>(i, j)</code> 的<strong> 数量 </strong>。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["a","aba","ababa","aa"]
+<strong>输出：</strong>4
+<strong>解释：</strong>在本示例中，计数的下标对包括：
+i = 0 且 j = 1 ，因为 isPrefixAndSuffix("a", "aba") 为 true 。
+i = 0 且 j = 2 ，因为 isPrefixAndSuffix("a", "ababa") 为 true 。
+i = 0 且 j = 3 ，因为 isPrefixAndSuffix("a", "aa") 为 true 。
+i = 1 且 j = 2 ，因为 isPrefixAndSuffix("aba", "ababa") 为 true 。
+因此，答案是 4 。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["pa","papa","ma","mama"]
+<strong>输出：</strong>2
+<strong>解释：</strong>在本示例中，计数的下标对包括：
+i = 0 且 j = 1 ，因为 isPrefixAndSuffix("pa", "papa") 为 true 。
+i = 2 且 j = 3 ，因为 isPrefixAndSuffix("ma", "mama") 为 true 。
+因此，答案是 2 。</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["abab","ab"]
+<strong>输出：</strong>0
+<strong>解释：</strong>在本示例中，唯一有效的下标对是 i = 0 且 j = 1 ，但是 isPrefixAndSuffix("abab", "ab") 为 false 。
+因此，答案是 0 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= words.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= words[i].length &lt;= 10<sup>5</sup></code></li>
+	<li><code>words[i]</code> 仅由小写英文字母组成。</li>
+	<li>所有 <code>words[i]</code> 的长度之和不超过 <code>5 * 10<sup>5</sup></code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 159 ms</p>
+                    <p>内存: 32.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countPrefixSuffixPairs(self, words: List[str]) -&gt; int:
+        n = len(words)
+        if n == 0:
+            return 0
+        s2c = {words[-1] : 1}
+        resn = 0
+        for i in range(n-2, -1, -1):
+            n1 = len(words[i])
+            for s, c in s2c.items():
+                if words[i] == s[:n1] and words[i] == s[-n1:]:
+                    resn += c
+            s2c[words[i]] = s2c.get(words[i], 0) + 1
+        return resn</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了逆序遍历与哈希表的结合来优化查询和统计过程。首先，从数组的尾部开始遍历，使用哈希表s2c来记录遍历过的每个字符串及其出现次数。对于每个字符串words[i]，检查它是否为已记录在哈希表中的每个字符串的前缀和后缀。如果是，则累加对应字符串的计数到结果中。此方法避免了重复的字符串比较，利用哈希表快速地检索和更新字符串的出现次数。</p>
+                                <p>时间复杂度: O(n^2 * l)</p>
+                                <p>空间复杂度: O(n * l)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countPrefixSuffixPairs(self, words: List[str]) -&gt; int:
+        n = len(words)
+        if n == 0:
+            return 0
+        # 哈希表存储每个字符串及其计数
+        s2c = {words[-1] : 1}
+        resn = 0
+        # 从后向前遍历words数组
+        for i in range(n-2, -1, -1):
+            n1 = len(words[i])
+            # 检查当前字符串是否为之前任一字符串的前后缀
+            for s, c in s2c.items():
+                if words[i] == s[:n1] and words[i] == s[-n1:]:
+                    resn += c
+            # 更新当前字符串的计数
+            s2c[words[i]] = s2c.get(words[i], 0) + 1
+        return resn</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择从数组的尾部向前遍历而不是从头部开始遍历？这种遍历方向对算法的效率有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从数组的尾部向前遍历可以有效地利用哈希表记录已经遍历过的字符串及其出现次数，这样在遍历到每一个新字符串时，可以直接使用哈希表检查该字符串是否为任一已遍历字符串的前后缀。如果从数组头部开始遍历，每次遇到新字符串都需要向后检查所有未遍历的字符串，这将导致大量的重复比较和计算。逆序遍历让每个字符串在进入哈希表前先作为前缀和后缀候选，从而减少了计算量并提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            哈希表s2c在算法中扮演了什么角色，它是如何帮助减少计算量的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表s2c在算法中扮演了关键的数据记录角色。它记录每一个已遍历字符串及其出现次数，使得在遍历到新的字符串时，可以直接利用哈希表来快速检查这个新字符串是否为任何已记录字符串的前缀或后缀。这种方法避免了对每个新字符串进行大量的字符串比较，从而显著减少了计算量。此外，使用哈希表还可以快速更新和查询字符串的计数，进一步提高算法的执行效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新哈希表s2c时，为什么选择使用 get 方法，并且如何确保它的正确性和高效性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新哈希表s2c时，使用get方法可以方便地返回指定键的值，如果键不存在，则返回一个默认值，通常是0。这样可以在一行代码内完成查询和默认值处理，简化了代码并减少了错误的可能性。使用get方法更新哈希表不仅保证了代码的简洁性，还保持了高效性，因为它避免了先检查键是否存在再进行赋值的多步骤操作。这种方式确保了算法的正确性和高效性，因为它能够快速响应键值对的检索和更新需求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-prefix-and-suffix-pairs-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-prefix-and-suffix-pairs-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>停在原地的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>停在原地的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个长度为 <code>arrLen</code> 的数组，开始有一个指针在索引 <code>0</code> 处。</p>
+
+<p>每一步操作中，你可以将指针向左或向右移动 1 步，或者停在原地（指针不能被移动到数组范围外）。</p>
+
+<p>给你两个整数 <code>steps</code> 和 <code>arrLen</code> ，请你计算并返回：在恰好执行 <code>steps</code> 次操作以后，指针仍然指向索引 <code>0</code> 处的方案数。</p>
+
+<p>由于答案可能会很大，请返回方案数 <strong>模</strong> <code>10^9 + 7</code> 后的结果。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>steps = 3, arrLen = 2
+<strong>输出：</strong>4
+<strong>解释：</strong>3 步后，总共有 4 种不同的方法可以停在索引 0 处。
+向右，向左，不动
+不动，向右，向左
+向右，不动，向左
+不动，不动，不动
+</pre>
+
+<p><strong>示例  2：</strong></p>
+
+<pre>
+<strong>输入：</strong>steps = 2, arrLen = 4
+<strong>输出：</strong>2
+<strong>解释：</strong>2 步后，总共有 2 种不同的方法可以停在索引 0 处。
+向右，向左
+不动，不动
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>steps = 4, arrLen = 2
+<strong>输出：</strong>8
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= steps <= 500</code></li>
+	<li><code>1 <= arrLen <= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 50 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numWays(self, steps: int, arrLen: int) -&gt; int:
+        arrLen=min(steps//2+2,arrLen)
+        if arrLen==1:
+            return 1
+        dp=[0]*(arrLen+2)
+        dp_new=[0]*(arrLen+2)
+        dp_new[2]=1
+        dp_new[1]=1
+        # print(dp_new)
+        for i in range((steps-1)//2):
+            dp,dp_new=dp_new,dp
+            
+            for j in range(1,arrLen+1):
+                dp_new[j]=(dp[j-1]+dp[j]+dp[j+1])%1000000007
+            # print(dp_new)
+        else:
+            if steps%2:
+                ans=0
+                for j in range(1,arrLen+1):
+                    ans+=dp_new[j]*dp[j]
+            else:
+                ans=0
+                for j in range(1,arrLen+1):
+                    ans+=dp_new[j]*dp_new[j]
+            return ans%1000000007
+        
+
+       </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了动态规划的方法。定义一个 dp 数组，其中 dp[j] 表示在当前步数下，指针位于位置 j 的方案数。由于指针每一步可以向左、向右移动或停在原地，因此状态转移方程为 dp_new[j] = (dp[j-1] + dp[j] + dp[j+1]) % 1000000007。此外，由于指针不能超出数组长度或数组起始位置，数组长度可以通过 min(steps//2+2, arrLen) 进行优化，这是因为指针最远只能走到最远的距离，再走回来，而这个距离大约是 steps 的一半。最后，根据步数的奇偶性，计算最终停在原点的方案数。</p>
+                                <p>时间复杂度: O(steps * min(steps/2+1, arrLen))</p>
+                                <p>空间复杂度: O(min(steps/2+2, arrLen))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numWays(self, steps: int, arrLen: int) -&gt; int:
+        arrLen = min(steps//2 + 2, arrLen)  # 优化数组长度
+        if arrLen == 1:
+            return 1  # 只有一个位置时，唯一方案就是不动
+        dp = [0] * (arrLen + 2)
+        dp_new = [0] * (arrLen + 2)
+        dp_new[2] = 1
+        dp_new[1] = 1  # 初始化起始位置的方案
+        # 进行动态规划更新
+        for i in range((steps - 1) // 2):
+            dp, dp_new = dp_new, dp  # 交换数组，准备下一轮计算
+            for j in range(1, arrLen + 1):
+                dp_new[j] = (dp[j - 1] + dp[j] + dp[j + 1]) % 1000000007  # 更新状态
+        if steps % 2:
+            ans = 0
+            for j in range(1, arrLen + 1):
+                ans += dp_new[j] * dp[j]  # 奇数步，计算最终方案数
+        else:
+            ans = 0
+            for j in range(1, arrLen + 1):
+                ans += dp_new[j] * dp_new[j]  # 偶数步，计算最终方案数
+        return ans % 1000000007  # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么题解中选择使用动态规划来解决这个问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划是解决这类问题（计数问题和存在多个状态转移的问题）的一种有效方法。在这个问题中，每一步的状态（指针位置）取决于前一步的状态，形成了状态转移关系，这是动态规划的典型应用场景。使用动态规划可以有效地利用之前计算的结果，避免重复计算，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到了`arrLen = min(steps//2 + 2, arrLen)`的优化策略，这里的+2是如何确定的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个优化策略基于指针从起始位置出发最远能到达的距离的考虑。理论上指针最远可以移动到`steps//2`的位置，然后再返回。+2是为了考虑边界情况，例如在计数过程中需要考虑指针可能停留在起始点或者稍微超过最远点的情况。这种优化可以减少内存使用并加速计算过程，因为不需要在数组中保留不可能到达的位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划的转移方程中，为何只考虑`dp[j-1]`，`dp[j]`和`dp[j+1]`三个状态？其他位置的状态对当前位置没有影响吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个特定的问题中，每一步，指针只能从当前位置不动或者移动到相邻的左边或右边的位置。因此，对于任何位置`j`，下一步的状态只能由`dp[j-1]`（左边的位置），`dp[j]`（当前位置），和`dp[j+1]`（右边的位置）这三个状态决定。这是根据问题的规则设定的，即每步只能移动至最近的相邻位置或停留在原地。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中交换`dp`和`dp_new`数组的目的是什么？这样做有什么好处？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>交换`dp`和`dp_new`数组的目的是为了在每一轮迭代中重用数组，避免额外的数组创建和数据复制开销。这种技术称为数组滚动，可以将空间复杂度从O(n * m)降低到O(n)，其中n是状态数组的大小，m是步数。通过交换指针指向，可以实现在更新当前状态的同时保留前一状态的信息，从而有效地进行动态规划的状态转移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-ways-to-stay-in-the-same-place-after-some-steps')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-ways-to-stay-in-the-same-place-after-some-steps/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

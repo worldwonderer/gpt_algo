@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>通过最少操作次数使数组的和相等</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>通过最少操作次数使数组的和相等</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个长度可能不等的整数数组 <code>nums1</code> 和 <code>nums2</code> 。两个数组中的所有值都在 <code>1</code> 到 <code>6</code> 之间（包含 <code>1</code> 和 <code>6</code>）。</p>
+
+<p>每次操作中，你可以选择 <strong>任意</strong> 数组中的任意一个整数，将它变成 <code>1</code> 到 <code>6</code> 之间 <strong>任意</strong> 的值（包含 <code>1</code> 和 <code><span style="">6</span></code>）。</p>
+
+<p>请你返回使 <code>nums1</code> 中所有数的和与 <code>nums2</code> 中所有数的和相等的最少操作次数。如果无法使两个数组的和相等，请返回 <code>-1</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>nums1 = [1,2,3,4,5,6], nums2 = [1,1,2,2,2,2]
+<b>输出：</b>3
+<b>解释：</b>你可以通过 3 次操作使 nums1 中所有数的和与 nums2 中所有数的和相等。以下数组下标都从 0 开始。
+- 将 nums2[0] 变为 6 。 nums1 = [1,2,3,4,5,6], nums2 = [<strong>6</strong>,1,2,2,2,2] 。
+- 将 nums1[5] 变为 1 。 nums1 = [1,2,3,4,5,<strong>1</strong>], nums2 = [6,1,2,2,2,2] 。
+- 将 nums1[2] 变为 2 。 nums1 = [1,2,<strong>2</strong>,4,5,1], nums2 = [6,1,2,2,2,2] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums1 = [1,1,1,1,1,1,1], nums2 = [6]
+<b>输出：</b>-1
+<b>解释：</b>没有办法减少 nums1 的和或者增加 nums2 的和使二者相等。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>nums1 = [6,6], nums2 = [1]
+<b>输出：</b>3
+<b>解释：</b>你可以通过 3 次操作使 nums1 中所有数的和与 nums2 中所有数的和相等。以下数组下标都从 0 开始。
+- 将 nums1[0] 变为 2 。 nums1 = [<strong>2</strong>,6], nums2 = [1] 。
+- 将 nums1[1] 变为 2 。 nums1 = [2,<strong>2</strong>], nums2 = [1] 。
+- 将 nums2[0] 变为 4 。 nums1 = [2,2], nums2 = [<strong>4</strong>] 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums1.length, nums2.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums1[i], nums2[i] &lt;= 6</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 68 ms</p>
+                    <p>内存: 20.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minOperations(self, nums1: List[int], nums2: List[int]) -&gt; int:
+        a = sum(nums1)
+        b = sum(nums2)
+        if a &gt; b:
+            a, b = b, a
+            nums1, nums2 = nums2, nums1
+        if len(nums1) &gt; 6 * len(nums2) or len(nums2) &gt; 6 * len(nums1):
+            return -1 
+
+        x = Counter(nums1)
+        y = Counter(nums2)
+
+        ans = 0
+        de = b - a
+
+        while de &gt; 0:
+            for i in range(1, 7):
+                ct = x[i] + y[7 - i]
+                val = ct * (6 - i)
+                if val &lt; de:
+                    de -= val
+                    ans += ct
+                else:
+                    return ans + ceil(de / (6 - i))
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>首先计算两个数组的和，如果一个数组的和大于另一个数组，将它们交换，以便始终让a是较小的和。然后检查是否有可能通过修改使两个数组和相等，即检查数组长度的6倍是否大于另一个数组的长度，如果是则返回-1。使用Counter来计数每个数组中各数字的出现次数。然后计算两数组和之差de。通过从1到6遍历，尝试减少这个差距。对于每个数字i，计算可以通过将nums1中的i增加到6或将nums2中的7-i减少到1来改变差距的总次数。如果通过当前数字能够完全消除差距，则直接返回结果；如果不能，则减少差距并继续处理。这个过程中，ans累加操作次数，直到差距为0。</p>
+                                <p>时间复杂度: O(n + m)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minOperations(self, nums1: List[int], nums2: List[int]) -&gt; int:
+        a = sum(nums1) # 计算nums1的总和
+        b = sum(nums2) # 计算nums2的总和
+        if a &gt; b: # 确保a是较小的和
+            a, b = b, a
+            nums1, nums2 = nums2, nums1
+        if len(nums1) &gt; 6 * len(nums2) or len(nums2) &gt; 6 * len(nums1): # 检查是否有可能使两数组和相等
+            return -1
+
+        x = Counter(nums1) # 数组nums1的计数器
+        y = Counter(nums2) # 数组nums2的计数器
+
+        ans = 0 # 初始化操作次数
+        de = b - a # 计算两数组和的差距
+
+        while de &gt; 0: # 当还有差距需要处理时
+            for i in range(1, 7): # 遍历所有可能的数字
+                ct = x[i] + y[7 - i] # 计算可以通过增加或减少改变差距的次数
+                val = ct * (6 - i) # 计算通过当前数字最多可以改变的差距
+                if val &lt; de: # 如果不足以消除全部差距
+                    de -= val
+                    ans += ct # 更新操作次数和剩余的差距
+                else: # 如果可以完全消除差距
+                    return ans + ceil(de / (6 - i)) # 计算最终需要的操作次数并返回
+        return ans # 如果没有剩余差距，返回操作次数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在判断两个数组和是否可以通过修改变得相等时，需要检查数组长度的6倍是否大于另一个数组的长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个检查是为了确保在最极端的情况下（即一个数组的所有元素都是1，另一个数组的所有元素都是6），也有可能通过修改使两个数组的和相等。如果不满足这个条件，即使把一个数组的所有元素改为1，另一个数组的所有元素改为6，两个数组的元素个数的差距也太大，导致即便是在极端情况下也无法通过增减操作使两个数组的和相等。因此，这是一个基本的可行性检查，确保算法执行前的基本条件满足。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在算法中，`ceil(de / (6 - i))`的计算方法为何能确保最小操作次数，这里的逻辑是怎样的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，`ceil(de / (6 - i))`表示为了消除剩余的差额`de`，在当前数字`i`可以提供的单次最大改变量`6-i`下，需要进行的最小操作次数。使用`ceil`函数是因为即使差额不能被`6-i`完全整除，也需要进行一次完整的操作来确保差额被完全消除。例如，如果差额为10，而`6-i`为5，则需要进行`ceil(10 / 5) = 2`次操作。这保证了在每一个步骤中我们都在进行最优的操作，即每次尽可能多地减少差额，从而确保操作次数是最少的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么选择从1到6遍历数字，并计算通过增加或减少来改变差距的次数，这样的策略为何是高效的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择从1到6遍历数字是因为数组中的元素值范围是这个区间内的整数。算法需要评估每个元素值的变化对总和差`de`的影响。通过考虑将nums1中的元素增加到6（最大值）或将nums2中的元素减少到1（最小值），我们可以最大化单次操作对差值的影响。这种策略高效的原因在于它直接针对最大可行的单次差值变化，从而减少了总的操作次数，加快了收敛速度，提高了算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/equal-sum-arrays-with-minimum-number-of-operations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/equal-sum-arrays-with-minimum-number-of-operations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

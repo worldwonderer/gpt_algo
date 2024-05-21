@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>迷宫 III</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>迷宫 III</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 33 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findShortestWay(self, maze: List[List[int]], ball: List[int], hole: List[int]) -&gt; str:
+        # dijkstra算法，并且需要记录路线
+        row,col = len(maze),len(maze[0])
+        dis = [[inf]*col for i in range(row)]
+        dis[ball[0]][ball[1]] = 0
+        path = defaultdict(list)
+        h = [(0,ball,&#39;&#39;)]
+        while h:
+            d,(i,j),route = heappop(h)
+            # 计算终点
+            if [i,j] == hole:
+                return min(path[(i,j)])
+            for dx,dy,way in (1,0,&#39;d&#39;),(-1,0,&#39;u&#39;),(0,1,&#39;r&#39;),(0,-1,&#39;l&#39;):
+                x,y = i,j
+                while 0&lt;=x&lt;row and 0&lt;=y&lt;col and maze[x][y]==0:
+                    x += dx
+                    y += dy
+                    if [x,y] == hole:
+                        break
+                else:
+                    x -= dx # 撞墙撤回一步
+                    y -= dy
+                if [x,y] == [i,j]:
+                    continue
+                nd = abs(x-i) + abs(y-j) + d
+                nway = route + way
+                if nd &lt; dis[x][y]:
+                    dis[x][y] = nd
+                    path[(x,y)] = [nway]
+                    heappush(h,(nd,(x,y),nway))
+                elif nd == dis[x][y]:
+                    path[(x,y)].append(nway)
+                    heappush(h,(nd,(x,y),nway))
+
+        return &#39;impossible&#39;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了Dijkstra算法来寻找从起点到终点的最短路径。与普通的Dijkstra算法不同的是，除了记录最短距离外，还需要记录到达每个位置的路线。具体实现时，使用优先队列来存储当前探索到的位置，每次取出距离最小的位置进行扩展。对于每个位置，尝试向四个方向移动，直到撞墙或到达终点。如果到达一个之前未探索过的位置，则更新其距离并记录路线；如果到达一个已探索过的位置，且距离相等，则在该位置的路线中追加新的路线。最后，如果到达终点，则返回字典序最小的路线；如果无法到达终点，则返回&#39;impossible&#39;。</p>
+                                <p>时间复杂度: O(mnlog(mn))</p>
+                                <p>空间复杂度: O(mn(m+n))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findShortestWay(self, maze: List[List[int]], ball: List[int], hole: List[int]) -&gt; str:
+        # 迷宫的行数和列数
+        row, col = len(maze), len(maze[0])
+        # 记录每个位置的最短距离，初始化为无穷大
+        dis = [[inf] * col for i in range(row)]
+        # 起点的距离为0
+        dis[ball[0]][ball[1]] = 0
+        # 记录每个位置的路线
+        path = defaultdict(list)
+        # 优先队列，存储(距离,(x坐标,y坐标),路线)，按距离从小到大排序
+        h = [(0, ball, &#39;&#39;)]
+
+        while h:
+            # 取出距离最小的位置
+            d, (i, j), route = heappop(h)
+            # 如果到达终点，返回字典序最小的路线
+            if [i, j] == hole:
+                return min(path[(i, j)])
+            # 向四个方向扩展
+            for dx, dy, way in (1, 0, &#39;d&#39;), (-1, 0, &#39;u&#39;), (0, 1, &#39;r&#39;), (0, -1, &#39;l&#39;):
+                x, y = i, j
+                # 沿当前方向移动，直到撞墙或到达终点
+                while 0 &lt;= x &lt; row and 0 &lt;= y &lt; col and maze[x][y] == 0:
+                    x += dx
+                    y += dy
+                    if [x, y] == hole:
+                        break
+                else:
+                    # 撞墙，回退一步
+                    x -= dx
+                    y -= dy
+                # 如果没有移动，则跳过该方向
+                if [x, y] == [i, j]:
+                    continue
+                # 计算到达新位置的距离和路线
+                nd = abs(x - i) + abs(y - j) + d
+                nway = route + way
+                # 如果新距离更短，则更新距离和路线
+                if nd &lt; dis[x][y]:
+                    dis[x][y] = nd
+                    path[(x, y)] = [nway]
+                    heappush(h, (nd, (x, y), nway))
+                # 如果新距离等于当前最短距离，则追加路线
+                elif nd == dis[x][y]:
+                    path[(x, y)].append(nway)
+                    heappush(h, (nd, (x, y), nway))
+        
+        # 无法到达终点
+        return &#39;impossible&#39;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用Dijkstra算法时，你是如何处理迷宫中的&#39;撞墙&#39;逻辑？在代码中似乎有回退一步的操作，请问这是怎样实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实现迷宫问题的Dijkstra算法中，处理撞墙的逻辑是通过在移动过程中检查下一个移动的格子是否有效（即是否在迷宫范围内且不是墙）。当沿着某一方向前进且即将移动到的格子是墙时（或者超出迷宫边界），算法会停止在当前方向的前进，并进行回退一步的操作。具体地，在代码中，这一逻辑是通过在循环条件判断中将移动到的下一个位置设为墙或出界前的最后一个合法格子实现的。这意味着一旦发现下一个位置不合法，循环会结束，此时的坐标还是合法的最后位置，但在循环结束后，代码会减去最后一次的移动（dx或dy），使(x, y)回退到最后一个合法的位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            此题解中提到，如果到达一个已探索过的位置且距离相等，则在该位置的路线中追加新的路线。请问这种处理对于Dijkstra算法的效率有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Dijkstra算法中，当发现一条到达某个位置的相同长度的新路径时，将这条路径加入到该位置的路径列表中，这种处理方式确实会增加算法的空间复杂度（因为需要存储额外的路径信息）。此外，每次向优先队列中添加相同距离的新路径，也会稍微增加时间复杂度，因为优先队列需要对更多的元素进行排序。然而，这种影响通常是可接受的，因为它使得我们能够探索所有可能的最短路径，进而可以在最后选择字典序最小的路径，这在某些应用场景下是有用的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到当到达终点时，返回字典序最小的路线。请问是否有可能存在多条相同长度但字典序不同的最短路径？如果有，该如何决定返回哪一条？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，存在可能有多条相同长度但字典序不同的最短路径的情况。在这种情况下，题解中通过维护一个路径列表，并在到达终点时从这些路径中选择一个字典序最小的路径来返回。这通过在最终到达终点时，比较存储在路径列表中的所有路径，选择出字典序最小的一个实现。这种方法确保了无论有多少条相同长度的路径，总能返回一个确定且最优的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新距离数组和路径字典时，如果新计算的距离小于之前记录的距离，会替换原有的路径。这种操作是否可能导致先前的一些优秀路径被遗漏？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Dijkstra算法中，如果一个位置的新计算距离小于已记录的距离，则意味着我们找到了一条更短的路径到达该位置，因此会更新该位置的距离并替换原有的路径。这种操作不会导致遗漏‘优秀’路径，因为所谓的优秀路径应当是指更短的路径。算法的目标是找到从起点到终点的最短路径，因此，只有更短的路径才被考虑为“优秀”，而更长的路径即使在字典序上较好也会被舍弃。这是因为我们的首要目标是最小化路径长度，而非路径的字典序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/the-maze" class="list-group-item list-group-item-action">
+                                迷宫
+                            </a>
+                        
+                            <a href="/problem/the-maze-ii" class="list-group-item list-group-item-action">
+                                迷宫 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-maze-iii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-maze-iii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

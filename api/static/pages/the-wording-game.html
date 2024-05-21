@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单词游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单词游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=game-theory" class="badge bg-secondary tag-link">博弈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 96 ms</p>
+                    <p>内存: 42.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def canAliceWin(self, a: List[str], b: List[str]) -&gt; bool:
+        left = [&#39;&#39;] * 27
+        right = [&#39;&#39;] * 27
+        for s in a:
+            left[ord(s[0])-ord(&#39;a&#39;)] = s
+        
+        for s in b:
+            right[ord(s[0])-ord(&#39;a&#39;)] = s
+        
+        
+        def pick(last,arr):
+            i = ord(last[0])-ord(&#39;a&#39;)
+            if i &lt; 25:
+                if arr[i+1]:
+                    return arr[i+1]
+                                       
+            if arr[i] and arr[i] &gt; last:
+                return arr[i]
+                
+            return last
+        
+        # 当前能否获胜
+        @cache
+        def dfs(last,flag):
+            i = ord(last[0])-ord(&#39;a&#39;)
+            # a选
+            if flag:
+                if left[i] and left[i] &gt; last:
+                    if not dfs(left[i],not flag):
+                        return True
+                
+                if left[i+1]:
+                    if not dfs(left[i+1],not flag):
+                        return True
+                return False
+            # b选
+            else:
+                if right[i] and right[i] &gt; last:
+                    if not dfs(right[i],not flag):
+                        return True
+                
+                if right[i+1]:
+                    if not dfs(right[i+1],not flag):
+                        return True
+                return False
+                    
+        return not dfs(a[0],False)
+                                                    </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的基本思路是使用深度优先搜索（DFS）来模拟两个玩家（Alice 和 Bob）轮流从两个不同的单词列表中选择单词的游戏。玩家必须选择的单词需要字母顺序大于上一个选择的单词，并且以相邻的字母开头。解题关键是利用缓存（通过@cache装饰器）来避免重复计算相同状态下的结果，提高效率。通过递归调用`dfs`函数来判断当前玩家是否有必胜策略。如果当前玩家能选择一个单词，使得对方在下一轮没有必胜策略，则当前玩家获胜。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def canAliceWin(self, a: List[str], b: List[str]) -&gt; bool:
+        left = [&#39;&#39;] * 27
+        right = [&#39;&#39;] * 27
+        for s in a:
+            left[ord(s[0])-ord(&#39;a&#39;)] = s
+        
+        for s in b:
+            right[ord(s[0])-ord(&#39;a&#39;)] = s
+        
+        @cache
+        def dfs(last, flag):
+            i = ord(last[0])-ord(&#39;a&#39;)
+            if flag:  # Alice&#39;s turn
+                if left[i] and left[i] &gt; last:
+                    if not dfs(left[i], not flag):
+                        return True
+                if left[i+1]:
+                    if not dfs(left[i+1], not flag):
+                        return True
+                return False
+            else:  # Bob&#39;s turn
+                if right[i] and right[i] &gt; last:
+                    if not dfs(right[i], not flag):
+                        return True
+                if right[i+1]:
+                    if not dfs(right[i+1], not flag):
+                        return True
+                return False
+        
+        return not dfs(a[0], False)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到的`字母顺序大于上一个选择的单词`是如何具体比较的？是否是比较整个字符串的字典序还是只比较首字母？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，`字母顺序大于上一个选择的单词`指的是比较两个单词的整个字符串的字典序。这意味着如果在字典中，一个单词（例如&#39;bcd&#39;）出现在另一个单词（例如&#39;abc&#39;）之后，则第一个单词在字典序上大于第二个单词。题解中的比较操作`left[i] &gt; last`或`right[i] &gt; last`就是执行这样的字典序比较，确保所选的单词在字典序上严格大于上一个选中的单词。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在函数`dfs`中，递归调用`not dfs(left[i], not flag)`返回True表示什么意思？这是如何体现当前玩家有必胜策略的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`dfs`函数中，`not dfs(left[i], not flag)`返回True表示如果当前玩家选择单词`left[i]`后，对手在接下来的回合中没有必胜策略。这是因为`dfs`函数设计为判断当前玩家是否会输掉游戏（即对手有必胜策略）。因此，如果对手的`dfs`调用返回False（表示对手无法必胜），那么`not dfs(...)`就会返回True，显示当前玩家通过选择这个单词能够迫使对手进入一个必败的状态。这正是体现当前玩家拥有必胜策略的关键逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的缓存是如何优化递归性能的？能否具体解释缓存在这个问题中起到的作用和它的工作机制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中使用的缓存是通过Python的`@cache`装饰器实现的，它是一种优化技术，用于存储已解决的子问题的结果。在递归过程中，某些状态可能会被重复计算多次，特别是在深度优先搜索中，这会导致效率低下。通过存储已计算过的函数结果，当相同的输入再次出现时，可以直接返回存储的结果，避免重复计算。在这个问题中，缓存存储了每个`(last, flag)`状态的结果，防止在探索不同路径时对相同的游戏状态进行重复的胜负判定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么题解选择以首字母的Ascii码偏移量来初始化`left`和`right`数组？使用这种方法有什么特别的优点吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解通过将首字母转换为Ascii码偏移量来初始化`left`和`right`数组，这样做可以快速定位到以特定字母开头的单词。这种方法的优点在于它提供了一种快速的索引方式，允许算法直接访问以任何特定字母开头的最大单词，而无需遍历整个单词列表。这种基于首字母索引的方式减少了查找时间，使得算法在处理大量单词时更加高效。此外，这种方法在处理字母开头的排序和比较时也更为直观和方便。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-wording-game')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-wording-game/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

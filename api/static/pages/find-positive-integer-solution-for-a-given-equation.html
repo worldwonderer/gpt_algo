@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找出给定方程的正整数解</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找出给定方程的正整数解</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=interactive" class="badge bg-secondary tag-link">交互</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个函数  <code>f(x, y)</code> 和一个目标结果 <code>z</code>，函数公式未知，请你计算方程 <code>f(x,y) == z</code> 所有可能的正整数 <strong>数对</strong> <code>x</code> 和 <code>y</code>。满足条件的结果数对可以按任意顺序返回。</p>
+
+<p>尽管函数的具体式子未知，但它是单调递增函数，也就是说：</p>
+
+<ul>
+	<li><code>f(x, y) < f(x + 1, y)</code></li>
+	<li><code>f(x, y) < f(x, y + 1)</code></li>
+</ul>
+
+<p>函数接口定义如下：</p>
+
+<pre>
+interface CustomFunction {
+public:
+  // Returns some positive integer f(x, y) for two positive integers x and y based on a formula.
+  int f(int x, int y);
+};</pre>
+
+<p>你的解决方案将按如下规则进行评判：</p>
+
+<ul>
+	<li>判题程序有一个由 <code>CustomFunction</code> 的 <code>9</code> 种实现组成的列表，以及一种为特定的 <code>z</code> 生成所有有效数对的答案的方法。</li>
+	<li>判题程序接受两个输入：<code>function_id</code>（决定使用哪种实现测试你的代码）以及目标结果 <code>z</code> 。</li>
+	<li>判题程序将会调用你实现的 <code>findSolution</code> 并将你的结果与答案进行比较。</li>
+	<li>如果你的结果与答案相符，那么解决方案将被视作正确答案，即 <code>Accepted</code> 。</li>
+</ul>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>function_id = 1, z = 5
+<strong>输出：</strong>[[1,4],[2,3],[3,2],[4,1]]
+<strong>解释：</strong>function_id = 1 暗含的函数式子为 f(x, y) = x + y
+以下 x 和 y 满足 f(x, y) 等于 5：
+x=1, y=4 -> f(1, 4) = 1 + 4 = 5
+x=2, y=3 -> f(2, 3) = 2 + 3 = 5
+x=3, y=2 -> f(3, 2) = 3 + 2 = 5
+x=4, y=1 -> f(4, 1) = 4 + 1 = 5
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>function_id = 2, z = 5
+<strong>输出：</strong>[[1,5],[5,1]]
+<strong>解释：</strong>function_id = 2 暗含的函数式子为 f(x, y) = x * y
+以下 x 和 y 满足 f(x, y) 等于 5：
+x=1, y=5 -> f(1, 5) = 1 * 5 = 5
+x=5, y=1 -> f(5, 1) = 5 * 1 = 5</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= function_id <= 9</code></li>
+	<li><code>1 <= z <= 100</code></li>
+	<li>题目保证 <code>f(x, y) == z</code> 的解处于 <code>1 <= x, y <= 1000</code> 的范围内。</li>
+	<li>在 <code>1 <= x, y <= 1000</code> 的前提下，题目保证 <code>f(x, y)</code> 是一个 32 位有符号整数。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 32 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">&#34;&#34;&#34;
+   This is the custom function interface.
+   You should not implement it, or speculate about its implementation
+   class CustomFunction:
+       # Returns f(x, y) for any given positive integers x and y.
+       # Note that f(x, y) is increasing with respect to both x and y.
+       # i.e. f(x, y) &lt; f(x + 1, y), f(x, y) &lt; f(x, y + 1)
+       def f(self, x, y):
+  
+&#34;&#34;&#34;
+class Solution:
+    def findSolution(self, customfunction: &#39;CustomFunction&#39;, z: int) -&gt; List[List[int]]:
+        x = 1
+        y = 1000
+        res = []
+        up = 1000
+        for y in range(1, 1001):
+            x = self.bisec(lambda x: customfunction.f(x, y), 1, up, z)
+            if customfunction.f(x, y) == z:
+                res.append([x, y])
+            elif x == 1:
+                break
+            up = x
+        return res
+    
+    def bisec(self, f, left, right, z):
+        if f(left) &gt;= z:
+            return left
+        if f(right) == z:
+            return right
+        while left + 1 &lt; right:
+            mid = int((left + right) / 2)
+            if f(mid) &lt; z:
+                left = mid
+            elif f(mid) &gt; z:
+                right = mid
+            else:
+                return mid
+        if f(left) &gt;= z:
+            return left
+        else:
+            return right</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的思路是使用二分查找配合单调递增的性质来找到满足 f(x, y) == z 的所有整数对 (x, y)。首先固定 y 从 1 到 1000，对于每个 y，使用二分查找在 1 到 1000 的范围内寻找满足条件的 x。如果找到满足条件的 x，则将 (x, y) 添加到结果列表中。为了优化查找过程，每次找到一个解后，将下一次的 x 的搜索上界设置为当前找到的 x，因为函数对于 x 是单调递增的。</p>
+                                <p>时间复杂度: O(m log n)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findSolution(self, customfunction: &#39;CustomFunction&#39;, z: int) -&gt; List[List[int]]:
+        res = []
+        up = 1000
+        for y in range(1, 1001):
+            x = self.bisec(lambda x: customfunction.f(x, y), 1, up, z)
+            if customfunction.f(x, y) == z:
+                res.append([x, y])
+            elif x == 1:
+                break
+            up = x
+        return res
+    
+    def bisec(self, f, left, right, z):
+        if f(left) &gt;= z:
+            return left
+        if f(right) == z:
+            return right
+        while left + 1 &lt; right:
+            mid = int((left + right) / 2)
+            if f(mid) &lt; z:
+                left = mid
+            elif f(mid) &gt; z:
+                right = mid
+            else:
+                return mid
+        if f(left) &gt;= z:
+            return left
+        else:
+            return right
+        # 二分法查找适合的 x 值，适应给定的 y 和 z 条件</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择二分查找来寻找x，而不是使用其他搜索技术，如顺序搜索或插值搜索？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找被选择是因为它比顺序搜索更高效，特别是在数据范围较大时。顺序搜索的时间复杂度为O(n)，而二分查找的时间复杂度为O(log n)，因此在数据范围为1到1000时，二分查找明显更快。相比于插值搜索，二分查找不需要假定数据分布，使其更加通用和稳定，尤其是在未知函数形式或者数据不均匀分布的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到对于每个y值都从1到1000使用二分法寻找x，但如何确定这个范围是合理的，尤其是考虑到函数f的具体形式是未知的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个范围的设定基于问题的约束和实际情况。假设问题约束了x和y的取值范围在1到1000，这也意味着所有可能的解都位于这个范围内。虽然函数f的具体形式未知，但通常情况下，如果问题设计者提供了这样的范围，那么合理的假设是解应该存在于此范围内。同时，在实际应用中，如果有额外信息表明解可能存在于更广或更窄的范围，那么可以相应调整搜索范围。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在二分查找实现中，如何处理当`f(mid)`等于z时直接返回mid，与可能存在多个x满足`f(x, y) == z`的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，一旦发现`f(mid) == z`，则直接返回mid作为解。这种做法是基于题目要求找到任意一组满足条件的解，而非所有解。在实际应用中，如果需要找到所有满足条件的x值，应该在找到一个解后继续在左右子区间分别进行搜索，即使当前mid已经满足条件。这需要修改二分查找的实现，以确保不遗漏任何解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中断言如果`f(x, y) == z`找到一个解后，下一次x的搜索上界设置为当前找到的x，这种方法在哪些情况下可能会失败？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法假设函数f对于x是严格单调递增的。如果函数f在某些y值下对x不是单调递增，或者f在某些区间内对x是常数（即在多个x值上取相同的值），那么设置下一次搜索的上界为当前找到的x可能导致遗漏其他有效的x值。因此，在函数f的单调性未知或不保证时，这种方法可能会失败。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-positive-integer-solution-for-a-given-equation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-positive-integer-solution-for-a-given-equation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

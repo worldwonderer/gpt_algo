@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>打开转盘锁</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>打开转盘锁</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： <code>'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'</code> 。每个拨轮可以自由旋转：例如把 <code>'9'</code> 变为&nbsp;<code>'0'</code>，<code>'0'</code> 变为 <code>'9'</code> 。每次旋转都只能旋转一个拨轮的一位数字。</p>
+
+<p>锁的初始数字为 <code>'0000'</code> ，一个代表四个拨轮的数字的字符串。</p>
+
+<p>列表 <code>deadends</code> 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。</p>
+
+<p>字符串 <code>target</code> 代表可以解锁的数字，你需要给出解锁需要的最小旋转次数，如果无论如何不能解锁，返回 <code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入：</strong>deadends = ["0201","0101","0102","1212","2002"], target = "0202"
+<strong>输出：</strong>6
+<strong>解释：</strong>
+可能的移动序列为 "0000" -&gt; "1000" -&gt; "1100" -&gt; "1200" -&gt; "1201" -&gt; "1202" -&gt; "0202"。
+注意 "0000" -&gt; "0001" -&gt; "0002" -&gt; "0102" -&gt; "0202" 这样的序列是不能解锁的，
+因为当拨动到 "0102" 时这个锁就会被锁定。
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> deadends = ["8888"], target = "0009"
+<strong>输出：</strong>1
+<strong>解释：</strong>把最后一位反向旋转一次即可 "0000" -&gt; "0009"。
+</pre>
+
+<p><strong>示例 3:</strong></p>
+
+<pre>
+<strong>输入:</strong> deadends = ["8887","8889","8878","8898","8788","8988","7888","9888"], target = "8888"
+<strong>输出：</strong>-1
+<strong>解释：</strong>无法旋转到目标数字且不被锁定。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;=&nbsp;deadends.length &lt;= 500</code></li>
+	<li><code><font face="monospace">deadends[i].length == 4</font></code></li>
+	<li><code><font face="monospace">target.length == 4</font></code></li>
+	<li><code>target</code> <strong>不在</strong> <code>deadends</code> 之中</li>
+	<li><code>target</code> 和 <code>deadends[i]</code> 仅由若干位数字组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 864 ms</p>
+                    <p>内存: 15.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+from collections import deque
+
+
+class Solution:
+    def openLock(self, deadends: List[str], target: str) -&gt; int:
+        def up(s, i):
+            arr = list(s)
+            if arr[i] == &#39;9&#39;:
+                arr[i] = &#39;0&#39;
+            else:
+                arr[i] = str(int(arr[i]) + 1)
+            return &#39;&#39;.join(arr)
+
+        def down(s, i):
+            arr = list(s)
+            if arr[i] == &#39;0&#39;:
+                arr[i] = &#39;9&#39;
+            else:
+                arr[i] = str(int(arr[i]) - 1)
+            return &#39;&#39;.join(arr)
+
+        q = deque()
+        visited = set(deadends)
+        if &#39;0000&#39; in visited:
+            return -1
+        q.append(&#34;0000&#34;)
+        visited.add(&#34;0000&#34;)
+        count = 0
+        while q:
+            size = len(q)
+            for _ in range(size):
+                s = q.popleft()
+                if s == target:
+                    return count
+                for i in range(4):
+                    for func in (up, down):
+                        n = func(s, i)
+                        if n not in visited:
+                            visited.add(n)
+                            q.append(n)
+            count += 1
+        return -1
+
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.openLock([&#34;0201&#34;,&#34;0101&#34;,&#34;0102&#34;,&#34;1212&#34;,&#34;2002&#34;], &#39;0202&#39;))
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了宽度优先搜索（BFS）算法来找到从初始状态&#39;0000&#39;到目标状态&#39;target&#39;的最短路径。每个状态表示为一个四位数字的字符串，每次操作可以将任意一位数字增加1或减少1。如果增加或减少后的数字是9或者0，则会循环到0或9。使用队列来存储每一层的所有状态，并用一个集合来记录已访问过的状态和死亡数字。从&#39;0000&#39;开始搜索，每次从队列中取出当前状态，并生成新的状态，如果新状态没有被访问过且不在死亡数字中，则加入队列继续搜索。如果找到目标状态，则返回当前的步数。如果队列为空还没有找到目标状态，返回-1。</p>
+                                <p>时间复杂度: O(N)</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2">from typing import List
+from collections import deque
+
+
+class Solution:
+    def openLock(self, deadends: List[str], target: str) -&gt; int:
+        def up(s, i):
+            arr = list(s)
+            if arr[i] == &#39;9&#39;:
+                arr[i] = &#39;0&#39;
+            else:
+                arr[i] = str(int(arr[i]) + 1)
+            return &#39;&#39;.join(arr)
+
+        def down(s, i):
+            arr = list(s)
+            if arr[i] == &#39;0&#39;:
+                arr[i] = &#39;9&#39;
+            else:
+                arr[i] = str(int(arr[i]) - 1)
+            return &#39;&#39;.join(arr)
+
+        q = deque()
+        visited = set(deadends)
+        if &#39;0000&#39; in visited:
+            return -1
+        q.append(&#39;0000&#39;)
+        visited.add(&#39;0000&#39;)
+        count = 0
+        while q:
+            size = len(q)
+            for _ in range(size):
+                s = q.popleft()
+                if s == target:
+                    return count
+                for i in range(4):
+                    for func in (up, down):
+                        n = func(s, i)
+                        if n not in visited:
+                            visited.add(n)
+                            q.append(n)
+            count += 1
+        return -1
+
+if __name__ == &#39;__main__&#39;:
+    s = Solution()
+    print(s.openLock([&#39;0201&#39;,&#39;0101&#39;,&#39;0102&#39;,&#39;1212&#39;,&#39;2002&#39;], &#39;0202&#39;))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在宽度优先搜索中使用队列而不是栈？队列和栈在这种搜索中有什么不同的影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在宽度优先搜索（BFS）中使用队列而不是栈是因为队列遵循先进先出（FIFO）的原则，这有助于按层次（从起点开始的距离）探索所有可能的状态。这种方式确保了一旦找到目标状态，就是通过最短的路径达到的。相反，栈遵循后进先出（LIFO）的原则，它会导致深度优先搜索（DFS），这种搜索方式首先探索尽可能深的路径而不是最短路径，可能会错过最短路径解，在解决此类找最短路径的问题时不是最佳选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在检查到当前状态为目标状态时直接返回步数的逻辑是否考虑了所有可能的路径到达目标状态的最小步数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，在BFS中，由于搜索是层次进行的，当首次到达某个状态时，可以保证是通过最短路径到达的。因此，一旦在搜索过程中遇到目标状态，立即返回的步数即是到达该状态的最短路径。此时无需考虑其他可能的路径，因为它们要么已经被探索过，要么路径更长。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            函数up和down在处理边界条件（数字为0或9时）的策略是什么？这种处理方式是否最优？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>函数`up`和`down`处理边界条件的策略是，当需要增加数字9时，它会回绕到0，而当需要减少数字0时，它会回绕到9。这种处理方式是对转盘锁的自然模拟，因为转盘锁是循环的。这种处理方式是最优的，因为它正确并且直接地反映了问题的实际物理约束。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中有一个检查&#39;0000&#39;是否在deadends中的步骤，如果&#39;0000&#39;在deadends列表中，为什么直接返回-1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果&#39;0000&#39;在deadends列表中，意味着初始状态是锁定状态，无法开始任何操作来改变锁的状态。在这种情况下，由于起始点已被阻塞，不存在任何可能的路径可以从&#39;0000&#39;达到目标状态。因此，直接返回-1是合理的，表示问题无解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/open-the-lock')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/open-the-lock/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

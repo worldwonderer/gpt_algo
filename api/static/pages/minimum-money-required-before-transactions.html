@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>完成所有交易的初始最少钱数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>完成所有交易的初始最少钱数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的二维整数数组&nbsp;<code><font face="monospace">transactions</font></code>，其中<code>transactions[i] = [cost<sub>i</sub>, cashback<sub>i</sub>]</code>&nbsp;。</p>
+
+<p>数组描述了若干笔交易。其中每笔交易必须以 <strong>某种顺序</strong> 恰好完成一次。在任意一个时刻，你有一定数目的钱&nbsp;<code>money</code>&nbsp;，为了完成交易&nbsp;<code>i</code>&nbsp;，<code>money &gt;= cost<sub>i</sub></code>&nbsp;这个条件必须为真。执行交易后，你的钱数&nbsp;<code>money</code> 变成&nbsp;<code>money - cost<sub>i</sub> + cashback<sub>i</sub></code><sub>&nbsp;</sub>。</p>
+
+<p>请你返回 <strong>任意一种</strong> 交易顺序下，你都能完成所有交易的最少钱数<em>&nbsp;</em><code>money</code>&nbsp;是多少。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>transactions = [[2,1],[5,0],[4,2]]
+<b>输出：</b>10
+<strong>解释：
+</strong>刚开始 money = 10 ，交易可以以任意顺序进行。
+可以证明如果 money &lt; 10 ，那么某些交易无法进行。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>transactions = [[3,0],[0,3]]
+<b>输出：</b>3
+<strong>解释：</strong>
+- 如果交易执行的顺序是 [[3,0],[0,3]] ，完成所有交易需要的最少钱数是 3 。
+- 如果交易执行的顺序是 [[0,3],[3,0]] ，完成所有交易需要的最少钱数是 0 。
+所以，刚开始钱数为 3 ，任意顺序下交易都可以全部完成。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= transactions.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>transactions[i].length == 2</code></li>
+	<li><code>0 &lt;= cost<sub>i</sub>, cashback<sub>i</sub> &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 108 ms</p>
+                    <p>内存: 54.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumMoney(self, transactions: List[List[int]]) -&gt; int:
+        need = 0
+        m = 0
+        for c, cb in transactions:
+            if c &gt; cb:
+                m = max(m, cb)
+                need += c - cb 
+            else:
+                m = max(m, c)
+        return m + need</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了一个贪心策略，分析所有交易并计算在最坏情况下完成所有交易需要的最少起始资金。它遍历所有交易，如果交易的成本大于返现（c &gt; cb），则意味着你在这笔交易后会亏损 &#39;c - cb&#39; 的金额。因此，累加所有这样的亏损值到 &#39;need&#39; 变量。同时更新 &#39;m&#39; 为所有交易中的 &#39;cb&#39; 的最大值或成本 &#39;c&#39; 的最大值，取决于交易是否产生亏损。最终，你需要的最少起始资金是累积的亏损加上 &#39;m&#39;，这样确保无论交易顺序如何，你都有足够的资金来应对最差情况。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 添加注释的题解代码
+
+class Solution:
+    def minimumMoney(self, transactions: List[List[int]]) -&gt; int:
+        need = 0  # 初始化需要的额外资金总和
+        m = 0  # 初始化完成交易时所需的最小初始资金
+        for c, cb in transactions:  # 遍历每笔交易的成本和返现
+            if c &gt; cb:  # 如果成本高于返现
+                m = max(m, cb)  # 更新m为迄今为止的最大返现（保证资金足够）
+                need += c - cb  # 累加亏损
+            else:  # 如果返现高于或等于成本
+                m = max(m, c)  # 更新m为迄今为止的最大成本
+        return m + need  # 返回初始资金需求，包括额外亏损和最大单笔交易所需资金</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中的贪心策略是基于什么理论或假设？为何累加亏损值和最大返现或成本值就能确保完成所有交易？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的贪心策略基于假设：在不考虑交易顺序的情况下，确保每次交易后都不导致资金为负。为了满足这一点，我们需要关注两个方面：1）如果成本大于返现的情况，这会导致资金亏损，因此我们累加所有这些亏损值以确保有足够资金覆盖这些亏损。2）独立于亏损，我们还需要考虑单次交易中可能需要的最大资金（无论是成本还是返现）。这样，无论交易顺序如何变化，总能保证有足够的资金来完成所有交易。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解算法中，为什么选择最大的返现值或成本值作为m的更新依据？这样的策略在哪些情况下可能不是最优的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中选择最大的返现值或成本值更新`m`是为了确保在最坏的单笔交易情况下，你仍然有足够的资金进行交易。这种策略以最坏情况为准，保证了算法的正确性但有时可能会导致资金的冗余，即可能导致计算出的起始资金比实际需要的多。例如，如果所有交易的返现都非常高，那么实际上并不需要额外准备太多资金来进行交易。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法对于处理交易顺序的灵活性是如何保证的？即如何确保在不同的交易顺序下，计算出的起始资金都是足够的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过计算并保留必要的两个最大值：亏损总和和最大单笔交易所需资金（最大成本或返现），来确保交易顺序的灵活性。无论交易的实际执行顺序如何，只要初始资金不少于这两个值的总和，就可以确保始终有足够的资金来应对任何单笔交易以及累积的亏损，从而保持算法的普适性和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到如果成本高于返现，则累加亏损值`c - cb`，这里的逻辑是否在所有情况下都成立？例如，如果后续交易返现很高怎么办？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>逻辑`c - cb`累加亏损在考虑到最坏情况下总是成立的，因为它保证了在任何交易中，即使没有足够的返现来抵消成本，你也仍然有足够的资金来处理这个亏损。即使后续交易的返现很高，这种方法依然保持有效，因为它是基于确保每笔交易都不会导致资金变为负数的最坏情况分析。这种策略可能导致对资金的过估计，但从安全性角度来看是保守且合理的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-money-required-before-transactions')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-money-required-before-transactions/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

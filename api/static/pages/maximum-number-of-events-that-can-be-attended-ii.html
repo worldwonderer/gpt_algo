@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最多可以参加的会议数目 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最多可以参加的会议数目 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>events</code> 数组，其中 <code>events[i] = [startDay<sub>i</sub>, endDay<sub>i</sub>, value<sub>i</sub>]</code> ，表示第 <code>i</code> 个会议在 <code>startDay<sub>i</sub></code><sub> </sub>天开始，第 <code>endDay<sub>i</sub></code> 天结束，如果你参加这个会议，你能得到价值 <code>value<sub>i</sub></code> 。同时给你一个整数 <code>k</code> 表示你能参加的最多会议数目。</p>
+
+<p>你同一时间只能参加一个会议。如果你选择参加某个会议，那么你必须 <strong>完整</strong> 地参加完这个会议。会议结束日期是包含在会议内的，也就是说你不能同时参加一个开始日期与另一个结束日期相同的两个会议。</p>
+
+<p>请你返回能得到的会议价值 <strong>最大和</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/02/06/screenshot-2021-01-11-at-60048-pm.png" style="width: 400px; height: 103px;" /></p>
+
+<pre>
+<b>输入：</b>events = [[1,2,4],[3,4,3],[2,3,1]], k = 2
+<b>输出：</b>7
+<strong>解释：</strong>选择绿色的活动会议 0 和 1，得到总价值和为 4 + 3 = 7 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/02/06/screenshot-2021-01-11-at-60150-pm.png" style="width: 400px; height: 103px;" /></p>
+
+<pre>
+<b>输入：</b>events = [[1,2,4],[3,4,3],[2,3,10]], k = 2
+<b>输出：</b>10
+<b>解释：</b>参加会议 2 ，得到价值和为 10 。
+你没法再参加别的会议了，因为跟会议 2 有重叠。你 <strong>不</strong> 需要参加满 k 个会议。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/02/06/screenshot-2021-01-11-at-60703-pm.png" style="width: 400px; height: 126px;" /></strong></p>
+
+<pre>
+<b>输入：</b>events = [[1,1,1],[2,2,2],[3,3,3],[4,4,4]], k = 3
+<b>输出：</b>9
+<b>解释：</b>尽管会议互不重叠，你只能参加 3 个会议，所以选择价值最大的 3 个会议。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= k <= events.length</code></li>
+	<li><code>1 <= k * events.length <= 10<sup>6</sup></code></li>
+	<li><code>1 <= startDay<sub>i</sub> <= endDay<sub>i</sub> <= 10<sup>9</sup></code></li>
+	<li><code>1 <= value<sub>i</sub> <= 10<sup>6</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 562 ms</p>
+                    <p>内存: 90.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxValue(self, events: List[List[int]], k: int) -&gt; int:
+        events.sort(key=lambda e:e[1]) # 按结束时间的先后进行排序
+
+        n = len(events)
+        dp=[[0]*(k+1) for i in range(n+1)]
+        # dp[i][j]表示从前i个会议中选择j个会议的最大价值和
+
+
+        for i in range(1,n+1):
+            # 通过遍历找到某个会议开始前的最晚结束的会议！这里遍历不会超时，放心遍历
+            start = events[i-1][0]
+            end = events[i-1][1]
+            val = events[i-1][2]
+
+            last = -1
+            for j in range(i-1,-1,-1):
+                if events[j][1]&lt;start:
+                    last = j
+                    break
+
+            for j in range(1,k+1):
+                # 前一项是不参加当前会议，后一项是参加当前会议
+                dp[i][j] = max(dp[i-1][j], dp[last+1][j-1]+val)
+
+        return dp[n][k]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解主要使用了动态规划的方法来解决问题。首先，将事件按照结束时间进行排序，以保证在处理事件的顺序时可以按照时间的顺序来处理。定义一个二维的dp数组，其中dp[i][j]代表考虑前i个事件，最多参加j个事件时能获得的最大价值。对于每一个事件，我们可以选择参加或不参加。如果不参加，则最大价值与前i-1个事件选择j个的价值相同，即dp[i][j] = dp[i-1][j]。如果选择参加，我们需要找到在该事件开始之前结束的最晚的事件，这可以通过从当前事件向前搜索，找到第一个结束时间小于当前事件开始时间的事件来实现。如果找到这样的事件，参加当前事件的价值是该事件的价值加上在找到的事件之前的最大价值，即dp[i][j] = max(dp[i][j], dp[last+1][j-1] + value)。最终，dp[n][k]中存储的就是在所有事件中选择最多k个事件能得到的最大价值。</p>
+                                <p>时间复杂度: O(n^2 * k)</p>
+                                <p>空间复杂度: O(n * k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxValue(self, events: List[List[int]], k: int) -&gt; int:
+        events.sort(key=lambda e:e[1]) # Sort events by their end times
+
+        n = len(events)
+        dp = [[0] * (k + 1) for i in range(n + 1)] # dp[i][j] represents the maximum value from choosing j events among the first i events
+
+        for i in range(1, n + 1):
+            start = events[i - 1][0]
+            end = events[i - 1][1]
+            val = events[i - 1][2]
+
+            last = -1
+            for j in range(i - 1, -1, -1): # Find the last event that ends before the current event starts
+                if events[j][1] &lt; start:
+                    last = j
+                    break
+
+            for j in range(1, k + 1): # Update dp values for up to k events
+                dp[i][j] = max(dp[i - 1][j], dp[last + 1][j - 1] + val) # Max value without current event or with current event
+
+        return dp[n][k] # The maximum value with at most k events
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            请问在寻找`在该事件开始之前结束的最晚的事件`时，简单地遍历前面所有事件是否效率最优？是否有更高效的方法来找到这个事件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>简单地遍历前面所有事件来寻找`在该事件开始之前结束的最晚的事件`并不是效率最优的方法，因为这样做的时间复杂度为O(n^2)，其中n是事件的数量。更高效的方法是使用二分搜索（Binary Search），因为事件已经根据结束时间排序。通过二分搜索，我们可以将寻找该事件的时间复杂度降低到O(log n)，从而使整体算法的时间复杂度优化到O(n log n)。在实现时，可以维护一个根据结束时间排序的事件列表，然后对于每个事件使用二分搜索来查找最晚且在当前事件开始前结束的事件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划的转移方程中，为什么选择`dp[last + 1][j - 1] + val`作为参加当前事件时的状态更新？这里的`last + 1`代表什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dp[last + 1][j - 1] + val`在状态转移方程中表示如果选择参加当前事件，我们应该加上当前事件的价值(val)和在此事件开始之前可以参与的最多事件的最大价值。这里的`last`是在当前事件开始之前结束的最晚的事件的索引，`last + 1`代表在`last`事件之后的第一个事件，也就是说`dp[last + 1][j - 1]`是考虑从`last + 1`到当前事件之前的事件中选择最多`j-1`个事件时的最大价值。这种方法确保了事件选择的不重叠，因为`last`事件结束的时间是在当前事件开始之前，所以这两个事件不会冲突。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在初始化dp数组时，所有元素都被初始化为0。这是否适用于所有情况，即使有些会议的价值为负数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化dp数组为0是基于假设所有事件的价值非负的情况下的标准做法，这样做的目的是确保在不选择任何事件时的价值为0。如果事件的价值可能为负数，那么简单地初始化为0可能不再适用，因为这可能导致选择负价值事件而降低总价值。在这种情况下，可能需要调整初始化策略或在状态转移时考虑是否选择负价值事件。例如，可以初始化为一个足够大的负数以确保不会错误地选择负价值事件，或者在更新dp值时添加条件检查事件的价值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-events-that-can-be-attended-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-events-that-can-be-attended-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

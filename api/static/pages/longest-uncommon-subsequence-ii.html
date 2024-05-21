@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长特殊序列 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长特殊序列 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定字符串列表&nbsp;<code>strs</code> ，返回其中 <strong>最长的特殊序列</strong>&nbsp;的长度。如果最长特殊序列不存在，返回 <code>-1</code> 。</p>
+
+<p><strong>特殊序列</strong> 定义如下：该序列为某字符串 <strong>独有的子序列（即不能是其他字符串的子序列）</strong>。</p>
+
+<p>&nbsp;<code>s</code>&nbsp;的&nbsp;<strong>子序列</strong>可以通过删去字符串&nbsp;<code>s</code>&nbsp;中的某些字符实现。</p>
+
+<ul>
+	<li>例如，<code>"abc"</code>&nbsp;是 <code>"aebdc"</code>&nbsp;的子序列，因为您可以删除<code>"a<u>e</u>b<u>d</u>c"</code>中的下划线字符来得到 <code>"abc"</code>&nbsp;。<code>"aebdc"</code>的子序列还包括<code>"aebdc"</code>、 <code>"aeb"</code>&nbsp;和 <font color="#c7254e" face="Menlo, Monaco, Consolas, Courier New, monospace"><span style="font-size: 12.6px; background-color: rgb(249, 242, 244);">""</span></font>&nbsp;(空字符串)。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入:</strong> strs = ["aba","cdc","eae"]
+<strong>输出:</strong> 3
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> strs = ["aaa","aaa","aa"]
+<strong>输出:</strong> -1
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>2 &lt;= strs.length &lt;= 50</code></li>
+	<li><code>1 &lt;= strs[i].length &lt;= 10</code></li>
+	<li><code>strs[i]</code>&nbsp;只包含小写英文字母</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findLUSlength(self, strs: List[str]) -&gt; int:
+        def is_sub(s1, s2):
+            n, m, j = len(s1), len(s2), 0
+            for i in range(n):
+                if s1[i] == s2[j]:
+                    j += 1
+                if j == m:
+                    return True
+            return False
+
+        strs.sort(key=lambda x: (-len(x), x))
+        n, deleted = len(strs), set()
+        for i in range(n):
+            if i in deleted:
+                continue
+            if i + 1 &lt; n and len(strs[i]) &gt; len(strs[i + 1]):
+                return len(strs[i])
+            flag = True
+            for j in range(i + 1, n):
+                s1, s2 = strs[i], strs[j]
+                if is_sub(s1, s2):
+                    deleted.add(j)
+                if flag and len(strs[j]) == len(strs[i]) and is_sub(s2, s1):
+                    flag = False
+            if flag:
+                return len(strs[i])
+        return -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是先将字符串数组按长度降序排序，然后遍历每个字符串，判断其是否是特殊序列。对于当前遍历到的字符串，如果它比下一个字符串长，那么它一定是特殊序列；否则，如果它不是任何其他字符串的子序列，那么它也是特殊序列。在判断子序列的过程中，可以通过双指针来实现。</p>
+                                <p>时间复杂度: O(nlogn + n^2m^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findLUSlength(self, strs: List[str]) -&gt; int:
+        def is_sub(s1, s2):
+            n, m, j = len(s1), len(s2), 0
+            for i in range(n):
+                if s1[i] == s2[j]:
+                    j += 1
+                if j == m:
+                    return True
+            return False
+
+        # 按照长度降序排序字符串数组
+        strs.sort(key=lambda x: (-len(x), x))
+        n, deleted = len(strs), set()
+        for i in range(n):
+            if i in deleted:
+                continue
+            # 如果当前字符串比下一个字符串长，那么它一定是特殊序列
+            if i + 1 &lt; n and len(strs[i]) &gt; len(strs[i + 1]):
+                return len(strs[i])
+            flag = True
+            for j in range(i + 1, n):
+                s1, s2 = strs[i], strs[j]
+                # 判断当前字符串是否为其他字符串的子序列
+                if is_sub(s1, s2):
+                    deleted.add(j)
+                # 判断其他字符串是否为当前字符串的子序列
+                if flag and len(strs[j]) == len(strs[i]) and is_sub(s2, s1):
+                    flag = False
+            if flag:
+                return len(strs[i])
+        return -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在判断字符串是否为特殊序列时，你是如何通过双指针技术检查一个字符串是否是另一个字符串的子序列的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双指针技术用于效率地遍历两个字符串，以确定一个字符串是否是另一个字符串的子序列。具体实现中，设置两个指针i和j，分别指向两个字符串s1和s2的开始位置。遍历s1的过程中，每当s1的字符与s2的当前字符相匹配时，指针j向前移动一位。如果j移动到了s2的末尾，则说明s2是s1的子序列。如果遍历结束后j没有到达s2的末尾，说明s2不是s1的子序列。这种方法在性能上较优，因为它仅需要线性时间即可判断子序列关系。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在排序后，如果当前字符串长度大于下一个字符串长度，就可以直接认定它是特殊序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在字符串数组按长度降序排序后，如果一个字符串长度大于紧跟其后的字符串，那么它不可能是任何长度更长的字符串的子序列，因为子序列的长度必然不会超过原字符串。此外，由于它比后续所有字符串都长，所以也不可能是后续任何字符串的子序列。因此，这样的字符串满足特殊序列的条件，即它不是数组中任何其他字符串的子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解中提到，如果当前字符串与后面某字符串长度相同且互为子序列，那么当前字符串不是特殊序列。能否解释这种情况下如何判断两个相等长度的字符串是否互为子序列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当两个字符串长度相等时，判断它们是否互为子序列主要是通过检查它们是否完全相同。因为只有当两个相同长度的字符串完全一致时，它们才能互为子序列。在实现中，可以通过比较两个字符串是否相等来实现这一点。如果相等，它们互为子序列，否则不是。在给定的题解中，这种情况意味着当前字符串不是特殊序列，因为它至少与一个其他字符串相同。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            你使用了一个集合`deleted`来记录被判断为子序列的字符串下标。这种方法在处理大量数据时是否会影响性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用集合`deleted`来记录被判断为子序列的字符串下标可以有效避免重复处理某些字符串，从而节省时间和计算资源。然而，这种方法确实会增加额外的空间复杂度，因为需要存储被删除的字符串的下标。在处理大量数据时，这可能会导致内存使用增加。但是，考虑到避免重复处理的时间节省，这通常是一个合理的权衡。如果数据量极大，可能需要考虑更高效的数据结构或优化算法以减少内存使用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/longest-uncommon-subsequence-i" class="list-group-item list-group-item-action">
+                                最长特殊序列 Ⅰ
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-uncommon-subsequence-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-uncommon-subsequence-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

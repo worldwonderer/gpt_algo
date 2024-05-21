@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>特别的排列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>特别的排列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;，它包含 <code>n</code>&nbsp;个 <strong>互不相同</strong>&nbsp;的正整数。如果&nbsp;<code>nums</code>&nbsp;的一个排列满足以下条件，我们称它是一个特别的排列：</p>
+
+<ul>
+	<li>对于&nbsp;<code>0 &lt;= i &lt; n - 1</code>&nbsp;的下标 <code>i</code>&nbsp;，要么&nbsp;<code>nums[i] % nums[i+1] == 0</code>&nbsp;，要么&nbsp;<code>nums[i+1] % nums[i] == 0</code>&nbsp;。</li>
+</ul>
+
+<p>请你返回特别排列的总数目，由于答案可能很大，请将它对<strong>&nbsp;</strong><code>10<sup>9&nbsp;</sup>+ 7</code>&nbsp;<strong>取余</strong>&nbsp;后返回。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums = [2,3,6]
+<b>输出：</b>2
+<b>解释：</b>[3,6,2] 和 [2,6,3] 是 nums 两个特别的排列。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>nums = [1,4,3]
+<b>输出：</b>2
+<b>解释：</b>[3,1,4] 和 [4,1,3] 是 nums 两个特别的排列。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= nums.length &lt;= 14</code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 305 ms</p>
+                    <p>内存: 29.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def specialPerm(self, nums: List[int]) -&gt; int:
+        nums.sort()
+        r, mod = range(len(nums)), 10**9 + 7
+        g = [1 &lt;&lt; i for i in r]
+        for i, j in combinations(r, 2):
+            if nums[j] % nums[i] == 0:
+                g[i] |= 1 &lt;&lt; j
+                g[j] |= 1 &lt;&lt; i
+        ends = [i for i, b in enumerate(g) if b.bit_count() == 2]
+        if any(i.bit_count() == 1 for i in g) or len(ends) &gt; 2:
+            return 0
+            
+        def ones(mask):
+            while mask:
+                i = mask.bit_length() - 1
+                yield i
+                mask ^= 1 &lt;&lt; i
+                
+        @cache
+        def complete(mask):
+            return all(g[i] &amp; mask == mask for i in ones(mask)) and factorial(mask.bit_count() - 1)
+            
+        @cache
+        def unconnected(mask):
+            return any(g[i] &amp; mask == 1 &lt;&lt; i for i in ones(mask))
+        
+        @cache
+        def dfs(start, mask):
+            intersection = g[start] &amp; mask
+            if intersection == 0:
+                return 0
+            if cm := complete(mask):
+                return cm * intersection.bit_count()
+            if unconnected(mask):
+                return 0
+            return sum(dfs(i, mask ^ (1 &lt;&lt; i)) for i in ones(intersection))
+        
+        universal = (1 &lt;&lt; len(nums)) - 1
+        g.append(1 &lt;&lt; ends[0] if ends else universal)
+        ans = dfs(-1, universal) % mod
+        return ans * 2 % mod if ends else ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划与深度优先搜索（DFS）结合的方法来解决问题。首先对数组进行排序，利用排序的特性简化除法运算的条件检查。接着，构建一个图的表示方式，用一个整数数组g来表示节点之间的连接关系，其中g[i]的二进制中的第j位如果是1，表示nums[i]和nums[j]之间可以相互整除。然后，通过DFS遍历所有可能的排列组合，使用位掩码技术来表示当前已经选择的元素集合。最后，利用缓存机制（@cache）来优化重复计算，提高效率。</p>
+                                <p>时间复杂度: O(n * 2^n)</p>
+                                <p>空间复杂度: O(n + 2^n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def specialPerm(self, nums: List[int]) -&gt; int:
+        nums.sort()  # 先对数组排序
+        r, mod = range(len(nums)), 10**9 + 7
+        g = [1 &lt;&lt; i for i in r]  # 初始化每个数自己的掩码
+        for i, j in combinations(r, 2):  # 生成所有可能的两数组合
+            if nums[j] % nums[i] == 0:  # 检查是否整除
+                g[i] |= 1 &lt;&lt; j
+                g[j] |= 1 &lt;&lt; i
+        ends = [i for i, b in enumerate(g) if b.bit_count() == 2]  # 查找端点
+        if any(i.bit_count() == 1 for i in g) or len(ends) &gt; 2:  # 检查是否存在单独点或端点过多
+            return 0
+        
+        def ones(mask):  # 生成mask中所有为1的位的索引
+            while mask:
+                i = mask.bit_length() - 1
+                yield i
+                mask ^= 1 &lt;&lt; i
+        
+        @cache
+        def complete(mask):  # 检查mask是否为一个完整的子图
+            return all(g[i] &amp; mask == mask for i in ones(mask)) and factorial(mask.bit_count() - 1)
+        
+        @cache
+        def unconnected(mask):  # 检查是否有未连接的点
+            return any(g[i] &amp; mask == 1 &lt;&lt; i for i in ones(mask))
+        
+        @cache
+        def dfs(start, mask):  # 深度优先搜索
+            intersection = g[start] &amp; mask
+            if intersection == 0:
+                return 0
+            if cm := complete(mask):
+                return cm * intersection.bit_count()
+            if unconnected(mask):
+                return 0
+            return sum(dfs(i, mask ^ (1 &lt;&lt; i)) for i in ones(intersection))
+        
+        universal = (1 &lt;&lt; len(nums)) - 1
+        g.append(1 &lt;&lt; ends[0] if ends else universal)
+        ans = dfs(-1, universal) % mod
+        return ans * 2 % mod if ends else ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到了使用排序来简化运算，排序后的数组具体如何简化除法条件的检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数组排序之后，较小的数字会位于数组的前面，较大的数字则位于后面。这种排序可以简化除法条件的检查，因为对于任何两个数nums[i]和nums[j]，如果i &lt; j，那么nums[i]必然不大于nums[j]。这使得我们只需要检查nums[j]是否可以被nums[i]整除，而不必再检查nums[i]是否可以被nums[j]整除，从而减少了需要进行的除法运算次数，并提高了整体算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到使用一个整数数组g来表示节点之间的连接关系，具体是如何使用二进制位来表示这种关系的？能否详细解释一下这种表示方法的原理和优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，每一个整数g[i]的二进制表示形式用来表示元素nums[i]与其他元素之间的关系。具体来说，如果g[i]的第j位是1（从0开始计数），这表示nums[i]可以与nums[j]相互整除。使用这种二进制位来表示连接关系的优势在于它极大地节省了空间，同时也方便了快速的位运算处理，如位与（&amp;）、位或（|），以及位异或（^）。这种表示方法使得检查和更新节点之间关系的操作更加高效，特别是在需要频繁查询和修改节点间关系的图算法中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到了查找端点，这里的端点是指什么？为什么端点的数量超过2会导致返回0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，&#39;端点&#39;指的是那些在整除关系图中只与一个其他节点相连的节点。在二进制表示中，这样的端点的g[i]会恰好有两个1位（包括自身和连接的另一个节点）。如果一个图的端点数量超过两个，这意味着无法形成一个闭合的环或一条简单的链，这通常代表图不连贯或存在多个独立的子图，这不符合题目要求的特别排列条件。因此，如果端点数量超过两个，函数会直接返回0，表示不存在有效的排列方式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            DFS函数中使用了位掩码技术，位掩码在此算法中扮演了什么角色？如何利用位掩码来跟踪哪些元素已被选中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS函数中，位掩码用于有效地跟踪和管理在当前递归调用中已经被选中的元素。位掩码是一个整数，其中的每一位对应于nums数组中的一个元素。如果某位是1，这表示对应的元素已经被选中。在DFS递归过程中，每选择一个新元素，我们就通过位或运算将该元素对应的位设置为1。这种方法不仅减少了存储空间的需求（不需要额外的数组来跟踪选择状态），还使得操作如检查元素是否被选中（位与操作）和更新选择状态（位异或操作）变得非常快速和直接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/special-permutations')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/special-permutations/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

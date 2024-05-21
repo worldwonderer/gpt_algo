@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>工作计划的最低难度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>工作计划的最低难度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>你需要制定一份&nbsp;<code>d</code>&nbsp;天的工作计划表。工作之间存在依赖，要想执行第&nbsp;<code>i</code>&nbsp;项工作，你必须完成全部&nbsp;<code>j</code>&nbsp;项工作（&nbsp;<code>0 &lt;= j &lt; i</code>）。</p>
+
+<p>你每天 <strong>至少</strong>&nbsp;需要完成一项任务。工作计划的总难度是这&nbsp;<code>d</code>&nbsp;天每一天的难度之和，而一天的工作难度是当天应该完成工作的最大难度。</p>
+
+<p>给你一个整数数组&nbsp;<code>jobDifficulty</code>&nbsp;和一个整数&nbsp;<code>d</code>，分别代表工作难度和需要计划的天数。第&nbsp;<code>i</code>&nbsp;项工作的难度是&nbsp;<code>jobDifficulty[i]</code>。</p>
+
+<p>返回整个工作计划的 <strong>最小难度</strong> 。如果无法制定工作计划，则返回&nbsp;<strong>-1&nbsp;</strong>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/26/untitled.png" style="height: 304px; width: 365px;"></p>
+
+<pre><strong>输入：</strong>jobDifficulty = [6,5,4,3,2,1], d = 2
+<strong>输出：</strong>7
+<strong>解释：</strong>第一天，您可以完成前 5 项工作，总难度 = 6.
+第二天，您可以完成最后一项工作，总难度 = 1.
+计划表的难度 = 6 + 1 = 7 
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>jobDifficulty = [9,9,9], d = 4
+<strong>输出：</strong>-1
+<strong>解释：</strong>就算你每天完成一项工作，仍然有一天是空闲的，你无法制定一份能够满足既定工作时间的计划表。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>jobDifficulty = [1,1,1], d = 3
+<strong>输出：</strong>3
+<strong>解释：</strong>工作计划为每天一项工作，总难度为 3 。
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>jobDifficulty = [7,1,7,1,7,1], d = 3
+<strong>输出：</strong>15
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre><strong>输入：</strong>jobDifficulty = [11,111,22,222,33,333,44,444], d = 6
+<strong>输出：</strong>843
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= jobDifficulty.length &lt;= 300</code></li>
+	<li><code>0 &lt;=&nbsp;jobDifficulty[i] &lt;= 1000</code></li>
+	<li><code>1 &lt;= d &lt;= 10</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 37 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minDifficulty(self, jobDifficulty: List[int], d: int) -&gt; int:
+        n = len(jobDifficulty)
+        f = list(accumulate(jobDifficulty, max))
+        for i in range(1, d):
+            stk = []
+            pre = f[i-1]
+            for j in range(i, n):
+                mn = pre
+                pre = f[j]
+                while stk and jobDifficulty[stk[-1][0]]&lt;jobDifficulty[j]:
+                    mn = min(mn, stk.pop()[1])
+                f[j] = mn+jobDifficulty[j]
+                if stk:
+                    f[j] = min(f[j], f[stk[-1][0]])
+                stk.append((j, mn))
+        return f[-1] if n&gt;=d else -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划和单调栈的结合来解决问题。初始化一个动态规划数组f，其中f[i]代表完成前i+1项工作的最小难度。使用一个单调栈来优化查找过程，栈中存储的是元组(j, mn)，其中j是索引，mn是到j为止的最小值。遍历工作计划，利用栈来维持一种单调递增的状态，从而快速计算出完成指定天数工作的最小难度。在迭代中，每次尝试更新f数组表示分割后的最优解。如果栈中的工作难度小于当前工作难度，将其弹出。每一天都计算完成工作的最大难度，更新f数组。通过单调栈来快速得到分割点以前的最优难度。</p>
+                                <p>时间复杂度: O(d * n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minDifficulty(self, jobDifficulty: List[int], d: int) -&gt; int:
+        n = len(jobDifficulty)
+        # 使用accumulate计算前缀最大难度
+        f = list(accumulate(jobDifficulty, max))
+        # 外层循环天数，内层循环工作难度数组
+        for i in range(1, d):
+            stk = []  # 单调栈
+            pre = f[i-1]
+            for j in range(i, n):
+                mn = pre
+                pre = f[j]
+                # 维持栈的单调性，确保可以快速计算最小难度
+                while stk and jobDifficulty[stk[-1][0]] &lt; jobDifficulty[j]:
+                    mn = min(mn, stk.pop()[1])
+                f[j] = mn + jobDifficulty[j]
+                # 检查并更新当前的最优值
+                if stk:
+                    f[j] = min(f[j], f[stk[-1][0]])
+                stk.append((j, mn))
+        # 如果任务数小于天数，返回-1，否则返回最小难度总和
+        return f[-1] if n &gt;= d else -1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用动态规划和单调栈的结合，能否具体解释这两种数据结构是如何结合在一起的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，动态规划用于确定分割工作计划以最小化总难度。动态规划数组f记录了完成前i+1项工作的最小难度。单调栈则用于优化动态规划的过程中对最小值的快速查找和更新。在更新f数组时，单调栈帮助快速确定之前的最小难度值。通过维护栈的单调递增性质，可以确保在寻找最小难度时不需要回溯整个数组，从而提高效率。这种结合方式允许动态规划在每一步都利用单调栈提供的最优历史数据，快速更新状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的动态规划过程中，f数组的每个元素代表的具体含义是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的动态规划过程中，f数组的每个元素f[i]代表的是完成前i+1项工作，且恰好分割成当前考虑的天数时所能达到的最小难度总和。具体来说，f[i]反映了将前i+1项工作分配到已考虑的天数中，每天工作的难度最大值的总和的最小可能值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到每天都计算完成工作的最大难度，这是如何通过单调栈实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，单调栈用来在迭代过程中维持一个工作难度的递减顺序。当遍历到新的工作难度时，如果当前工作难度大于栈顶元素的难度，之前的低难度工作将被弹出栈，这样可以确保每天考虑的工作难度是最大可能的。然后，栈中存储的是一个元组（工作索引，到该索引为止的最小难度），这样可以在计算分割点以前的最优难度时提供快速访问。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            单调栈在题解中是如何维持其单调性的，以及为什么要维持这种单调性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈在题解中通过在每个迭代中检查并可能弹出栈顶元素来维持其单调递减性。具体来说，当遇到一个新的工作难度大于栈顶工作难度时，栈顶元素会被弹出。这样做的目的是确保栈中的每个元素都代表了在此之前遇到的最大难度，从而在计算分割工作的最小总难度时，可以快速获取到前面工作的最小难度。维持单调性能够减少每次更新f数组时的计算量，使得算法更加高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-difficulty-of-a-job-schedule')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-difficulty-of-a-job-schedule/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

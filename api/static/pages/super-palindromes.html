@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>超级回文数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>超级回文数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>如果一个正整数自身是回文数，而且它也是一个回文数的平方，那么我们称这个数为超级回文数。</p>
+
+<p>现在，给定两个正整数&nbsp;<code>L</code> 和&nbsp;<code>R</code> （以字符串形式表示），返回包含在范围 <code>[L, R]</code> 中的超级回文数的数目。</p>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>L = &quot;4&quot;, R = &quot;1000&quot;
+<strong>输出：</strong>4
+<strong>解释：
+</strong>4，9，121，以及 484 是超级回文数。
+注意 676 不是一个超级回文数： 26 * 26 = 676，但是 26 不是回文数。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ol>
+	<li><code>1 &lt;= len(L) &lt;= 18</code></li>
+	<li><code>1 &lt;= len(R) &lt;= 18</code></li>
+	<li><code>L</code> 和&nbsp;<code>R</code>&nbsp;是表示&nbsp;<code>[1, 10^18)</code>&nbsp;范围的整数的字符串。</li>
+	<li><code>int(L) &lt;= int(R)</code></li>
+</ol>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 29 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def superpalindromesInRange (self, L, R):
+        L, R = int(L), int(R)
+        MAGIC = 100000
+        ans = 0
+        # count odd length
+        for k in range(MAGIC):
+            s = str(k)  # Eg. s = &#39;1234&#39;
+            t = s + s[-2::-1]  # t = &#39;1234321&#39;
+            v = int(t) ** 2
+            if v &gt; R: break
+            if v &gt;= L and self.is_palindrome(v):
+                ans += 1
+
+        # count even length
+        for k in range(MAGIC):
+            s = str(k)  # Eg. s = &#39;1234&#39;
+            t = s + s[::-1]  # t = &#39;12344321&#39;
+            v = int(t) ** 2
+            if v &gt; R: break
+            if v &gt;= L and self.is_palindrome(v):
+                ans += 1
+        return ans
+
+    def is_palindrome(self, x):
+        return str(x) == str(x)[::-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>解题思路是通过首先生成可能的回文数，然后检查这些回文数的平方是否仍然是回文数。考虑到生成回文数有两种形式：奇数长度和偶数长度的回文数，分别对这两种情况进行生成和检查。对于奇数长度的回文数，形如 &#39;abc&#39; + &#39;cba&#39;（去掉中心的字符），例如 &#39;123&#39; + &#39;21&#39; = &#39;12321&#39;；对于偶数长度的回文数，形式是 &#39;abc&#39; + &#39;cba&#39;，例如 &#39;123&#39; + &#39;321&#39; = &#39;123321&#39;。之后，将生成的回文数平方，并检查是否在给定的范围 [L, R] 内，如果在这个范围内，再检查其平方是否是回文数。</p>
+                                <p>时间复杂度: O(100000)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def superpalindromesInRange(self, L, R):
+        L, R = int(L), int(R)
+        MAGIC = 100000
+        ans = 0
+        # count odd length palindromes
+        for k in range(MAGIC):
+            s = str(k)  # convert number to string
+            t = s + s[-2::-1]  # form the palindrome by mirroring and omitting the last digit
+            v = int(t) ** 2  # square the palindrome
+            if v &gt; R: break  # stop if square is beyond upper limit
+            if v &gt;= L and self.is_palindrome(v):  # check if square is a palindrome and within range
+                ans += 1
+
+        # count even length palindromes
+        for k in range(MAGIC):
+            s = str(k)  # convert number to string
+            t = s + s[::-1]  # form the palindrome by full mirroring
+            v = int(t) ** 2  # square the palindrome
+            if v &gt; R: break  # stop if square is beyond upper limit
+            if v &gt;= L and self.is_palindrome(v):  # check if square is a palindrome and within range
+                ans += 1
+        return ans
+
+    def is_palindrome(self, x):
+        return str(x) == str(x)[::-1]  # check if string representation of number is a palindrome</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在确定MAGIC值为100000时，你是如何考虑这个具体值对算法效率和结果准确性的影响的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>MAGIC值的设定是基于平衡算法的运算时间和覆盖必要范围的考虑。由于需要生成足够多的回文数并检查它们的平方是否也是回文数，MAGIC值应该足够大以确保可以生成覆盖[L, R]范围内可能的所有超级回文数。100000是一个估计值，可以生成长度为6的回文数（例如，生成&#39;999999&#39;），其平方值达到999999999999，覆盖了广泛的数值范围。这个值的选择是实验性的，旨在在可接受的计算时间内尽可能减少遗漏正确结果的风险。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么生成回文数时选择了奇数长度和偶数长度两种方法而不是直接遍历所有数字？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接遍历所有数字进行平方和回文检查将非常低效，特别是在数字范围非常大的情况下。通过专门生成回文数，我们可以直接构造出可能的超级回文数候选，显著减少需要检查的数字数量。奇数长度和偶数长度的回文数覆盖了所有可能的回文形式，确保算法可以完整地检查所有潜在的超级回文数。这种方法更加高效，因为它直接针对问题的特性进行了优化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在循环中，当平方后的数大于R时即中断循环，这种策略是否可能导致遗漏某些在范围内的有效超级回文数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>此策略不会导致遗漏有效的超级回文数。因为生成的回文数是有序的，随着基数k的增加，生成的回文数及其平方将单调增加。一旦回文数的平方超过了R，随后生成的更大的回文数的平方也必然超过R，因此不会存在后面突然有一个平方数又落在[L, R]范围内的情况。这种策略是有效的，可以在确认超出上限后立即停止进一步无用的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/super-palindromes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/super-palindromes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

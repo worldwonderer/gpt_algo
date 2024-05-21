@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计回文子序列数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计回文子序列数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你数字字符串&nbsp;<code>s</code>&nbsp;，请你返回&nbsp;<code>s</code>&nbsp;中长度为&nbsp;<code>5</code>&nbsp;的 <b>回文子序列</b>&nbsp;数目。由于答案可能很大，请你将答案对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong>&nbsp;后返回。</p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>如果一个字符串从前往后和从后往前读相同，那么它是 <strong>回文字符串</strong>&nbsp;。</li>
+	<li>子序列是一个字符串中删除若干个字符后，不改变字符顺序，剩余字符构成的字符串。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>s = "103301"
+<b>输出：</b>2
+<b>解释：</b>
+总共有 6 长度为 5 的子序列："10330" ，"10331" ，"10301" ，"10301" ，"13301" ，"03301" 。
+它们中有两个（都是 "10301"）是回文的。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>s = "0000000"
+<b>输出：</b>21
+<b>解释：</b>所有 21 个长度为 5 的子序列都是 "00000" ，都是回文的。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>s = "9999900000"
+<b>输出：</b>2
+<b>解释：</b>仅有的两个回文子序列是 "99999" 和 "00000" 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>s</code>&nbsp;只包含数字字符。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 152 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countPalindromes(self, s: str) -&gt; int:
+        s = list(map(int, s))
+        
+        # a[3] = 当前A状态3的个数
+        # b[5][3] = 当前子序列AB=35的[个数,索引和]
+        # d[5][3] = 当前子序列ABCD=35X5的个数
+        a = [0] * 10
+        b = [[[0, 0] for j in range(10)] for i in range(10)]
+        d = [[0 for j in range(10)] for i in range(10)]
+        
+        ans = 0
+        M = 10 ** 9 + 7
+        for i, num in enumerate(s):
+            # 计算e
+            for y in range(10):
+                ans = (ans + d[num][y]) % M
+            # 计算d
+            for x in range(10):
+                d[x][num] += (i-1) * b[x][num][0] - b[x][num][1]
+                d[x][num] %= M
+            # 计算b
+            for x in range(10):
+                b[x][num][0] += a[x]
+                b[x][num][1] += a[x] * i
+                
+            a[num] += 1
+        
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用动态编程的方法来计算所有长度为5的回文子序列的数量。思路是使用多层哈希结构（数组）来维护字符的各种可能组合及其出现的次数和索引和。主要步骤分为：1) 更新a数组，它维护每个数字字符的出现次数；2) 更新b数组，它维护每种两字符组合的出现次数及索引和；3) 更新d数组，它维护每种四字符组合（形如ABCD）的出现次数；4) 通过对d数组的查询来统计所有可能的回文子序列。由于回文的特性，第五个字符必须与第一个字符相同，因此通过匹配这种模式来累计计数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countPalindromes(self, s: str) -&gt; int:
+        s = list(map(int, s))
+        a = [0] * 10  # Count of each digit
+        b = [[[0, 0] for j in range(10)] for i in range(10)]  # Count and sum of indexes for pairs
+        d = [[0 for j in range(10)] for i in range(10)]  # Count of quads
+        ans = 0
+        M = 10 ** 9 + 7
+        for i, num in enumerate(s):
+            # Calculate counts for 5-length palindromes
+            for y in range(10):
+                ans = (ans + d[num][y]) % M
+            # Update quads based on pairs
+            for x in range(10):
+                d[x][num] += (i-1) * b[x][num][0] - b[x][num][1]
+                d[x][num] %= M
+            # Update pairs based on digit count
+            for x in range(10):
+                b[x][num][0] += a[x]
+                b[x][num][1] += a[x] * i
+            # Update count of each digit
+            a[num] += 1
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为何选择使用三层数组结构（a、b、d）来处理问题，而不是直接遍历所有长度为5的子序列来检查其是否为回文？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>直接遍历所有长度为5的子序列来检查是否为回文，虽然直观但效率较低，时间复杂度为O(n^5)，其中n是字符串的长度。使用三层数组结构（a、b、d）能够利用动态规划的方法，将问题分解为多个较小的子问题，并存储中间结果，从而避免重复计算，显著提升算法效率。数组a、b、d分别记录了不同长度组合的字符出现情况，使得通过更新和查询这些数组，可以在O(n)的时间复杂度内完成对所有长度为5的回文子序列的计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算五位回文子序列时，d数组是如何精确地利用之前记录的四字符组合和当前字符来更新回文子序列的计数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>d数组用于记录每种四字符组合的出现次数。在计算过程中，每遇到一个新字符，就尝试将其与之前记录的所有可能的三字符组合（由b数组记录）结合，形成新的四字符组合，同时更新d数组。当处理到字符串的某个位置时，对于当前字符，检查所有以此字符结尾能形成的四字符组合（即查看d数组），检查它们能否与之前的字符配对成为回文子序列。因此，d数组使得我们能够高效地统计所有可能的以当前字符结尾的回文子序列数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新d数组的步骤中，表达式`(i-1) * b[x][num][0] - b[x][num][1]`是如何工作的，它的目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个表达式用于计算与当前字符配对的所有可能的三字符组合（由b数组记录）的更新。其中`b[x][num][0]`是到目前为止与当前字符配对的字符x的出现次数，而`b[x][num][1]`是这些字符出现位置的索引和。表达式中的`(i-1) * b[x][num][0] - b[x][num][1]`是计算所有以x和当前字符num为中心的三字符组合能形成的四字符组合的数量。这是通过计算当前位置i之前所有可能的配对位置与当前位置的差的和来实现的，从而确保更新d数组时能正确反映所有四字符组合的出现次数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到，通过对d数组的查询来统计所有可能的回文子序列，那么能否详细解释如何通过d数组查询来得出最终的回文子序列数目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在每次处理字符串中的一个新字符时，我们通过查询d数组来统计可能的回文子序列。具体地，对于当前字符，如果它能与某个四字符组合形成回文（即当前字符等于该四字符组合的第一个字符），我们就通过查看d数组中记录的该四字符组合的出现次数来增加回文子序列的计数。这种方法确保了每次遇到一个可能的回文结尾时，能够快速查询并累加之前所有匹配的四字符组合的数量，从而高效地统计出所有长度为5的回文子序列的总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-palindromic-subsequences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-palindromic-subsequences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

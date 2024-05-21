@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>轰炸敌人</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>轰炸敌人</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 184 ms</p>
+                    <p>内存: 42.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxKilledEnemies(self, grid: List[List[str]]) -&gt; int:
+
+        rows = len(grid)
+        cols = len(grid[0])
+
+        dprow = [[0]* cols for _ in range(rows)]
+        dpcol = [[0]* cols for _ in range(rows)]
+
+        for i in range(rows):
+            curnum = 0
+            for j in range(cols):
+                if grid[i][j] == &#39;E&#39;:
+                    curnum += 1
+                elif grid[i][j] == &#39;W&#39;:
+                    curnum = 0
+                dprow[i][j] = curnum
+
+            curmax = curnum
+            for j in range(cols-1, -1, -1):    
+                if grid[i][j] == &#39;W&#39;:
+                    curmax = 0
+                elif grid[i][j] == &#39;E&#39;:
+                    if dprow[i][j] &gt; curmax:
+                        curmax = dprow[i][j]
+                    dprow[i][j] = 0
+                else:
+                    if dprow[i][j] &gt; curmax:
+                        curmax = dprow[i][j]
+                    dprow[i][j] = curmax
+
+        for j in range(cols):
+            curnum = 0
+            for i in range(rows):
+                if grid[i][j] == &#39;E&#39;:
+                    curnum += 1
+                elif grid[i][j] == &#39;W&#39;:
+                    curnum = 0
+                dpcol[i][j] = curnum
+
+            curmax = curnum
+            for i in range(rows-1, -1, -1):    
+                if grid[i][j] == &#39;W&#39;:
+                    curmax = 0
+                elif grid[i][j] == &#39;E&#39;:
+                    if dpcol[i][j] &gt; curmax:
+                        curmax = dpcol[i][j]
+                    dpcol[i][j] = 0
+                else:
+                    if dpcol[i][j] &gt; curmax:
+                        curmax = dpcol[i][j]
+                    dpcol[i][j] = curmax
+
+        #print(dprow)
+        #print(dpcol)
+        globalmax = 0
+        for i in range(rows):
+            for j in range(cols):
+                curdeath = dprow[i][j] + dpcol[i][j]
+                if curdeath &gt; globalmax:
+                    globalmax = curdeath
+        
+        return globalmax</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是使用两个动态规划数组 dprow 和 dpcol 分别记录每个空格左边和上边的敌人数量。首先，遍历每一行，用 dprow 数组记录当前行每个空格左边的敌人数量。接着从右到左再次遍历该行，更新 dprow 数组，使其记录每个空格左右两侧的最大敌人数量。然后，用类似的方法遍历每一列，用 dpcol 数组记录每个空格上下两侧的最大敌人数量。最后，遍历整个网格，将每个空格在 dprow 和 dpcol 中对应的值相加，得到该空格所能消灭的敌人总数，并更新全局最大值。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxKilledEnemies(self, grid: List[List[str]]) -&gt; int:
+
+        rows = len(grid)
+        cols = len(grid[0])
+        
+        # 初始化 dprow 和 dpcol 数组
+        dprow = [[0]* cols for _ in range(rows)]
+        dpcol = [[0]* cols for _ in range(rows)]
+
+        # 遍历每一行
+        for i in range(rows):
+            curnum = 0
+            # 从左到右遍历
+            for j in range(cols):
+                if grid[i][j] == &#39;E&#39;:
+                    curnum += 1
+                elif grid[i][j] == &#39;W&#39;:
+                    curnum = 0
+                dprow[i][j] = curnum
+            
+            curmax = curnum
+            # 从右到左遍历
+            for j in range(cols-1, -1, -1):    
+                if grid[i][j] == &#39;W&#39;:
+                    curmax = 0
+                elif grid[i][j] == &#39;E&#39;:
+                    if dprow[i][j] &gt; curmax:
+                        curmax = dprow[i][j]
+                    dprow[i][j] = 0
+                else:
+                    if dprow[i][j] &gt; curmax:
+                        curmax = dprow[i][j]
+                    dprow[i][j] = curmax
+
+        # 遍历每一列
+        for j in range(cols):
+            curnum = 0
+            # 从上到下遍历
+            for i in range(rows):
+                if grid[i][j] == &#39;E&#39;:
+                    curnum += 1
+                elif grid[i][j] == &#39;W&#39;:
+                    curnum = 0
+                dpcol[i][j] = curnum
+            
+            curmax = curnum
+            # 从下到上遍历
+            for i in range(rows-1, -1, -1):    
+                if grid[i][j] == &#39;W&#39;:
+                    curmax = 0
+                elif grid[i][j] == &#39;E&#39;:
+                    if dpcol[i][j] &gt; curmax:
+                        curmax = dpcol[i][j]
+                    dpcol[i][j] = 0
+                else:
+                    if dpcol[i][j] &gt; curmax:
+                        curmax = dpcol[i][j]
+                    dpcol[i][j] = curmax
+        
+        # 遍历网格，找到最大消灭敌人数
+        globalmax = 0
+        for i in range(rows):
+            for j in range(cols):
+                curdeath = dprow[i][j] + dpcol[i][j]
+                if curdeath &gt; globalmax:
+                    globalmax = curdeath
+        
+        return globalmax</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理每一行和每一列时，需要分别从两个方向进行遍历？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理每一行和每一列时，需要从两个方向进行遍历，以确保能够正确计算出每个空格可以影响到的敌人的总数。从左到右或从上到下的遍历仅能统计出来自一个方向的敌人数，而从右到左或从下到上的遍历则可以补充另一个方向的敌人数。这样，每个位置上存储的数字最终表示的是两边所有可直接攻击到的敌人的总和，确保了计算的全面性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在从右到左遍历时，为什么将 dprow[i][j] 设置为 0 当 grid[i][j] == &#39;E&#39;？这是否会导致计算上的错误？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在从右到左遍历时，dprow[i][j] 设置为 0 当 grid[i][j] == &#39;E&#39; 是因为敌人本身不能被算作可以攻击的敌人数量。此处设置为 0 的目的是防止其自身被计算在内。这不会导致计算错误，反而是为了确保不将当前位置的敌人也算作可攻击的敌人。每个敌人都只在其被首次遇到时计数，之后即使在同一行或列中再次遇到也应重置计数器，以避免重复计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新 dprow 和 dpcol 数组时，你是如何确保不会重复计算同一行或同一列中的敌人数目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新 dprow 和 dpcol 数组时，通过在遇到墙（&#39;W&#39;）时重置当前计数（设置为 0），确保每段连续的空地只统计到该段中的敌人。此外，在从一个方向开始遍历时，每次更新只基于当前方向的统计，当方向改变时，重置统计，这样可以避免重复计算同一行或同一列中的敌人数目。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在计算每个空格能消灭的敌人总数时，直接将 dprow 和 dpcol 对应的值相加即可？这种方法是否考虑到了墙（&#39;W&#39;）的阻挡效应？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算每个空格能消灭的敌人总数时，直接将 dprow 和 dpcol 对应的值相加是可行的，因为这两个数组分别统计了在不考虑墙阻挡时，从行和列两个维度可以攻击到的敌人数。每个数组的更新过程中已经考虑到了墙的阻挡效果，即每次遇到墙时，计数会被重置。因此，这两个数组的值加起来即表示在没有墙阻挡的情况下，该点潜在能够攻击到的敌人总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bomb-enemy')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bomb-enemy/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

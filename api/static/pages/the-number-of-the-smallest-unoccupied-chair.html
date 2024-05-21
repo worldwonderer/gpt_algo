@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小未被占据椅子的编号</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小未被占据椅子的编号</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有 <code>n</code> 个朋友在举办一个派对，这些朋友从 <code>0</code> 到 <code>n - 1</code> 编号。派对里有 <strong>无数</strong> 张椅子，编号为 <code>0</code> 到 <code>infinity</code> 。当一个朋友到达派对时，他会占据 <strong>编号最小</strong> 且未被占据的椅子。</p>
+
+<ul>
+	<li>比方说，当一个朋友到达时，如果椅子 <code>0</code> ，<code>1</code> 和 <code>5</code> 被占据了，那么他会占据 <code>2</code> 号椅子。</li>
+</ul>
+
+<p>当一个朋友离开派对时，他的椅子会立刻变成未占据状态。如果同一时刻有另一个朋友到达，可以立即占据这张椅子。</p>
+
+<p>给你一个下标从 <strong>0</strong> 开始的二维整数数组 <code>times</code> ，其中 <code>times[i] = [arrival<sub>i</sub>, leaving<sub>i</sub>]</code> 表示第 <code>i</code> 个朋友到达和离开的时刻，同时给你一个整数 <code>targetFriend</code> 。所有到达时间 <strong>互不相同</strong> 。</p>
+
+<p>请你返回编号为 <code>targetFriend</code> 的朋友占据的 <strong>椅子编号</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>times = [[1,4],[2,3],[4,6]], targetFriend = 1
+<b>输出：</b>1
+<b>解释：</b>
+- 朋友 0 时刻 1 到达，占据椅子 0 。
+- 朋友 1 时刻 2 到达，占据椅子 1 。
+- 朋友 1 时刻 3 离开，椅子 1 变成未占据。
+- 朋友 0 时刻 4 离开，椅子 0 变成未占据。
+- 朋友 2 时刻 4 到达，占据椅子 0 。
+朋友 1 占据椅子 1 ，所以返回 1 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>times = [[3,10],[1,5],[2,6]], targetFriend = 0
+<b>输出：</b>2
+<b>解释：</b>
+- 朋友 1 时刻 1 到达，占据椅子 0 。
+- 朋友 2 时刻 2 到达，占据椅子 1 。
+- 朋友 0 时刻 3 到达，占据椅子 2 。
+- 朋友 1 时刻 5 离开，椅子 0 变成未占据。
+- 朋友 2 时刻 6 离开，椅子 1 变成未占据。
+- 朋友 0 时刻 10 离开，椅子 2 变成未占据。
+朋友 0 占据椅子 2 ，所以返回 2 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == times.length</code></li>
+	<li><code>2 &lt;= n &lt;= 10<sup>4</sup></code></li>
+	<li><code>times[i].length == 2</code></li>
+	<li><code>1 &lt;= arrival<sub>i</sub> &lt; leaving<sub>i</sub> &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= targetFriend &lt;= n - 1</code></li>
+	<li>每个 <code>arrival<sub>i</sub></code> 时刻 <strong>互不相同</strong> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 129 ms</p>
+                    <p>内存: 20.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def smallestChair(self, times: List[List[int]], targetFriend: int) -&gt; int:
+        for i, x in enumerate(times):
+            times[i] = x + [i]
+        times.sort(key=lambda x: x[0])
+        leave_times = []
+        avail_chairs = list(range(0, len(times)))
+        heapify(avail_chairs)
+        for arrive_t, leave_t, idx in times:
+            while leave_times and leave_times[0][0] &lt;= arrive_t:
+                _, pre_chair, _ = heappop(leave_times)
+                heappush(avail_chairs, pre_chair)
+            chair = heappop(avail_chairs)
+            if idx == targetFriend:
+                return chair
+            heappush(leave_times, (leave_t, chair, idx))
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>首先，解题思路是将每个朋友的到达和离开时间转换为一个事件列表，并包含每个朋友的索引。对这个列表根据到达时间进行排序。使用一个最小堆来跟踪当前可用的椅子编号，另一个最小堆来维护离开时间和对应的椅子编号。遍历每个事件，如果有朋友离开（即当前时间大于等于堆顶的离开时间），则将对应的椅子编号放回可用椅子堆中。如果有朋友到达，则从可用椅子堆中取出最小的椅子编号，并记录该朋友使用的椅子。如果当前到达的朋友是目标朋友，直接返回其所使用的椅子编号。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def smallestChair(self, times: List[List[int]], targetFriend: int) -&gt; int:
+        # 给每个朋友的时间加上索引
+        for i, x in enumerate(times):
+            times[i] = x + [i]
+        # 根据到达时间排序
+        times.sort(key=lambda x: x[0])
+        # 初始化离开时间堆
+        leave_times = []
+        # 初始化可用椅子堆，并堆化
+        avail_chairs = list(range(0, len(times)))
+        heapify(avail_chairs)
+        # 遍历每个事件
+        for arrive_t, leave_t, idx in times:
+            # 处理所有已经离开的朋友，回收椅子
+            while leave_times and leave_times[0][0] &lt;= arrive_t:
+                _, pre_chair, _ = heappop(leave_times)
+                heappush(avail_chairs, pre_chair)
+            # 分配椅子给当前到达的朋友
+            chair = heappop(avail_chairs)
+            # 如果是目标朋友，返回结果
+            if idx == targetFriend:
+                return chair
+            # 将当前朋友的离开事件加入堆中
+            heappush(leave_times, (leave_t, chair, idx))
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理离开事件时，如何确保在多个朋友同时离开时，椅子编号能正确地被回收并且保持最小编号优先的原则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，我们使用了一个最小堆来维护离开时间和椅子编号的关系。每个元素是一个元组，包含离开时间、椅子编号和朋友的索引。最小堆的性质确保了堆顶元素总是拥有最小的离开时间。在处理事件时，我们会循环检查堆顶元素的离开时间是否小于或等于当前事件的到达时间。如果是，就将该椅子编号回收至另一个最小堆（可用椅子堆）。由于这个可用椅子堆也是最小堆，它保证了每次从中取出或插入元素都会维持椅子编号的最小序，即每次都可以分配最小的未被占用的椅子编号。因此，即使多个朋友同时离开，我们也能确保椅子编号正确回收，且按照最小编号优先原则进行再分配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            代码实现中，当目标朋友到达时直接返回其椅子编号。如果在目标朋友到达之前处理完所有事件会对结果有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，处理事件的逻辑是基于朋友的到达时间顺序进行的。每个到达事件都在处理完之前所有必要的离开事件之后立即处理。这意味着，只要目标朋友到达时，我们已经处理了所有先前到达且必须在目标朋友之前离开的朋友的离开事件。因此，如果在目标朋友到达之前处理所有事件，实际上我们只处理到目标朋友到达之前的事件。一旦目标朋友到达并被分配了椅子，我们就返回这个椅子编号作为结果，而不需要关心后续的任何事件。这不会影响结果，因为目标朋友的椅子编号一旦确定，即使后续有更多事件发生，也不会影响已经分配给目标朋友的椅子编号。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/the-number-of-the-smallest-unoccupied-chair')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/the-number-of-the-smallest-unoccupied-chair/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

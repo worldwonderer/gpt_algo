@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>数组中特殊等间距元素的和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>数组中特殊等间距元素的和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 2714 ms</p>
+                    <p>内存: 477.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def solve(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(nums)
+        sqrtn = floor(sqrt(n))
+        pre = [[0 for _ in range(n)] for _ in range(sqrtn+1)]
+        for i in range(1, sqrtn+1):
+            for j in range(n-1, n-i-1, -1):
+                pre[i][j] = nums[j]
+
+            for j in range(n-i-1, -1, -1):
+                pre[i][j] = pre[i][j+i] + nums[j]
+        
+        mod = 10**9 + 7
+        res = []
+        for x, y in queries:            
+            if y &gt; sqrtn:
+                val = 0
+                while x &lt; n:
+                    val += nums[x]
+                    x += y
+            else:
+                val = pre[y][x]
+            res.append(val%mod)
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用预处理数组和分块的思路处理特殊等间距元素的和的问题。对于每个间隔y，如果y小于等于sqrt(n)，题解通过构建一个预处理数组pre来存储从每个起点x开始，以y为间隔的所有元素的和。这样，在查询时，如果y小于等于sqrt(n)，我们可以直接通过查表得到结果。如果y大于sqrt(n)，则直接遍历数组，从x开始，每次增加y来累加求和。此方法利用了分块的策略，将问题分为两部分处理，以达到优化查询的目的。</p>
+                                <p>时间复杂度: O(n*sqrt(n) + q * max(1, n/y))</p>
+                                <p>空间复杂度: O(n*sqrt(n))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def solve(self, nums: List[int], queries: List[List[int]]) -&gt; List[int]:
+        n = len(nums) # 数组的长度
+        sqrtn = floor(sqrt(n)) # sqrt(n)的下整数
+        pre = [[0 for _ in range(n)] for _ in range(sqrtn+1)] # 初始化预处理数组
+        for i in range(1, sqrtn+1): # 针对每个可能的间隔i
+            for j in range(n-1, n-i-1, -1): # 初始化最后几个元素
+                pre[i][j] = nums[j]
+
+            for j in range(n-i-1, -1, -1): # 从后向前填充预处理数组
+                pre[i][j] = pre[i][j+i] + nums[j] # 累加间隔为i的元素和
+        
+        mod = 10**9 + 7 # 用于结果取模
+        res = [] # 存储结果的数组
+        for x, y in queries: # 对每个查询进行处理
+            if y &gt; sqrtn: # 如果间隔大于sqrt(n)
+                val = 0
+                while x &lt; n: # 直接计算等间距的元素和
+                    val += nums[x]
+                    x += y
+            else: # 如果间隔小于等于sqrt(n)
+                val = pre[y][x] # 直接从预处理数组中获取结果
+            res.append(val%mod) # 将结果取模后添加到结果数组
+        return res # 返回结果数组</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择sqrt(n)作为区分直接遍历和使用预处理数组的阈值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择sqrt(n)作为阈值基于时间复杂度和空间复杂度的权衡。对于间隔y小于等于sqrt(n)，预处理数组可以在O(n*sqrt(n))的时间内构建，并存储O(n*sqrt(n))的数据。这种情况下，预处理使得任何间隔y的查询都可以在O(1)时间内完成。对于间隔y大于sqrt(n)，直接遍历数组查询的时间复杂度为O(n/y)，由于y较大，这种直接遍历的方法变得更为高效。因此，sqrt(n)是一个有效的分界点，使得两种情况都可以在相对较优的时间复杂度内处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            预处理数组pre的初始化为什么是从数组的末尾开始而不是开始？这样做有什么具体的优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从数组的末尾开始初始化预处理数组pre可以有效地利用之前计算的结果。在计算以某一点为起始点的等间距元素的和时，我们可以用该点后一个间隔点的累计和加上当前点的值，即pre[i][j] = pre[i][j+i] + nums[j]。这样从后向前填充可以确保在计算当前点的累加和时，所需的下一个间隔点的累加和已经被计算并存储，从而避免了重复计算，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算等间距元素和的时候，如何处理当x的初始位置加上间隔y超出数组长度的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在直接遍历计算等间距元素和的方法中，当x的初始位置加上间隔y超出数组长度时，循环应该终止。这是因为一旦索引超过数组长度，再访问数组将导致越界错误。因此，每次循环中需要检查x + y是否仍然在数组的有效索引范围内(n)，如果不在，则停止累加操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际应用中，如何选择更优的方法来处理间隔大于sqrt(n)的情况，以进一步优化性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于间隔大于sqrt(n)的情况，可以考虑使用更加高效的数据结构，例如线段树或者树状数组，来进一步优化性能。这些数据结构支持快速的区间求和与更新操作。特别是在频繁修改数组的场景中，线段树或树状数组可以在O(log n)的时间内完成更新和区间求和，相对于直接遍历的方法，这可以在多次查询中节省大量时间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/sum-of-special-evenly-spaced-elements-in-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/sum-of-special-evenly-spaced-elements-in-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

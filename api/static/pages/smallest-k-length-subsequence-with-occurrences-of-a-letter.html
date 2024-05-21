@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>含特定字母的最小子序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>含特定字母的最小子序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串 <code>s</code> ，一个整数 <code>k</code> ，一个字母 <code>letter</code> 以及另一个整数 <code>repetition</code> 。</p>
+
+<p>返回 <code>s</code> 中长度为 <code>k</code> 且 <strong>字典序最小</strong> 的子序列，该子序列同时应满足字母 <code>letter</code> 出现<strong> 至少</strong> <code>repetition</code> 次。生成的测试用例满足 <code>letter</code> 在 <code>s</code> 中出现 <strong>至少</strong> <code>repetition</code> 次。</p>
+
+<p><strong>子序列</strong> 是由原字符串删除一些（或不删除）字符且不改变剩余字符顺序得到的剩余字符串。</p>
+
+<p>字符串 <code>a</code> 字典序比字符串 <code>b</code> 小的定义为：在 <code>a</code> 和 <code>b</code> 出现不同字符的第一个位置上，字符串 <code>a</code> 的字符在字母表中的顺序早于字符串 <code>b</code>&nbsp;的字符。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "leet", k = 3, letter = "e", repetition = 1
+<strong>输出：</strong>"eet"
+<strong>解释：</strong>存在 4 个长度为 3 ，且满足字母 'e' 出现至少 1 次的子序列：
+- "lee"（"<em><strong>lee</strong></em>t"）
+- "let"（"<em><strong>le</strong></em>e<em><strong>t</strong></em>"）
+- "let"（"<em><strong>l</strong></em>e<em><strong>et</strong></em>"）
+- "eet"（"l<em><strong>eet</strong></em>"）
+其中字典序最小的子序列是 "eet" 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="example-2" src="https://assets.leetcode.com/uploads/2021/09/13/smallest-k-length-subsequence.png" style="width: 339px; height: 67px;" /></p>
+
+<pre>
+<strong>输入：</strong>s = "leetcode", k = 4, letter = "e", repetition = 2
+<strong>输出：</strong>"ecde"
+<strong>解释：</strong>"ecde" 是长度为 4 且满足字母 "e" 出现至少 2 次的字典序最小的子序列。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "bb", k = 2, letter = "b", repetition = 2
+<strong>输出：</strong>"bb"
+<strong>解释：</strong>"bb" 是唯一一个长度为 2 且满足字母 "b" 出现至少 2 次的子序列。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= repetition &lt;= k &lt;= s.length &lt;= 5 * 10<sup>4</sup></code></li>
+	<li><code>s</code> 由小写英文字母组成</li>
+	<li><code>letter</code> 是一个小写英文字母，在 <code>s</code>&nbsp;中至少出现 <code>repetition</code> 次</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 283 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def smallestSubsequence(self, s: str, k: int, letter: str, repetition: int) -&gt; str:
+        stack = []
+        remove = len(s) - k
+        remainder = s.count(letter)
+        for c in s:
+            while remove and stack and c &lt; stack[-1]:
+                if stack[-1] == letter and remainder == repetition:
+                    break
+                if stack.pop() == letter:
+                    remainder -= 1
+                remove -= 1
+            stack.append(c)
+        stack = stack[:k]
+        cur = stack.count(letter)
+        if cur &lt; repetition:
+            for i in range(k -1, -1, -1):
+                if cur == repetition:
+                    break
+                if stack[i] != letter:
+                    stack[i] = letter
+                    cur += 1
+        return &#34;&#34;.join(stack)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用单调栈的方法来构建字典序最小的子序列。首先，遍历字符串s，利用栈来存储潜在的最小字典序的子序列。在遍历过程中，如果当前字符c小于栈顶字符并且还有足够的空间（可以移除的字符数remains &gt; 0）来满足最终序列长度为k，就尝试将栈顶字符弹出，直到无法弹出（栈空、当前字符不再小于栈顶字符、或者弹出后无法满足letter的repetition要求）。为了确保生成的子序列中letter出现至少repetition次，需要统计letter的总出现次数以及在栈中的数量，确保不会因为弹出操作而使得letter的数量不足。遍历完成后，如果栈中letter的数量不足，从栈尾开始替换非letter字符直到满足条件。最终，截取栈中前k个字符作为结果。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def smallestSubsequence(self, s: str, k: int, letter: str, repetition: int) -&gt; str:
+        stack = [] # 初始化栈
+        remove = len(s) - k # 可以移除的字符数
+        remainder = s.count(letter) # s中letter的总数量
+        for c in s: # 遍历字符串s的每个字符
+            while remove and stack and c &lt; stack[-1]: # 栈非空且当前字符小于栈顶字符且还可以移除字符
+                if stack[-1] == letter and remainder == repetition: # 栈顶字符为letter且letter数量刚好满足要求时不能移除
+                    break
+                if stack.pop() == letter: # 弹出字符，如果是letter则更新计数
+                    remainder -= 1
+                remove -= 1 # 更新可移除字符数量
+            stack.append(c) # 将当前字符加入栈
+        stack = stack[:k] # 取栈中前k个元素
+        cur = stack.count(letter) # 统计栈中letter的数量
+        if cur &lt; repetition: # 如果letter数量不足
+            for i in range(k -1, -1, -1): # 从后向前遍历栈
+                if cur == repetition: # 已满足letter的数量要求
+                    break
+                if stack[i] != letter: # 替换非letter字符为letter
+                    stack[i] = letter
+                    cur += 1
+        return &#39;&#39;.join(stack) # 将栈转换为字符串并返回</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到的单调栈方法中，为什么在遍历字符串时要进行栈顶字符的弹出操作，而不是直接添加所有字符到栈中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈的主要目的是维护一个字典序最小的序列。如果直接添加所有字符到栈中，将无法保证最终结果的字典序最小。弹出栈顶字符的操作是为了在遇到一个字典序较小的字符时，移除前面较大的字符，从而使整个栈保持字典序最小。此外，这种操作还有助于调整栈的大小以确保最终的序列长度为k。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中的算法保证了`letter`字符至少出现`repetition`次的条件是如何实现的？在弹出栈顶字符时，有哪些特殊的考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过记录`s`中`letter`的总数量以及在栈中的数量来确保`letter`至少出现`repetition`次。在每次弹出栈顶字符时，若栈顶字符是`letter`，会检查剩余的`letter`数量是否还能满足`repetition`的要求。如果弹出当前`letter`后，剩余的`letter`数量加上栈中的`letter`数量小于`repetition`，则停止弹出操作。这确保了即使在尝试获取字典序最小的子序列时，也不会破坏对`letter`数量的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中最后提到如果栈中`letter`的数量不足，会从栈尾开始替换非`letter`字符直到满足条件。在实际操作中，这种方式会不会影响到子序列的字典序最小性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种操作可能会影响到子序列的字典序最小性。尽管如此，由于替换发生在栈的尾部，并且只在必要时进行（即当`letter`数量不足以满足`repetition`要求时），因此对整体字典序的影响是有限的。实际上，这是一种折衷方案，用来在满足`letter`数量要求的同时尽可能保持子序列的字典序较小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解的算法中，如何处理输入字符串`s`的长度等于所需子序列长度`k`的特殊情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当输入字符串`s`的长度等于所需子序列长度`k`时，算法简化为必须使用所有字符，因此不需要执行任何字符的移除操作。在这种情况下，只需确保生成的序列中`letter`字符出现至少`repetition`次。如果`letter`数量不足，将按照先前的逻辑替换足够的非`letter`字符以满足条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/smallest-k-length-subsequence-with-occurrences-of-a-letter')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/smallest-k-length-subsequence-with-occurrences-of-a-letter/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

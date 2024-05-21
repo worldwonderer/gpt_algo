@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>打砖块</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>打砖块</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个 <code>m x n</code> 的二元网格<meta charset="UTF-8" />&nbsp;<code>grid</code>&nbsp;，其中 <code>1</code> 表示砖块，<code>0</code> 表示空白。砖块 <strong>稳定</strong>（不会掉落）的前提是：</p>
+
+<ul>
+	<li>一块砖直接连接到网格的顶部，或者</li>
+	<li>至少有一块相邻（4&nbsp;个方向之一）砖块<strong> 稳定 </strong>不会掉落时</li>
+</ul>
+
+<p>给你一个数组 <code>hits</code> ，这是需要依次消除砖块的位置。每当消除&nbsp;<code>hits[i] = (rowi, coli)</code> 位置上的砖块时，对应位置的砖块（若存在）会消失，然后其他的砖块可能因为这一消除操作而 <strong>掉落</strong> 。一旦砖块掉落，它会 <strong>立即</strong> 从网格&nbsp;<code>grid</code>&nbsp;中消失（即，它不会落在其他稳定的砖块上）。</p>
+
+<p>返回一个数组 <code>result</code> ，其中 <code>result[i]</code> 表示第 <code>i</code> 次消除操作对应掉落的砖块数目。</p>
+
+<p><strong>注意</strong>，消除可能指向是没有砖块的空白位置，如果发生这种情况，则没有砖块掉落。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1,0,0,0],[1,1,1,0]], hits = [[1,0]]
+<strong>输出：</strong>[2]
+<strong>解释：</strong>网格开始为：
+[[1,0,0,0]，
+ [<strong>1</strong>,1,1,0]]
+消除 (1,0) 处加粗的砖块，得到网格：
+[[1,0,0,0]
+ [0,<strong>1</strong>,<strong>1</strong>,0]]
+两个加粗的砖不再稳定，因为它们不再与顶部相连，也不再与另一个稳定的砖相邻，因此它们将掉落。得到网格：
+[[1,0,0,0],
+ [0,0,0,0]]
+因此，结果为 [2] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>grid = [[1,0,0,0],[1,1,0,0]], hits = [[1,1],[1,0]]
+<strong>输出：</strong>[0,0]
+<strong>解释：</strong>网格开始为：
+[[1,0,0,0],
+ [1,<strong>1</strong>,0,0]]
+消除 (1,1) 处加粗的砖块，得到网格：
+[[1,0,0,0],
+ [1,0,0,0]]
+剩下的砖都很稳定，所以不会掉落。网格保持不变：
+[[1,0,0,0], 
+ [<strong>1</strong>,0,0,0]]
+接下来消除 (1,0) 处加粗的砖块，得到网格：
+[[1,0,0,0],
+ [0,0,0,0]]
+剩下的砖块仍然是稳定的，所以不会有砖块掉落。
+因此，结果为 [0,0] 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 200</code></li>
+	<li><code>grid[i][j]</code> 为 <code>0</code> 或 <code>1</code></li>
+	<li><code>1 &lt;= hits.length &lt;= 4 * 10<sup>4</sup></code></li>
+	<li><code>hits[i].length == 2</code></li>
+	<li><code>0 &lt;= x<sub>i&nbsp;</sub>&lt;= m - 1</code></li>
+	<li><code>0 &lt;=&nbsp;y<sub>i</sub> &lt;= n - 1</code></li>
+	<li>所有 <code>(x<sub>i</sub>, y<sub>i</sub>)</code> 互不相同</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 167 ms</p>
+                    <p>内存: 23.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def hitBricks(self, grid: List[List[int]], hits: List[List[int]]) -&gt; List[int]:
+        def dfs(i,j):
+            if i&lt;0 or i==n or j&lt;0 or j==m or grid[i][j]!=1:
+                return 0
+            grid[i][j]=2
+            return 1+dfs(i-1,j)+dfs(i+1,j)+dfs(i,j-1)+dfs(i,j+1)
+        
+        def worth(x,y):
+            if x==0:
+                return True
+            if x-1&gt;=0 and grid[x-1][y]==2:
+                return True
+            if x+1&lt;n and grid[x+1][y]==2:
+                return True
+            if y-1&gt;=0 and grid[x][y-1]==2:
+                return True
+            if y+1&lt;m and grid[x][y+1]==2:
+                return True
+            return False
+                
+        n,m=len(grid),len(grid[0])
+        l=len(hits)
+        res=[0]*l
+        for x,y in hits:
+            grid[x][y]-=1
+        for j in range(m):
+            if grid[0][j]==1:
+                dfs(0,j)
+        for i in range(l-1,-1,-1):
+            x,y=hits[i]
+            grid[x][y]+=1
+            if grid[x][y]==1 and worth(x,y):
+                res[i]=dfs(x,y)-1
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的思路是使用并查集和逆向思维。首先，我们将所有的hit操作预先执行，将对应位置的砖块标记为已消除状态。然后从网格的顶部开始进行深度优先搜索，将所有与顶部连通的砖块标记为稳定状态。接下来，我们逆序遍历hits数组，依次将砖块还原。对于每个还原的砖块，我们判断其是否与稳定的砖块相邻或者位于顶部，如果是，则进行深度优先搜索，将与其连通的不稳定砖块都标记为稳定状态，并记录下变为稳定状态的砖块数量。最后返回每次还原操作导致掉落的砖块数量。</p>
+                                <p>时间复杂度: O(l * nm)</p>
+                                <p>空间复杂度: O(nm)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def hitBricks(self, grid: List[List[int]], hits: List[List[int]]) -&gt; List[int]:
+        def dfs(i,j):
+            if i&lt;0 or i==n or j&lt;0 or j==m or grid[i][j]!=1:
+                # 越界或者当前位置不是砖块，返回0
+                return 0
+            grid[i][j]=2  # 将当前砖块标记为稳定状态
+            # 递归搜索上下左右四个方向，并将结果相加
+            return 1+dfs(i-1,j)+dfs(i+1,j)+dfs(i,j-1)+dfs(i,j+1)
+        
+        def worth(x,y):
+            if x==0:  # 如果砖块在顶部，返回True
+                return True
+            # 判断砖块的上下左右是否有稳定的砖块
+            if x-1&gt;=0 and grid[x-1][y]==2:
+                return True
+            if x+1&lt;n and grid[x+1][y]==2:
+                return True
+            if y-1&gt;=0 and grid[x][y-1]==2:
+                return True
+            if y+1&lt;m and grid[x][y+1]==2:
+                return True
+            return False
+                
+        n,m=len(grid),len(grid[0])
+        l=len(hits)
+        res=[0]*l
+        for x,y in hits:
+            grid[x][y]-=1  # 预处理hits数组，将对应位置的砖块标记为已消除状态
+        for j in range(m):
+            if grid[0][j]==1:  # 从网格顶部开始搜索稳定的砖块
+                dfs(0,j)
+        for i in range(l-1,-1,-1):  # 逆序遍历hits数组
+            x,y=hits[i]
+            grid[x][y]+=1  # 还原砖块
+            if grid[x][y]==1 and worth(x,y):  # 如果还原后的砖块与稳定砖块相邻或位于顶部
+                res[i]=dfs(x,y)-1  # 进行深度优先搜索，并记录变为稳定状态的砖块数量
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理结束后，需要将grid中的值从1改为2来标记砖块为稳定状态？这与原始的1有何不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，将grid中的值从1改为2是用来区分未访问的砖块和已确认为稳定的砖块。原始的1表示砖块存在但尚未确认其稳定性，而2表示该砖块已经被访问过，并且确认与顶部直接或间接相连，因此是稳定的。这种区分有助于在后续的递归搜索中避免重复访问同一个砖块，从而优化算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在预处理`hits`数组时，为何直接将grid中的值减1而不是检查当前位置是否有砖块存在？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法预设所有hits操作都是有效的，即hits数组中的每个位置都有砖块存在。因此，在预处理阶段，直接将对应位置的砖块值减1（即从1变为0）以模拟砖块被击中并消除的效果。这个假设简化了代码的复杂度，避免了不必要的检查。如果有必要处理无效的hits（比如原位置没有砖块的情况），则需要在代码中添加额外的逻辑来验证每个hit的有效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算每次还原操作导致的掉落砖块数量时，为什么要从结果中减去1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在每次还原操作中，我们首先检查被还原的砖块是否能与稳定砖块相连。如果可以，我们通过深度优先搜索（DFS）将所有与之相连的不稳定砖块标记为稳定。在这个过程中，DFS函数返回的是所有通过此次搜索变为稳定的砖块数量，包括被还原的那一块砖本身。因此，为了准确计算由于这次还原操作额外导致的掉落（变稳定）的砖块数量，需要从DFS的结果中减去1，即除去被还原的那块砖本身。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            递归深度优先搜索（DFS）中，如何处理grid边界外的情况以及避免重复访问已标记为稳定的砖块？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归深度优先搜索中，首先会检查当前坐标是否越界（即是否超出grid的行或列范围），以及当前位置的砖块状态。如果当前位置越界或者不是未访问的砖块（即状态不是1），则DFS直接返回0并终止当前路径的搜索。同时，为了避免重复访问已经标记为稳定的砖块（状态为2），一旦某个砖块在DFS过程中被验证为稳定，其状态就会从1变为2。这样，后续的DFS调用遇到状态为2的砖块时，会直接返回0，从而有效避免重复访问。这些措施确保了DFS的效率和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/bricks-falling-when-hit')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/bricks-falling-when-hit/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

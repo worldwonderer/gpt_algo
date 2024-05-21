@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>恢复空格</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>恢复空格</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>哦，不！你不小心把一个长篇文章中的空格、标点都删掉了，并且大写也弄成了小写。像句子<code>&quot;I reset the computer. It still didn&rsquo;t boot!&quot;</code>已经变成了<code>&quot;iresetthecomputeritstilldidntboot&quot;</code>。在处理标点符号和大小写之前，你得先把它断成词语。当然了，你有一本厚厚的词典<code>dictionary</code>，不过，有些词没在词典里。假设文章用<code>sentence</code>表示，设计一个算法，把文章断开，要求未识别的字符最少，返回未识别的字符数。</p>
+
+<p><strong>注意：</strong>本题相对原题稍作改动，只需返回未识别的字符数</p>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong>
+dictionary = [&quot;looked&quot;,&quot;just&quot;,&quot;like&quot;,&quot;her&quot;,&quot;brother&quot;]
+sentence = &quot;jesslookedjustliketimherbrother&quot;
+<strong>输出：</strong> 7
+<strong>解释：</strong> 断句后为&quot;<strong>jess</strong> looked just like <strong>tim</strong> her brother&quot;，共7个未识别字符。
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= len(sentence) &lt;= 1000</code></li>
+	<li><code>dictionary</code>中总字符数不超过 150000。</li>
+	<li>你可以认为<code>dictionary</code>和<code>sentence</code>中只包含小写字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 68 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def respace(self, dictionary: List[str], sentence: str) -&gt; int:
+        dictionary = [x for x in dictionary if x in sentence]
+        dp = [float(&#39;inf&#39;)] * (len(sentence)+1)
+        dp[0] = 0
+        for i in range(len(sentence)+1):
+            dp[i] = min(dp[i],dp[i-1]+1)
+            for x in dictionary:
+                j = i + len(x)
+                if sentence[i:j] == x:
+                    dp[j] = min(dp[j],dp[i])
+        return dp[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了动态规划的方法。首先，将词典中在句子中出现的词筛选出来，以减少后续的计算量。然后，定义一个动态规划数组dp，其中dp[i]表示句子中前i个字符中未识别的字符数量的最小值。初始时，dp[0]=0，表示空字符串中没有未识别的字符。接着，遍历句子中的每个字符，对于每个位置i，首先将dp[i]更新为dp[i-1]+1，因为句子中的第i个字符可能是未识别的，然后遍历筛选后的词典，检查以当前位置为结尾的子字符串是否是词典中的单词，如果是，则尝试更新dp[j]（j是单词结束的位置），使得dp[j]=min(dp[j], dp[i])，这表示如果以i结尾的子字符串是一个词典中的单词，那么前j个字符中未识别的字符数量可以不包括这个单词。最后，返回dp数组的最后一个元素，即为整个句子中未识别的字符数量的最小值。</p>
+                                <p>时间复杂度: O(nmk)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def respace(self, dictionary: List[str], sentence: str) -&gt; int:
+        dictionary = [x for x in dictionary if x in sentence]  # 筛选出在句子中出现的词
+        dp = [float(&#39;inf&#39;)] * (len(sentence)+1)  # 初始化动态规划数组
+        dp[0] = 0  # 空字符串中没有未识别的字符
+        for i in range(len(sentence)+1):
+            dp[i] = min(dp[i],dp[i-1]+1)  # 更新当前位置的未识别字符数量
+            for x in dictionary:
+                j = i + len(x)
+                if sentence[i:j] == x:
+                    dp[j] = min(dp[j],dp[i])  # 如果当前子字符串是词典中的单词，更新dp[j]
+        return dp[-1]  # 返回整个句子中未识别的字符数量的最小值</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在动态规划数组`dp`中，初始值设置为`float(&#39;inf&#39;)`而非其他数字，如0或一个具体的大数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划数组`dp`中，`dp[i]`表示句子中前i个字符中未识别的字符数量的最小值。初始化`dp[0]=0`因为空字符串中没有未识别的字符。其他位置初始值设置为`float(&#39;inf&#39;)`是为了在后续的动态规划过程中能够使用`min`函数来正确地比较并选择最小值。如果使用0或具体的大数，可能会导致无法正确更新最小值，因为这些初始值可能会被错误地识别为最小的未识别字符数量，尤其是在字符串的某些部分实际上可以完全由词典中的单词覆盖时。`float(&#39;inf&#39;)`作为一个足够大的数，保证了任何实际的字符数都会比它小，从而在比较时能被正确更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在进行词典筛选`dictionary = [x for x in dictionary if x in sentence]`时，这种筛选是否可能导致一些必要词汇被遗漏，特别是当词汇形成嵌套或重叠时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种筛选方法的确可能导致一些必要词汇被遗漏。例如，如果词典中的某个词没有在句子中单独出现，而是作为其他更长词汇的一部分出现，那么这种筛选就会将其排除，尽管这个词是必要的。这种情况在词汇嵌套或重叠时尤为明显，如词典中的&#39;abc&#39;和&#39;ab&#39;，而句子中只有&#39;abc&#39;。如果只检查完全匹配，&#39;ab&#39;将不会被包括在筛选后的词典中，但实际上它可能对解决问题非常重要。因此，这种筛选虽然可以减少计算量，但也可能影响算法的准确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在内层循环中，判断子字符串是否为词典中的单词`if sentence[i:j] == x:`，这种方法的效率如何？是否有更高效的字符串匹配方法可用于此场景？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>此方法在每次循环中都要对子字符串进行判断，这可能导致效率较低，特别是当句子和词典中的单词较长时。更高效的字符串匹配方法包括使用哈希表或字典树（Trie）。例如，可以先将所有词典中的单词存储在一个字典树中，然后遍历句子，使用字典树来检查以每个位置开始可能形成的所有单词。这种方法可以显著提高匹配的速度，因为字典树能够在O(m)时间内完成检查（m是单词的长度），并且可以同时处理多个潜在匹配项。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/re-space-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/re-space-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

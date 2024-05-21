@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>达到末尾下标所需的最大跳跃次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>达到末尾下标所需的最大跳跃次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始、由 <code>n</code> 个整数组成的数组 <code>nums</code> 和一个整数 <code>target</code> 。</p>
+
+<p>你的初始位置在下标 <code>0</code> 。在一步操作中，你可以从下标 <code>i</code> 跳跃到任意满足下述条件的下标 <code>j</code> ：</p>
+
+<ul>
+	<li><code>0 &lt;= i &lt; j &lt; n</code></li>
+	<li><code>-target &lt;= nums[j] - nums[i] &lt;= target</code></li>
+</ul>
+
+<p>返回到达下标 <code>n - 1</code> 处所需的 <strong>最大跳跃次数</strong> 。</p>
+
+<p>如果无法到达下标 <code>n - 1</code> ，返回 <code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1,3,6,4,1,2], target = 2
+<strong>输出：</strong>3
+<strong>解释：</strong>要想以最大跳跃次数从下标 0 到下标 n - 1 ，可以按下述跳跃序列执行操作：
+- 从下标 0 跳跃到下标 1 。 
+- 从下标 1 跳跃到下标 3 。 
+- 从下标 3 跳跃到下标 5 。 
+可以证明，从 0 到 n - 1 的所有方案中，不存在比 3 步更长的跳跃序列。因此，答案是 3 。 </pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1,3,6,4,1,2], target = 3
+<strong>输出：</strong>5
+<strong>解释：</strong>要想以最大跳跃次数从下标 0 到下标 n - 1 ，可以按下述跳跃序列执行操作：
+- 从下标 0 跳跃到下标 1 。 
+- 从下标 1 跳跃到下标 2 。 
+- 从下标 2 跳跃到下标 3 。 
+- 从下标 3 跳跃到下标 4 。 
+- 从下标 4 跳跃到下标 5 。 
+可以证明，从 0 到 n - 1 的所有方案中，不存在比 5 步更长的跳跃序列。因此，答案是 5 。 </pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>nums = [1,3,6,4,1,2], target = 0
+<strong>输出：</strong>-1
+<strong>解释：</strong>可以证明不存在从 0 到 n - 1 的跳跃序列。因此，答案是 -1 。 
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= nums.length == n &lt;= 1000</code></li>
+	<li><code>-10<sup>9</sup>&nbsp;&lt;= nums[i]&nbsp;&lt;= 10<sup>9</sup></code></li>
+	<li><code>0 &lt;= target &lt;= 2 * 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 263 ms</p>
+                    <p>内存: 16.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">inf = 1&lt;&lt;60
+class ZKW:
+    &#34;&#34;&#34;自低向上非递归写法线段树，0_indexed
+    tmx = ZKW(pre, max, -2 ** 61)
+    &#34;&#34;&#34;
+    __slots__ = (&#39;n&#39;, &#39;op&#39;, &#39;e&#39;, &#39;log&#39;, &#39;size&#39;, &#39;d&#39;)
+
+    def __init__(self, n, OP, E):
+        &#34;&#34;&#34;
+        OP: 操作:max,min,sum
+        E: 每个元素默认值
+        &#34;&#34;&#34;
+        self.n = n
+        self.op = OP
+        self.e = E
+        self.log = (self.n - 1).bit_length()
+        self.size = 1 &lt;&lt; self.log
+        self.d = [E for i in range(2 * self.size)]
+
+    def build(self, V):
+        for i in range(self.n):
+            self.d[self.size+i]=V[i]
+        for i in range(self.size-1,0,-1):
+            self.update(i)
+
+    def set(self, p, x):
+        # assert 0 &lt;= p and p &lt; self.n
+        update = self.update
+        p += self.size
+        self.d[p] = x
+        for i in range(1, self.log + 1):
+            update(p &gt;&gt; i)
+            
+    def get(self,p):
+        p+=self.size
+        return self.d[p]
+
+    def query(self, l, r):  # [l,r] 双闭区间
+        # assert 0 &lt;= l and l &lt;= r and r &lt;= self.n
+        sml, smr, op, d = self.e, self.e, self.op, self.d
+        l += self.size
+        r += self.size+1
+        while l &lt; r:
+            if l &amp; 1:
+                sml = op(sml, d[l])
+                l += 1
+            if r &amp; 1:
+                smr = op(d[r - 1], smr)
+                r -= 1
+            l &gt;&gt;= 1
+            r &gt;&gt;= 1
+        return self.op(sml, smr)
+
+    def update(self, k):
+        self.d[k] = self.op(self.d[2 * k], self.d[2 * k + 1])
+    def all_query(self):
+        return self.d[1]
+class Solution:
+    def maximumJumps(self, nums: List[int], target: int) -&gt; int:
+        arr=[]
+        for i in nums:
+            arr+=[i-target,i,i+target]
+        arr=sorted(set(arr))
+        d={x:i for i,x in enumerate(arr)}
+        seg=ZKW(len(d),max,-inf)
+        seg.set(d[nums[0]],0)
+        n=len(nums)
+        for i in range(1,n):
+            x=nums[i]
+            q=seg.query(d[x-target],d[x+target])
+            seg.set(d[x],q+1)
+            if i==n-1:
+                if q&lt;0:
+                    return -1
+                else:
+                    return q+1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了线段树（ZKW线段树的非递归版本）来求解问题。首先，为了应对题目中允许的跳跃范围 [-target, target]，题解将数组中的每个元素 x 扩展到三个可能的跳跃值 x-target, x, x+target，并去重排序。这种扩展允许在 O(log n) 时间内查询和更新任何区间的最大值。通过映射每个扩展值到其索引，可以用线段树高效查询和更新最大的跳跃次数。遍历 nums 数组，对于每个元素 x，查询在 [x-target, x+target] 范围内的最大跳跃次数，并在线段树中更新当前 x 的位置。最后，检查是否能到达 n-1 索引处，并返回相应的跳跃次数。如果不能到达，则返回 -1。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">inf = 1&lt;&lt;60
+class ZKW:
+    \&#34;\&#34;\&#34;自低向上非递归写法线段树，0_indexed
+    tmx = ZKW(pre, max, -2 ** 61)
+    \&#34;\&#34;\&#34;
+    __slots__ = (&#39;n&#39;, &#39;op&#39;, &#39;e&#39;, &#39;log&#39;, &#39;size&#39;, &#39;d&#39;)
+
+    def __init__(self, n, OP, E):
+        \&#34;\&#34;\&#34;初始化线段树
+        OP: 操作:max,min,sum
+        E: 每个元素默认值
+        \&#34;\&#34;\&#34;
+        self.n = n
+        self.op = OP
+        self.e = E
+        self.log = (self.n - 1).bit_length()
+        self.size = 1 &lt;&lt; self.log
+        self.d = [E for i in range(2 * self.size)]
+
+    def build(self, V):
+        for i in range(self.n):
+            self.d[self.size+i]=V[i]
+        for i in range(self.size-1,0,-1):
+            self.update(i)
+
+    def set(self, p, x):
+        update = self.update
+        p += self.size
+        self.d[p] = x
+        for i in range(1, self.log + 1):
+            update(p &gt;&gt; i)
+            
+    def get(self,p):
+        p+=self.size
+        return self.d[p]
+
+    def query(self, l, r):  # [l,r] 双闭区间
+        sml, smr, op, d = self.e, self.e, self.op, self.d
+        l += self.size
+        r += self.size+1
+        while l &lt; r:
+            if l &amp; 1:
+                sml = op(sml, d[l])
+                l += 1
+            if r &amp; 1:
+                smr = op(d[r - 1], smr)
+                r -= 1
+            l &gt;&gt;= 1
+            r &gt;&gt;= 1
+        return self.op(sml, smr)
+
+    def update(self, k):
+        self.d[k] = self.op(self.d[2 * k], self.d[2 * k + 1])
+    def all_query(self):
+        return self.d[1]
+class Solution:
+    def maximumJumps(self, nums: List[int], target: int) -&gt; int:
+        arr=[]
+        for i in nums:
+            arr+=[i-target,i,i+target]
+        arr=sorted(set(arr))
+        d={x:i for i,x in enumerate(arr)}
+        seg=ZKW(len(d),max,-inf)
+        seg.set(d[nums[0]],0)
+        n=len(nums)
+        for i in range(1,n):
+            x=nums[i]
+            q=seg.query(d[x-target],d[x+target])
+            seg.set(d[x],q+1)
+            if i==n-1:
+                if q&lt;0:
+                    return -1
+                else:
+                    return q+1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理跳跃范围时，选择将每个元素扩展为 x-target, x, x+target 三个可能的值？这种设计对算法的效率和结果有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理跳跃范围时，选择将每个元素扩展为 x-target, x, x+target 是为了覆盖所有可能的跳跃目的地。这样做可以确保算法能够考虑到从当前位置可能到达的所有位置。这种设计使得算法能够在更新和查询操作中直接访问到任意跳跃的目的地，极大地提高了效率。同时，这种方法需要更多的空间来存储扩展后的值，并且需要额外的计算来处理这些值，但这是为了确保算法的正确性和全面性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的线段树（ZKW线段树的非递归版本）的具体实现细节是什么？特别是如何在非递归的情况下实现区间的查询和更新？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>ZKW线段树的非递归版本是一种自底向上的更新方法，不需要使用递归调用。在这种实现中，数组的元素首先被放置在线段树的底部，对应于叶子节点。对于更新操作，首先更新叶子节点，然后向上更新其祖先节点直到根节点。对于查询操作，从底层开始，逐层向上，根据查询区间的边界动态决定查询路径，合并左右子区间的结果。这种方式避免了递归造成的额外开销，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的线段树初始化时为什么将每个元素默认值设为 -inf，这个选择对算法的执行有什么特别的意义或影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将每个元素的默认值设为 -inf 是为了正确处理还未经过更新的线段树节点。因为本题需要计算最大跳跃次数，未更新的节点应该不对最终结果产生影响（即被视为负无穷大，在求最大值时被忽略）。这样在进行区间最大值查询时，只有那些已经被设置或更新过的节点才会对结果有贡献，确保算法的正确性和初始状态的一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在算法的最后阶段，如果最终的跳跃次数 q 为负值，返回 -1 表示无法到达最后一个索引。这种情况是如何出现的？具体是在什么情况下会出现 q&lt;0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果最终的跳跃次数 q 为负值，意味着在尝试跳跃到最后一个索引的过程中，不存在有效的跳跃路径可以到达该索引。这通常发生在没有任何可用跳跃能够到达最后一个位置时，例如，如果前面所有的跳跃都不能覆盖到达最后位置的范围。在这种情况下，线段树查询返回的是初始化的 -inf 值，表明从起始点到终点无有效路径，因此算法返回 -1 来表示无法完成任务。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-jumps-to-reach-the-last-index')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-jumps-to-reach-the-last-index/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

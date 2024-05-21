@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>多线程网页爬虫</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>多线程网页爬虫</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=concurrency" class="badge bg-secondary tag-link">多线程</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 206 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># &#34;&#34;&#34;
+# This is HtmlParser&#39;s API interface.
+# You should not implement it, or speculate about its implementation
+# &#34;&#34;&#34;
+#class HtmlParser(object):
+#    def getUrls(self, url):
+#        &#34;&#34;&#34;
+#        :type url: str
+#        :rtype List[str]
+#        &#34;&#34;&#34;
+from queue import Queue
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import concurrent
+
+def get_hostname(url):
+    # url = url[len(&#39;http://&#39;):]
+    # hostname = f&#39;http://{url.split(&#34;/&#34;)[0]}&#39;
+    # return hostname
+    return url.split(&#39;/&#39;)[2]
+
+
+class Solution:
+    def crawl(self, startUrl: str, htmlParser: &#39;HtmlParser&#39;) -&gt; List[str]:
+        hostname = get_hostname(startUrl)
+
+        seen = set()
+        seen.add(startUrl)
+
+        to_visit = [startUrl]
+        res = [startUrl]
+
+        while(to_visit):
+            futures = []
+            # Explore candidates of ALL urls in the queue, with parallelism.
+            with ThreadPoolExecutor(max_workers=16) as executor:
+                for url in to_visit:
+                    futures.append(executor.submit(htmlParser.getUrls, url))
+            
+            to_visit = []
+            for future in concurrent.futures.as_completed(futures):
+                for c in future.result():
+                    if c not in seen and get_hostname(c) == hostname:
+                        seen.add(c)
+                        res.append(c)
+                        to_visit.append(c)
+        return res
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了多线程来加速网页爬虫的过程。首先，定义了一个帮助函数 `get_hostname` 用来从 URL 中提取主机名。在主函数 `crawl` 中，首先使用 `get_hostname` 得到初始 URL 的主机名。然后，使用一个集合 `seen` 来跟踪已经访问过的 URL，避免重复访问。接下来，使用列表 `to_visit` 来存储当前层待访问的 URL，并使用列表 `res` 来存储所有被访问过的 URL。对于 `to_visit` 中的每个 URL，使用线程池 `ThreadPoolExecutor` 来并行获取每个 URL 链接到的新 URL。对于每个新 URL，如果它未被访问过且与起始 URL 属于同一主机，就将其添加到 `seen`，`res`，以及下一轮的 `to_visit` 中。这个过程重复进行，直到没有新的 URL 可以访问。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># 定义获取主机名的函数
+from queue import Queue
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import concurrent
+
+def get_hostname(url):
+    # 从 URL 中提取主机名部分
+    return url.split(&#39;/&#39;)[2]
+
+
+class Solution:
+    def crawl(self, startUrl: str, htmlParser: &#39;HtmlParser&#39;) -&gt; List[str]:
+        # 获取起始 URL 的主机名
+        hostname = get_hostname(startUrl)
+
+        # 初始化已访问集合和结果列表
+        seen = set()
+        seen.add(startUrl)
+
+        # 初始化待访问列表
+        to_visit = [startUrl]
+        res = [startUrl]
+
+        # 当还有未访问的 URL 时继续
+        while(to_visit):
+            futures = []
+            # 使用线程池并行处理每个 URL
+            with ThreadPoolExecutor(max_workers=16) as executor:
+                for url in to_visit:
+                    futures.append(executor.submit(htmlParser.getUrls, url))
+            
+            # 清空待访问列表以准备下一轮
+            to_visit = []
+            # 等待所有线程处理完成并处理结果
+            for future in concurrent.futures.as_completed(futures):
+                for c in future.result():
+                    # 检查新 URL 是否未被访问且属于同一主机
+                    if c not in seen and get_hostname(c) == hostname:
+                        seen.add(c)
+                        res.append(c)
+                        to_visit.append(c)
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在多线程网页爬虫中，如何确保对`seen`集合的访问是线程安全的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在多线程环境中，确保对`seen`集合的访问是线程安全的，可以采用几种策略。一种是使用锁（如`threading.Lock()`）来控制对`seen`的访问，确保在同一时间只有一个线程可以修改`seen`集合。另一种方法是使用线程安全的数据结构，如`queue.Queue`或`concurrent.futures`中的`ConcurrentHashMap`等。在提供的代码中，可以通过在修改`seen`集合前获取一个锁，并在修改完成后释放该锁来实现线程安全。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你选择使用`ThreadPoolExecutor`的`max_workers`参数设为16的依据是什么？是否有可能因为过多线程而导致资源竞争增加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择`ThreadPoolExecutor`的`max_workers`参数设为16通常基于系统的CPU核心数和预期的I/O等待时间。选择适当的线程数可以使得CPU和I/O资源得到有效利用，而不至于造成过度的线程切换和资源争抢。过多线程确实可能导致资源竞争增加，特别是当线程数远大于处理器核心数时。在实际应用中，应该根据目标系统的具体配置和任务特性来调整`max_workers`的值，可能需要通过实验来找到最优的线程数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在爬虫过程中，`to_visit`列表是如何保证不重复添加相同的URL的，特别是在多线程环境下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在多线程环境下，确保`to_visit`列表不重复添加相同的URL需要依赖于`seen`集合的线程安全操作。在每个线程中解析URL前，应先检查该URL是否已存在于`seen`中，这一检查和添加操作应当是原子的，即在获取到锁之后进行检查并添加操作，然后再释放锁。这样可以确保不会有多个线程同时将同一个URL添加到`to_visit`列表中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/web-crawler-multithreaded')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/web-crawler-multithreaded/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

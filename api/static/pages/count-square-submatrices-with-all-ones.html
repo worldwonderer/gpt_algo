@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计全为 1 的正方形子矩阵</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计全为 1 的正方形子矩阵</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>m * n</code>&nbsp;的矩阵，矩阵中的元素不是 <code>0</code> 就是 <code>1</code>，请你统计并返回其中完全由 <code>1</code> 组成的 <strong>正方形</strong> 子矩阵的个数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>matrix =
+[
+&nbsp; [0,1,1,1],
+&nbsp; [1,1,1,1],
+&nbsp; [0,1,1,1]
+]
+<strong>输出：</strong>15
+<strong>解释：</strong> 
+边长为 1 的正方形有 <strong>10</strong> 个。
+边长为 2 的正方形有 <strong>4</strong> 个。
+边长为 3 的正方形有 <strong>1</strong> 个。
+正方形的总数 = 10 + 4 + 1 = <strong>15</strong>.
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>matrix = 
+[
+  [1,0,1],
+  [1,1,0],
+  [1,1,0]
+]
+<strong>输出：</strong>7
+<strong>解释：</strong>
+边长为 1 的正方形有 <strong>6</strong> 个。 
+边长为 2 的正方形有 <strong>1</strong> 个。
+正方形的总数 = 6 + 1 = <strong>7</strong>.
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length&nbsp;&lt;= 300</code></li>
+	<li><code>1 &lt;= arr[0].length&nbsp;&lt;= 300</code></li>
+	<li><code>0 &lt;= arr[i][j] &lt;= 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 98 ms</p>
+                    <p>内存: 18.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countSquares(self, matrix: List[List[int]]) -&gt; int:
+        m, n = len(matrix), len(matrix[0])
+        #动态规划
+        dp = [[0] * n for _ in range(m)]
+        ans = 0
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 1:
+                    if i == 0 or j == 0:
+                        dp[i][j] = 1
+                    else:
+                        dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+                    ans += dp[i][j]
+        
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用动态规划的方法来解决问题。我们设一个与输入矩阵相同大小的DP表，dp[i][j]表示以(i, j)为右下角的正方形的最大边长。对于每个1在矩阵中的位置，如果它是第一行或第一列的一部分，它只能形成边长为1的正方形（即本身）。对于其他位置，如果matrix[i][j]是1，dp[i][j]将基于其左方(dp[i][j-1])、上方(dp[i-1][j])以及左上方(dp[i-1][j-1])的dp值，取这三个值中的最小值然后加1。这确保了只计算完全由1组成的正方形。最后，将所有dp[i][j]的值累加，即得到所有可能的正方形数量。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countSquares(self, matrix: List[List[int]]) -&gt; int:
+        m, n = len(matrix), len(matrix[0]) # m, n分别为矩阵的行数和列数
+        dp = [[0] * n for _ in range(m)] # 初始化DP表
+        ans = 0 # 初始化计数器
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 1: # 只有当当前位置是1时，才可能构成正方形
+                    if i == 0 or j == 0: # 边界情况处理，第一行或第一列
+                        dp[i][j] = 1
+                    else: # 非边界情况下，取左，上，左上三个位置的最小值加1
+                        dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+                    ans += dp[i][j] # 将当前位置的正方形数量加到结果中
+        return ans # 返回总的正方形数量</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么dp数组的初始化都是0，而不是直接将矩阵的值复制过来？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp数组中的每个元素dp[i][j]代表以(i, j)为右下角的最大正方形的边长。初始化为0是因为在动态规划的开始阶段，我们尚未开始计算任何正方形的大小。直接使用矩阵的值会引入误解，因为矩阵的值1只表示该位置有一个单独的1，并不代表那里已经有一个正方形。dp数组的值是基于一系列条件计算得出的结果，而不仅仅是单个元素的值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划中，为什么选择取左方、上方和左上方三个dp值的最小值然后加1来更新dp[i][j]？这样做的数学逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种更新策略确保了只有当一个单元格的左侧、上方和左上方三个相邻位置都至少能形成某一大小的正方形时，当前位置才能形成更大的正方形。取最小值加1的逻辑是因为正方形的形成是受到最短边的限制。例如，如果左侧、上方和左上方的正方形边长分别是2, 3, 2，则只能以当前位置形成边长为3的正方形（2+1=3），因为边长超过2的正方形会在某个方向上缺少支持。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到如果matrix[i][j]是1且位于第一行或第一列，dp[i][j]直接设置为1。请问这种处理对结果的正确性有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理保证了正确性，因为第一行和第一列的元素没有足够的上方或左方空间来形成大于1x1的正方形。因此，如果这些位置的元素是1，它们自身就是一个边长为1的正方形。这种处理简化了边界条件的处理，避免了在循环中进行不必要的边界检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实现中，每增加一个正方形边长，都需要检查三个方向的dp值，这是否意味着所有三个方向都必须是相同的正方形边长才能形成更大的正方形？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>不完全是这样。虽然实际形成的新正方形的边长是由三个方向中的最小边长决定的，但这三个方向的正方形边长不必完全相同。只要这三个位置的正方形边长都至少达到某个值，就可以在此基础上形成一个较大的正方形。例如，如果这三个方向的正方形边长分别是2, 3, 和2，则可以在这个位置形成一个3x3的正方形，因为所有方向都支持至少2x2的正方形，再加上该位置本身的1，形成3x3正方形。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-square-submatrices-with-all-ones')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-square-submatrices-with-all-ones/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

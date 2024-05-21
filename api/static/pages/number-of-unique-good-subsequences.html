@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>不同的好子序列数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>不同的好子序列数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二进制字符串&nbsp;<code>binary</code>&nbsp;。&nbsp;<code>binary</code>&nbsp;的一个 <strong>子序列</strong>&nbsp;如果是 <strong>非空</strong>&nbsp;的且没有 <b>前导</b>&nbsp;<strong>0</strong>&nbsp;（除非数字是 <code>"0"</code>&nbsp;本身），那么它就是一个 <strong>好</strong>&nbsp;的子序列。</p>
+
+<p>请你找到&nbsp;<code>binary</code>&nbsp;<strong>不同好子序列</strong>&nbsp;的数目。</p>
+
+<ul>
+	<li>比方说，如果&nbsp;<code>binary = "001"</code>&nbsp;，那么所有 <strong>好</strong>&nbsp;子序列为&nbsp;<code>["0", "0", "1"]</code>&nbsp;，所以 <b>不同</b>&nbsp;的好子序列为&nbsp;<code>"0"</code> 和&nbsp;<code>"1"</code>&nbsp;。 注意，子序列&nbsp;<code>"00"</code>&nbsp;，<code>"01"</code>&nbsp;和&nbsp;<code>"001"</code>&nbsp;不是好的，因为它们有前导 0 。</li>
+</ul>
+
+<p>请你返回&nbsp;<code>binary</code>&nbsp;中&nbsp;<strong>不同好子序列</strong>&nbsp;的数目。由于答案可能很大，请将它对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;<strong>取余</strong> 后返回。</p>
+
+<p>一个 <strong>子序列</strong>&nbsp;指的是从原数组中删除若干个（可以一个也不删除）元素后，不改变剩余元素顺序得到的序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>binary = "001"
+<b>输出：</b>2
+<b>解释：</b>好的二进制子序列为 ["0", "0", "1"] 。
+不同的好子序列为 "0" 和 "1" 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>binary = "11"
+<b>输出：</b>2
+<b>解释：</b>好的二进制子序列为 ["1", "1", "11"] 。
+不同的好子序列为 "1" 和 "11" 。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>binary = "101"
+<b>输出：</b>5
+<b>解释：</b>好的二进制子序列为 ["1", "0", "1", "10", "11", "101"] 。
+不同的好子序列为 "0" ，"1" ，"10" ，"11" 和 "101" 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= binary.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>binary</code>&nbsp;只含有&nbsp;<code>'0'</code>&nbsp;和&nbsp;<code>'1'</code> 。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 84 ms</p>
+                    <p>内存: 17.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numberOfUniqueGoodSubsequences(self, binary: str) -&gt; int:
+        mod = 10**9 + 7
+
+        even = odd = 0
+        for ch in binary:
+            if ch == &#34;0&#34;:
+                even = (even + odd) % mod
+            else:
+                odd = (even + odd + 1) % mod
+        
+        ans = (even + odd + (&#34;0&#34; in binary)) % mod
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用动态规划的思想，通过遍历字符串来构建所有可能的好子序列。定义两个变量even和odd，分别代表以&#39;0&#39;结尾和以&#39;1&#39;结尾的好子序列数量。遍历字符串的每个字符，根据当前字符是&#39;0&#39;还是&#39;1&#39;，更新even或odd的值。最终结果为even和odd的和，再加上是否含有字符&#39;0&#39;（作为单独的子序列&#39;0&#39;）。整个过程中，每个字符只更新even或odd，因此时间复杂度为O(n)，空间复杂度为O(1)。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numberOfUniqueGoodSubsequences(self, binary: str) -&gt; int:
+        mod = 10**9 + 7  # 定义模数
+
+        even = odd = 0  # 初始化以&#39;0&#39;和&#39;1&#39;结尾的好子序列数量
+        for ch in binary:  # 遍历输入的二进制字符串
+            if ch == &#34;0&#34;:
+                even = (even + odd) % mod  # 如果当前字符是&#39;0&#39;，更新even
+            else:
+                odd = (even + odd + 1) % mod  # 如果当前字符是&#39;1&#39;，更新odd
+        
+        ans = (even + odd + (&#34;0&#34; in binary)) % mod  # 计算总的好子序列数量，加上单独的&#39;0&#39;序列
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在定义动态规划变量`even`和`odd`时，它们具体代表了什么意义？为何选择这样的表示方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`even`和`odd`是动态规划中用于记录子序列的变量，其中`even`代表所有以&#39;0&#39;结尾的好子序列的数量，而`odd`代表所有以&#39;1&#39;结尾的好子序列的数量。选择这样的表示方法是为了在遍历字符串时能够有效地根据当前字符更新子序列的数量，同时确保算法的时间复杂度为O(n)。这种表示方法可以清晰地区分处理两种不同结尾字符的子序列，并简化状态转移的逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理字符&#39;1&#39;时，更新`odd`的表达式中要额外加1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理字符&#39;1&#39;时，`odd`的更新表达式中额外加1是因为除了从现有的所有好子序列（以&#39;0&#39;和&#39;1&#39;结尾的）中添加&#39;1&#39;之外，还可以形成一个新的单字符子序列&#39;1&#39;。这个单独的&#39;1&#39;是一个有效的好子序列，所以在计算以&#39;1&#39;结尾的子序列数量时需要将它包括进去。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你是如何确保子序列不包含前导0的？在代码中是如何体现这一点的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这段代码中，我们并没有直接在算法中排除包含前导0的子序列，而是通过最终的结果计算方式间接处理了这个问题。即使`even`变量在遇到&#39;0&#39;时被更新，但最终结果在返回之前加上了单独的&#39;0&#39;子序列。这意味着即使在动态规划过程中可能计算了一些非法的带前导0的子序列，最终输出的结果仍然是正确的，因为我们只计算了合法的子序列数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到，最终结果需要加上单独的&#39;0&#39;序列，这是基于什么考虑？为何需要特别处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中加上单独的&#39;0&#39;序列是因为在遍历字符串并动态更新`even`和`odd`时，我们考虑了由多个字符组成的子序列，但没有直接考虑单个字符&#39;0&#39;作为子序列的情况。在二进制字符串中，单独的&#39;0&#39;也是一个有效的子序列。因此，如果原始字符串中包含字符&#39;0&#39;，我们需要在最终的子序列数量中额外加上这个单独的&#39;0&#39;子序列，以确保所有可能的好子序列都被计算在内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-unique-good-subsequences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-unique-good-subsequences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

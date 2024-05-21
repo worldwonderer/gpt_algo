@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>基本计算器 IV</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>基本计算器 IV</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=recursion" class="badge bg-secondary tag-link">递归</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个表达式如&nbsp;<code>expression = "e + 8 - a + 5"</code>&nbsp;和一个求值映射，如&nbsp;<code>{"e": 1}</code>（给定的形式为&nbsp;<code>evalvars = ["e"]</code> 和&nbsp;<code>evalints = [1]</code>），返回表示简化表达式的标记列表，例如 <code>["-1*a","14"]</code></p>
+
+<ul>
+	<li>表达式交替使用块和符号，每个块和符号之间有一个空格。</li>
+	<li>块要么是括号中的表达式，要么是变量，要么是非负整数。</li>
+	<li>变量是一个由小写字母组成的字符串（不包括数字）。请注意，变量可以是多个字母，并注意变量从不具有像&nbsp;<code>"2x"</code>&nbsp;或&nbsp;<code>"-x"</code>&nbsp;这样的前导系数或一元运算符&nbsp;。</li>
+</ul>
+
+<p>表达式按通常顺序进行求值：先是括号，然后求乘法，再计算加法和减法。</p>
+
+<ul>
+	<li>例如，<code>expression = "1 + 2 * 3"</code>&nbsp;的答案是 <code>["7"]</code>。</li>
+</ul>
+
+<p>输出格式如下：</p>
+
+<ul>
+	<li>对于系数非零的每个自变量项，我们按字典排序的顺序将自变量写在一个项中。
+	<ul>
+		<li>例如，我们永远不会写像 <code>“b*a*c”</code> 这样的项，只写 <code>“a*b*c”</code>。</li>
+	</ul>
+	</li>
+	<li>项的次数等于被乘的自变量的数目，并计算重复项。我们先写出答案的最大次数项，用字典顺序打破关系，此时忽略词的前导系数。
+	<ul>
+		<li>例如，<code>"a*a*b*c"</code> 的次数为 4。</li>
+	</ul>
+	</li>
+	<li>项的前导系数直接放在左边，用星号将它与变量分隔开(如果存在的话)。前导系数 1 仍然要打印出来。</li>
+	<li>格式良好的一个示例答案是&nbsp;<code>["-2*a*a*a", "3*a*a*b", "3*b*b", "4*a", "5*c", "-6"]</code>&nbsp;。</li>
+	<li>系数为 <code>0</code> 的项（包括常数项）不包括在内。
+	<ul>
+		<li>例如，<code>“0”</code> 的表达式输出为&nbsp;<code>[]</code>&nbsp;。</li>
+	</ul>
+	</li>
+</ul>
+
+<p><strong>注意：</strong>你可以假设给定的表达式均有效。所有中间结果都在区间 <code>[-2<sup>31</sup>, 2<sup>31</sup> - 1]</code> 内。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>expression = "e + 8 - a + 5", evalvars = ["e"], evalints = [1]
+<strong>输出：</strong>["-1*a","14"]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>expression = "e - 8 + temperature - pressure",
+evalvars = ["e", "temperature"], evalints = [1, 12]
+<strong>输出：</strong>["-1*pressure","5"]
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>expression = "(e + 8) * (e - 8)", evalvars = [], evalints = []
+<strong>输出：</strong>["1*e*e","-64"]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= expression.length &lt;= 250</code></li>
+	<li><code>expression</code>&nbsp;由小写英文字母，数字&nbsp;<code>'+'</code>,&nbsp;<code>'-'</code>,&nbsp;<code>'*'</code>,&nbsp;<code>'('</code>,&nbsp;<code>')'</code>,&nbsp;<code>' '</code>&nbsp;组成</li>
+	<li><code>expression</code>&nbsp;不包含任何前空格或后空格</li>
+	<li><code>expression</code>&nbsp;中的所有符号都用一个空格隔开</li>
+	<li><code>0 &lt;= evalvars.length &lt;= 100</code></li>
+	<li><code>1 &lt;= evalvars[i].length &lt;= 20</code></li>
+	<li><code>evalvars[i]</code>&nbsp;由小写英文字母组成</li>
+	<li><code>evalints.length == evalvars.length</code></li>
+	<li><code>-100 &lt;= evalints[i] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 34 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Poly(collections.Counter):
+    def __add__(self, other):
+        self.update(other)
+        return self
+
+    def __sub__(self, other):
+        self.update({k: -v for k, v in other.items()})
+        return self
+
+    def __mul__(self, other):
+        ans = Poly()
+        for k1, v1 in self.items():
+            for k2, v2 in other.items():
+                ans.update({tuple(sorted(k1 + k2)): v1 * v2})
+        return ans
+
+    def evaluate(self, evalmap):
+        ans = Poly()
+        for k, c in self.items():
+            free = []
+            for token in k:
+                if token in evalmap:
+                    c *= evalmap[token]
+                else:
+                    free.append(token)
+            ans[tuple(free)] += c
+        return ans
+
+    def to_list(self):
+        p = sorted(self.items(), key=lambda kv: (-len(kv[0]), kv[0], kv[1]))
+        return [&#39;*&#39;.join((str(v),) + k) for k, v in p if v]
+
+class Solution(object):
+    def basicCalculatorIV(self, expression, evalvars, evalints):
+        evalmap = dict(zip(evalvars, evalints))
+
+        def combine(left, right, symbol):
+            if symbol == &#39;+&#39;: return left + right
+            if symbol == &#39;-&#39;: return left - right
+            if symbol == &#39;*&#39;: return left * right
+            raise
+
+        def make(expr):
+            ans = Poly()
+            if expr.isdigit():
+                ans.update({(): int(expr)})
+            else:
+                ans[(expr,)] += 1
+            return ans
+
+        def parse(expr):
+            bucket = []
+            symbols = []
+            i = 0
+            while i &lt; len(expr):
+                if expr[i] == &#39;(&#39;:
+                    bal = 0
+                    for j in range(i, len(expr)):
+                        if expr[j] == &#39;(&#39;: bal += 1
+                        if expr[j] == &#39;)&#39;: bal -= 1
+                        if bal == 0: break
+                    bucket.append(parse(expr[i+1:j]))
+                    i = j
+                elif expr[i].isalnum():
+                    for j in range(i, len(expr)):
+                        if expr[j] == &#39; &#39;:
+                            bucket.append(make(expr[i:j]))
+                            break
+                    else:
+                        bucket.append(make(expr[i:]))
+                    i = j
+                elif expr[i] in &#39;+-*&#39;:
+                    symbols.append(expr[i])
+                i += 1
+
+            for i in range(len(symbols) - 1, -1, -1):
+                if symbols[i] == &#39;*&#39;:
+                    bucket[i] = combine(bucket[i], bucket.pop(i+1),
+                                        symbols.pop(i))
+
+            if not bucket: return Poly()
+            ans = bucket[0]
+            for i, symbol in enumerate(symbols, 1):
+                ans = combine(ans, bucket[i], symbol)
+
+            return ans
+
+        P = parse(expression).evaluate(evalmap)
+        return P.to_list()</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了一种多项式处理方法，通过自定义的Poly类（基于collections.Counter），来表示和操作多项式。每个Poly实例表示一个多项式，其中键是变量组合的元组，值是相应的系数。
+
+1. __add__ 和 __sub__ 方法重载了加法和减法运算符来合并和减去多项式。
+2. __mul__ 方法通过嵌套循环计算两个多项式的乘积，组合项的所有可能的变量组合，并更新结果多项式。
+3. evaluate 方法通过给定的变量映射替换变量值，并合并多项式中相同的项。
+4. to_list 方法用于将多项式转换为规定格式的字符串列表，按照项的次数（降序）、变量的字典序排列。
+
+解析表达式的过程(parse)使用递归来处理括号和操作符，生成相应的多项式对象。该方法首先分离出各个组成部分（数字、变量或括号内的表达式），并根据运算符适当组合它们。</p>
+                                <p>时间复杂度: O(n + m^2)，其中n是表达式的长度，m是操作数中项的数量</p>
+                                <p>空间复杂度: O(m^2)</p>
+                                <pre class="bg-light p-2">class Poly(collections.Counter):
+    # 初始化多项式，继承Counter以方便统计和操作
+    def __add__(self, other):
+        # 加法操作，更新当前多项式的每个项
+        self.update(other)
+        return self
+
+    def __sub__(self, other):
+        # 减法操作，更新当前多项式，为other的每个项系数取反
+        self.update({k: -v for k, v in other.items()})
+        return self
+
+    def __mul__(self, other):
+        # 乘法操作，计算当前多项式与另一多项式的所有项的乘积
+        ans = Poly()
+        for k1, v1 in self.items():
+            for k2, v2 in other.items():
+                ans.update({tuple(sorted(k1 + k2)): v1 * v2})
+        return ans
+
+    def evaluate(self, evalmap):
+        # 计算多项式的值，替换变量为具体数值
+        ans = Poly()
+        for k, c in self.items():
+            free = []
+            for token in k:
+                if token in evalmap:
+                    c *= evalmap[token]
+                else:
+                    free.append(token)
+            ans[tuple(free)] += c
+        return ans
+
+    def to_list(self):
+        # 转换多项式为规定格式的字符串列表
+        p = sorted(self.items(), key=lambda kv: (-len(kv[0]), kv[0], kv[1]))
+        return [&#39;*&#39;.join((str(v),) + k) for k, v in p if v]
+
+class Solution(object):
+    def basicCalculatorIV(self, expression, evalvars, evalints):
+        evalmap = dict(zip(evalvars, evalints))
+
+        def combine(left, right, symbol):
+            # 根据符号执行相应的多项式运算
+            if symbol == &#39;+&#39;: return left + right
+            if symbol == &#39;-&#39;: return left - right
+            if symbol == &#39;*&#39;: return left * right
+            raise
+
+        def make(expr):
+            # 生成多项式对象，将表达式转换为多项式
+            ans = Poly()
+            if expr.isdigit():
+                ans.update({(): int(expr)})
+            else:
+                ans[(expr,)] += 1
+            return ans
+
+        def parse(expr):
+            # 解析表达式，处理括号和操作符，递归构造多项式
+            bucket = []
+            symbols = []
+            i = 0
+            while i &lt; len(expr):
+                if expr[i] == &#39;(&#39;: 
+                    bal = 0
+                    for j in range(i, len(expr)):
+                        if expr[j] == &#39;(&#39;: bal += 1
+                        if expr[j] == &#39;)&#39;: bal -= 1
+                        if bal == 0: break
+                    bucket.append(parse(expr[i+1:j]))
+                    i = j
+                elif expr[i].isalnum():
+                    for j in range(i, len(expr)):
+                        if expr[j] == &#39; &#39;:
+                            bucket.append(make(expr[i:j]))
+                            break
+                    else:
+                        bucket.append(make(expr[i:]))
+                    i = j
+                elif expr[i] in &#39;+-*&#39;:
+                    symbols.append(expr[i])
+                i += 1
+
+            for i in range(len(symbols) - 1, -1, -1):
+                if symbols[i] == &#39;*&#39;:
+                    bucket[i] = combine(bucket[i], bucket.pop(i+1),
+                                        symbols.pop(i))
+
+            if not bucket: return Poly()
+            ans = bucket[0]
+            for i, symbol in enumerate(symbols, 1):
+                ans = combine(ans, bucket[i], symbol)
+
+            return ans
+
+        P = parse(expression).evaluate(evalmap)
+        return P.to_list()
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在实现多项式类的`__mul__`方法时，为什么选择使用`tuple(sorted(k1 + k2))`来表示项的组合？这种方式是否会引入额外的计算成本？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在多项式乘法中，使用`tuple(sorted(k1 + k2))`来表示项的组合确保不同顺序的变量组合被视为同一项。例如，&#39;x*y&#39;和&#39;y*x&#39;应被视为同一项。通过排序，我们统一了项的表示方式，从而能正确地合并同类项。这种方法确实引入了额外的计算成本，主要是因为每次乘法都需要对变量组合进行排序。排序操作的时间复杂度为O(n log n)，其中n是变量的数量。尽管引入了额外成本，但这是保证多项式正确性的必要步骤。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`evaluate`函数中，如何处理变量替换并合并同类项时确保不会出现重复计算或遗漏项？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`evaluate`函数中，每个多项式项的变量被替换为具体数值（如果在`evalmap`中定义）。若变量未在映射中定义，则保留为自由变量。计算过程中，相同的自由变量组合会自动合并，因为`Poly`类继承自`collections.Counter`，这保证了相同键的项（即自由变量组合）的系数会被累加。这种方法避免了重复计算和遗漏项，因为每个变量组合都被唯一确定，并且Counter类的特性自动处理了系数的累加，确保计算的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的`parse`函数使用了递归来分解表达式，这种递归方法在处理极其复杂或深层嵌套的表达式时的效率如何？是否存在栈溢出的风险？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>递归方法在处理复杂或深层嵌套的表达式时可能效率较低，主要是因为每层递归都需要进行函数调用，这会消耗额外的时间和空间。深层嵌套的表达式可能导致递归调用的层数过多，从而存在栈溢出的风险。虽然现代编程语言和环境通常提供了较大的栈空间，但在极端情况下仍可能遇到栈溢出问题。为了避免这种情况，可以考虑使用迭代方法或将递归转化为迭代，这可能需要额外的数据结构来显式维护调用栈。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/parse-lisp-expression" class="list-group-item list-group-item-action">
+                                Lisp 语法解析
+                            </a>
+                        
+                            <a href="/problem/basic-calculator-iii" class="list-group-item list-group-item-action">
+                                基本计算器 III
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/basic-calculator-iv')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/basic-calculator-iv/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

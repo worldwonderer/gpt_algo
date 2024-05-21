@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>中心对称数 III</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>中心对称数 III</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=recursion" class="badge bg-secondary tag-link">递归</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 34 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def strobogrammaticInRange(self, low: str, high: str) -&gt; int:
+        def count(num: str):
+            def flip(s):
+                match = {&#34;0&#34;:&#34;0&#34;, &#34;1&#34;:&#34;1&#34;, &#34;6&#34;:&#34;9&#34;, &#34;8&#34;:&#34;8&#34;, &#34;9&#34;:&#34;6&#34;}
+                ans  = &#34;&#34;
+                for ch in s:
+                    ans += match[ch]
+                return ans
+
+            @cache
+            def dfs(pos: int, path: str, limit: bool, start: int) -&gt; int:
+                digits = [0,1,6,8,9]
+                if pos == len(num):
+                    return int(start &gt;= 0 and path in {&#34;0&#34;,&#34;1&#34;,&#34;8&#34;})
+                ans  = 0
+                if start &gt;= 0:
+                    if 2 * (pos-start) &gt;= len(num)-start:
+                        if not limit:
+                            if (len(num)-start) % 2 == 1:
+                                return int(path in {&#34;0&#34;,&#34;1&#34;,&#34;8&#34;})
+                            else:
+                                return 1
+                        else:
+                            s = path
+                            if len(num) % 2 == 0:
+                                s = s + flip(path[len(path)-1::-1])
+                            else:
+                                s = s + flip(path[len(path)-2::-1])
+                            return int(s &lt;= num)
+                    else:
+                        for d in digits:
+                            if limit and d &gt; int(num[pos]):
+                                break
+                            newLimit = limit and d == int(num[pos])
+                            if newLimit:
+                                ans += dfs(pos+1, path+str(d),True, start)
+                            else:
+                                ans += dfs(pos+1, str(d), False, start)
+                else:
+                    ans += dfs(pos+1, &#34;&#34;, False, -1)
+                    for d in digits:
+                        if d == 0:
+                            continue
+                        if limit and d &gt; int(num[pos]):
+                            break
+                        newLimit = limit and d == int(num[pos])
+                        if newLimit:
+                            ans += dfs(pos+1, path+str(d), True, pos)
+                        else:
+                            ans += dfs(pos+1, str(d), False, pos)
+                return ans
+            return dfs(0, &#34;&#34;, True, -1) + 1
+        #print(count(high))
+        #print(count(low))
+        ans  = count(high) - count(low)
+        match = {&#34;0&#34;:&#34;0&#34;, &#34;1&#34;:&#34;1&#34;, &#34;6&#34;:&#34;9&#34;, &#34;8&#34;:&#34;8&#34;, &#34;9&#34;:&#34;6&#34;}
+        for i in range((len(low)+1)//2):
+            if low[i] not in match or low[len(low)-1-i] != match[low[i]]:
+                break
+        else:
+            ans += 1
+        return ans
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题使用DFS+记忆化搜索的方法来统计在给定范围内的中心对称数的个数。主要思路是：从高位到低位依次构造中心对称数，在构造的过程中，根据已经构造的前缀判断剩余部分是否能够构成中心对称数，如果可以直接计算出个数，避免重复搜索。同时使用记忆化存储已经搜索过的状态，降低时间复杂度。</p>
+                                <p>时间复杂度: O(n * 5^(n/2))</p>
+                                <p>空间复杂度: O(n * 5^(n/2))</p>
+                                <pre class="bg-light p-2">```python
+class Solution:
+    def strobogrammaticInRange(self, low: str, high: str) -&gt; int:
+        def count(num: str):
+            def flip(s):
+                match = {&#34;0&#34;:&#34;0&#34;, &#34;1&#34;:&#34;1&#34;, &#34;6&#34;:&#34;9&#34;, &#34;8&#34;:&#34;8&#34;, &#34;9&#34;:&#34;6&#34;}  # 定义翻转映射
+                ans  = &#34;&#34;
+                for ch in s:
+                    ans += match[ch]
+                return ans
+
+            @cache
+            def dfs(pos: int, path: str, limit: bool, start: int) -&gt; int:
+                digits = [0,1,6,8,9]  # 可选的数字
+                if pos == len(num):  # 已经构造完整个数字
+                    return int(start &gt;= 0 and path in {&#34;0&#34;,&#34;1&#34;,&#34;8&#34;})  # 判断构造的数是否为中心对称数
+                ans  = 0
+                if start &gt;= 0:  # 已经开始构造中心对称数
+                    if 2 * (pos-start) &gt;= len(num)-start:  # 已经构造了一半以上的数字
+                        if not limit:  # 没有上界限制
+                            if (len(num)-start) % 2 == 1:  # 数字长度为奇数
+                                return int(path in {&#34;0&#34;,&#34;1&#34;,&#34;8&#34;})  # 判断当前构造的数是否为中心对称数
+                            else:  # 数字长度为偶数
+                                return 1  # 只有一种可能
+                        else:  # 有上界限制
+                            s = path
+                            if len(num) % 2 == 0:  # 数字长度为偶数
+                                s = s + flip(path[len(path)-1::-1])  # 补全右半部分
+                            else:  # 数字长度为奇数
+                                s = s + flip(path[len(path)-2::-1])  # 补全右半部分
+                            return int(s &lt;= num)  # 判断构造的数是否在范围内
+                    else:  # 还未构造一半的数字
+                        for d in digits:
+                            if limit and d &gt; int(num[pos]):  # 超出上界限制，停止搜索
+                                break
+                            newLimit = limit and d == int(num[pos])  # 更新上界限制条件
+                            if newLimit:  # 当前位取到上界
+                                ans += dfs(pos+1, path+str(d),True, start)
+                            else:  # 当前位未取到上界
+                                ans += dfs(pos+1, str(d), False, start)
+                else:  # 还未开始构造中心对称数
+                    ans += dfs(pos+1, &#34;&#34;, False, -1)  # 跳过当前位
+                    for d in digits:
+                        if d == 0:  # 不能以0开头
+                            continue
+                        if limit and d &gt; int(num[pos]):  # 超出上界限制，停止搜索
+                            break
+                        newLimit = limit and d == int(num[pos])  # 更新上界限制条件
+                        if newLimit:  # 当前位取到上界
+                            ans += dfs(pos+1, path+str(d), True, pos)
+                        else:  # 当前位未取到上界
+                            ans += dfs(pos+1, str(d), False, pos)
+                return ans
+            return dfs(0, &#34;&#34;, True, -1) + 1
+        ans  = count(high) - count(low)  # 计算范围内的中心对称数个数
+        match = {&#34;0&#34;:&#34;0&#34;, &#34;1&#34;:&#34;1&#34;, &#34;6&#34;:&#34;9&#34;, &#34;8&#34;:&#34;8&#34;, &#34;9&#34;:&#34;6&#34;}
+        for i in range((len(low)+1)//2):
+            if low[i] not in match or low[len(low)-1-i] != match[low[i]]:
+                break
+        else:
+            ans += 1  # 如果下界本身是中心对称数，需要加1
+        return ans
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在DFS的设计中，使用了`digits = [0,1,6,8,9]`而没有包括其他数字如2,3,4等？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在中心对称数的定义中，数字必须在旋转180度后仍能表示同一个数或有效的对应数。数字2,3,4,5和7旋转后无法得到有效的数字，因此不包含在中心对称数中。有效的中心对称数数字只包括0, 1, 6, 8, 9，其中6和9旋转后互为对方，0、1、8旋转后保持不变。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在函数`flip`中，如果传入的数字字符串中有不是`0,1,6,8,9`的字符，函数会如何处理？是否有错误处理机制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在提供的`flip`函数中，如果输入的数字字符串包含非`0,1,6,8,9`的字符，将会引发一个KeyError，因为这些字符没有在翻转映射`match`字典中定义。当前的实现没有错误处理机制来处理这种情况，所以在使用`flip`函数之前，需要确保所有字符都是有效的中心对称数字符。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在递归函数`dfs`中，`limit`参数的具体作用是什么？如何通过这个参数控制搜索范围？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`limit`参数在递归函数`dfs`中用来标识当前的数字构造是否受到原始数字的位限制。如果`limit`为`True`，则当前位置的数字不能超过原始数字对应位置的数字；如果为`False`，则可以自由选择`0,1,6,8,9`中的任一数字。这个参数确保在构造数字时，只有当完全符合原始上界数字的前缀时，才会继续严格匹配上界；否则可以较为自由地构造数字。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在记忆化搜索时，为什么选择对`dfs`函数使用`@cache`装饰器，而不是手动管理一个记忆化数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用`@cache`装饰器可以自动处理记忆化的细节，如存储已经计算的结果和在后续调用中直接返回这些结果，从而减少代码复杂性和出错的可能性。相比于手动管理记忆化数组，`@cache`提供了一种更简洁和易于维护的方式来实现记忆化，特别是在涉及多个参数的递归函数中这一点尤为重要。它自动地为每个不同的参数组合创建一个缓存条目，避免了复杂的索引和数据结构管理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/strobogrammatic-number" class="list-group-item list-group-item-action">
+                                中心对称数
+                            </a>
+                        
+                            <a href="/problem/strobogrammatic-number-ii" class="list-group-item list-group-item-action">
+                                中心对称数 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/strobogrammatic-number-iii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/strobogrammatic-number-iii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

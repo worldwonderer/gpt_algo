@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两个回文子字符串长度的最大乘积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两个回文子字符串长度的最大乘积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的字符串&nbsp;<code>s</code>&nbsp;，你需要找到两个 <strong>不重叠</strong><strong>的回文&nbsp;</strong>子字符串，它们的长度都必须为 <strong>奇数</strong>&nbsp;，使得它们长度的乘积最大。</p>
+
+<p>更正式地，你想要选择四个整数&nbsp;<code>i</code>&nbsp;，<code>j</code>&nbsp;，<code>k</code>&nbsp;，<code>l</code>&nbsp;，使得&nbsp;<code>0 &lt;= i &lt;= j &lt; k &lt;= l &lt; s.length</code>&nbsp;，且子字符串&nbsp;<code>s[i...j]</code> 和&nbsp;<code>s[k...l]</code>&nbsp;都是回文串且长度为奇数。<code>s[i...j]</code>&nbsp;表示下标从 <code>i</code>&nbsp;到 <code>j</code>&nbsp;且 <strong>包含</strong>&nbsp;两端下标的子字符串。</p>
+
+<p>请你返回两个不重叠回文子字符串长度的 <strong>最大</strong>&nbsp;乘积。</p>
+
+<p><strong>回文字符串</strong>&nbsp;指的是一个从前往后读和从后往前读一模一样的字符串。<strong>子字符串</strong>&nbsp;指的是一个字符串中一段连续字符。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "ababbb"
+<b>输出：</b>9
+<b>解释：</b>子字符串 "aba" 和 "bbb" 为奇数长度的回文串。乘积为 3 * 3 = 9 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>s = "zaaaxbbby"
+<b>输出：</b>9
+<b>解释：</b>子字符串 "aaa" 和 "bbb" 为奇数长度的回文串。乘积为 3 * 3 = 9 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s</code>&nbsp;只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 668 ms</p>
+                    <p>内存: 26.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxProduct(self, s: str) -&gt; int:
+        n = len(s)
+        # print(n)
+        r = [0] * n
+        l = [0] * n
+        l[0] = 1
+        def manchester(s):
+            n = len(s)
+            p = [0] * n
+            c = r = m = 0
+            for i in range(n):
+                if r &gt; i:
+                    p[i] = min(r - i, p[2*c - i])
+                else:
+                    p[i] = 0
+                while i + 1 + p[i] &lt; n and i - 1 - p[i] &gt;= 0 and s[i + 1 + p[i]] == s[i - 1 - p[i]]:
+                    p[i] += 1
+                if i + p[i] &gt; r:
+                    c, r = i, i + p[i]
+                if p[i] &gt; m:
+                    m = p[i]
+            return p
+
+        res = manchester(s)
+        # print(res)
+        j = 1
+        for i in range(1, n): 
+            while j &lt;= res[i] + i:
+                l[j] = 2 * (j - i) + 1
+                j += 1
+            # l[res[i] + i] = max(l[res[i] + i], 2 * res[i] + 1)
+        for i in range(1, n):
+            l[i] = max(l[i - 1], l[i])
+        
+        j = n - 2
+        r[n - 1] = 1
+        for i in range(n - 2, -1, -1):
+            while j &gt;= i - res[i]:
+                r[j] = 2 * (i - j) + 1
+                j -= 1
+            # r[i - res[i]] = max(r[i - res[i]], 2 * res[i] + 1)
+        for i in range(n - 2, -1, -1):
+            r[i] = max(r[i + 1], r[i])
+        
+        # print(l)
+        # print(r)
+        ans = 0
+        for i in range(n - 1):
+            ans = max(ans, l[i] * r[i + 1])
+        return ans
+            
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目使用了马拉车算法（Manacher&#39;s algorithm），首先求解每个字符为中心的最大回文半径。利用这个半径数组，我们可以计算出每个位置最大的奇数长度回文串的长度。接着，使用两个辅助数组 l 和 r，l[i] 表示从字符串起点到位置 i 最长的奇数长度回文串，r[i] 表示从位置 i 到字符串结尾最长的奇数长度回文串。最后，我们遍历字符串，每个位置尝试将其分成两部分，左边的部分使用 l 数组，右边的部分使用 r 数组，并尝试找出两个部分的长度乘积的最大值。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxProduct(self, s: str) -&gt; int:
+        n = len(s)
+        r = [0] * n  # 存储从每个位置开始的最大奇数长度回文串
+        l = [0] * n  # 存储到每个位置为止的最大奇数长度回文串
+        l[0] = 1  # 初始化第一个字符自身是长度为1的回文串
+        def manchester(s):
+            n = len(s)
+            p = [0] * n  # 存储每个位置的最大回文半径
+            c = r = m = 0  # 中心，当前右边界，和最大回文半径
+            for i in range(n):
+                if r &gt; i:
+                    p[i] = min(r - i, p[2*c - i])
+                while i + 1 + p[i] &lt; n and i - 1 - p[i] &gt;= 0 and s[i + 1 + p[i]] == s[i - 1 - p[i]]:
+                    p[i] += 1
+                if i + p[i] &gt; r:
+                    c, r = i, i + p[i]
+            return p
+
+        res = manchester(s)  # 应用马拉车算法
+        j = 1
+        for i in range(1, n): 
+            while j &lt;= res[i] + i:
+                l[j] = 2 * (j - i) + 1
+                j += 1
+        for i in range(1, n):
+            l[i] = max(l[i - 1], l[i])
+
+        j = n - 2
+        r[n - 1] = 1
+        for i in range(n - 2, -1, -1):
+            while j &gt;= i - res[i]:
+                r[j] = 2 * (i - j) + 1
+                j -= 1
+        for i in range(n - 2, -1, -1):
+            r[i] = max(r[i + 1], r[i])
+
+        ans = 0
+        for i in range(n - 1):
+            ans = max(ans, l[i] * r[i + 1])  # 查找最大的乘积
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用马拉车算法时，如何确保每次扩展都正确地检测到回文的边界？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>马拉车算法通过中心扩展的方式检测回文边界。算法中有两个关键变量：`c`（当前回文中心）和`r`（当前回文的右边界）。对于每个字符位置`i`，若`i`在`r`内，则利用对称性质初始化`p[i]`。随后，算法尝试向两侧扩展，比较位置`i+p[i]+1`和`i-p[i]-1`的字符是否相等，若相等则增加`p[i]`。这个过程确保了对于每个位置，算法都精确地检测到了以该位置为中心的最长回文的边界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在`manchester`函数中，当`r &gt; i`时使用`p[i] = min(r - i, p[2*c - i])`来初始化p[i]？这样做的原理是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`r &gt; i`时，表示当前位置`i`位于一个已知的回文子串内。使用`p[2*c - i]`（即`i`关于中心`c`的对称点的回文半径）来尝试初始化`p[i]`。由于回文的对称性，`p[i]`至少可以取到`p[2*c - i]`的值，但是不能超过`r - i`（即`i`到已知回文右边界的距离），因此取两者的最小值作为初始值。这样做可以有效利用已知信息加速算法的执行，避免不必要的重复计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新l数组和r数组时，用`2 * (j - i) + 1`来计算奇数长度的回文串，这个公式是如何得来的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>公式`2 * (j - i) + 1`用于计算以位置`i`为中心的奇数长度回文串的长度。这里，`j - i`是回文半径（从中心到边界的距离）。由于回文串以中心对称，实际长度需要将左半部分（`j - i`）和右半部分（`j - i`）长度相加，再加上中心位置的1个字符，因此总长度为`2 * (j - i) + 1`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在遍历过程中需要两个独立的循环来分别更新l数组和r数组？不能在一个循环中同时更新吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>两个独立的循环确保l数组和r数组能够完整地计算出所有位置的最大奇数长度回文串。若在一个循环中同时更新，由于l数组和r数组的更新依赖于不同方向的累积最大值（l数组依赖之前的值，r数组依赖之后的值），可能会导致部分数据未能正确更新。分开两个循环可以简化逻辑，确保每个数组在更新前都已经得到了需要的全部信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-product-of-the-length-of-two-palindromic-substrings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-product-of-the-length-of-two-palindromic-substrings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

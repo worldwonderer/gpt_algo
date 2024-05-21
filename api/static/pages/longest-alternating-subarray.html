@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长交替子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长交替子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;。如果 <code>nums</code>&nbsp;中长度为&nbsp;<code>m</code>&nbsp;的子数组&nbsp;<code>s</code>&nbsp;满足以下条件，我们称它是一个 <strong>交替子数组</strong> ：</p>
+
+<ul>
+	<li><code>m</code>&nbsp;大于&nbsp;<code>1</code>&nbsp;。</li>
+	<li><code>s<sub>1</sub> = s<sub>0</sub> + 1</code>&nbsp;。</li>
+	<li>下标从 <strong>0</strong> 开始的子数组&nbsp;<code>s</code>&nbsp;与数组&nbsp;<code>[s<sub>0</sub>, s<sub>1</sub>, s<sub>0</sub>, s<sub>1</sub>,...,s<sub>(m-1) % 2</sub>]</code>&nbsp;一样。也就是说，<code>s<sub>1</sub> - s<sub>0</sub> = 1</code>&nbsp;，<code>s<sub>2</sub> - s<sub>1</sub> = -1</code>&nbsp;，<code>s<sub>3</sub> - s<sub>2</sub> = 1</code>&nbsp;，<code>s<sub>4</sub> - s<sub>3</sub> = -1</code>&nbsp;，以此类推，直到&nbsp;<code>s[m - 1] - s[m - 2] = (-1)<sup>m</sup></code>&nbsp;。</li>
+</ul>
+
+<p>请你返回 <code>nums</code>&nbsp;中所有 <strong>交替</strong>&nbsp;子数组中，最长的长度，如果不存在交替子数组，请你返回 <code>-1</code>&nbsp;。</p>
+
+<p>子数组是一个数组中一段连续 <strong>非空</strong>&nbsp;的元素序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,3,4,3,4]
+<b>输出：</b>4
+<b>解释：</b>交替子数组有 [3,4] ，[3,4,3] 和 [3,4,3,4] 。最长的子数组为 [3,4,3,4] ，长度为4 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [4,5,6]
+<b>输出：</b>2
+<strong>解释：</strong>[4,5] 和 [5,6] 是仅有的两个交替子数组。它们长度都为 2 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= nums.length &lt;= 100</code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def alternatingSubarray(self, nums: List[int]) -&gt; int:
+        a, b = nums[:2]
+        cnt = max_cnt = (b == a + 1) * 2
+        for x in nums[2:]:
+            if cnt &gt; 0 and x == a:
+                a, b = b, a
+                cnt += 1
+            else:
+                max_cnt = max(cnt, max_cnt)
+                a, b = b, x
+                cnt = (b ==  a + 1) * 2
+                max_cnt = max(cnt, max_cnt)
+        max_cnt = max(cnt, max_cnt)
+        return max_cnt or -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用双指针策略来检测并统计最长的交替子数组。首先初始化两个指针a和b，分别代表交替子数组的当前两个连续元素。变量cnt用于记录当前交替子数组的长度，而max_cnt用于记录遇到的最长交替子数组的长度。接下来，遍历数组中的每个元素，检查当前元素是否能延续当前的交替模式。如果可以，则更新a，b和cnt。如果不可以，就将当前的cnt与max_cnt比较，更新max_cnt，并尝试重新开始一个新的交替子数组。循环结束后，再次比较cnt和max_cnt确保最后一个可能的子数组被正确处理。如果max_cnt仍为0，说明没有找到合适的交替子数组，返回-1。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def alternatingSubarray(self, nums: List[int]) -&gt; int:
+        a, b = nums[:2]  # 初始化前两个元素
+        cnt = max_cnt = (b == a + 1) * 2  # 初始化计数器和最大长度计数器
+        for x in nums[2:]:  # 从第三个元素开始遍历
+            if cnt &gt; 0 and x == a:  # 如果当前元素能继续交替模式
+                a, b = b, a  # 更新a和b
+                cnt += 1  # 增加当前交替子数组的长度
+            else:  # 如果不能继续交替模式
+                max_cnt = max(cnt, max_cnt)  # 更新最大交替子数组长度
+                a, b = b, x  # 重新开始新的交替子数组
+                cnt = (b == a + 1) * 2  # 重置计数器
+                max_cnt = max(cnt, max_cnt)  # 再次更新最大长度
+        max_cnt = max(cnt, max_cnt)  # 确保最后一个子数组被处理
+        return max_cnt or -1  # 如果没有有效交替子数组，返回-1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在双指针策略中，a和b指针的具体作用是什么？它们是如何帮助识别和扩展交替子数组的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在双指针策略中，a和b作为指针主要用于追踪交替子数组中的最后两个元素。它们帮助确定当前数组元素是否与前一个元素交替（即符合交替模式的递增或递减关系）。当当前元素符合与前一个元素的交替模式时，指针a和b的值会更新，以此延续并记录当前的交替子数组。如果当前元素不符合交替模式，指针a和b则会重置，以尝试在新的位置开始识别新的交替子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到如果当前元素x能继续交替模式，则会更新a和b的值。请问在什么情况下x被认为是能继续当前的交替模式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，当前元素x被认为可以继续交替模式的条件是x等于前一个元素a。这意味着x能够与前一个元素a形成有效的交替关系（例如，如果前一个元素是递增的下一个元素，则当前元素应为递增后的值），从而可以继续当前的交替子数组。当这种情况发生时，a和b的值会更新，其中a变为b，b变为x，以此继续扩展交替子数组的长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当检测到当前元素x不能继续交替模式时，代码进行了哪些操作来尝试重新开始一个新的交替子数组？这种方法是否能够确保不遗漏任何可能的交替子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当当前元素x不能继续交替模式时，代码首先会比较并更新max_cnt，以记录到目前为止找到的最长交替子数组的长度。然后，a和b的值会更新为最近的b和当前的x，尝试重新开始一个新的交替子数组。同时，cnt会重置为2（如果b和x满足交替条件），表示新子数组的初始长度。这种方法在每次发现当前元素无法继续交替子数组时重新开始计数，并更新最大长度，可以有效确保不遗漏任何可能的交替子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果数组中的数字都是相同的，例如nums = [5, 5, 5, 5]，该算法会返回什么结果？算法对这种情况的处理是否合理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当数组中的数字都相同时，例如nums = [5, 5, 5, 5]，算法会返回-1。这是因为所有元素都相同，无法形成任何交替模式。算法在这种情况下的处理是合理的，因为交替子数组的定义要求元素之间必须交替（即有递增或递减的关系），相同的元素之间无法形成这种关系。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-alternating-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-alternating-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

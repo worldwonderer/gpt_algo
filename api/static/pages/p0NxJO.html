@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>魔塔游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>魔塔游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        小扣当前位于魔塔游戏第一层，共有 `N` 个房间，编号为 `0 ~ N-1`。每个房间的补血道具/怪物对于血量影响记于数组 `nums`，其中正数表示道具补血数值，即血量增加对应数值；负数表示怪物造成伤害值，即血量减少对应数值；`0` 表示房间对血量无影响。
+
+**小扣初始血量为 1，且无上限**。假定小扣原计划按房间编号升序访问所有房间补血/打怪，**为保证血量始终为正值**，小扣需对房间访问顺序进行调整，**每次仅能将一个怪物房间（负数的房间）调整至访问顺序末尾**。请返回小扣最少需要调整几次，才能顺利访问所有房间。若调整顺序也无法访问完全部房间，请返回 -1。
+
+
+**示例 1：**
+>输入：`nums = [100,100,100,-250,-60,-140,-50,-50,100,150]`
+>
+>输出：`1`
+>
+>解释：初始血量为 1。至少需要将 nums[3] 调整至访问顺序末尾以满足要求。
+
+**示例 2：**
+>输入：`nums = [-200,-300,400,0]`
+>
+>输出：`-1`
+>
+>解释：调整访问顺序也无法完成全部房间的访问。
+
+**提示：**
+- `1 <= nums.length <= 10^5`
+- `-10^5 <= nums[i] <= 10^5`
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 58 ms</p>
+                    <p>内存: 30.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def magicTower(self, nums: List[int]) -&gt; int:
+        q = list()
+        ans, hp, delay = 0, 1, 0
+        for num in nums:
+            if num &lt; 0:
+                heapq.heappush(q, num)
+            hp += num
+            if hp &lt;= 0:
+                ans += 1
+                delay += q[0]
+                hp -= heapq.heappop(q)
+        hp += delay
+        return -1 if hp &lt;= 0 else ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>为了确保小扣在游戏中始终保持正的血量，题解使用贪心策略和优先队列（最小堆）来解决问题。整个思路是在遍历房间时，记录所有遇到的怪物（负数）。如果小扣的血量在任何点变为非正数，将最大的负数（即堆顶元素，因为是最小堆，存负数时绝对值最大的会在堆顶）移至房间数组的末尾，即延迟与这个怪物的战斗，并从总血量中减去这个数值。这个操作可视为将最危险的怪物延后处理，以便小扣在之前的房间中可能获得更多的血量。最后，如果经过所有调整后小扣的血量仍然不是正数，则返回-1，表示无法通过所有房间，否则返回调整次数。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def magicTower(self, nums: List[int]) -&gt; int:
+        q = list()  # 用来存储遇到的怪物
+        ans, hp, delay = 0, 1, 0  # ans是调整次数，hp是当前血量，delay是延迟的负面影响总和
+        for num in nums:
+            if num &lt; 0:
+                heapq.heappush(q, num)  # 将怪物加入堆中
+            hp += num  # 更新血量
+            if hp &lt;= 0:  # 如果血量非正
+                ans += 1  # 增加调整次数
+                delay += q[0]  # 增加被延迟处理的怪物的伤害值
+                hp -= heapq.heappop(q)  # 将影响最大的怪物延后处理，并更新血量
+        hp += delay  # 最后加上所有延迟的负面影响
+        return -1 if hp &lt;= 0 else ans  # 如果最终血量非正，返回-1，否则返回调整次数</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用优先队列（最小堆）存储怪物时，为什么选择存储怪物而不是补血道具，这种选择对算法的效果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择存储怪物而非补血道具是因为在游戏中，保持生存比增加血量更为重要。怪物房间的负数值直接关系到是否能存活下去，因此需要优先处理。使用优先队列（最小堆）存储怪物可以快速地获取并调整对小扣威胁最大的负面影响（即绝对值最大的负数）。这种策略使得可以优先重新安排那些对当前血量影响最深刻的怪物，以最大程度地减少其对小扣的危害，从而提高整体的生存概率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            堆中存储负数的方式能确保每次移出的是绝对值最大的怪物吗？如何通过负数的存储实现这一点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，堆中存储负数的方式能确保每次移出的是绝对值最大的怪物。在最小堆中，堆顶总是最小的元素，所以当我们将怪物的伤害值（负数）存入堆中时，最大的负数（即绝对值最大的负数）会被视为最小元素并置于堆顶。这样，每当需要减轻血量损失最大的怪物影响时，直接从堆顶移除该元素即可，这保证了我们总是优先处理最危险的怪物。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在代码中，`hp += num` 后紧接着检查 `hp &lt;= 0` 来决定是否需要调整。这种检查方式是否可能遗漏某些情况，从而影响到调整策略的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种检查方式理论上不会遗漏情况，因为它直接根据当前房间的影响后的血量来决策是否需要调整。每次小扣进入一个房间后，都会立即更新血量，并检查是否存活（即血量是否大于0）。如果血量非正，就意味着在不进行调整的情况下小扣无法继续前进。因此，这种方法能及时响应任何可能导致游戏失败的情况，并采取措施（如调整怪物房间顺序）以保持游戏可以继续进行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/p0NxJO')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/p0NxJO/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

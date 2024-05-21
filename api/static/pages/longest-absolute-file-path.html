@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>文件的最长绝对路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>文件的最长绝对路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>假设有一个同时存储文件和目录的文件系统。下图展示了文件系统的一个示例：</p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2020/08/28/mdir.jpg" style="height: 142px; width: 300px;" /></p>
+
+<p>这里将 <code>dir</code> 作为根目录中的唯一目录。<code>dir</code> 包含两个子目录 <code>subdir1</code> 和 <code>subdir2</code> 。<code>subdir1</code> 包含文件 <code>file1.ext</code> 和子目录 <code>subsubdir1</code>；<code>subdir2</code> 包含子目录 <code>subsubdir2</code>，该子目录下包含文件 <code>file2.ext</code> 。</p>
+
+<p>在文本格式中，如下所示(⟶表示制表符)：</p>
+
+<pre>
+dir
+⟶ subdir1
+⟶ ⟶ file1.ext
+⟶ ⟶ subsubdir1
+⟶ subdir2
+⟶ ⟶ subsubdir2
+⟶ ⟶ ⟶ file2.ext
+</pre>
+
+<p>如果是代码表示，上面的文件系统可以写为 <code>"dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"</code> 。<code>'\n'</code> 和 <code>'\t'</code> 分别是换行符和制表符。</p>
+
+<p>文件系统中的每个文件和文件夹都有一个唯一的 <strong>绝对路径</strong> ，即必须打开才能到达文件/目录所在位置的目录顺序，所有路径用 <code>'/'</code> 连接。上面例子中，指向 <code>file2.ext</code> 的 <strong>绝对路径</strong> 是 <code>"dir/subdir2/subsubdir2/file2.ext"</code> 。每个目录名由字母、数字和/或空格组成，每个文件名遵循 <code>name.extension</code> 的格式，其中<meta charset="UTF-8" />&nbsp;<code>name</code>&nbsp;和<meta charset="UTF-8" />&nbsp;<code>extension</code>由字母、数字和/或空格组成。</p>
+
+<p>给定一个以上述格式表示文件系统的字符串 <code>input</code> ，返回文件系统中&nbsp;<em>指向&nbsp;<strong>文件</strong>&nbsp;的 <strong>最长绝对路径</strong> 的长度</em>&nbsp;。 如果系统中没有文件，返回&nbsp;<code>0</code>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/08/28/dir1.jpg" style="height: 101px; width: 200px;" />
+<pre>
+<strong>输入：</strong>input = "dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"
+<strong>输出：</strong>20
+<strong>解释：</strong>只有一个文件，绝对路径为 "dir/subdir2/file.ext" ，路径长度 20
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/08/28/dir2.jpg" style="height: 151px; width: 300px;" />
+<pre>
+<strong>输入：</strong>input = "dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"
+<strong>输出：</strong>32
+<strong>解释：</strong>存在两个文件：
+"dir/subdir1/file1.ext" ，路径长度 21
+"dir/subdir2/subsubdir2/file2.ext" ，路径长度 32
+返回 32 ，因为这是最长的路径</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>input = "a"
+<strong>输出：</strong>0
+<strong>解释：</strong>不存在任何文件</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre>
+<strong>输入：</strong>input = "file1.txt\nfile2.txt\nlongfile.txt"
+<strong>输出：</strong>12
+<strong>解释：</strong>根目录下有 3 个文件。
+因为根目录中任何东西的绝对路径只是名称本身，所以答案是 "longfile.txt" ，路径长度为 12
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= input.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>input</code> 可能包含小写或大写的英文字母，一个换行符 <code>'\n'</code>，一个制表符 <code>'\t'</code>，一个点 <code>'.'</code>，一个空格 <code>' '</code>，和数字。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def lengthLongestPath(self, input: str) -&gt; int:
+        stack = []  # 用于存储目录路径的栈
+        max_length = 0  # 最长路径长度
+        
+        # 将输入字符串按换行符分割成多行
+        lines = input.split(&#39;
+&#39;)
+        
+        for line in lines:
+            # 计算当前行的缩进级别（制表符数量）
+            level = line.count(&#39;\t&#39;)
+            
+            # 根据缩进级别调整栈的大小
+            while len(stack) &gt; level:
+                stack.pop()
+            
+            # 去除行首的制表符，得到当前目录/文件名
+            name = line.lstrip(&#39;\t&#39;)
+            
+            # 如果当前行表示一个文件（包含扩展名），则计算绝对路径长度并更新最大长度
+            if &#39;.&#39; in name:
+                path = &#39;/&#39;.join(stack + [name])
+                max_length = max(max_length, len(path))
+            else:
+                # 如果当前行表示一个目录，则将其加入栈中
+                stack.append(name)
+        
+        return max_length
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用栈来模拟文件系统的目录结构。遍历输入字符串的每一行，根据行首的制表符数量确定当前目录/文件的缩进级别。如果当前行表示一个文件（包含扩展名），则计算该文件的绝对路径长度，并更新最长路径长度。如果当前行表示一个目录，则将其加入栈中，以便后续构建完整的目录路径。通过不断调整栈的大小和计算文件的绝对路径长度，最终得到文件系统中指向文件的最长绝对路径的长度。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def lengthLongestPath(self, input: str) -&gt; int:
+        stack = []  # 用于存储目录路径的栈
+        max_length = 0  # 最长路径长度
+        
+        # 将输入字符串按换行符分割成多行
+        lines = input.split(&#39;
+&#39;)
+        
+        for line in lines:
+            # 计算当前行的缩进级别（制表符数量）
+            level = line.count(&#39;\t&#39;)
+            
+            # 根据缩进级别调整栈的大小
+            while len(stack) &gt; level:
+                stack.pop()
+            
+            # 去除行首的制表符，得到当前目录/文件名
+            name = line.lstrip(&#39;\t&#39;)
+            
+            # 如果当前行表示一个文件（包含扩展名），则计算绝对路径长度并更新最大长度
+            if &#39;.&#39; in name:
+                path = &#39;/&#39;.join(stack + [name])
+                max_length = max(max_length, len(path))
+            else:
+                # 如果当前行表示一个目录，则将其加入栈中
+                stack.append(name)
+        
+        return max_length
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定每行的缩进级别是根据制表符数量还是其他特征？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题的解题思路中，每行的缩进级别是通过计算行首的制表符数量来确定的。这是因为在类似文件系统的结构中，制表符通常用于表示不同级别的目录深度。没有使用其他特征来确定缩进级别，因为题目描述和常见的文件系统表示法都假定缩进使用制表符来体现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何处理文件名或目录名中意外包含制表符或换行符的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中并没有直接处理文件名或目录名中包含制表符或换行符的情况。在实际应用中，这种情况需要额外的逻辑来处理。例如，可以在处理之前先清洗输入数据，去除或替换文件名中的制表符和换行符。如果题目允许错误输入，需要定义一个更复杂的解析机制来准确区分各级目录和文件名。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在实际使用中，栈的最大深度是否有可能超过输入字符串的行数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在实际使用中，栈的最大深度不会超过输入字符串的行数。栈的深度直接对应于目录的级别，且每个目录或文件至少占据一行。因此，栈的深度最大值等于行的数量，即每行代表一个新的目录层级。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            解题思路中提到的字符串拼接操作，这种方法在处理极大数据量时是否会影响性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，字符串拼接操作在处理大量数据时可能会影响性能。在Python中，每次使用 &#39;+&#39; 运算符拼接字符串时，都会创建一个新的字符串对象，这会导致大量的内存分配和复制，从而影响性能。尤其是在目录层级较深且文件名较长的情况下，重复的字符串拼接操作会显著增加时间和空间复杂度。一个更高效的方法可能是使用字符串列表和在最终输出前一次性使用 &#39;join&#39; 方法来连接，这样可以减少中间字符串的创建和销毁。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-absolute-file-path')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-absolute-file-path/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

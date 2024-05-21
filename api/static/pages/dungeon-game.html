@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>地下城游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>地下城游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <style type="text/css">table.dungeon, .dungeon th, .dungeon td {
+  border:3px solid black;
+}
+
+ .dungeon th, .dungeon td {
+    text-align: center;
+    height: 70px;
+    width: 70px;
+}
+</style>
+<p>恶魔们抓住了公主并将她关在了地下城&nbsp;<code>dungeon</code> 的 <strong>右下角</strong> 。地下城是由 <code>m x n</code> 个房间组成的二维网格。我们英勇的骑士最初被安置在 <strong>左上角</strong> 的房间里，他必须穿过地下城并通过对抗恶魔来拯救公主。</p>
+
+<p>骑士的初始健康点数为一个正整数。如果他的健康点数在某一时刻降至 0 或以下，他会立即死亡。</p>
+
+<p>有些房间由恶魔守卫，因此骑士在进入这些房间时会失去健康点数（若房间里的值为<em>负整数</em>，则表示骑士将损失健康点数）；其他房间要么是空的（房间里的值为 <em>0</em>），要么包含增加骑士健康点数的魔法球（若房间里的值为<em>正整数</em>，则表示骑士将增加健康点数）。</p>
+
+<p>为了尽快解救公主，骑士决定每次只 <strong>向右</strong> 或 <strong>向下</strong> 移动一步。</p>
+
+<p>返回确保骑士能够拯救到公主所需的最低初始健康点数。</p>
+
+<p><strong>注意：</strong>任何房间都可能对骑士的健康点数造成威胁，也可能增加骑士的健康点数，包括骑士进入的左上角房间以及公主被监禁的右下角房间。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/03/13/dungeon-grid-1.jpg" style="width: 253px; height: 253px;" />
+<pre>
+<strong>输入：</strong>dungeon = [[-2,-3,3],[-5,-10,1],[10,30,-5]]
+<strong>输出：</strong>7
+<strong>解释：</strong>如果骑士遵循最佳路径：右 -&gt; 右 -&gt; 下 -&gt; 下 ，则骑士的初始健康点数至少为 7 。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>dungeon = [[0]]
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == dungeon.length</code></li>
+	<li><code>n == dungeon[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 200</code></li>
+	<li><code>-1000 &lt;= dungeon[i][j] &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 18.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+
+    # 动态规划：状态的定义，状态的初始，状态的转移；状态需要有无后向性
+    # 注释掉的这种解法不满足无后向性，所以不行
+    # def minHP(self, last_min, hp, cost):
+    #     hp += cost
+    #     if hp &lt; last_min:
+    #         last_min = hp
+    #     return last_min, hp
+
+    # def calculateMinimumHP(self, dungeon: List[List[int]]) -&gt; int:
+    #     # f(i, j) (0, 0)-(i, j)过程中最低的hp值和路径和
+    #     m, n = len(dungeon), len(dungeon[0])
+    #     dp = [[(0, 0)] * n for _ in range(m)]
+    #     dp[0][0] = (dungeon[0][0], dungeon[0][0])
+    #     for i in range(1, m):
+    #         dp[i][0] = self.minHP(dp[i-1][0][0], dp[i-1][0][1], dungeon[i][0])
+    #     for j in range(1, n):
+    #         dp[0][j] = self.minHP(dp[0][j-1][0], dp[0][j-1][1], dungeon[0][j])
+    #     for i in range(1, m):
+    #         for j in range(1, n):
+    #             left_last_min, left_hp =  self.minHP(dp[i][j-1][0], dp[i][j-1][1], dungeon[i][j])
+    #             up_last_min, up_hp =  self.minHP(dp[i-1][j][0], dp[i-1][j][1], dungeon[i][j])
+    #             if left_last_min &gt; up_last_min:
+    #                 dp[i][j] = (left_last_min, left_hp)
+    #             else:
+    #                 dp[i][j] = ( up_last_min, up_hp)
+    #     print(dp)
+    #     return max(1, -dp[-1][-1][0]+1)
+
+    def calculateMinimumHP(self, dungeon: List[List[int]]) -&gt; int:
+        m, n = len(dungeon), len(dungeon[0])
+        dp = [[0] * n for _ in range(m)]
+        dp[m-1][n-1] = dungeon[m-1][n-1]
+        for i in range(m-2, -1, -1):
+            dp[i][n-1] = dungeon[i][n-1] + min(dp[i+1][n-1], 0)
+        for j in range(n-2, -1, -1):
+            dp[m-1][j] = dungeon[m-1][j] + min(dp[m-1][j+1], 0)
+        for i in range(m-2, -1, -1):
+            for j in range(n-2, -1, -1):
+                dp[i][j] = dungeon[i][j] + min(max(dp[i+1][j], dp[i][j+1]), 0)
+        # print(dp)
+        return max(1, -dp[0][0]+1)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用动态规划的思路来解决问题。我们定义状态 dp[i][j] 表示从坐标 (i,j) 到终点所需的最小生命值。状态转移方程为：dp[i][j] = max(min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j], 1)。我们从右下角开始，倒着往左上角推导状态。最后返回 dp[0][0] 即为所需的最小初始生命值。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def calculateMinimumHP(self, dungeon: List[List[int]]) -&gt; int:
+        m, n = len(dungeon), len(dungeon[0])
+        # 定义状态数组 dp，dp[i][j] 表示从 (i,j) 到终点所需的最小生命值
+        dp = [[0] * n for _ in range(m)]
+        
+        # 初始化最后一个状态
+        dp[m-1][n-1] = max(1 - dungeon[m-1][n-1], 1)
+        
+        # 初始化最后一列的状态
+        for i in range(m-2, -1, -1):
+            dp[i][n-1] = max(dp[i+1][n-1] - dungeon[i][n-1], 1)
+        
+        # 初始化最后一行的状态
+        for j in range(n-2, -1, -1):
+            dp[m-1][j] = max(dp[m-1][j+1] - dungeon[m-1][j], 1)
+        
+        # 倒着递推每个状态的值
+        for i in range(m-2, -1, -1):
+            for j in range(n-2, -1, -1):
+                dp[i][j] = max(min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j], 1)
+        
+        # 返回左上角所需的最小生命值             
+        return dp[0][0]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在动态规划中的状态转移方程中使用`max(min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j], 1)`，这里的逻辑是如何确定的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个状态转移方程的核心在于确保任何时候角色的生命值至少为1以继续游戏。`min(dp[i+1][j], dp[i][j+1])` 代表从当前位置 (i, j) 向右或向下走时所需的最小生命值。从 (i, j) 出发时，角色会收到 `dungeon[i][j]` 的影响，这可能是正的（增加生命值）或负的（减少生命值）。因此，角色在 (i, j) 位置结束时至少需要的生命值是 `min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j]`。然而，无论 `dungeon[i][j]` 是正是负，角色的生命值不能小于1，因此使用 `max(..., 1)` 确保至少为1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在初始化最后一行和最后一列的状态时，为什么选择的初始条件是`max(dp[相邻位置] - dungeon[当前位置], 1)`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化最后一行和最后一列时，这些位置只有一个方向可以移动（最后一行只能向右移动，最后一列只能向下移动）。因此，初始化这些位置的状态时，只需要考虑单一方向上的相邻位置。对于这些边界位置，其所需的最小生命值计算方式与其他位置类似：从当前位置到目标位置（终点）所需的生命值减去当前位置的地牢值，同时确保结果不小于1。这样可以确保角色从这些边界位置开始时，不论地牢值的影响如何，都有足够的生命值至少为1继续游戏。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何理解动态规划数组dp中每一个位置的含义？即dp[i][j]代表的具体是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，动态规划数组dp[i][j]表示从位置(i, j)到目标位置（通常是右下角）所需要的最小生命值。这个值保证了从任何一个位置开始，角色都可以到达终点且在任何时刻生命值都不会低于1。这样的设置帮助我们从终点反向推导出起点所需的最小生命值，即dp[0][0]。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在逆向填充dp数组时，为何要确保`dp[i][j]`的值不小于1，即使用`max(..., 1)`的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在地下城游戏中，角色的生命值如果降至0或更低表示游戏结束。因此，为了保证角色能够从任何位置(i, j)安全地到达终点，我们需要保证在任何时刻角色的生命值至少为1。这是为了避免角色因生命值耗尽而无法继续游戏。使用 `max(..., 1)` 确保即使计算得到的生命值需求是0或负数，我们也会将其调整至最低有效生命值1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/unique-paths" class="list-group-item list-group-item-action">
+                                不同路径
+                            </a>
+                        
+                            <a href="/problem/minimum-path-sum" class="list-group-item list-group-item-action">
+                                最小路径和
+                            </a>
+                        
+                            <a href="/problem/cherry-pickup" class="list-group-item list-group-item-action">
+                                摘樱桃
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/dungeon-game')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/dungeon-game/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

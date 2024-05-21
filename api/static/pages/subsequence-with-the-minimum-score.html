@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最少得分子序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最少得分子序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个字符串&nbsp;<code>s</code> 和&nbsp;<code>t</code>&nbsp;。</p>
+
+<p>你可以从字符串 <code>t</code>&nbsp;中删除任意数目的字符。</p>
+
+<p>如果没有从字符串&nbsp;<code>t</code>&nbsp;中删除字符，那么得分为&nbsp;<code>0</code>&nbsp;，否则：</p>
+
+<ul>
+	<li>令&nbsp;<code>left</code>&nbsp;为删除字符中的最小下标。</li>
+	<li>令&nbsp;<code>right</code>&nbsp;为删除字符中的最大下标。</li>
+</ul>
+
+<p>字符串的得分为&nbsp;<code>right - left + 1</code>&nbsp;。</p>
+
+<p>请你返回使<em>&nbsp;</em><code>t</code><em> </em>成为<em>&nbsp;</em><code>s</code>&nbsp;子序列的最小得分。</p>
+
+<p>一个字符串的 <strong>子序列</strong>&nbsp;是从原字符串中删除一些字符后（也可以一个也不删除），剩余字符不改变顺序得到的字符串。（比方说&nbsp;<code>"ace"</code> 是&nbsp;<code>"<strong><em>a</em></strong>b<strong><em>c</em></strong>d<strong><em>e</em></strong>"</code>&nbsp;的子序列，但是&nbsp;<code>"aec"</code>&nbsp;不是）。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "abacaba", t = "bzaa"
+<b>输出：</b>1
+<b>解释：</b>这个例子中，我们删除下标 1 处的字符 "z" （下标从 0 开始）。
+字符串 t 变为 "baa" ，它是字符串 "abacaba" 的子序列，得分为 1 - 1 + 1 = 1 。
+1 是能得到的最小得分。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>s = "cde", t = "xyz"
+<b>输出：</b>3
+<b>解释：</b>这个例子中，我们将下标为 0， 1 和 2 处的字符 "x" ，"y" 和 "z" 删除（下标从 0 开始）。
+字符串变成 "" ，它是字符串 "cde" 的子序列，得分为 2 - 0 + 1 = 3 。
+3 是能得到的最小得分。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length, t.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s</code> 和&nbsp;<code>t</code>&nbsp;都只包含小写英文字母。</li>
+</ul>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 87 ms</p>
+                    <p>内存: 20.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumScore(self, s: str, t: str) -&gt; int:
+        n, m = len(s), len(t)
+        suf = [m] * (n + 1)
+        j = m - 1
+        for i in range(n - 1, -1, -1):
+            if j &gt;= 0 and s[i] == t[j]:
+                j -= 1
+            suf[i] = j + 1
+        ans = suf[0]  # 删除 t[:suf[0]]
+        if ans == 0: return 0
+        j = 0
+        for i, c in enumerate(s):
+            if c == t[j]:  # 注意 j 不会等于 m，因为上面 suf[0]&gt;0 表示 t 不是 s 的子序列
+                j += 1
+                ans = min(ans, suf[i + 1] - j)  # 删除 t[j:suf[i+1]]
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了一种双指针和后缀数组的混合策略，来确定最小得分。首先，从后向前遍历字符串s，同时使用指针j跟踪字符串t，寻找t作为s的子序列的最后一个字符的位置。这个位置存储在suf数组中，suf[i]表示s从i开始，t需要删除到哪个位置才能成为s的子序列。然后，从前向后遍历字符串s，同时更新指针j来检查s的每个字符是否与t的当前字符匹配，如果匹配，则移动j。对于每个匹配，计算得分suf[i + 1] - j，这是当前i的最小得分。最后，返回所有可能得分中的最小值。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumScore(self, s: str, t: str) -&gt; int:
+        n, m = len(s), len(t)
+        suf = [m] * (n + 1)  # 后缀数组，记录t作为s的子序列需要删除到哪个位置
+        j = m - 1
+        for i in range(n - 1, -1, -1):
+            if j &gt;= 0 and s[i] == t[j]:
+                j -= 1  # s[i]匹配t[j], j向左移
+            suf[i] = j + 1  # 记录t需要删除到的位置
+        ans = suf[0]  # 初始化最小得分
+        if ans == 0: return 0  # 如果无需删除，得分为0
+        j = 0
+        for i, c in enumerate(s):
+            if c == t[j]:  # 如果s[i]匹配t[j]
+                j += 1  # j向右移动
+                ans = min(ans, suf[i + 1] - j)  # 计算得分并更新最小值
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，后缀数组suf的具体作用是什么？能不能详细解释一下它如何帮助确定t需要删除到哪个位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，后缀数组suf用于记录对于字符串s中的每个位置i，字符串t要成为s的子序列，需要删除到的位置。具体来说，suf[i]存储的是字符串t的索引位置，表示从t的这个位置往前（包括此位置），所有字符都已经在s的索引i及之前找到匹配。这样，suf数组帮助我们理解为了让t成为s从位置i开始的子序列，t需要保留哪些字符，从而可以计算出需要删除的字符数量。通过这种方式，我们可以针对每个s的位置，快速得到t需要调整的程度，进而计算出每个位置的得分。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，通过一次反向遍历s来建立suf数组。为什么选择反向遍历，而不是正向遍历s字符串来构建suf数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择反向遍历s字符串来构建suf数组的原因是，这样可以更自然地处理t的字符与s的匹配顺序。当我们从s的末尾开始向前遍历时，我们逐渐构建t作为s子序列的可能性。这使我们能够在遇到匹配的字符时，逐步减小j的值（即t的索引），这能够保证t的这部分是s从当前i位置到末尾的有效子序列。如果我们从前向后遍历s，则每次匹配后处理t的剩余部分会变得复杂，因为我们需要不断更新和回溯t的索引位置，这在逻辑上和实现上都更为复杂。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何理解题解中提到的&#39;对于每个匹配，计算得分suf[i + 1] - j&#39;，这里的suf[i + 1]和j各代表什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，&#39;suf[i + 1] - j&#39;用于计算每个匹配位置的得分。这里，suf[i + 1]表示在字符串s的位置i+1及之后，t成为s的子序列需要删除t中字符到的位置。而j是当前匹配到的t的字符位置，表示t中前j个字符已经在s中找到了匹配。因此，suf[i + 1] - j实际上表示从t的第j个位置到suf[i + 1]的位置，t需要保留的字符数量，即s[i]位置处的得分。这个得分反映了在i位置匹配之后，为了保持t作为s的子序列，t需要做出的调整。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/subsequence-with-the-minimum-score')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/subsequence-with-the-minimum-score/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

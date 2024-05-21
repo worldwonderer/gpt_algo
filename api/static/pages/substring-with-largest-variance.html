@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大波动的子字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大波动的子字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>字符串的 <strong>波动</strong>&nbsp;定义为子字符串中出现次数 <strong>最多</strong>&nbsp;的字符次数与出现次数 <strong>最少</strong>&nbsp;的字符次数之差。</p>
+
+<p>给你一个字符串&nbsp;<code>s</code>&nbsp;，它只包含小写英文字母。请你返回 <code>s</code>&nbsp;里所有 <strong>子字符串的</strong>&nbsp;<strong>最大波动</strong>&nbsp;值。</p>
+
+<p><strong>子字符串</strong> 是一个字符串的一段连续字符序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "aababbb"
+<b>输出：</b>3
+<strong>解释：</strong>
+所有可能的波动值和它们对应的子字符串如以下所示：
+- 波动值为 0 的子字符串："a" ，"aa" ，"ab" ，"abab" ，"aababb" ，"ba" ，"b" ，"bb" 和 "bbb" 。
+- 波动值为 1 的子字符串："aab" ，"aba" ，"abb" ，"aabab" ，"ababb" ，"aababbb" 和 "bab" 。
+- 波动值为 2 的子字符串："aaba" ，"ababbb" ，"abbb" 和 "babb" 。
+- 波动值为 3 的子字符串 "babbb" 。
+所以，最大可能波动值为 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>s = "abcde"
+<b>输出：</b>0
+<strong>解释：</strong>
+s 中没有字母出现超过 1 次，所以 s 中每个子字符串的波动值都是 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>s</code>&nbsp; 只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 527 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def largestVariance(self, s: str) -&gt; int:
+        if s.count(s[0]) == len(s):
+            return 0
+        
+        ans = 0
+        diff = [[0] * 26 for _ in range(26)]
+        diff_with_b = [[float(&#34;-inf&#34;)] * 26 for _ in range(26)]
+
+        for ch in s:
+            ch = ord(ch) - ord(&#39;a&#39;)
+            for i in range(26):
+                if i == ch:
+                    continue
+                diff[ch][i] += 1
+                diff_with_b[ch][i] += 1
+
+                diff[i][ch] -= 1
+                diff_with_b[i][ch] = diff[i][ch]
+                if diff[i][ch] &lt; 0:
+                    diff[i][ch] = 0
+                ans = max(diff_with_b[ch][i], diff_with_b[i][ch], ans )
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的解决方案使用了双层字母频率差分数组来跟踪任意两个字符的出现次数差异。首先，对于全由同一字符构成的字符串，波动值为0。接着，定义两个二维数组，分别用来记录每对字符在遍历过程中的次数差(diff)和含波动性的次数差(diff_with_b)。遍历字符串中的每个字符，并更新两个数组：如果当前字符是i，那么对于所有不等于i的j，增加diff[i][j]，减少diff[j][i]。若diff[j][i]变为负值，则重置为0，表示重新开始计算该对字符的差异。同时更新diff_with_b，该数组记录了包含至少一次波动性的最大次数差。最后，遍历完所有字符后，diff_with_b数组中的最大值即为答案。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 添加注释的解题代码
+class Solution:
+    def largestVariance(self, s: str) -&gt; int:
+        if s.count(s[0]) == len(s):
+            return 0  # 如果字符串中所有字符相同，波动值为0
+        
+        ans = 0  # 初始化最大波动值
+        diff = [[0] * 26 for _ in range(26)]  # 字符对次数差
+        diff_with_b = [[float(&#34;-inf&#34;)] * 26 for _ in range(26)]  # 包含波动的字符对次数差
+
+        for ch in s:
+            ch = ord(ch) - ord(&#39;a&#39;)  # 转换当前字符为索引
+            for i in range(26):  # 遍历所有可能的字符对
+                if i == ch:
+                    continue  # 跳过自己与自己的比较
+                diff[ch][i] += 1  # 增加当前字符的计数
+                diff_with_b[ch][i] += 1  # 相同的增加操作
+
+                diff[i][ch] -= 1  # 减少与当前字符对的其他字符计数
+                diff_with_b[i][ch] = diff[i][ch]  # 更新含波动性的计数
+                if diff[i][ch] &lt; 0:
+                    diff[i][ch] = 0  # 如果次数差为负，重置
+                ans = max(diff_with_b[ch][i], diff_with_b[i][ch], ans)  # 更新最大波动值
+        return ans  # 返回计算的最大波动值</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在这个算法中，为什么需要两个二维数组diff和diff_with_b来分别追踪字符对的次数差和含波动性的次数差？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中，数组 `diff` 用于追踪任意两个不同字符之间的出现次数差。这个差值可以帮助我们理解两个字符在任意时间点的相对频率。数组 `diff_with_b` 则用于追踪包含至少一次波动（即一方至少比另一方多出现一次）的次数差的最大值。这种分开追踪的方式允许我们准确地计算出在任何时点字符出现的动态差异，并保持记录在何时某个字符对首次出现波动，这对于解决问题至关重要。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法解释中提到，如果diff[j][i]变为负值，则重置为0，并且diff_with_b[i][j]更新为diff[i][j]。这种重置的逻辑是如何帮助我们找到最大波动值的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 `diff[j][i]` 变为负值时，意味着在当前的字符序列中，字符 `i` 出现的次数比字符 `j` 更少。重置 `diff[j][i]` 为0是为了重新开始计数这两个字符的差异，忽略之前的负波动。这是因为我们只对正的波动值感兴趣（即一种字符比另一种多的情况），并且这种重置使我们能够关注从当前点开始的新的波动。同时更新 `diff_with_b[i][j]` 为 `diff[i][j]` 保证了我们记录的是包含至少一次波动的次数差的最大值，从而帮助我们找到可能的最大波动值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在更新diff_with_b数组时，即使diff[i][ch]被重置为0，我们仍然需要保留diff_with_b[i][ch]的值不变？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，`diff_with_b[i][ch]` 记录的是从字符串开始到当前位置，包含至少一次波动的最大次数差。即使 `diff[i][ch]` 被重置为0，我们需要保留 `diff_with_b[i][ch]` 的值不变，因为该值代表了之前的最大波动，可能是整个字符串中的最大值。重置 `diff[i][ch]` 是为了重新开始计算新的波动，但这不影响之前已经达到的最大波动值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中使用了两层循环来处理26个字母的所有可能对，这种方法在最坏情况下的效率如何？是否存在优化的可能性，尤其是在字符串长度远大于26时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该代码中的两层循环分别遍历字符串中的每个字符和26个可能的字母，导致算法的时间复杂度为O(n * 26)，其中n是字符串的长度。在最坏情况下，这种方法是有效的，因为每个字符都需要与其他25个字符进行比较来更新差异。尽管如此，考虑到实际字符的使用频率，可以对算法进行优化，例如只更新实际在字符串中出现的字符对，而不是固定的26个字母，这可能会减少不必要的计算并提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/substring-with-largest-variance')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/substring-with-largest-variance/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

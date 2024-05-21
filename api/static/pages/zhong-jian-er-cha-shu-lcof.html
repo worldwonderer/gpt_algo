@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>推理二叉树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>推理二叉树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>某二叉树的先序遍历结果记录于整数数组 <code>preorder</code>，它的中序遍历结果记录于整数数组 <code>inorder</code>。请根据 <code>preorder</code> 和 <code>inorder</code> 的提示构造出这棵二叉树并返回其根节点。</p>
+
+
+
+<p>注意：<code>preorder</code> 和 <code>inorder</code> 中均不含重复数字。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/02/19/tree.jpg" /></p>
+
+<pre>
+<strong>输入: </strong>preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+
+<strong>输出: </strong>[3,9,20,null,null,15,7]
+</pre>
+
+
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>preorder = [-1], inorder = [-1]
+
+<strong>输出:</strong> [-1]
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= preorder.length &lt;= 3000</code></li>
+	<li><code>inorder.length == preorder.length</code></li>
+	<li><code>-3000 &lt;= preorder[i], inorder[i] &lt;= 3000</code></li>
+	<li><code>inorder</code> 均出现在 <code>preorder</code></li>
+	<li><code>preorder</code> 保证 为二叉树的前序遍历序列</li>
+	<li><code>inorder</code> 保证 为二叉树的中序遍历序列</li>
+</ul>
+
+
+
+<p>注意：本题与主站 105 题重复：<a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" rel="noopener noreferrer" target="_blank">https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/</a></p>
+
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 224 ms</p>
+                    <p>内存: 19.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -&gt; TreeNode:
+
+        def build(pstart, pend, istart, iend):
+            if pstart &gt; pend:
+                return
+
+            root_val = preorder[pstart]
+            root = TreeNode(root_val)
+            index = istart
+            for i in range(istart, iend+1):
+                if inorder[i] == root_val:
+                    index = i
+                    break
+            
+            left_length = index - istart
+            root.left = build(pstart+1, pstart+left_length, istart, istart+left_length)
+            root.right = build(pstart+left_length+1, pend, istart+left_length+1, iend)
+            return root
+
+        return build(0, len(preorder)-1, 0, len(inorder)-1)
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用的是递归的方式来构建二叉树。首先根据前序遍历的第一个元素确定树的根节点，然后在中序遍历中找到该根节点，从而区分出左子树和右子树的中序遍历。利用中序遍历中左、右子树的长度，可以相应地从前序遍历中划分出左右子树的前序遍历序列。这样，递归地对左右子树进行相同的构建过程，直到所有的子树都被正确构建。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -&gt; TreeNode:
+
+        def build(pstart, pend, istart, iend):
+            if pstart &gt; pend:
+                return
+
+            # 找到根节点的值，并创建根节点
+            root_val = preorder[pstart]
+            root = TreeNode(root_val)
+
+            # 在中序遍历中找到根节点的索引
+            index = istart
+            for i in range(istart, iend+1):
+                if inorder[i] == root_val:
+                    index = i
+                    break
+            
+            # 计算左子树的长度
+            left_length = index - istart
+
+            # 递归构建左子树
+            root.left = build(pstart+1, pstart+left_length, istart, istart+left_length)
+            # 递归构建右子树
+            root.right = build(pstart+left_length+1, pend, istart+left_length+1, iend)
+            return root
+
+        return build(0, len(preorder)-1, 0, len(inorder)-1)
+        </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在题解中在中序遍历数组中查找根节点的索引时不直接使用哈希表，而是选择了线性搜索？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中使用线性搜索而不使用哈希表来查找中序遍历数组中的根节点索引，可能是出于简化代码的考虑或假设输入规模较小而搜索开销不大。使用哈希表虽然可以将索引查找的时间复杂度降低到O(1)，提高效率，但会增加额外的空间复杂度。对于小规模数据，这种时间复杂度的提升可能不明显，而额外的空间复杂度则可能成为负担。然而，在处理大规模数据时，使用哈希表来优化查找效率确实是一种更优的选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构建左右子树的递归调用中，为何左子树的递归结束条件是`pstart+left_length`而右子树的开始条件是`pstart+left_length+1`？这里的+1是如何确定的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归构建二叉树的过程中，`pstart+left_length`是左子树在前序遍历序列中的最后一个元素的位置，因此这确定了左子树的边界。右子树在前序遍历中的开始位置是`pstart+left_length+1`，这里的+1表明跳过了当前的根节点，直接移动到右子树的第一个元素。这是因为前序遍历的顺序是根节点后紧跟左子树，再跟右子树，且左子树的长度正是由中序遍历中的根节点位置决定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的递归函数`build`在何种情况下会返回`None`？这是否意味着在某些情况下子树可能不存在？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>递归函数`build`会在`pstart`大于`pend`时返回`None`，这发生在二叉树的某个分支不存在任何节点时，比如某个节点不存在左子树或右子树。在这种情况下，递归的边界条件`pstart &gt; pend`成立，意味着不存在更多的节点可以用来构建子树，因此返回`None`表示该子树为空。这确实意味着在某些情况下子树可能不存在，这在不完全二叉树中是常见的情形。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在这种树的构建方法中，是否有可能通过优化递归过程来进一步提高算法性能？例如通过尾递归优化等技术？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种树的构建方法中，优化递归过程确实可以提高算法性能。然而，尾递归优化在这个场景下可能不太适用，因为树的构建本质上需要处理两个递归分支（左子树和右子树），并且它们的处理依赖于前一个递归的结果。这不符合尾递归的条件，因为尾递归要求最后一个操作必须是递归调用本身。更有效的优化方法可能包括使用哈希表来优化中序遍历的索引查找，从而减少查找时间，或者重新设计递归逻辑，减少不必要的计算和空间消耗。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/zhong-jian-er-cha-shu-lcof')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/zhong-jian-er-cha-shu-lcof/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

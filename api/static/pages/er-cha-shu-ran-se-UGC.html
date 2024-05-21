@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树染色</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树染色</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        小扣有一个根结点为 `root` 的二叉树模型，初始所有结点均为白色，可以用蓝色染料给模型结点染色，模型的每个结点有一个 `val` 价值。小扣出于美观考虑，希望最后二叉树上每个蓝色相连部分的结点个数不能超过 `k` 个，求所有染成蓝色的结点价值总和最大是多少？
+
+
+**示例 1：**
+> 输入：`root = [5,2,3,4], k = 2`
+>
+> 输出：`12`
+>
+> 解释：`结点 5、3、4 染成蓝色，获得最大的价值 5+3+4=12`
+![image.png](https://pic.leetcode-cn.com/1616126267-BqaCRj-image.png)
+
+
+**示例 2：**
+> 输入：`root = [4,1,3,9,null,null,2], k = 2`
+>
+> 输出：`16`
+>
+> 解释：结点 4、3、9 染成蓝色，获得最大的价值 4+3+9=16
+![image.png](https://pic.leetcode-cn.com/1616126301-gJbhba-image.png)
+
+
+
+**提示：**
++ `1 <= k <= 10`
++ `1 <= val <= 10000`
++ `1 <= 结点数量 <= 10000`
+    
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 324 ms</p>
+                    <p>内存: 22.6 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def maxValue(self, root: TreeNode, k: int) -&gt; int:
+
+        def maxSubTree(node):
+            if not node:
+                return [0]
+
+            l = maxSubTree(node.left)
+            r = maxSubTree(node.right)
+
+            res = [0] * (k + 1)
+            res[0] = l[-1] + r[-1]
+            for i in range(len(l)):
+                for j in range(min(len(r), k - i)):
+                    res[i + j + 1] = max(res[i + j], res[i + j + 1], l[i] + r[j] + node.val)
+            return res[: len(l) + len(r)]
+        
+        return max(maxSubTree(root))</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用递归方法进行动态规划。首先定义一个辅助函数 maxSubTree，该函数返回一个列表，其中包含以当前节点为根的子树内，各个可能的蓝色节点群组的最大值累计。列表中的每个位置i表示恰好有i个连续节点被染色的情况下，可以获得的最大价值。函数首先处理基本情况，如果当前节点为空，则返回一个只包含0的列表。然后，它递归地计算左右子树的最大价值列表。使用两层循环遍历左右子树返回的列表，来确定在当前节点下，形成不同大小的蓝色节点群组的最大价值。外层循环和内层循环分别遍历左子树和右子树返回的列表，通过将左右子树的某些价值组合并加上当前节点的价值，来更新结果列表。最后，返回整棵树调用 maxSubTree 后的最大价值。</p>
+                                <p>时间复杂度: O(n*k^2)</p>
+                                <p>空间复杂度: O(n*k)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def maxValue(self, root: TreeNode, k: int) -&gt; int:
+
+        def maxSubTree(node):
+            # 如果节点为空，返回包含一个0的列表
+            if not node:
+                return [0]
+
+            # 递归计算左右子树的最大价值列表
+            l = maxSubTree(node.left)
+            r = maxSubTree(node.right)
+
+            # 初始化当前节点的最大价值列表
+            res = [0] * (k + 1)
+            res[0] = l[-1] + r[-1]
+            # 更新当前节点下各种可能的连续蓝色节点群组的最大价值
+            for i in range(len(l)):
+                for j in range(min(len(r), k - i)):
+                    res[i + j + 1] = max(res[i + j], res[i + j + 1], l[i] + r[j] + node.val)
+            return res[: len(l) + len(r)]
+        
+        # 返回整棵树的最大价值
+        return max(maxSubTree(root))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在递归函数`maxSubTree`中，当节点为null时返回的是包含一个0的列表，这里的0代表什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数`maxSubTree`中，当节点为null时返回包含一个0的列表，这里的0代表的是，在没有任何节点的情况下，染色节点个数为0时的最大价值。因为没有节点可染色，所以最大价值是0。这个返回值为递归处理提供了一个基准情况，确保当递归到空节点时，可以正常地继续计算而不会出现错误或异常。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你在计算`res[0]`时使用了`l[-1] + r[-1]`，这个操作代表的是什么？为什么选择列表的最后一个元素进行相加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算`res[0]`时使用`l[-1] + r[-1]`，这个操作代表的是计算当前节点不被染色时，其左右子树能够达到的最大价值的和。这里选择列表的最后一个元素进行相加是因为，列表的最后一个元素（即`l[k]`和`r[k]`）代表了在子树中恰好有k个连续节点被染成蓝色时的最大价值。因此，当当前节点不染色时，我们希望利用左右子树分别达到其最大染色潜力的和，这就是`l[-1]`和`r[-1]`的含义。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新`res`数组时，内层循环的终止条件为`k - i`，这里为什么要使用这个条件来限制循环的范围？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在更新`res`数组时，内层循环的终止条件设置为`k - i`是为了确保总的染色节点数不超过k。这里`i`表示从左子树中选取的染色节点数，而`j`表示从右子树中选取的染色节点数。因此，`i + j + 1`（加1表示当前节点也被染色）是当前节点下形成的蓝色节点群组的总数，这个值必须小于等于k。通过设置循环的终止条件为`k - i`，我们确保了在任何时候，左子树和右子树中选取的节点数之和不会超过k减去已选择的左子树节点数，从而保证整个节点群组的大小符合要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/er-cha-shu-ran-se-UGC')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/er-cha-shu-ran-se-UGC/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

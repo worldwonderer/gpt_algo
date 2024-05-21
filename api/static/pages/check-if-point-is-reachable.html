@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>判断一个点是否可以到达</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>判断一个点是否可以到达</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个无穷大的网格图。一开始你在&nbsp;<code>(1, 1)</code>&nbsp;，你需要通过有限步移动到达点&nbsp;<code>(targetX, targetY)</code>&nbsp;。</p>
+
+<p><b>每一步</b>&nbsp;，你可以从点&nbsp;<code>(x, y)</code>&nbsp;移动到以下点之一：</p>
+
+<ul>
+	<li><code>(x, y - x)</code></li>
+	<li><code>(x - y, y)</code></li>
+	<li><code>(2 * x, y)</code></li>
+	<li><code>(x, 2 * y)</code></li>
+</ul>
+
+<p>给你两个整数&nbsp;<code>targetX</code> 和&nbsp;<code>targetY</code>&nbsp;，分别表示你最后需要到达点的 X 和 Y 坐标。如果你可以从&nbsp;<code>(1, 1)</code>&nbsp;出发到达这个点，请你返回<code>true</code> ，否则返回<em>&nbsp;</em><code>false</code><em>&nbsp;</em>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>targetX = 6, targetY = 9
+<b>输出：</b>false
+<b>解释：</b>没法从 (1,1) 出发到达 (6,9) ，所以返回 false 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>targetX = 4, targetY = 7
+<b>输出：</b>true
+<b>解释：</b>你可以按照以下路径到达：(1,1) -&gt; (1,2) -&gt; (1,4) -&gt; (1,8) -&gt; (1,7) -&gt; (2,7) -&gt; (4,7) 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= targetX, targetY&nbsp;&lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 21 ms</p>
+                    <p>内存: 15.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isReachable(self, targetX: int, targetY: int) -&gt; bool:
+        return self.dfs(targetX,targetY,targetX,targetY)
+        
+    @cache
+    def dfs(self,x,y, targetX, targetY):
+        if x==1 and y==1: return True
+        if x==y and x%2!=0 and y%2!=0: return False
+        if x%2==0: return self.dfs(x//2,y,targetX,targetY)
+        if y%2==0: return self.dfs(x,y//2,targetX,targetY)
+        return self.dfs(x+y,min(x,y),targetX,targetY) 
+        return False
+        
+    
+    
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了逆向思维的深度优先搜索（DFS）方法。从目标点 (targetX, targetY) 开始，尝试反向追溯到起点 (1, 1)。反向操作包括：如果当前坐标的 x 或 y 是偶数，则将其除以 2；如果坐标 x 和 y 不相等，则尝试通过减法操作逆向推回。这里的思路是从目标点反推到初始点，而非正向从起点搜索到终点，因为反向操作可以更直接地缩小搜索空间。递归中，如果 x 和 y 相等而且都是奇数，则无法继续操作，因为不可能通过以上操作生成两个相等的奇数。最终，如果能反向递归到 (1, 1)，说明目标点可达，返回 true；否则返回 false。通过使用 @cache 装饰器，优化了重复子问题的求解过程，提高了效率。</p>
+                                <p>时间复杂度: O(log(max(targetX, targetY)))</p>
+                                <p>空间复杂度: O(log(max(targetX, targetY)))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isReachable(self, targetX: int, targetY: int) -&gt; bool:
+        # 开始逆向搜索从目标点到起点
+        return self.dfs(targetX,targetY,targetX,targetY)
+        
+    @cache
+    def dfs(self,x,y, targetX, targetY):
+        # 如果到达起点，返回 True
+        if x==1 and y==1: return True
+        # 如果 x 和 y 相等且都是奇数，无法继续操作，返回 False
+        if x==y and x%2!=0 and y%2!=0: return False
+        # 如果 x 是偶数，尝试 x 除以 2 的操作
+        if x%2==0: return self.dfs(x//2,y,targetX,targetY)
+        # 如果 y 是偶数，尝试 y 除以 2 的操作
+        if y%2==0: return self.dfs(x,y//2,targetX,targetY)
+        # 尝试通过加法逆向操作
+        return self.dfs(x+y,min(x,y),targetX,targetY) 
+        # 此行代码永远不会执行，可以删除
+        return False</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在递归函数中，对 x 和 y 都是偶数的情况没有同时尝试 x 和 y 除以 2 的操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数中，当 x 和 y 都是偶数时，实际上对 x 或 y 进行除以 2 的操作是互相独立的。这意味着，在任何给定的递归步骤中，我们可以选择对 x 或 y 进行操作，而不会遗漏可能的路径。由于这两种操作是条件互斥的（即进行一种操作后，另一种操作的条件就不再满足），因此在一个递归调用中只需要选择一种操作。此外，同时对 x 和 y 进行除以 2 的操作在逻辑上不会同时出现，因为我们总是可以通过多次递归来达到相同的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在递归函数中，如果 x 和 y 都是奇数且相等时返回 false，这种情况下是否有可能通过某种组合的操作到达其他状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 x 和 y 都是奇数且相等时，无法通过给定的操作（除以 2 或减法）来改变它们的状态，使得其中一个成为偶数或不相等。因为减法操作 (x - y, y) 或 (x, y - x) 在 x 和 y 相等时不会改变任何值，而除以 2 的操作也无法应用于奇数。因此，如果 x 和 y 在任何递归步骤中都是奇数且相等，就无法通过进一步的操作到达 (1, 1)。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在递归中使用 @cache 来优化性能，那么这种方法的空间复杂度是多少？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用 @cache 装饰器可以缓存递归函数的中间结果，避免重复计算相同参数的结果，从而显著提高效率。空间复杂度主要取决于缓存中存储的不同参数组合的数量。在最坏情况下，每个参数 (x, y) 可能都是从 targetX 和 targetY 出发可能达到的任何值。因此，空间复杂度依赖于从目标点到起点可能的路径数量。在这种情况下，空间复杂度可能接近 O(targetX * targetY)，因为每个点可能至少被访问一次。但实际上，由于操作的限制性，访问的状态通常远少于此理论上限。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/check-if-point-is-reachable')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/check-if-point-is-reachable/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

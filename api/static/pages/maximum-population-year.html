@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>人口最多的年份</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>人口最多的年份</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维整数数组 <code>logs</code> ，其中每个 <code>logs[i] = [birth<sub>i</sub>, death<sub>i</sub>]</code> 表示第 <code>i</code> 个人的出生和死亡年份。</p>
+
+<p>年份 <code>x</code> 的 <strong>人口</strong> 定义为这一年期间活着的人的数目。第 <code>i</code> 个人被计入年份 <code>x</code> 的人口需要满足：<code>x</code> 在闭区间 <code>[birth<sub>i</sub>, death<sub>i</sub> - 1]</code> 内。注意，人不应当计入他们死亡当年的人口中。</p>
+
+<p>返回 <strong>人口最多</strong> 且 <strong>最早</strong> 的年份。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>logs = [[1993,1999],[2000,2010]]
+<strong>输出：</strong>1993
+<strong>解释：</strong>人口最多为 1 ，而 1993 是人口为 1 的最早年份。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>logs = [[1950,1961],[1960,1971],[1970,1981]]
+<strong>输出：</strong>1960
+<strong>解释：</strong> 
+人口最多为 2 ，分别出现在 1960 和 1970 。
+其中最早年份是 1960 。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= logs.length &lt;= 100</code></li>
+	<li><code>1950 &lt;= birth<sub>i</sub> &lt; death<sub>i</sub> &lt;= 2050</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximumPopulation(self, logs: List[List[int]]) -&gt; int:
+        res=[0]*100
+        for i in range(len(logs)):
+            for j in range(logs[i][0],logs[i][1]):
+                res[j-1950]+=1
+        ma=0
+
+        ins=0
+        for i in range(len(res)):
+            if res[i]&gt;ma:
+            
+                ma=res[i]
+                ins=i
+
+        return ins+1950</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了计数的方法来解决问题。首先，创建一个大小为100的数组（因为年份从1950到2049，共100年），用于记录每一年的人口数量。遍历每个人的生命记录，对于每个人，其在生存期间的每一年对应的数组位置增加1，表示那一年的人口增加了1。在更新完所有人的生存记录后，再遍历这个数组，找到人口最多的年份。如果有多个年份人口相同，由于是从最早的年份开始统计的，第一个找到的最大值将是最早的年份。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximumPopulation(self, logs: List[List[int]]) -&gt; int:
+        res = [0] * 100  # 创建用于存储每年人口数量的数组
+        for log in logs:  # 遍历每个人的生死年份
+            for year in range(log[0], log[1]):  # 遍历每个人的生存年份
+                res[year - 1950] += 1  # 更新对应年份人口数量
+        max_population = 0  # 用于记录最大人口数
+        earliest_year = 0  # 用于记录人口最多的最早年份
+        for i in range(len(res)):  # 遍历每一年查找人口最多的年份
+            if res[i] &gt; max_population:  # 如果当前年份人口更多
+                max_population = res[i]  # 更新最大人口数
+                earliest_year = i  # 更新最早年份记录
+        return earliest_year + 1950  # 返回最早的人口最多年份</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择使用大小为100的数组来记录每一年的人口数量，而不是使用哈希表或其他数据结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择使用大小为100的数组来记录每一年的人口数量是因为年份范围（1950到2049）是已知的且连续的，这使得数组可以通过简单的索引来访问对应年份的人口数量。数组的访问时间复杂度为O(1)，这比哈希表的平均O(1)时间复杂度更为稳定且没有额外的哈希冲突处理开销。此外，数组因其连续内存分配，也优于哈希表在空间局部性方面的表现，这有助于提升缓存效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算每一个人的生存年份时，为什么可以直接使用`range(log[0], log[1])`，而不需要考虑边界年份是否包含在1950到2049之间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中直接使用`range(log[0], log[1])`来计算每一个人的生存年份，基于假设输入数据始终有效，即所有的出生和死亡年份都严格在1950到2049范围内。如果实际应用需要处理边界外的年份，那么代码应该添加适当的边界检查以避免数组访问越界。但在这个特定问题的设定中，这样的检查被认为是不必要的，前提是输入数据遵循这一规范。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解中提到的`人口最多的最早年份`的定义，是否意味着在相同人口数量的情况下，只关心第一次出现的年份而忽略后续的年份？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，根据题解的逻辑，`人口最多的最早年份`的定义确实意味着如果存在多个年份人口数量相同，只关心最早出现的年份。这是通过在找到新的最大人口数量时立即更新年份实现的，而不是继续搜索可能出现相同人口数量的其他年份。这种方法确保了只记录第一次达到最大值的年份。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            对于`res[year - 1950] += 1`这一操作，如果输入数据中存在错误，比如死亡年份早于出生年份，这种情况下题解是否还能正确处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的`res[year - 1950] += 1`操作基于假定所有输入数据都是正确的，即每个人的死亡年份都晚于或等于其出生年份。如果输入数据中死亡年份早于出生年份，这将导致`range`函数生成一个空序列，因此不会执行任何加法操作，也不会引发错误。然而，这种情况在现实中可能表示输入数据本身存在问题，应该在实际应用中进行错误处理或数据验证。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-population-year')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-population-year/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两数相除</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两数相除</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数，被除数&nbsp;<code>dividend</code>&nbsp;和除数&nbsp;<code>divisor</code>。将两数相除，要求 <strong>不使用</strong> 乘法、除法和取余运算。</p>
+
+<p>整数除法应该向零截断，也就是截去（<code>truncate</code>）其小数部分。例如，<code>8.345</code> 将被截断为 <code>8</code> ，<code>-2.7335</code> 将被截断至 <code>-2</code> 。</p>
+
+<p>返回被除数&nbsp;<code>dividend</code>&nbsp;除以除数&nbsp;<code>divisor</code>&nbsp;得到的 <strong>商</strong> 。</p>
+
+<p><strong>注意：</strong>假设我们的环境只能存储 <strong>32 位</strong> 有符号整数，其数值范围是 <code>[−2<sup>31</sup>,&nbsp; 2<sup>31&nbsp;</sup>− 1]</code> 。本题中，如果商 <strong>严格大于</strong> <code>2<sup>31&nbsp;</sup>− 1</code> ，则返回 <code>2<sup>31&nbsp;</sup>− 1</code> ；如果商 <strong>严格小于</strong> <code>-2<sup>31</sup></code> ，则返回 <code>-2<sup>31</sup></code><sup> </sup>。</p>
+
+
+
+<p><strong>示例&nbsp;1:</strong></p>
+
+<pre>
+<strong>输入:</strong> dividend = 10, divisor = 3
+<strong>输出:</strong> 3
+<strong>解释: </strong>10/3 = 3.33333.. ，向零截断后得到 3 。</pre>
+
+<p><strong>示例&nbsp;2:</strong></p>
+
+<pre>
+<strong>输入:</strong> dividend = 7, divisor = -3
+<strong>输出:</strong> -2
+<strong>解释:</strong> 7/-3 = -2.33333.. ，向零截断后得到 -2 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>-2<sup>31</sup> &lt;= dividend, divisor &lt;= 2<sup>31</sup> - 1</code></li>
+	<li><code>divisor != 0</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 204 ms</p>
+                    <p>内存: 14.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def divide(self, dividend: int, divisor: int) -&gt; int:
+        if (dividend &lt; 0 and divisor) &gt; 0 or (dividend &gt; 0 and divisor &lt; 0):
+            sign = -1
+        else:
+            sign = 1
+
+        divisor = abs(divisor)
+        dividend = abs(dividend)
+
+        def mul(a, b):
+            ans = 0
+            while b != 0:
+                if b &amp; 1 != 0:
+                    ans += a
+                a &lt;&lt;= 1
+                b &gt;&gt;= 1
+            return ans
+
+        l = 0
+        r = dividend
+        while l &lt; r:
+            mid = l + (r - l + 1) // 2
+            if mul(mid, divisor) &lt;= dividend:
+                l = mid
+            else:
+                r = mid - 1
+        ans = sign * l
+        if ans &gt; (1 &lt;&lt; 31) - 1 or ans &lt; -1 &lt;&lt; 31:
+            return (1 &lt;&lt; 31) - 1
+        return ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用二分查找的方法来找出商。首先判断结果的正负号。然后将被除数和除数都转为正数。在二分查找的过程中，使用自定义的 mul 函数来计算中间结果 mid 乘以除数是否小于等于被除数。mul 函数通过位运算来实现乘法，避免使用乘号。最后根据正负号返回二分查找的结果 l，并判断是否溢出。</p>
+                                <p>时间复杂度: O(log n * log b)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def divide(self, dividend: int, divisor: int) -&gt; int:
+        # 判断结果的正负号
+        if (dividend &lt; 0 and divisor) &gt; 0 or (dividend &gt; 0 and divisor &lt; 0):
+            sign = -1
+        else:
+            sign = 1
+        
+        # 将被除数和除数都转为正数
+        divisor = abs(divisor)
+        dividend = abs(dividend)
+        
+        # 自定义乘法函数，用位运算实现
+        def mul(a, b):
+            ans = 0
+            while b != 0:
+                if b &amp; 1 != 0:
+                    ans += a
+                a &lt;&lt;= 1
+                b &gt;&gt;= 1
+            return ans
+        
+        # 二分查找
+        l = 0
+        r = dividend
+        while l &lt; r:
+            mid = l + (r - l + 1) // 2
+            if mul(mid, divisor) &lt;= dividend:
+                l = mid
+            else:
+                r = mid - 1
+        
+        # 根据正负号返回结果
+        ans = sign * l
+        
+        # 判断是否溢出
+        if ans &gt; (1 &lt;&lt; 31) - 1 or ans &lt; -1 &lt;&lt; 31:
+            return (1 &lt;&lt; 31) - 1
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何保证二分查找在不使用除法的情况下正确找到商的值，特别是在边界条件下如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分查找通过迭代缩小搜索的范围来找到正确的商。在每次迭代中，计算中点 mid，并使用自定义的 mul 函数来检查 mid 乘以除数是否小于等于被除数。这个过程继续直到搜索范围缩小到无法继续缩小（即 l 和 r 相邻或相等）。针对边界条件，特别是被除数等于除数的情况，二分查找通过从 l 到 r 的范围中持续查找确保可以找到精确的商。此外，通过设置 r = dividend 并令 mid = l + (r - l + 1) // 2 确保在接近边界时可以正确地处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            mul函数通过位运算实现乘法时，是否存在特定情况下的效率问题，例如极大或极小的数字乘法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>mul 函数使用位运算实现乘法，其效率依赖于乘数 b 的位数。对于较大的 b 值，函数需要更多的迭代来完成乘法，因为它每次迭代只处理 b 的一个位。当 b 的值非常大时，这会导致效率问题，尤其是在乘以较大的 a 值时。因此，尽管避免了乘号的使用，但在处理大数乘法时，性能可能会受到影响，特别是在 b 的二进制表示中有较多位设置为 1 的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在二分查找的过程中，你是如何确定将搜索范围从 l 到 r 缩小到恰当的大小，特别是当 mid*divisor 接近 dividend 的时候？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分查找中，通过不断调整 l 和 r 的值逐渐缩小搜索范围。当 mid * divisor 小于等于 dividend 时，将 l 设为 mid，因为这意味着可能的商至少为 mid；如果 mid * divisor 大于 dividend，则将 r 设为 mid - 1，因为这意味着商必然小于 mid。通过不断迭代，直到 l 和 r 相遇或相邻，这样可以保证找到最接近且不超过实际商的整数值。这个过程特别在 mid * divisor 接近 dividend 时显得非常重要，因为它保证了即使在这种边界情况下，也能够找到正确的商。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法在处理可能的溢出时只简单地检查了结果是否超出 32 位整数的范围，是否考虑了在乘法过程中可能的溢出情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>目前的算法实现确实在最终结果计算前仅检查是否超出了 32 位整数的范围。然而，理论上在 mul 函数中的乘法过程也可能发生溢出，尤其是当 a 和 b 都非常大时。尽管 Python 的整数类型可以自动处理大数，但在其他语言或环境中，这种乘法实现可能需要额外的检查来确保在中间计算步骤中不会发生溢出。在严格的环境下，应该在 mul 函数中加入检查以避免中间结果的溢出，特别是在位操作和加法操作中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/divide-two-integers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/divide-two-integers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

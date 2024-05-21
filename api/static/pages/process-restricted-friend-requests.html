@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>处理含限制条件的好友请求</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>处理含限制条件的好友请求</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数 <code>n</code> ，表示网络上的用户数目。每个用户按从 <code>0</code> 到 <code>n - 1</code> 进行编号。</p>
+
+<p>给你一个下标从 <strong>0</strong> 开始的二维整数数组 <code>restrictions</code> ，其中 <code>restrictions[i] = [x<sub>i</sub>, y<sub>i</sub>]</code> 意味着用户 <code>x<sub>i</sub></code> 和用户 <code>y<sub>i</sub></code> <strong>不能</strong> 成为 <strong>朋友</strong> ，不管是 <strong>直接</strong> 还是通过其他用户 <strong>间接</strong> 。</p>
+
+<p>最初，用户里没有人是其他用户的朋友。给你一个下标从 <strong>0</strong> 开始的二维整数数组 <code>requests</code> 表示好友请求的列表，其中 <code>requests[j] = [u<sub>j</sub>, v<sub>j</sub>]</code> 是用户 <code>u<sub>j</sub></code> 和用户 <code>v<sub>j</sub></code> 之间的一条好友请求。</p>
+
+<p>如果 <code>u<sub>j</sub></code> 和 <code>v<sub>j</sub></code> 可以成为 <strong>朋友</strong> ，那么好友请求将会 <strong>成功</strong> 。每个好友请求都会按列表中给出的顺序进行处理（即，<code>requests[j]</code> 会在 <code>requests[j + 1]</code> 前）。一旦请求成功，那么对所有未来的好友请求而言， <code>u<sub>j</sub></code> 和 <code>v<sub>j</sub></code> 将会 <strong>成为直接朋友 。</strong></p>
+
+<p>返回一个 <strong>布尔数组</strong> <code>result</code> ，其中元素遵循此规则：如果第 <code>j</code> 个好友请求 <strong>成功</strong><em> </em>，那么 <code>result[j]</code><em> </em>就是<em> </em><code>true</code><em> </em>；否则，为<em> </em><code>false</code> 。</p>
+
+<p><strong>注意：</strong>如果 <code>u<sub>j</sub></code> 和 <code>v<sub>j</sub></code> 已经是直接朋友，那么他们之间的请求将仍然&nbsp;<strong>成功</strong> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 3, restrictions = [[0,1]], requests = [[0,2],[2,1]]
+<strong>输出：</strong>[true,false]
+<strong>解释：
+</strong>请求 0 ：用户 0 和 用户 2 可以成为朋友，所以他们成为直接朋友。 
+请求 1 ：用户 2 和 用户 1 不能成为朋友，因为这会使 用户 0 和 用户 1 成为间接朋友 (1--2--0) 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 3, restrictions = [[0,1]], requests = [[1,2],[0,2]]
+<strong>输出：</strong>[true,false]
+<strong>解释：</strong>
+请求 0 ：用户 1 和 用户 2 可以成为朋友，所以他们成为直接朋友。 
+请求 1 ：用户 0 和 用户 2 不能成为朋友，因为这会使 用户 0 和 用户 1 成为间接朋友 (0--2--1) 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, restrictions = [[0,1],[1,2],[2,3]], requests = [[0,4],[1,2],[3,1],[3,4]]
+<strong>输出：</strong>[true,false,true,false]
+<strong>解释：
+</strong>请求 0 ：用户 0 和 用户 4 可以成为朋友，所以他们成为直接朋友。 
+请求 1 ：用户 1 和 用户 2 不能成为朋友，因为他们之间存在限制。
+请求 2 ：用户 3 和 用户 1 可以成为朋友，所以他们成为直接朋友。 
+请求 3 ：用户 3 和 用户 4 不能成为朋友，因为这会使 用户 0 和 用户 1 成为间接朋友 (0--4--3--1) 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 1000</code></li>
+	<li><code>0 &lt;= restrictions.length &lt;= 1000</code></li>
+	<li><code>restrictions[i].length == 2</code></li>
+	<li><code>0 &lt;= x<sub>i</sub>, y<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>x<sub>i</sub> != y<sub>i</sub></code></li>
+	<li><code>1 &lt;= requests.length &lt;= 1000</code></li>
+	<li><code>requests[j].length == 2</code></li>
+	<li><code>0 &lt;= u<sub>j</sub>, v<sub>j</sub> &lt;= n - 1</code></li>
+	<li><code>u<sub>j</sub> != v<sub>j</sub></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 203 ms</p>
+                    <p>内存: 17.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def friendRequests(self, n: int, restrictions: List[List[int]], requests: List[List[int]]) -&gt; List[bool]:
+        fri = defaultdict(set)
+        res = defaultdict(set)
+        for a, b in restrictions:
+            res[a].add(b)
+            res[b].add(a)
+        for i in range(n):
+            fri[i].add(i)
+        ans = []
+        for a, b in requests:
+            if b in fri and a in fri[b]:
+                ans.append(True)
+                continue
+            if (fri[a] &amp; res[b]) or (fri[b] &amp; res[a]):
+                ans.append(False)
+                continue
+            fri[a] |= fri[b]
+            res[a] |= res[b]
+            for x in fri[a]:
+                fri[x] = fri[a]
+                res[x] = res[a]
+            ans.append(True)
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用了两个字典 `fri` 和 `res` 来存储朋友关系和限制条件。其中 `fri` 的键是用户编号，值是该用户的朋友集合；`res` 的键是用户编号，值是与该用户存在限制的用户集合。处理好友请求时，如果两个用户已经是直接朋友，则请求成功；如果两用户之间存在间接限制，请求失败；否则，更新双方的朋友集和限制集，并将新的朋友关系传播到相关用户，最后标记此请求为成功。</p>
+                                <p>时间复杂度: O(m * n)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def friendRequests(self, n: int, restrictions: List[List[int]], requests: List[List[int]]) -&gt; List[bool]:
+        fri = defaultdict(set)  # 用户的朋友集
+        res = defaultdict(set)  # 用户的限制集
+        for a, b in restrictions:
+            res[a].add(b)
+            res[b].add(a)
+        for i in range(n):
+            fri[i].add(i)  # 初始化每个用户至少与自己是朋友
+        ans = []
+        for a, b in requests:
+            if b in fri and a in fri[b]:  # 如果已经是朋友，则请求成功
+                ans.append(True)
+                continue
+            if (fri[a] &amp; res[b]) or (fri[b] &amp; res[a]):  # 检查是否存在间接限制
+                ans.append(False)
+                continue
+            fri[a] |= fri[b]  # 合并朋友集
+            res[a] |= res[b]  # 合并限制集
+            for x in fri[a]:  # 更新所有相关用户的朋友集和限制集
+                fri[x] = fri[a]
+                res[x] = res[a]
+            ans.append(True)
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，如何保证当更新一个用户的朋友集和限制集后，相关联的用户集也能同步更新？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过在更新一个用户的朋友集和限制集后，遍历该用户现有的朋友集中的每一个成员，并将每个成员的朋友集和限制集设置为更新后的集合，从而保证所有相关联用户的数据同步。这种方法虽然简单，但可能在大规模数据中效率较低，因为每次更新都需要进行广泛的遍历和更新操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到处理好友请求时会检查间接限制，具体是如何检查两个用户之间是否存在间接限制的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过检查两个用户各自的限制集合与对方的朋友集合是否有交集来确定是否存在间接限制。具体来说，如果用户 A 的限制集中的任何一个用户是用户 B 的朋友，或者用户 B 的限制集中的任何一个用户是用户 A 的朋友，那么就判定存在间接限制，此时好友请求失败。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用了集合合并操作来处理好友关系，这对算法的效率有什么影响？是否存在更优的数据结构来处理此类操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用集合合并操作虽然直观且易于理解，但在大数据量时，每次合并操作都可能涉及大量元素的复制，这会导致效率较低。一种更优的数据结构是并查集（Union-Find），它可以更高效地处理动态连通性问题，尤其是在合并集合和查询集合的根元素时，通过路径压缩和按秩合并可以显著提升效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            解题思路中未提及如何处理多重间接关系，例如A与B是朋友，B与C是朋友，但A与C不能是朋友的情况。算法如何解决这种复杂的间接限制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在当前的算法实现中，这种多重间接关系的处理是通过逐步更新每个用户的限制集来实现的。当用户 A 和 B 成为朋友时，他们的限制集会合并，因此任何后续的好友请求都会检查这个更新后的限制集。如果存在如上述的复杂间接关系，算法会在合并朋友集的同时合并限制集，并在后续的请求中考虑这些合并后的限制集来判断是否能够添加新的朋友关系。这种方式确保了即使在多重间接关系的情况下也能正确处理限制。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/process-restricted-friend-requests')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/process-restricted-friend-requests/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

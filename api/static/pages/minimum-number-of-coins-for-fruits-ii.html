@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>购买水果需要的最少金币数 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>购买水果需要的最少金币数 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=monotonic-queue" class="badge bg-secondary tag-link">单调队列</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 216 ms</p>
+                    <p>内存: 30.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumCoins(self, prices: List[int]) -&gt; int:
+        n = len(prices)
+        dp = [0] * (n + 1)
+        dp[1] = prices[0]
+        st = deque([0])
+        for i in range(1, n):
+            while st and 2 * st[0] + 1 &lt; i:
+                st.popleft()
+            while st and prices[st[-1]] + dp[st[-1]] &gt;= prices[i] + dp[i]:
+                st.pop()
+            st.append(i)
+            dp[i + 1] = prices[st[0]] + dp[st[0]]
+        return dp[-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了动态规划加上双端队列的优化方法来解决问题。该方法的基本思想是使用一个动态规划数组dp，其中dp[i]表示购买到第i-1个水果时所需的最小金币数。初始状态是dp[1]等于第一个水果的价格。接下来，我们用一个双端队列st来存储那些可能是最优购买策略的水果的索引。为了维持队列的特性，我们会在移动到下一个水果时，从队列前端移除那些不再可能是最优策略的索引，并且从后端移除那些价格加上之前的最小花费比当前水果的价格加上当前最小花费更高的索引。然后将当前索引添加到队列中。队列的第一个元素总是给出了到当前水果为止的最小花费。队列的维护保证了每个元素最多只被加入和移除一次，从而提高了效率。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumCoins(self, prices: List[int]) -&gt; int:
+        n = len(prices)
+        dp = [0] * (n + 1)  # 初始化dp数组
+        dp[1] = prices[0]  # 第一个水果的价格
+        st = deque([0])  # 初始化双端队列，存储可能的最优购买策略的索引
+        for i in range(1, n):
+            # 移除不再可能是最优策略的索引
+            while st and 2 * st[0] + 1 &lt; i:
+                st.popleft()
+            # 移除价格加上之前最小花费高于当前的索引
+            while st and prices[st[-1]] + dp[st[-1]] &gt;= prices[i] + dp[i]:
+                st.pop()
+            st.append(i)  # 将当前索引添加到队列中
+            dp[i + 1] = prices[st[0]] + dp[st[0]]  # 更新dp数组
+        return dp[-1]  # 返回最后一个元素，即最小花费</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            动态规划数组dp[i]表示购买到第i-1个水果时所需的最少金币数。为何dp数组需要初始化为n+1长度，而非n长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>dp数组的大小设置为n+1是为了方便处理和表示状态，其中dp[i]表示购买到第i-1个水果时的最小花费。由于数组索引从0开始，并且dp[0]通常用来表示初始状态（这里是不购买任何水果的状态，其最小花费是0），所以需要dp[n]来存储购买到最后一个水果（即第n-1个水果，对应prices数组的prices[n-1]）的最小花费。如果dp数组只有n长度，则dp[n-1]将是最后一个存储的状态，我们将无法直接表示在购买完所有水果后的总花费状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在算法中，移除双端队列前端不再可能是最优策略的索引的条件为`2 * st[0] + 1 &lt; i`。这个条件是如何确定的，它的逻辑依据是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件`2 * st[0] + 1 &lt; i`是为了确保双端队列中的索引始终包含可能导致最小花费的有效范围内的水果价格。在问题中，如果队列中的索引st[0]代表的水果价格加上之前花费的总和已经不可能比当前考虑的水果价格加上之前花费的总和更优（即st[0]太远，不再影响当前的购买决策），则该索引会被移除。具体来说，这个条件可能与问题中水果购买的某些特定规则（如每次最多购买固定数量的水果）相关，但未提供具体详情。通常，这类条件用于压缩状态空间，移除那些对当前决策无影响的过时状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            双端队列中，当`prices[st[-1]] + dp[st[-1]] &gt;= prices[i] + dp[i]`时，会移除队列的后端索引。这种移除策略的目的和效果是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`prices[st[-1]] + dp[st[-1]] &gt;= prices[i] + dp[i]`时，从队列后端移除索引的目的是保持队列中始终包含可以导致最小总花费的索引。具体来说，如果队列中的某个索引st[-1]对应的水果价格加上到达该索引状态的花费已经不优于当前考虑的水果价格加上到达i状态的花费，那么这个索引就不可能为后续状态提供更低的花费，因此应该被移除。这种策略保证了队列中的第一个元素总是能够给出当前考虑的水果到达时的最小花费，从而有效地简化了问题的解决过程，并提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-number-of-coins-for-fruits-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-number-of-coins-for-fruits-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

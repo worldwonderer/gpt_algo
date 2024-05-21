@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两地调度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两地调度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>公司计划面试 <code>2n</code> 人。给你一个数组 <code>costs</code> ，其中 <code>costs[i] = [aCost<sub>i</sub>, bCost<sub>i</sub>]</code> 。第 <code>i</code> 人飞往 <code>a</code> 市的费用为 <code>aCost<sub>i</sub></code> ，飞往 <code>b</code> 市的费用为 <code>bCost<sub>i</sub></code> 。</p>
+
+<p>返回将每个人都飞到 <code>a</code> 、<code>b</code> 中某座城市的最低费用，要求每个城市都有 <code>n</code> 人抵达<strong>。</strong></p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>costs = [[10,20],[30,200],[400,50],[30,20]]
+<strong>输出：</strong>110
+<strong>解释：</strong>
+第一个人去 a 市，费用为 10。
+第二个人去 a 市，费用为 30。
+第三个人去 b 市，费用为 50。
+第四个人去 b 市，费用为 20。
+
+最低总费用为 10 + 30 + 50 + 20 = 110，每个城市都有一半的人在面试。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>costs = [[259,770],[448,54],[926,667],[184,139],[840,118],[577,469]]
+<strong>输出：</strong>1859
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>costs = [[515,563],[451,713],[537,709],[343,819],[855,779],[457,60],[650,359],[631,42]]
+<strong>输出：</strong>3086
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 * n == costs.length</code></li>
+	<li><code>2 <= costs.length <= 100</code></li>
+	<li><code>costs.length</code> 为偶数</li>
+	<li><code>1 <= aCost<sub>i</sub>, bCost<sub>i</sub> <= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 24 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def twoCitySchedCost(self, costs: List[List[int]]) -&gt; int:
+        sub=[x[0]-x[1] for x in costs]
+        a,b=[],[]
+        for each in costs:
+            if each[0]&lt;each[1]:
+                a.append(each[0])
+            else:
+                b.append(each[1])
+        curr=sum(a)+sum(b)
+        m,n=len(a),len(b)
+        if m&lt;n:
+            remain = [x for x in sub if x&gt;=0]
+            while m&lt;n:
+                tmp=min(remain)
+                curr+=tmp
+                remain.remove(tmp)
+                m+=1
+                n-=1
+            return curr
+        elif m&gt;n:
+            remain = [abs(x) for x in sub if x&lt;0]
+            while m&gt;n:
+                tmp=min(remain)
+                curr+=tmp
+                remain.remove(tmp)
+                m-=1
+                n+=1
+            return curr
+        else:
+            return curr
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的思路是首先计算每个人去A市和B市的费用差，并基于此差值进行决策。首先，对于每个人，如果去A市比去B市便宜，就先选定其去A市，反之则去B市。之后，根据已选的结果检查A市和B市是否人数均为n。如果某城市人数过多，将需要重新考虑一些人的目的地，选取使总成本最小增加的方案。这通过计算差值的绝对值最小的调整来实现，以确保在调整人数以满足条件时增加的成本最小。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># 添加了注释的题解代码
+
+class Solution:
+    def twoCitySchedCost(self, costs: List[List[int]]) -&gt; int:
+        # 计算每个人去A与去B的成本差
+        sub = [x[0] - x[1] for x in costs]
+        a, b = [], []
+        # 根据成本差决定初步分配
+        for each in costs:
+            if each[0] &lt; each[1]:
+                a.append(each[0])
+            else:
+                b.append(each[1])
+        # 计算当前总成本
+        curr = sum(a) + sum(b)
+        # 对于人数不平衡的情况进行调整
+        m, n = len(a), len(b)
+        if m &lt; n:
+            remain = [x for x in sub if x &gt;= 0]
+            # 调整人数至平衡
+            while m &lt; n:
+                tmp = min(remain)
+                curr += tmp
+                remain.remove(tmp)
+                m += 1
+                n -= 1
+            return curr
+        elif m &gt; n:
+            remain = [abs(x) for x in sub if x &lt; 0]
+            while m &gt; n:
+                tmp = min(remain)
+                curr += tmp
+                remain.remove(tmp)
+                m -= 1
+                n += 1
+            return curr
+        else:
+            return curr
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            解题思路中提到的&#39;成本差&#39;是如何计算的？具体是哪两个成本之间的差异？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，每个人去A市和去B市的成本差是通过计算&#39;去A市的成本&#39;与&#39;去B市的成本&#39;之间的差值来得到的。具体来说，对于数组中的每个元素`costs[i] = [aCosti, bCosti]`，成本差计算为`aCosti - bCosti`。这个差值反映了个人去A市相较于去B市的额外成本，如果值为正，则表示去B市更便宜；如果值为负，则表示去A市更便宜。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在初步分配后，选择将成本差较小的个体进行重新分配，而不是直接选择成本最高的个体？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初步分配后，选择进行调整的策略是基于成本差的大小，而不是直接基于个体的总成本。这是因为我们的目标是调整分配以平衡两个城市的人数，同时尽量减少总成本的增加。选择成本差较小的个体进行重新分配意味着这些个体从一个城市转移到另一个城市的额外成本较低，从而能更有效地控制总成本的增加。如果选择成本最高的个体，可能会导致总成本大幅增加，这不符合最小化总成本的目标。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到的调整策略是否保证了最终的总成本是最低的？是否存在更优的调整策略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中提出的调整策略基于最小化因调整分配而增加的额外成本，这通常可以帮助接近最小总成本的解决方案，但不一定总能保证得到全局最优解。存在可能的更优策略，如使用动态规划、贪心算法的改进版本或其他优化算法来更全面地考虑所有可能的分配方式，从而可能找到一个更低的总成本。此外，可以通过模拟退火或遗传算法等启发式算法来探索可能的更好解决方案，尤其是在问题规模较大时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/two-city-scheduling')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/two-city-scheduling/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

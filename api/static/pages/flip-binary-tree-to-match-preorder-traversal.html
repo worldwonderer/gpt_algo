@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>翻转二叉树以匹配先序遍历</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>翻转二叉树以匹配先序遍历</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵二叉树的根节点 <code>root</code> ，树中有 <code>n</code> 个节点，每个节点都有一个不同于其他节点且处于 <code>1</code> 到 <code>n</code> 之间的值。</p>
+
+<p>另给你一个由 <code>n</code> 个值组成的行程序列 <code>voyage</code> ，表示 <strong>预期</strong> 的二叉树 <a href="https://baike.baidu.com/item/%E5%85%88%E5%BA%8F%E9%81%8D%E5%8E%86/6442839?fr=aladdin" target="_blank"><strong>先序遍历</strong></a> 结果。</p>
+
+<p>通过交换节点的左右子树，可以 <strong>翻转</strong> 该二叉树中的任意节点。例，翻转节点 1 的效果如下：</p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/02/15/fliptree.jpg" style="width: 400px; height: 187px;" />
+<p>请翻转 <strong>最少 </strong>的树中节点，使二叉树的 <strong>先序遍历</strong> 与预期的遍历行程 <code>voyage</code> <strong>相匹配</strong> 。 </p>
+
+<p>如果可以，则返回 <strong>翻转的</strong> 所有节点的值的列表。你可以按任何顺序返回答案。如果不能，则返回列表 <code>[-1]</code>。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2019/01/02/1219-01.png" style="width: 150px; height: 205px;" />
+<pre>
+<strong>输入：</strong>root = [1,2], voyage = [2,1]
+<strong>输出：</strong>[-1]
+<strong>解释：</strong>翻转节点无法令先序遍历匹配预期行程。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2019/01/02/1219-02.png" style="width: 150px; height: 142px;" />
+<pre>
+<strong>输入：</strong>root = [1,2,3], voyage = [1,3,2]
+<strong>输出：</strong>[1]
+<strong>解释：</strong>交换节点 2 和 3 来翻转节点 1 ，先序遍历可以匹配预期行程。</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2019/01/02/1219-02.png" style="width: 150px; height: 142px;" />
+<pre>
+<strong>输入：</strong>root = [1,2,3], voyage = [1,2,3]
+<strong>输出：</strong>[]
+<strong>解释：</strong>先序遍历已经匹配预期行程，所以不需要翻转节点。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树中的节点数目为 <code>n</code></li>
+	<li><code>n == voyage.length</code></li>
+	<li><code>1 <= n <= 100</code></li>
+	<li><code>1 <= Node.val, voyage[i] <= n</code></li>
+	<li>树中的所有值 <strong>互不相同</strong></li>
+	<li><code>voyage</code> 中的所有值 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 25 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class Solution:
+    def flipMatchVoyage(self, root: Optional[TreeNode], voyage: List[int]) -&gt; List[int]:
+        def dfs(node, index, flipped, result):
+            if not node:
+                return index
+
+            if node.val != voyage[index]:
+                return -1
+
+            index += 1
+
+            if index &lt; len(voyage) and node.left and node.left.val != voyage[index]:
+                if not node.right or node.right.val != voyage[index]:
+                    return -1
+
+                # Flip the node
+                node.left, node.right = node.right, node.left
+                flipped.append(node.val)
+
+            index = dfs(node.left, index, flipped, result)
+            if index == -1:
+                return -1
+
+            index = dfs(node.right, index, flipped, result)
+            if index == -1:
+                return -1
+
+            return index
+
+        flipped = []
+        result = []
+
+        if dfs(root, 0, flipped, result) != len(voyage):
+            return [-1]
+
+        return result if not flipped else flipped
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个解题思路是通过深度优先搜索（DFS）来比较树的当前先序遍历结果与给定的voyage序列。从根节点开始，每次访问一个节点时，都检查它是否与voyage中相应位置的值匹配。如果当前节点的左子节点存在且其值与voyage中下一个值不匹配，则检查右子节点是否与voyage中的这个值匹配。如果匹配，则交换左右子节点（即翻转当前节点），并记录这次翻转。之后，继续对左右子节点递归进行DFS。如果在任何时候节点值与voyage不匹配，且无法通过翻转来匹配，就返回-1表示无法匹配。最后，如果整个树都能与voyage匹配，则返回记录的翻转节点列表，否则返回[-1]表示无法匹配。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class Solution:
+    def flipMatchVoyage(self, root: Optional[TreeNode], voyage: List[int]) -&gt; List[int]:
+        def dfs(node, index, flipped, result):
+            if not node:
+                return index
+
+            if node.val != voyage[index]:
+                return -1
+
+            index += 1
+
+            if index &lt; len(voyage) and node.left and node.left.val != voyage[index]:
+                if not node.right or node.right.val != voyage[index]:
+                    return -1
+
+                # Flip the node
+                node.left, node.right = node.right, node.left
+                flipped.append(node.val)
+
+            index = dfs(node.left, index, flipped, result)
+            if index == -1:
+                return -1
+
+            index = dfs(node.right, index, flipped, result)
+            if index == -1:
+                return -1
+
+            return index
+
+        flipped = []
+        result = []
+
+        if dfs(root, 0, flipped, result) != len(voyage):
+            return [-1]
+
+        return result if not flipped else flipped
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在先序遍历中，节点值不匹配时需要首先尝试翻转节点？这种翻转操作是否有可能导致后续的遍历序列完全不匹配？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在先序遍历中，节点值不匹配时首先尝试翻转节点是为了尝试使当前节点的子节点顺序与voyage序列中的顺序一致，从而继续先序遍历。这种翻转操作确实有可能导致后续的遍历序列完全不匹配，这通常发生在翻转之后的树结构与voyage的结构本质上不兼容的情况下。如果翻转后序列仍然不能匹配，算法会检测到这一点并最终返回-1，表示无法通过翻转来匹配全部序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在DFS递归中，你是如何保证每次递归调用都能正确地更新索引 `index`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS递归中，索引`index`用于跟踪当前访问的节点在voyage序列中的位置。每次递归调用处理一个节点后，`index`增加1。当递归调用左子节点或右子节点时，将更新后的`index`传递给子调用。递归函数返回时，返回的是处理完所有子节点后的最新`index`。这样确保每层递归都使用正确的索引，并且所有修改都基于最新的遍历进度，从而在整个DFS过程中保持`index`的准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果在某个节点发现需要翻转，但该节点只有左子节点或只有右子节点，这种情况下的处理逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，如果某个节点需要翻转来匹配voyage序列，但该节点只有一个子节点（无论是左是右），则不执行翻转操作，因为翻转单个子节点没有意义。此时，如果该单一子节点不匹配voyage中对应的值，将返回-1，表示无法匹配。这种情况下，算法会检测这种不匹配并直接处理，而不尝试无效的翻转。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当翻转操作发生后，你是如何处理原左子节点和右子节点的遍历顺序的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当翻转操作发生后，原来的左子节点和右子节点的位置被交换。在继续DFS递归遍历时，会首先遍历新的左子节点（原右子节点），然后遍历新的右子节点（原左子节点）。这种处理方式确保了在翻转之后，节点的遍历顺序符合先序遍历的要求，并与更新后的voyage序列保持一致。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/flip-binary-tree-to-match-preorder-traversal')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/flip-binary-tree-to-match-preorder-traversal/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

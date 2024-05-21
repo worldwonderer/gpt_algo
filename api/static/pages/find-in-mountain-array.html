@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>山脉数组中查找目标值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>山脉数组中查找目标值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=interactive" class="badge bg-secondary tag-link">交互</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>（这是一个 <strong>交互式问题&nbsp;</strong>）</p>
+
+<p>给你一个 <strong>山脉数组</strong>&nbsp;<code>mountainArr</code>，请你返回能够使得&nbsp;<code>mountainArr.get(index)</code>&nbsp;<strong>等于</strong>&nbsp;<code>target</code>&nbsp;<strong>最小</strong>&nbsp;的下标 <code>index</code>&nbsp;值。</p>
+
+<p>如果不存在这样的下标 <code>index</code>，就请返回&nbsp;<code>-1</code>。</p>
+
+
+
+<p>何为山脉数组？如果数组&nbsp;<code>A</code> 是一个山脉数组的话，那它满足如下条件：</p>
+
+<p><strong>首先</strong>，<code>A.length &gt;= 3</code></p>
+
+<p><strong>其次</strong>，在&nbsp;<code>0 &lt; i&nbsp;&lt; A.length - 1</code>&nbsp;条件下，存在 <code>i</code> 使得：</p>
+
+<ul>
+	<li><code>A[0] &lt; A[1] &lt; ... A[i-1] &lt; A[i]</code></li>
+	<li><code>A[i] &gt; A[i+1] &gt; ... &gt; A[A.length - 1]</code></li>
+</ul>
+
+
+
+<p>你将&nbsp;<strong>不能直接访问该山脉数组</strong>，必须通过&nbsp;<code>MountainArray</code>&nbsp;接口来获取数据：</p>
+
+<ul>
+	<li><code>MountainArray.get(k)</code>&nbsp;- 会返回数组中索引为<code>k</code>&nbsp;的元素（下标从 0 开始）</li>
+	<li><code>MountainArray.length()</code>&nbsp;- 会返回该数组的长度</li>
+</ul>
+
+
+
+<p><strong>注意：</strong></p>
+
+<p>对&nbsp;<code>MountainArray.get</code>&nbsp;发起超过 <code>100</code> 次调用的提交将被视为错误答案。此外，任何试图规避判题系统的解决方案都将会导致比赛资格被取消。</p>
+
+<p>为了帮助大家更好地理解交互式问题，我们准备了一个样例 &ldquo;<strong>答案</strong>&rdquo;：<a href="https://leetcode-cn.com/playground/RKhe3ave" target="_blank">https://leetcode-cn.com/playground/RKhe3ave</a>，请注意这 <strong>不是一个正确答案</strong>。</p>
+
+<ol>
+</ol>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>array = [1,2,3,4,5,3,1], target = 3
+<strong>输出：</strong>2
+<strong>解释：</strong>3 在数组中出现了两次，下标分别为 2 和 5，我们返回最小的下标 2。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>array = [0,1,2,4,2,1], target = 3
+<strong>输出：</strong>-1
+<strong>解释：</strong>3 在数组中没有出现，返回 -1。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= mountain_arr.length() &lt;= 10000</code></li>
+	<li><code>0 &lt;= target &lt;= 10^9</code></li>
+	<li><code>0 &lt;= mountain_arr.get(index) &lt;=&nbsp;10^9</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findInMountainArray(self, target: int, mountain_arr: &#39;MountainArray&#39;) -&gt; int:
+        n = mountain_arr.length()
+        peak = self.findPeak(mountain_arr, 0, n - 1)
+        
+        # 在递增部分查找
+        left_result = self.binarySearch(mountain_arr, 0, peak, target, True)
+        if left_result != -1:
+            return left_result
+        
+        # 在递减部分查找
+        right_result = self.binarySearch(mountain_arr, peak + 1, n - 1, target, False)
+        return right_result
+    
+    def findPeak(self, mountain_arr: &#39;MountainArray&#39;, left: int, right: int) -&gt; int:
+        while left &lt; right:
+            mid = (left + right) // 2
+            if mountain_arr.get(mid) &lt; mountain_arr.get(mid + 1):
+                left = mid + 1
+            else:
+                right = mid
+        return left
+    
+    def binarySearch(self, mountain_arr: &#39;MountainArray&#39;, left: int, right: int, target: int, ascending: bool) -&gt; int:
+        while left &lt;= right:
+            mid = (left + right) // 2
+            if mountain_arr.get(mid) == target:
+                return mid
+            
+            if ascending:
+                if mountain_arr.get(mid) &lt; target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            else:
+                if mountain_arr.get(mid) &gt; target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+        
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个解决方案首先利用二分搜索找到山脉数组的峰值，即从左到右最大的元素，这个元素将数组分为递增和递减两部分。找到峰值后，解决方案再次使用二分搜索在递增部分查找目标值。如果在递增部分找到了目标值，直接返回其索引。如果没有找到，再在递减部分使用二分搜索查找目标值。如果在任何部分都没有找到目标值，则返回-1。</p>
+                                <p>时间复杂度: O(log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findInMountainArray(self, target: int, mountain_arr: &#39;MountainArray&#39;) -&gt; int:
+        n = mountain_arr.length()
+        peak = self.findPeak(mountain_arr, 0, n - 1)
+        
+        # 在递增部分查找
+        left_result = self.binarySearch(mountain_arr, 0, peak, target, True)
+        if left_result != -1:
+            return left_result
+        
+        # 在递减部分查找
+        right_result = self.binarySearch(mountain_arr, peak + 1, n - 1, target, False)
+        return right_result
+    
+    def findPeak(self, mountain_arr: &#39;MountainArray&#39;, left: int, right: int) -&gt; int:
+        # 使用二分搜索找到峰值
+        while left &lt; right:
+            mid = (left + right) // 2
+            if mountain_arr.get(mid) &lt; mountain_arr.get(mid + 1):
+                left = mid + 1
+            else:
+                right = mid
+        return left
+    
+    def binarySearch(self, mountain_arr: &#39;MountainArray&#39;, left: int, right: int, target: int, ascending: bool) -&gt; int:
+        # 根据数组的增减性质选择适当的二分搜索方向
+        while left &lt;= right:
+            mid = (left + right) // 2
+            if mountain_arr.get(mid) == target:
+                return mid
+            
+            if ascending:
+                if mountain_arr.get(mid) &lt; target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            else:
+                if mountain_arr.get(mid) &gt; target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+        
+        return -1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用二分搜索找到山脉数组的峰值时，你是如何确定峰值的确切位置的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分搜索过程中，我们比较中间元素和其右侧相邻的元素。如果中间元素小于其右侧元素，则表明峰值位于中间元素的右侧（包括中间元素的右侧元素），因此我们将搜索区间调整为右侧部分，即移动左边界`left`到`mid + 1`。反之，如果中间元素大于或等于其右侧元素，则峰值位于中间元素的左侧（包括中间元素本身），因此我们将搜索区间调整为左侧部分，即移动右边界`right`到`mid`。最终当`left`等于`right`时，它们指向的位置即为峰值位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在找到峰值之后需要分别在递增和递减部分进行二分搜索，这种方法的有效性是基于什么原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>山脉数组的定义是先递增再递减，因此在找到峰值后，我们可以明确两个部分：左侧部分是递增的，右侧部分是递减的。递增部分和递减部分都是单调的，这使得我们可以分别在这两个部分使用二分搜索来高效查找目标值。二分搜索有效的前提是数据的单调性，单调递增或递减的数组允许我们通过比较中间值与目标值来快速决定继续搜索的方向，从而有效地减少搜索范围。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在递增和递减部分的二分搜索中，你是如何根据数组的增减性质修改二分搜索条件的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递增部分的二分搜索中，如果中间元素小于目标值，则目标值可能位于中间元素的右侧，因此我们将左边界`left`移动到`mid + 1`。如果中间元素大于目标值，目标值可能位于中间元素的左侧，因此我们将右边界`right`移动到`mid - 1`。在递减部分的二分搜索中，逻辑相反：如果中间元素大于目标值，则目标值可能位于中间元素的右侧，因此我们将左边界`left`移动到`mid + 1`；如果中间元素小于目标值，则目标值可能位于中间元素的左侧，因此我们将右边界`right`移动到`mid - 1`。这样的调整是为了确保我们总是向可能包含目标值的区域缩小搜索范围。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-in-mountain-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-in-mountain-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>跳跃游戏 VI</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>跳跃游戏 VI</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=monotonic-queue" class="badge bg-secondary tag-link">单调队列</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code> 和一个整数 <code>k</code> 。</p>
+
+<p>一开始你在下标 <code>0</code> 处。每一步，你最多可以往前跳 <code>k</code> 步，但你不能跳出数组的边界。也就是说，你可以从下标 <code>i</code> 跳到 <code>[i + 1， min(n - 1, i + k)]</code> <strong>包含</strong> 两个端点的任意位置。</p>
+
+<p>你的目标是到达数组最后一个位置（下标为 <code>n - 1</code> ），你的 <strong>得分</strong> 为经过的所有数字之和。</p>
+
+<p>请你返回你能得到的 <strong>最大得分</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [<strong>1</strong>,<strong>-1</strong>,-2,<strong>4</strong>,-7,<strong>3</strong>], k = 2
+<b>输出：</b>7
+<b>解释：</b>你可以选择子序列 [1,-1,4,3] （上面加粗的数字），和为 7 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [<strong>10</strong>,-5,-2,<strong>4</strong>,0,<strong>3</strong>], k = 3
+<b>输出：</b>17
+<b>解释：</b>你可以选择子序列 [10,4,3] （上面加粗数字），和为 17 。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,-5,-20,4,-1,3,-6,-3], k = 2
+<b>输出：</b>0
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li> <code>1 <= nums.length, k <= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>4</sup> <= nums[i] <= 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 88 ms</p>
+                    <p>内存: 27.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxResult(self, nums: List[int], k: int) -&gt; int:
+        if k == 1:
+            return sum(nums)
+
+        ans = nums[0]
+        lastPositiveIdx = 0
+        n = len(nums)
+        for i in range(1, len(nums)):
+            if nums[i] &gt;= 0 or i == n - 1:
+                # we encountered a negative list we can&#39;t jump over
+                if i - lastPositiveIdx - 1 &gt;= k:
+                    # we use dp to solve this local problem
+                    # dp[j] = nums[j] + max([dp[i] for i in range(j-k, j)])
+                    # but k may be a large number, it&#39;s not efficient
+                    # since we only rely on the max on in the range
+                    # we can use a decreasing mono queue to speed up
+                    # we just put the dp[i] result in this mono queue
+                    # and we can get the max one quickly
+                    nums[lastPositiveIdx] = 0
+                    monoQueue = collections.deque([lastPositiveIdx])
+                    for j in range(lastPositiveIdx+1, i+1):
+                        if j - monoQueue[0] &gt; k:
+                            monoQueue.popleft()
+                        nums[j] += nums[monoQueue[0]]
+                        while monoQueue and nums[monoQueue[-1]] &lt;= nums[j]:
+                            monoQueue.pop()
+                        monoQueue.append(j)
+                ans += nums[i]
+                lastPositiveIdx = i
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的核心思路是使用动态规划(DP)结合单调队列优化。DP数组表示到达每个位置i的最大得分。为了避免重复计算每个位置最大得分时所有可能的前驱位置的得分，我们使用一个单调队列来优化这个过程。队列中存储的是索引，且保证队头是最大的DP值的索引。遍历数组时，每到一个正数或者数组最后一个元素，检查是否能直接从上一个正数位置跳到当前位置。如果不能，就用单调队列来计算从上一个正数位置到当前位置的最大得分，更新中间的DP值，并更新队列以保持单调递减。总的来说，此题解通过减少重复计算并快速访问当前最大得分，从而降低了时间复杂度。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxResult(self, nums: List[int], k: int) -&gt; int:
+        if k == 1:
+            return sum(nums)  # 当k=1时，直接返回整个数组的和
+
+        ans = nums[0]  # 初始化答案为第一个元素的值
+        lastPositiveIdx = 0  # 记录上一个非负数的索引
+        n = len(nums)
+        for i in range(1, len(nums)):
+            if nums[i] &gt;= 0 or i == n - 1:  # 当前数为非负数或者到达数组最后
+                if i - lastPositiveIdx - 1 &gt;= k:  # 如果无法直接跳到当前位置
+                    nums[lastPositiveIdx] = 0  # 将上一个正数位置置0，因为我们不会从它开始
+                    monoQueue = collections.deque([lastPositiveIdx])  # 初始化单调队列，从上一个正数位置开始
+                    for j in range(lastPositiveIdx+1, i+1):
+                        if j - monoQueue[0] &gt; k:
+                            monoQueue.popleft()  # 如果队首元素距离大于k，弹出队首
+                        nums[j] += nums[monoQueue[0]]  # 更新当前位置的得分为队首的最大得分加上当前数
+                        while monoQueue and nums[monoQueue[-1]] &lt;= nums[j]:
+                            monoQueue.pop()  # 维持队列的单调递减性
+                        monoQueue.append(j)  # 将当前索引加入队尾
+                ans += nums[i]  # 更新答案
+                lastPositiveIdx = i  # 更新上一个正数的位置
+        return ans  # 返回最终的最大得分</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到当`k=1`时直接返回整个数组的和，这种方法是否忽略了数组中可能存在的负数对总和的影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解在此处的确简化了问题处理。实际上，当`k=1`时，由于每一步只能向前移动一位，因此无论正负，你都必须走过数组中的每一个数。因此直接求和是正确的，因为你不能跳过任何元素，包括负数。这种方法并没有真正忽略负数的影响，而是反映了每步都必须经过的情况，即使这些步骤中包含负数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            单调队列的使用在这种情况下如何确保队头始终是最大的DP值的索引？能否详细解释这一过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调队列是按照值的单调递减顺序来维持元素的。在算法中，每当添加一个新的元素到单调队列时，会从队尾开始比较，把所有小于等于当前元素值的索引从队尾移除。这样做确保了队列里剩下的都是比当前元素大的值，且队头是所有这些元素中最大的。当超出跳跃范围`k`时，队首元素会被移除。这样，队头始终是在允许跳跃范围内的最大DP值的索引。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，如果当前数字是非负数或者是数组的最后一个元素时，会检查是否能直接从上一个非负数位置跳到当前位置。这里的逻辑是否意味着在两个非负数之间的负数会被忽略？这样做的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里并不是忽略了负数，而是对策略进行了优化。题解中的策略是在遇到非负数或数组最后一个元素时，尝试直接跳跃，如果不行（即两者之间的间隔超过了k），则使用单调队列来计算最优路径。这种做法是为了减少计算复杂度，因为非负数自然会增加得分，优先从这些点跳跃可能直接获得更高的分数。在不能直接跳跃的情况下，通过单调队列处理保证了即使存在负数，也能计算到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/jump-game-vi')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/jump-game-vi/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>电动车游城市</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>电动车游城市</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        小明的电动车电量充满时可行驶距离为 `cnt`，每行驶 1 单位距离消耗 1 单位电量，且花费 1 单位时间。小明想选择电动车作为代步工具。地图上共有 N 个景点，景点编号为 0 ~ N-1。他将地图信息以 `[城市 A 编号,城市 B 编号,两城市间距离]` 格式整理在在二维数组 `paths`，表示城市 A、B 间存在双向通路。初始状态，电动车电量为 0。每个城市都设有充电桩，`charge[i]` 表示第 i 个城市每充 1 单位电量需要花费的单位时间。请返回小明最少需要花费多少单位时间从起点城市 `start` 抵达终点城市 `end`。
+
+
+**示例 1：**
+>输入：`paths = [[1,3,3],[3,2,1],[2,1,3],[0,1,4],[3,0,5]], cnt = 6, start = 1, end = 0, charge = [2,10,4,1]`
+>
+>输出：`43`
+>
+>解释：最佳路线为：1->3->0。
+>在城市 1 仅充 3 单位电至城市 3，然后在城市 3 充 5 单位电，行驶至城市 5。
+>充电用时共 3\*10 + 5\*1= 35
+>行驶用时 3 + 5 = 8，此时总用时最短 43。
+![image.png](https://pic.leetcode-cn.com/1616125304-mzVxIV-image.png)
+
+
+
+
+**示例 2：**
+>输入：`paths = [[0,4,2],[4,3,5],[3,0,5],[0,1,5],[3,2,4],[1,2,8]], cnt = 8, start = 0, end = 2, charge = [4,1,1,3,2]`
+>
+>输出：`38`
+>
+>解释：最佳路线为：0->4->3->2。
+>城市 0 充电 2 单位，行驶至城市 4 充电 8 单位，行驶至城市 3 充电 1 单位，最终行驶至城市 2。
+>充电用时 4\*2+2\*8+3\*1 = 27
+>行驶用时 2+5+4 = 11，总用时最短 38。
+
+**提示：**
+- `1 <= paths.length <= 200`
+- `paths[i].length == 3`
+- `2 <= charge.length == n <= 100`
+- `0 <= path[i][0],path[i][1],start,end < n`
+- `1 <= cnt <= 100`
+- `1 <= path[i][2] <= cnt`
+- `1 <= charge[i] <= 100`
+- 题目保证所有城市相互可以到达
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 69 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def electricCarPlan(self, paths: List[List[int]], cnt: int, start: int, end: int, charge: List[int]) -&gt; int:
+        n = len(charge)
+        dist = [[inf] * (cnt+1) for _ in range(n)]
+
+        dist[start][0] = 0
+        
+        adj = defaultdict(list)
+        for u,v,w in paths:
+            adj[u].append((v,w))
+            adj[v].append((u,w))
+        q = []
+        heappush(q, (0, start, 0))
+        while q:
+            t, u, c = heappop(q)
+            if t &gt; dist[u][c]:
+                continue
+            if u==end:
+                return t
+            
+            if c&lt;cnt:
+                nt = t + charge[u]
+                if nt &lt; dist[u][c+1]:
+                    dist[u][c+1] = nt
+                    heappush(q, (nt, u, c+1))
+            for v, w in adj[u]:
+                if c &gt;= w and t+w &lt; dist[v][c-w]:
+                    dist[v][c-w] = t + w
+                    heappush(q, (t+w, v, c-w))
+    
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了带有优先队列（最小堆）的Dijkstra算法变种，结合状态转移来解决问题。每个状态由当前城市和车上的电量决定，形成一个状态空间。dist数组存储到达每个状态的最小时间。从起点开始，不断探索出发到其他城市的可能性，同时考虑在当前城市充电的可能性。当从优先队列中取出的状态的时间大于已记录的最小时间，则跳过该状态。算法结束的条件是当访问到终点城市时，队列中的第一个合法状态即为最小时间。此外，算法还考虑了每次充电的时间成本，并在每个城市尝试充电后再行驶到下一个城市，以及直接从当前电量出发到能达到的下一个城市。</p>
+                                <p>时间复杂度: O(n^2 * cnt * log(n*cnt))</p>
+                                <p>空间复杂度: O(n * cnt)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def electricCarPlan(self, paths: List[List[int]], cnt: int, start: int, end: int, charge: List[int]) -&gt; int:
+        n = len(charge)
+        dist = [[inf] * (cnt+1) for _ in range(n)]
+
+        dist[start][0] = 0
+        
+        adj = defaultdict(list)
+        for u,v,w in paths:
+            adj[u].append((v,w))
+            adj[v].append((u,w))
+        q = []
+        heappush(q, (0, start, 0))
+        while q:
+            t, u, c = heappop(q)
+            if t &gt; dist[u][c]:
+                continue
+            if u==end:
+                return t
+            
+            if c&lt;cnt:
+                nt = t + charge[u]
+                if nt &lt; dist[u][c+1]:
+                    dist[u][c+1] = nt
+                    heappush(q, (nt, u, c+1))
+            for v, w in adj[u]:
+                if c &gt;= w and t+w &lt; dist[v][c-w]:
+                    dist[v][c-w] = t + w
+                    heappush(q, (t+w, v, c-w))
+    </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为何在进行充电决策时，仅考虑增加1单位电量而不是多个单位电量，这样的策略是否最优？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在设计电动车游城市的算法中，每次仅考虑增加1单位电量而非多个单位的原因有两个：首先，这种策略简化了状态转移的复杂性。在每个城市充电时只考虑增加1单位电量，可以使状态空间和决策过程更加清晰和易于管理。其次，这种方法可以保证在任何时刻都能找到达到某状态的最小时间。如果一次充多个单位电量，虽然可能在某些情况下更快，但会使问题的状态空间剧增，增加了计算的复杂度。此外，这种逐步充电的策略可以在每一步都重新评估是否继续充电或驶向下一个城市，这样做提供了更好的灵活性和可能达到更优的总体策略。因此，虽然看似增加了步骤，实际上此策略有助于维护算法的效率和实现全局最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/DFPeFJ')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/DFPeFJ/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

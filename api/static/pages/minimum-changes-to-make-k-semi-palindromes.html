@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>得到 K 个半回文串的最少修改次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>得到 K 个半回文串的最少修改次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>s</code>&nbsp;和一个整数&nbsp;<code>k</code>&nbsp;，请你将&nbsp;<code>s</code> 分成&nbsp;<code>k</code>&nbsp;个<strong>&nbsp;子字符串</strong>&nbsp;，使得每个 <strong>子字符串</strong>&nbsp;变成&nbsp;<strong>半回文串</strong>&nbsp;需要修改的字符数目最少。</p>
+
+<p>请你返回一个整数，表示需要修改的 <strong>最少</strong>&nbsp;字符数目。</p>
+
+<p><strong>注意：</strong></p>
+
+<ul>
+	<li>如果一个字符串从左往右和从右往左读是一样的，那么它是一个 <strong>回文串</strong>&nbsp;。</li>
+	<li>如果长度为 <code>len</code>&nbsp;的字符串存在一个满足&nbsp;<code>1 &lt;= d &lt; len</code>&nbsp;的正整数&nbsp;<code>d</code>&nbsp;，<code>len % d == 0</code>&nbsp;成立且所有对 <code>d</code>&nbsp;做除法余数相同的下标对应的字符连起来得到的字符串都是 <strong>回文串</strong>&nbsp;，那么我们说这个字符串是 <strong>半回文串</strong>&nbsp;。比方说&nbsp;<code>"aa"</code>&nbsp;，<code>"aba"</code> ，<code>"adbgad"</code>&nbsp;和&nbsp;<code>"abab"</code>&nbsp;都是 <strong>半回文串</strong>&nbsp;，而&nbsp;<code>"a"</code>&nbsp;，<code>"ab"</code>&nbsp;和&nbsp;<code>"abca"</code>&nbsp;不是。</li>
+	<li><strong>子字符串</strong>&nbsp;指的是一个字符串中一段连续的字符序列。</li>
+</ul>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "abcac", k = 2
+<b>输出：</b>1
+<b>解释：</b>我们可以将 s 分成子字符串 "ab" 和 "cac" 。子字符串 "cac" 已经是半回文串。如果我们将 "ab" 变成 "aa" ，它也会变成一个 d = 1 的半回文串。
+该方案是将 s 分成 2 个子字符串的前提下，得到 2 个半回文子字符串需要的最少修改次数。所以答案为 1 。</pre>
+
+<p><strong class="example">示例 2:</strong></p>
+
+<pre>
+<b>输入：</b>s = "abcdef", k = 2
+<b>输出：</b>2
+<b>解释：</b>我们可以将 s 分成子字符串 "abc" 和 "def" 。子字符串 "abc" 和 "def" 都需要修改一个字符得到半回文串，所以我们总共需要 2 次字符修改使所有子字符串变成半回文串。
+该方案是将 s 分成 2 个子字符串的前提下，得到 2 个半回文子字符串需要的最少修改次数。所以答案为 2 。</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>s = "aabbaa", k = 3
+<b>输出：</b>0
+<b>解释：</b>我们可以将 s 分成子字符串 "aa" ，"bb" 和 "aa" 。
+字符串 "aa" 和 "bb" 都已经是半回文串了。所以答案为 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= s.length &lt;= 200</code></li>
+	<li><code>1 &lt;= k &lt;= s.length / 2</code></li>
+	<li><code>s</code>&nbsp;只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 416 ms</p>
+                    <p>内存: 21.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumChanges(self, s: str, k: int) -&gt; int:
+        @cache
+        def get_modify(start, end):
+            length = end - start + 1
+            best = length
+            for d in range(1, length//2+1):
+                if length%d:
+                    continue
+                cnt = 0
+                for start_ in range(d):
+                    left = start + start_
+                    right = end - d + start_ + 1
+                    while left &lt; right:
+                        cnt += (s[left] != s[right])
+                        left += d
+                        right -= d
+                best = min(best, cnt)
+            return best
+        
+        @cache
+        def dp(k, end):
+            if k==1:
+                return get_modify(0, end)
+            best = 201
+            for head in range((k-1)*2, end):
+                best = min(best, get_modify(head, end) + dp(k-1, head-1))
+            return best
+        return dp(k, len(s)-1)
+
+        # n = len(s)
+        # modify = [[0] * n for _ in range(n-1)]
+        # for start in range(n-1):
+        #     for end in range(start+1, n):
+        #         modify[start][end] = get_modify(start, end)
+
+        # dp = [[201]*k for _ in range(n)]
+        # for end in range(n):
+        #     dp[end][0] = modify[0][end]
+        #     for i in range(1, min(k, end//2+2)):
+        #         for start in range(i*2, end):
+        #             dp[end][i] = min(dp[end][i], dp[start-1][i-1] + modify[start][end])
+        # return dp[-1][-1]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划和记忆化搜索的方法来解决问题。主要分为两部分：
+1. **get_modify(start, end)**: 计算将子字符串 s[start:end+1] 转换成半回文串的最小修改次数。它通过枚举所有可能的 d 值来找到最优解。对于每个 d，它检查通过分组跳跃比较字符是否能形成多个小的回文字符串。
+2. **dp(k, end)**: 使用动态规划来计算最终结果，dp(k, end) 表示将字符串 s[0:end+1] 分割成 k 个半回文子字符串的最小修改次数。它递归地尝试所有可能的分割点，结合 get_modify 函数结果来更新状态。
+整体上，通过组合这两个函数的结果来构建全局最优解。</p>
+                                <p>时间复杂度: O(n^3 * K)</p>
+                                <p>空间复杂度: O(n^2 + n * K)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumChanges(self, s: str, k: int) -&gt; int:
+        @cache
+        def get_modify(start, end):
+            length = end - start + 1
+            best = length  # 初始化为最大修改次数，即全部修改
+            for d in range(1, length//2+1):
+                if length%d:  # 如果 length 不能整除 d，跳过
+                    continue
+                cnt = 0
+                for start_ in range(d):
+                    left = start + start_
+                    right = end - d + start_ + 1
+                    while left &lt; right:
+                        cnt += (s[left] != s[right])
+                        left += d
+                        right -= d
+                best = min(best, cnt)  # 取最小修改次数
+            return best
+        
+        @cache
+        def dp(k, end):
+            if k==1:
+                return get_modify(0, end)  # 如果只分成一个子字符串
+            best = 201
+            for head in range((k-1)*2, end):
+                best = min(best, get_modify(head, end) + dp(k-1, head-1))
+            return best
+        return dp(k, len(s)-1)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在函数`get_modify(start, end)`中，为什么将最大修改次数初始化为`length`？这是否意味着最坏情况下每个字符都需要修改？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`get_modify`函数中，`length`代表考察的子字符串`s[start:end+1]`的长度。初始化最大修改次数为`length`是基于最坏情况的考虑，即如果无法通过任何方式的字符分组或调整来形成半回文串，那么可能需要修改每一个字符来达到半回文的条件。因此，最初设定`best`为`length`，然后通过尝试不同的分组方法寻找是否有需要更少修改的方案。如果有，`best`会被更新为较小的数值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在枚举所有可能的`d`值时，为什么选择跳过`length % d != 0`的情况？这对于确定是否可以形成半回文串有什么特别的意义吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`get_modify`函数中跳过`length % d != 0`的情况，是因为如果`length`不能被`d`整除，那么子字符串不能被平均分割成长度为`d`的多个小组。这意味着字符分组将不均匀，一些组内的字符数量会与其他组不同，从而无法通过固定的跳跃间隔进行有效的回文检查。因此，只有当`length`能被`d`整除时，才能保证所有组内的字符数量相同，这是形成多个小的回文字符串的基础。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算每个可能的`d`时，具体是如何通过`分组跳跃比较字符`来检查是否能形成多个小的回文字符串的？能否详细解释这个过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>具体来说，在计算每个可能的`d`时，通过将子字符串`s[start:end+1]`分成多个长度为`d`的小组进行处理。对于每个起始位置`start_`（从0到`d-1`），在子字符串中以`start_`为起点，每隔`d`个字符取一个，这样形成一个新的字符序列。然后，检查这个序列是否能通过最小修改成为回文串。具体检查方法是，比较序列的首尾字符，逐步向中心移动，计算不匹配的字符对，这些就是需要修改的次数。这一过程重复进行，直到覆盖所有可能的起始位置`start_`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在`dp(k, end)`函数中，为什么特别将`k==1`的情况单独处理，而不是统一使用循环逻辑来处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`dp(k, end)`函数中，单独处理`k==1`的情况是为了效率和逻辑上的简化。当`k==1`时，意味着整个字符串`s[0:end+1]`需要被转换为一个半回文串，此时直接调用`get_modify(0, end)`得到转换整个子字符串的最小修改次数。这是一个基础情况，作为动态规划的边界条件。如果不单独处理，递归时会多一个不必要的内部循环，增加计算复杂度。单独处理可以更直接地解决问题，并减少不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-changes-to-make-k-semi-palindromes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-changes-to-make-k-semi-palindromes/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

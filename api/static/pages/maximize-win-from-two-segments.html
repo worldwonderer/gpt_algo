@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两个线段获得的最多奖品</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两个线段获得的最多奖品</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>在 <strong>X轴</strong>&nbsp;上有一些奖品。给你一个整数数组&nbsp;<code>prizePositions</code>&nbsp;，它按照 <strong>非递减</strong>&nbsp;顺序排列，其中&nbsp;<code>prizePositions[i]</code>&nbsp;是第&nbsp;<code>i</code>&nbsp;件奖品的位置。数轴上一个位置可能会有多件奖品。再给你一个整数&nbsp;<code>k</code>&nbsp;。</p>
+
+<p>你可以选择两个端点为整数的线段。每个线段的长度都必须是 <code>k</code>&nbsp;。你可以获得位置在任一线段上的所有奖品（包括线段的两个端点）。注意，两个线段可能会有相交。</p>
+
+<ul>
+	<li>比方说&nbsp;<code>k = 2</code>&nbsp;，你可以选择线段&nbsp;<code>[1, 3]</code> 和&nbsp;<code>[2, 4]</code>&nbsp;，你可以获得满足&nbsp;<code>1 &lt;= prizePositions[i] &lt;= 3</code> 或者&nbsp;<code>2 &lt;= prizePositions[i] &lt;= 4</code>&nbsp;的所有奖品 i 。</li>
+</ul>
+
+<p>请你返回在选择两个最优线段的前提下，可以获得的 <strong>最多</strong>&nbsp;奖品数目。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>prizePositions = [1,1,2,2,3,3,5], k = 2
+<b>输出：</b>7
+<b>解释：</b>这个例子中，你可以选择线段 [1, 3] 和 [3, 5] ，获得 7 个奖品。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>prizePositions = [1,2,3,4], k = 0
+<b>输出：</b>2
+<b>解释：</b>这个例子中，一个选择是选择线段 <code>[3, 3]</code> 和 <code>[4, 4] ，获得 2 个奖品。</code>
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= prizePositions.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= prizePositions[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>0 &lt;= k &lt;= 10<sup>9</sup> </code></li>
+	<li><code>prizePositions</code>&nbsp;有序非递减。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 67 ms</p>
+                    <p>内存: 26.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximizeWin(self, prizePositions: List[int], k: int) -&gt; int:
+        n = len(prizePositions)
+        # 所有奖品都能选的特殊情况
+        if k + k + 1 &gt;= prizePositions[-1] - prizePositions[0]:
+            return n
+
+        pre = [0] * (n + 1)
+        ans = left = 0
+        for right, p in enumerate(prizePositions):
+            while p - prizePositions[left] &gt; k:
+                left += 1
+            ans = max(ans, right - left + 1 + pre[left])
+            pre[right + 1] = max(pre[right], right - left + 1)
+        return ans
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用的是一种贪心加滑动窗口的方法。首先，特殊情况判断：如果两个长度为k的线段加上中间至少一个单位的间隔仍然小于整个奖品分布的跨度，则说明所有奖品都可以在两个线段内被覆盖，直接返回所有奖品的数量。在一般情况下，使用滑动窗口来确定每个位置结尾的线段可以覆盖的最多奖品数量，并记录下来。同时，通过维护一个pre数组，记录以每个位置结尾时前一个线段可以覆盖的最多奖品数量。最终，通过比较，找到两个线段可以覆盖的最大奖品数量。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximizeWin(self, prizePositions: List[int], k: int) -&gt; int:
+        n = len(prizePositions)
+        # 处理特殊情况：两个长度为k的线段可以覆盖所有奖品
+        if k + k + 1 &gt;= prizePositions[-1] - prizePositions[0]:
+            return n
+
+        pre = [0] * (n + 1) # 记录每个位置为结束点的线段可以覆盖的最多奖品数
+        ans = left = 0
+        for right, p in enumerate(prizePositions):
+            while p - prizePositions[left] &gt; k:
+                left += 1  # 移动左指针，直到窗口大小不超过k
+            ans = max(ans, right - left + 1 + pre[left]) # 更新两个线段可以获得奖品的最大数量
+            pre[right + 1] = max(pre[right], right - left + 1) # 更新pre数组，为后续的线段选择做准备
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            请问在计算两个线段覆盖的最大奖品数时，为什么可以通过简单地将两个线段的奖品数相加得到结果？是否需要考虑两个线段的重叠部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算两个线段覆盖的最大奖品数时，题解中通过使用滑动窗口和前缀数组来确保不会简单地相加两个线段的奖品数，而是考虑了两个线段可能的重叠。在计算过程中，我们通过维护一个pre数组来记录前一个线段可以覆盖的最多奖品数量，并结合当前线段的覆盖，从而确保了不会重复计算重叠部分的奖品。具体来说，每个位置在更新最大奖品数时，已经考虑了与之前线段的组合，避免了重复计数的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中提到的特殊情况`如果两个长度为k的线段加上中间至少一个单位的间隔仍然小于整个奖品分布的跨度`，这里的逻辑是否有误？应该是`小于等于`还是`小于`整个奖品分布的跨度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的表述中有一定的误区。正确的逻辑应该是考虑如果两个长度为k的线段加上中间至少一个单位的间隔仍然可以覆盖整个奖品分布的跨度时的情况。因此，应该使用`小于等于`来描述这种情况。如果两个线段的总长度加上至少一个单位的间隔小于等于奖品分布的最大跨度，那么可以直接覆盖所有奖品。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用的滑动窗口方法，如何确保在移动左指针时，不会错过某些可能的最优解？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口算法通过动态调整左右指针来维持窗口内的最优状态。在题解中，右指针right逐步向右移动，而左指针left只有在窗口大小超出了长度k时才向右移动。这种方法确保了在每个可能的右端点位置，左端点都调整到了能使当前窗口大小不超过k的最远位置。由于这种逐步调整保持了窗口内元素数量的最大化，它可以确保不会错过任何可能的最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在更新`pre`数组时，为什么选择`pre[right + 1] = max(pre[right], right - left + 1)`，这里的`right - left + 1`具体代表什么含义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`right - left + 1`代表的是当前滑动窗口内的奖品数量，即从位置left到位置right（包括两端）的奖品总数。在更新pre数组时，`pre[right + 1] = max(pre[right], right - left + 1)`操作是为了将当前最优的线段奖品覆盖数存储起来，以便后续的计算可以利用。这样，pre数组在位置right+1记录的值表示在考虑到位置right时，一个线段能覆盖的最大奖品数。这是一个步骤，确保计算两个线段时可以快速获取前一个线段的最优结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-win-from-two-segments')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-win-from-two-segments/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

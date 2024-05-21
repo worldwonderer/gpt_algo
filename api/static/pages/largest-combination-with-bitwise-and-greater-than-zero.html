@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>按位与结果大于零的最长组合</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>按位与结果大于零的最长组合</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>对数组&nbsp;<code>nums</code> 执行 <strong>按位与</strong> 相当于对数组&nbsp;<code>nums</code> 中的所有整数执行 <strong>按位与</strong> 。</p>
+
+<ul>
+	<li>例如，对 <code>nums = [1, 5, 3]</code> 来说，按位与等于 <code>1 &amp; 5 &amp; 3 = 1</code> 。</li>
+	<li>同样，对 <code>nums = [7]</code> 而言，按位与等于 <code>7</code> 。</li>
+</ul>
+
+<p>给你一个正整数数组 <code>candidates</code> 。计算 <code>candidates</code> 中的数字每种组合下 <strong>按位与</strong> 的结果。 <code>candidates</code> 中的每个数字在每种组合中只能使用 <strong>一次</strong> 。</p>
+
+<p>返回按位与结果大于 <code>0</code> 的 <strong>最长</strong> 组合的长度<em>。</em></p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>candidates = [16,17,71,62,12,24,14]
+<strong>输出：</strong>4
+<strong>解释：</strong>组合 [16,17,62,24] 的按位与结果是 16 &amp; 17 &amp; 62 &amp; 24 = 16 &gt; 0 。
+组合长度是 4 。
+可以证明不存在按位与结果大于 0 且长度大于 4 的组合。
+注意，符合长度最大的组合可能不止一种。
+例如，组合 [62,12,24,14] 的按位与结果是 62 &amp; 12 &amp; 24 &amp; 14 = 8 &gt; 0 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>candidates = [8,8]
+<strong>输出：</strong>2
+<strong>解释：</strong>最长组合是 [8,8] ，按位与结果 8 &amp; 8 = 8 &gt; 0 。
+组合长度是 2 ，所以返回 2 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= candidates.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= candidates[i] &lt;= 10<sup>7</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 280 ms</p>
+                    <p>内存: 25.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+class Solution:
+    def largestCombination(self, candidates: List[int]) -&gt; int:
+        max_length = 0
+        mask = 0
+        
+        # 统计 candidates 中每个数字的二进制表示中每一位上 1 的个数
+        bit_count = [0] * 32
+        for num in candidates:
+            for i in range(31, -1, -1):
+                if num &amp; (1 &lt;&lt; i):
+                    bit_count[i] += 1
+        
+        # 从最高位开始逐位判断，尽量让更多的数字在该位上为 1
+        for i in range(31, -1, -1):
+            if bit_count[i] &gt; 0:
+                mask |= (1 &lt;&lt; i)
+                max_length = max(max_length, bit_count[i])
+        
+        return max_length
+
+from typing import List
+
+class Solution:
+    def largestCombination(self, candidates: List[int]) -&gt; int:
+        max_length = 0
+        
+        # 找到 candidates 中的最大值，确定二进制表示的位数
+        max_num = max(candidates)
+        bits = len(bin(max_num)) - 2
+        
+        # 从最高位开始逐位判断
+        for i in range(bits, -1, -1):
+            # 初始化掩码和当前位为1的数字个数
+            mask = 1 &lt;&lt; i
+            count = 0
+            
+            # 统计当前位为1的数字个数
+            for num in candidates:
+                if num &amp; mask:
+                    count += 1
+            
+            # 如果当前位为1的数字个数等于数组长度，说明所有数字当前位都为1
+            # 直接返回数组长度，因为无法找到更长的组合
+            if count == len(candidates):
+                return len(candidates)
+            
+            # 如果当前位为1的数字个数大于0，说明存在组合使得当前位为1
+            # 更新最长组合长度，并继续判断下一位
+            if count &gt; 0:
+                max_length = max(max_length, count)
+        
+        return max_length
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用位操作和统计每位上的1的个数来找出按位与结果大于0的最长组合。首先，通过遍历candidates中的所有数字，利用位掩码来检测每个数在每一位上的值（1或0）。然后，统计每一位上1的个数，并存储在一个数组中。之后，从最高位开始逐位判断，找出最大的有效组合长度，即统计出现最多的1的数量，因为这表示最多的数字在此位上可以贡献按位与的结果大于0。整个过程中不需要实际进行组合，只是通过统计每一位的1的数量来确定可能的最长组合长度。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+class Solution:
+    def largestCombination(self, candidates: List[int]) -&gt; int:
+        max_length = 0 # 初始化最大长度为0
+        max_num = max(candidates) # 找到最大的数字以确定位数
+        bits = len(bin(max_num)) - 2 # 计算最大数字的位数
+
+        # 从最高位到最低位遍历每一位
+        for i in range(bits, -1, -1):
+            mask = 1 &lt;&lt; i # 创建一个只在第i位上有1的掩码
+            count = 0 # 初始化当前位为1的数字个数
+
+            # 统计当前位为1的数字个数
+            for num in candidates:
+                if num &amp; mask: # 检查数字的第i位是否为1
+                    count += 1 # 是则计数增加
+
+            # 更新最长组合长度
+            if count &gt; 0: # 只有当存在1时，组合的按位与结果才可能大于0
+                max_length = max(max_length, count) # 更新最大长度
+
+        return max_length # 返回最长组合的长度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到了&#39;利用位掩码来检测每个数在每一位上的值（1或0）&#39;，这个操作是如何确保只检查到最大数字的位数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，首先使用`max(candidates)`找出所有候选数字中的最大值，然后通过`len(bin(max_num)) - 2`计算这个最大值的二进制位数。这样做确保了位掩码只会检查每个数字至其最高有效位，因为超出这个范围的高位在所有数字中都是0，不影响结果。通过这种方式，算法避免了不必要的检查和计算，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到&#39;从最高位开始逐位判断，找出最大的有效组合长度&#39;，这里的有效组合是如何定义的？在所有位上的1的数量是否都必须等于最大组合长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这里，&#39;有效组合&#39;是指那些在特定位上至少有一个1的组合，因为只要这个位上至少有一个1，这个组合的按位与结果在该位上就为1，从而使得整个结果大于0。并不是说在所有位上1的数量都必须等于最大组合长度，而是在所有位中选择具有最多1的位，其1的数量就是最大的有效组合长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在题解的算法中没有考虑位与操作的结果实际上是否大于0？只是通过计数1的方式来确定组合长度是否准确？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过计数每一位1的数量来估计最长可能的组合长度，是基于这样一个假设：在任何一个位上1的数量越多，表示有更多的数字能在这一位上贡献1，从而使得在这一位上的按位与结果为1。这种方法是一个有效的近似，因为实际上我们只需要找到1的数量最多的位，这就足以保证按位与结果在那一位为1，从而整个结果大于0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中计算位数使用了`len(bin(max_num)) - 2`，这里为什么要减去2，这种方法有什么潜在的问题吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在Python中，`bin()`函数返回的是数字的二进制表示的字符串，其格式为&#39;0b...&#39;，其中&#39;0b&#39;是二进制的前缀。因此，我们需要从总长度中减去2来得到实际的位数。这种方法的潜在问题是，如果最大数字为0，`bin(0)`将返回&#39;0b0&#39;，长度为3，按上述计算方法位数为1，这是正确的。但是，如果不考虑特殊情况，如所有数字都是0，这可能导致不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/largest-combination-with-bitwise-and-greater-than-zero')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/largest-combination-with-bitwise-and-greater-than-zero/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

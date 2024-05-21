@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>镜面反射</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>镜面反射</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有一个特殊的正方形房间，每面墙上都有一面镜子。除西南角以外，每个角落都放有一个接受器，编号为&nbsp;<code>0</code>，&nbsp;<code>1</code>，以及&nbsp;<code>2</code>。</p>
+
+<p>正方形房间的墙壁长度为&nbsp;<code>p</code>，一束激光从西南角射出，首先会与东墙相遇，入射点到接收器 <code>0</code> 的距离为 <code>q</code> 。</p>
+
+<p>返回光线最先遇到的接收器的编号（保证光线最终会遇到一个接收器）。</p>
+&nbsp;
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://s3-lc-upload.s3.amazonaws.com/uploads/2018/06/18/reflection.png" style="width: 218px; height: 217px;" />
+<pre>
+<strong>输入：</strong>p = 2, q = 1
+<strong>输出：</strong>2
+<strong>解释：</strong>这条光线在第一次被反射回左边的墙时就遇到了接收器 2 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>p = 3, q = 1
+<strong>输入：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= q &lt;= p &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 21 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def mirrorReflection(self, p: int, q: int) -&gt; int:
+        # 我们可以假设没有北面的墙壁，无限延长东西两面镜子的长度，则光线会通过东西两面镜子的反射一直往北走，每次增加的纵向距离为 q。
+        # 当光线走过的纵向距离为 p 的整数倍时，光线到达某个接收器。现在问题转化为了怎么求纵向距离以及怎么通过这个距离来判断光线最终将到达哪一个接收器。
+        # 光线停止时最终向上走的距离肯定既是 p 的倍数，又是 q 的倍数，即为 p 和 q 的最小公倍数，设其为 k，可以根据 k 的奇偶性分为两种情况：
+        #   1.当 k 是 p 的奇数倍时，光线到达北墙；
+        #   2.当 k 为 p 的偶数倍时，光线到达南墙。
+        # 因为题中保证了光线最终会遇到一个接收器，所以光线最终到达南墙必定会遇到接收器 0。
+        # 若光线最终到达北墙，我们可以通过光线与东西墙接触的次数的奇偶性即 k%q 来确定光线最终会到达接收器 1 还是 2。
+        # 若 k 是 q 的奇数倍，则光线最终会遇到接收器 1，否则会遇到接收器 2。
+
+        # 求最大公约数
+        # k = math.gcd(p, q)
+        # # 相当于最小公倍数除以p
+        # q //= k
+        # # 相当于最小公倍数除以q
+        # p //= k
+        # if q % 2 and p % 2:
+        #     return(1)
+        # elif q % 2 and p % 2 == 0:
+        #     return(2)
+        # return(0)
+
+        left = True
+        upward = True
+        y = 0
+        while(True):
+            if y == p:
+                if not upward:
+                    return(0)
+                if left:
+                    return(2)
+                return(1)
+            if y &gt; p:
+                y %= p 
+                upward = not upward
+            else:
+                y += q
+                left = not left
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解使用了模拟的思路。我们可以假设没有北面的墙壁，无限延长东西两面镜子的长度，光线会通过东西两面镜子的反射一直往北走，每次增加的纵向距离为 q。当光线走过的纵向距离为 p 的整数倍时，光线到达某个接收器。题解中使用了 left 和 upward 两个布尔变量分别表示光线当前是向左运动还是向右运动，以及是向上运动还是向下运动。通过模拟光线的运动过程，当光线到达北面或南面的墙壁时，根据光线的运动方向和位置来判断遇到了哪个接收器。</p>
+                                <p>时间复杂度: O(p)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def mirrorReflection(self, p: int, q: int) -&gt; int:
+        left = True # 表示光线当前是否向左运动
+        upward = True # 表示光线当前是否向上运动
+        y = 0 # 光线当前的纵坐标
+        while(True):
+            if y == p: # 光线到达北面或南面的墙壁
+                if not upward: # 光线向下运动
+                    return(0) # 光线遇到接收器 0
+                if left: # 光线向左运动
+                    return(2) # 光线遇到接收器 2
+                return(1) # 光线遇到接收器 1
+            if y &gt; p: # 光线超出了北面墙壁
+                y %= p # 光线从南面墙壁射入
+                upward = not upward # 光线改变运动方向
+            else:
+                y += q # 光线向北运动 q 的距离
+                left = not left # 光线改变运动方向
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在模拟过程中，光线的方向变化只与其当前的位置有关，而不考虑其之前的路径或是反射次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在物理中，光线的反射遵循反射定律，即入射角等于反射角，且反射只与光线到达时的角度和被反射面的性质有关。在此题中，墙面被视作完美镜面，因此每次光线到达墙面的行为只依赖于它到达那一刻的状态（即当前位置和前进方向），而与之前的路径或反射次数无关。这种处理简化了模型，使得问题更易于通过计算和编程解决。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中，当光线的纵坐标y超出北面墙壁时，为什么将y对p取余，并改变光线的向上运动状态？这样的处理是否与物理反射原理相符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，将y对p取余是为了模拟光线在无限延长的墙面中的行为。当光线超出北面墙壁时，实际上是光线达到了墙的边界并需要从对面（南面）重新进入，这相当于光线在垂直方向上的周期性行为。改变光线的向上运动状态模拟了光线在到达墙顶后向下反射的物理现象。这种处理是一种抽象的逻辑模拟，虽然简化了问题，但基本保持了光的反射行为的物理本质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到当y等于p时，根据光线的运动方向判断遇到的接收器。如果光线刚好在角落处反射，是否会存在不确定性，即同时可能遇到两个接收器？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，当光线y等于p时，根据光线的水平运动方向来判断遇到的接收器。如果光线刚好在角落处反射，按照题解的逻辑，光线的方向已经足够决定它会遇到哪个接收器。在实际物理中，确实可能存在光线同时触及角落的两个接收器的情况，但在题解的模型中，这种不确定性通过假设光线在角落点只能触及一个特定接收器的方式被排除了，这是为了简化问题和避免复杂的边界处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解假设了一个无限延长的东西墙，这种假设在实际的数学或物理模型中是如何合理化的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数学和物理模型中，假设无限延长的墙面是一种理想化的条件，用于简化问题的复杂性和方便计算。通过这种假设，可以将问题的空间转化为具有周期性质的环境，从而使得光线的行为可以通过较简单的数学表示来描述。这种假设虽然与现实情况有所出入，但它允许我们忽略边界效应，专注于光线的反射和传播行为，是问题解决中常用的一种抽象方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/mirror-reflection')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/mirror-reflection/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

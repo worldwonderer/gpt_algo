@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最小K个数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最小K个数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=quickselect" class="badge bg-secondary tag-link">快速选择</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>设计一个算法，找出数组中最小的k个数。以任意顺序返回这k个数均可。</p>
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong> arr = [1,3,5,7,2,4,6,8], k = 4
+<strong>输出：</strong> [1,2,3,4]
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= len(arr) &lt;= 100000</code></li>
+	<li><code>0 &lt;= k &lt;= min(100000, len(arr))</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 35 ms</p>
+                    <p>内存: 21.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def smallestK(self, arr: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return []
+        self.random_select(arr, 0, len(arr) - 1, k)
+        return arr[:k]
+    
+    def random_select(self, arr, left, right, k):
+        pivotIndex = self.partition(arr, left, right)
+        nums = pivotIndex - left + 1
+        if k &lt; nums:
+            self.random_select(arr, left, pivotIndex - 1, k)
+        elif k &gt; nums:
+            self.random_select(arr, pivotIndex + 1, right, k - nums)
+
+    def partition(self, nums, left, right):
+        import random
+        p = random.randint(left, right)
+        nums[left], nums[p] = nums[p], nums[left]
+        le = left + 1
+        ge = right
+        pivot = nums[left]
+
+        while True:
+            while le &lt;= ge and nums[le] &lt; pivot:
+                le += 1
+            while le &lt;= ge and nums[ge] &gt; pivot:
+                ge -= 1
+            if le &gt;= ge:
+                break
+            nums[le], nums[ge] = nums[ge], nums[le]
+            le += 1
+            ge -= 1
+        nums[left], nums[ge] = nums[ge], nums[left]
+        return ge
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了快速选择算法来找到数组中最小的k个数。快速选择是快速排序算法的变形，主要用于在未完全排序的数组中找到第k小的元素。算法首先选择一个随机的枢轴元素，然后将数组分为小于枢轴和大于枢轴的两部分，类似于快速排序。根据枢轴的位置与k的关系，决定是继续在左侧还是右侧递归查找。如果枢轴位置正好是k，那么左侧的元素就是所需的最小的k个数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(log n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def smallestK(self, arr: List[int], k: int) -&gt; List[int]:
+        if k == 0:
+            return []  # 如果k为0，直接返回空列表
+        self.random_select(arr, 0, len(arr) - 1, k)  # 调用递归函数进行快速选择
+        return arr[:k]  # 返回前k个元素
+    
+    def random_select(self, arr, left, right, k):
+        pivotIndex = self.partition(arr, left, right)  # 进行一次划分
+        nums = pivotIndex - left + 1  # 计算枢轴左侧的元素数量
+        if k &lt; nums:
+            self.random_select(arr, left, pivotIndex - 1, k)  # 如果k小于枢轴左侧的数量，递归在左侧继续查找
+        elif k &gt; nums:
+            self.random_select(arr, pivotIndex + 1, right, k - nums)  # 如果k大于枢轴左侧的数量加1，递归在右侧查找
+
+    def partition(self, nums, left, right):
+        import random
+        p = random.randint(left, right)  # 随机选择一个枢轴
+        nums[left], nums[p] = nums[p], nums[left]  # 将枢轴交换到最左侧
+        le = left + 1
+        ge = right
+        pivot = nums[left]  # 枢轴的值
+
+        while True:
+            while le &lt;= ge and nums[le] &lt; pivot:
+                le += 1  # 移动左指针
+            while le &lt;= ge and nums[ge] &gt; pivot:
+                ge -= 1  # 移动右指针
+            if le &gt;= ge:
+                break  # 指针相遇，停止循环
+            nums[le], nums[ge] = nums[ge], nums[le]  # 交换左右指针的元素
+            le += 1
+            ge -= 1
+        nums[left], nums[ge] = nums[ge], nums[left]  # 将枢轴交换到最终位置
+        return ge  # 返回枢轴的最终位置</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在算法中使用随机选取枢轴而不是选择固定位置的元素作为枢轴？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用随机选取枢轴的主要目的是为了避免在最坏的情况下算法的性能退化。在一些极端情况下，如果总是选择固定位置的元素作为枢轴，例如总是选择第一个或最后一个元素，那么对于已经排序好的数组或者有大量重复元素的数组，快速选择算法会退化成线性时间复杂度，效率大大降低。通过随机选择枢轴，可以在平均情况下保证算法的效率更加稳定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在`partition`函数中，当`nums[le]`和`nums[ge]`交换后，为什么仍然需要移动`le`和`ge`的指针？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`partition`函数中，交换`nums[le]`和`nums[ge]`后，需要移动`le`和`ge`的指针以继续检查后续元素，确保所有小于枢轴的元素都在枢轴的左侧，而大于枢轴的元素都在枢轴的右侧。此外，移动指针也是为了防止重复比较已经交换过的元素，从而避免陷入无限循环，确保每次循环都能进展向前，直到两个指针相遇，结束循环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`random_select`函数中，如果`k`正好等于`nums`，即枢轴的位置，为什么不需要继续递归？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`random_select`函数中，如果`k`正好等于`nums`，即枢轴的位置，表明枢轴左侧的所有元素加上枢轴本身正好是所需的最小的k个数。此时，枢轴左侧的所有元素都已经是小于等于枢轴的值，不需要进一步排序或选择，因此可以直接返回结果，无需再递归进一步处理。这样做可以提高算法的效率，避免不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/smallest-k-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/smallest-k-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找到所有好下标</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找到所有好下标</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为 <code>n</code>&nbsp;下标从 <strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>nums</code>&nbsp;和一个正整数&nbsp;<code>k</code>&nbsp;。</p>
+
+<p>对于&nbsp;<code>k &lt;= i &lt; n - k</code>&nbsp;之间的一个下标&nbsp;<code>i</code>&nbsp;，如果它满足以下条件，我们就称它为一个&nbsp;<strong>好</strong>&nbsp;下标：</p>
+
+<ul>
+	<li>下标 <code>i</code> <strong>之前</strong> 的 <code>k</code>&nbsp;个元素是 <strong>非递增的</strong>&nbsp;。</li>
+	<li>下标 <code>i</code> <strong>之后</strong>&nbsp;的 <code>k</code>&nbsp;个元素是 <strong>非递减的</strong>&nbsp;。</li>
+</ul>
+
+<p>按 <strong>升序</strong>&nbsp;返回所有好下标。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,1,1,1,3,4,1], k = 2
+<b>输出：</b>[2,3]
+<b>解释：</b>数组中有两个好下标：
+- 下标 2 。子数组 [2,1] 是非递增的，子数组 [1,3] 是非递减的。
+- 下标 3 。子数组 [1,1] 是非递增的，子数组 [3,4] 是非递减的。
+注意，下标 4 不是好下标，因为 [4,1] 不是非递减的。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [2,1,1,2], k = 2
+<b>输出：</b>[]
+<b>解释：</b>数组中没有好下标。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>3 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>6</sup></code></li>
+	<li><code>1 &lt;= k &lt;= n / 2</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 87 ms</p>
+                    <p>内存: 27.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def goodIndices(self, nums: List[int], k: int) -&gt; List[int]:
+        n = len(nums)
+        if k == 1:
+            return [i for i in range(1, n-1)]
+        result = list()
+        left, right, cur = 0, k+1, 1
+        while True:
+            if right &gt;= n-1:
+                break
+            if nums[left+1] &lt;= nums[left] and nums[right+1] &gt;= nums[right]:
+                cur += 1
+                left += 1
+                right += 1
+                if cur &gt;= k:
+                    result.append(left+1)
+            else:
+                cur = 1
+                left += 1
+                right += 1
+        return result
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>解题思路主要是通过一次遍历来检查每一个可能的好下标。首先，初始化三个指针：left、right 和 cur。left 和 right 分别代表检查非递增和非递减子数组的起始位置。cur 用于计数连续满足条件的元素个数。遍历过程中，如果当前的元素满足非递增和非递减的条件，cur 递增并移动 left 和 right。当 cur 达到 k 时，说明找到了一个好下标并将其加入结果列表。如果条件被打破，cur 重置为 1。这种方法避免了多次重复检查子数组的情况。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 增加了注释的题解代码
+class Solution:
+    def goodIndices(self, nums: List[int], k: int) -&gt; List[int]:
+        n = len(nums)
+        # 处理 k=1 的特殊情况，理论上不会出现因为 k 最小为 1 且 n 最小为 3
+        if k == 1:
+            return [i for i in range(1, n-1)]
+        result = list()
+        left, right, cur = 0, k+1, 1
+        # 使用滑动窗口检查每个可能的好下标
+        while True:
+            # 当右指针到达数组末尾前，停止循环
+            if right &gt;= n-1:
+                break
+            # 检查当前元素是否满足非递增和非递减的条件
+            if nums[left+1] &lt;= nums[left] and nums[right+1] &gt;= nums[right]:
+                cur += 1
+                left += 1
+                right += 1
+                # 如果连续满足条件的元素个数达到 k，记录为好下标
+                if cur &gt;= k:
+                    result.append(left+1)
+            else:
+                # 如果不满足条件，重置 cur
+                cur = 1
+                left += 1
+                right += 1
+        return result
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中提到的`滑动窗口检查每个可能的好下标`策略如何确保不会错过任何一个好下标？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口的策略基于两个主要的指针：left和right，其中right指针负责探索数组的向右边界，而left指针随着right的推进同时推进。由于right指针会从k+1起始，确保其遍历数组直到倒数第二个元素之前，这样就能够覆盖所有可能的好下标位置。每次循环中，left和right指针都会同步向右移动，确保数组中的每个元素都被考虑到，因此不会错过任何一个可能的好下标。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果连续满足条件的元素个数达到k，记录为好下标。那么，如果在达到k之后的下一次迭代中条件不再满足，是如何处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>一旦连续满足条件的元素个数达到k，相应的下标会被记录为好下标。如果在此之后的下一次迭代中条件不再满足，即nums[left+1] &gt; nums[left]或nums[right+1] &lt; nums[right]，则cur（当前连续满足条件的长度）会被重置为1，同时left和right指针会同步向右移动一位。这意味着，每次条件不满足时，都会从新的位置开始重新计数，以寻找新的可能的好下标。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中没有详细解释如何处理`cur`在不满足条件时的重置逻辑，能否详细说明这一部分的处理逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的逻辑中，如果在遍历过程中遇到不满足非递增或非递减条件的情况，`cur`（当前连续满足条件的元素个数）会被立即重置为1。同时，left和right指针也会同步向右移动一位，从而开始新的检查周期。这种重置逻辑确保只有连续满足条件的元素序列才会被考虑为好下标的候选，一旦发现不符合条件的元素，之前的计数将不被考虑，且从新的起点开始重新计数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解说明中提到，当`right`指针到达数组末尾前，循环就会停止。这是否意味着数组的最后几个元素不会被完全检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实，按照题解中的逻辑，当right指针达到数组的倒数第二个元素时，循环将停止。这意味着数组的最后几个元素不会作为好下标的起始点来考虑。在实际实现中，由于需要检查以每个元素为起始点的k个元素是否满足非递增或非递减条件，所以在接近数组末尾时可能无法形成完整的k长度的子数组，因此这些元素不会被算作好下标起始点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-all-good-indices')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-all-good-indices/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

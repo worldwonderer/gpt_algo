@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>滑动窗口最大值</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>滑动窗口最大值</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=monotonic-queue" class="badge bg-secondary tag-link">单调队列</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code>，有一个大小为&nbsp;<code>k</code><em>&nbsp;</em>的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 <code>k</code>&nbsp;个数字。滑动窗口每次只向右移动一位。</p>
+
+<p>返回 <em>滑动窗口中的最大值 </em>。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1,3,-1,-3,5,3,6,7], k = 3
+<b>输出：</b>[3,3,5,5,6,7]
+<b>解释：</b>
+滑动窗口的位置                最大值
+---------------               -----
+[1  3  -1] -3  5  3  6  7       <strong>3</strong>
+ 1 [3  -1  -3] 5  3  6  7       <strong>3</strong>
+ 1  3 [-1  -3  5] 3  6  7      <strong> 5</strong>
+ 1  3  -1 [-3  5  3] 6  7       <strong>5</strong>
+ 1  3  -1  -3 [5  3  6] 7       <strong>6</strong>
+ 1  3  -1  -3  5 [3  6  7]      <strong>7</strong>
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>nums = [1], k = 1
+<b>输出：</b>[1]
+</pre>
+
+
+
+<p><b>提示：</b></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>4</sup>&nbsp;&lt;= nums[i] &lt;= 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= k &lt;= nums.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 156 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
+        if not nums or not k:
+            return []
+        
+        queue, output = collections.deque([]), []
+        
+        for i in range(len(nums)):
+            #queue存index，index代表的数字是递减的
+            while queue and nums[i]&gt;nums[queue[-1]]:
+                queue.pop()
+            
+            queue.append(i)
+            #此时开始有max_window存在；queue[0]永远是当前窗口里最大值
+            if i&gt;=k-1:
+                output.append(nums[queue[0]])
+            #i代表window上边界
+            if i+1-k==queue[0]:
+                queue.popleft()
+        return output</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用双端队列实现了单调队列，维护了一个队列存储窗口内的元素下标。通过控制队列的进出，保证队首下标对应的元素始终是当前窗口内的最大值。在窗口滑动的过程中，不断将队尾元素与当前元素比较，将小于当前元素的下标弹出，并将当前元素下标加入队尾。当窗口形成后，每次将队首元素对应的值加入输出数组中。同时，当窗口滑出某个下标时，若该下标是队首元素，则将其从队列中弹出。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
+        if not nums or not k:
+            return []
+        
+        queue, output = collections.deque([]), []
+        
+        for i in range(len(nums)):
+            # 维护单调递减队列，队列存储元素下标
+            while queue and nums[i] &gt; nums[queue[-1]]:
+                queue.pop()
+            
+            queue.append(i)
+            
+            # 当窗口形成后，将队首元素对应的值加入输出数组
+            if i &gt;= k - 1:
+                output.append(nums[queue[0]])
+            
+            # 当窗口滑出某个下标时，若该下标是队首元素，则将其弹出
+            if i - k + 1 == queue[0]:
+                queue.popleft()
+        
+        return output</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，为什么选择使用双端队列而不是其他数据结构如数组或链表来实现这个单调队列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双端队列（deque）允许我们从两端高效地添加和删除元素，这是实现单调队列时非常重要的功能。使用双端队列，可以在O(1)时间内从队尾添加新的元素，以及从队首移除旧的元素。如果使用数组，尽管可以在末尾添加元素，但从数组的开始位置删除元素的效率较低，通常是O(n)；而链表虽然可以在两端高效地添加和删除元素，但在实际操作中，相比于双端队列，其节点的动态分配和额外的指针操作可能使得性能稍逊一筹。因此，双端队列是实现此类功能的最佳选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            双端队列中存储的是元素的下标而不是元素的值，这样做有什么特别的优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>存储元素的下标而不是值有几个重要的优势。首先，通过下标可以直接访问元素的值，并且可以检查这些下标是否还在滑动窗口的范围内。这种方法特别有助于在窗口滑动时快速确定哪些元素应该从队列中移除：如果队首的下标不再位于当前窗口内，我们可以将其快速弹出。此外，这也使得在数组中移动窗口时，能够保持与原始数据的直接联系，方便操作和理解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你如何确保队列的单调递减性在整个窗口滑动过程中得到保持？具体是通过哪些操作实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了确保队列的单调递减性，每当新的元素准备加入队列时，算法会从队列的尾部开始，逐一比较已有的元素。如果队尾元素对应的值小于当前元素的值，则这些队尾元素会被连续弹出，直到遇到一个值大于或等于当前元素的值或队列为空为止。这样可以保证队列中的元素是按照从大到小的顺序排列的，队首元素始终是当前窗口的最大值。这个过程确保了每次插入操作后队列的单调递减性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当队列中元素的下标已经不在窗口范围内时，你是如何处理的？请解释为什么需要这样做。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当窗口向右移动时，窗口的起始索引也随之增加。如果队列的队首元素的下标小于当前窗口的起始索引，那么这个元素已不再属于当前窗口范围内。在这种情况下，我们需要从队列的队首移除这个下标。这样做是必要的，因为只有在队首的下标仍然位于窗口内时，我们才能保证队首元素是窗口中的最大值。这确保了输出数组中始终是每个窗口的最大值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/minimum-window-substring" class="list-group-item list-group-item-action">
+                                最小覆盖子串
+                            </a>
+                        
+                            <a href="/problem/min-stack" class="list-group-item list-group-item-action">
+                                最小栈
+                            </a>
+                        
+                            <a href="/problem/longest-substring-with-at-most-two-distinct-characters" class="list-group-item list-group-item-action">
+                                至多包含两个不同字符的最长子串
+                            </a>
+                        
+                            <a href="/problem/paint-house-ii" class="list-group-item list-group-item-action">
+                                粉刷房子 II
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/sliding-window-maximum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/sliding-window-maximum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

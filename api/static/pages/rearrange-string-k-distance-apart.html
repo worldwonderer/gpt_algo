@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>K 距离间隔重排字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>K 距离间隔重排字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 58 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def rearrangeString(self, s: str, k: int) -&gt; str:
+        temp = Counter(s)
+
+        temp = [[i,j] for i,j in temp.items()]
+
+        temp.sort(key = lambda x: -x[1])
+        n = len(s)
+
+        
+        count = len([i for i in temp if i[1] == temp[0][1]])
+        if (temp[0][1] - 1) * k + 1 + count - 1&gt; n:
+                return &#34;&#34;
+        
+        
+        ans = [&#39;_&#39;] * n
+
+        j = 0
+
+
+        for i in temp:
+            # print(ans)
+            while i[1] &gt; 0 and ans[j] != &#39;_&#39;:
+                j = (j + 1) % n
+            
+            while i[1] &gt; 0:
+                # print(ans)
+                # print(j, i)
+                ans[j] = i[0]
+                i[1] -= 1
+                if i[1] &gt; 0:
+                    j += k
+                    if j &gt;= n:
+                        j = 0
+
+                while i[1] &gt; 0 and ans[j] != &#39;_&#39;:
+                    j = (j + 1) % n
+
+        return &#39;&#39;.join(ans)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是先统计每个字符出现的频率，然后将字符按频率从大到小排序。接下来检查出现频率最高的字符是否会导致无法构造有效的重排后字符串，如果无法构造则直接返回空字符串。如果可以构造，则创建一个长度为n的数组ans，初始化为&#39;_&#39;。然后从频率最高的字符开始，每次将字符放到ans中当前位置，并将当前位置向后移动k个位置。如果到达末尾，则回到开头继续。每放置一个字符，就将该字符的剩余数量减1，直到所有字符都放置完毕。最后将ans数组转换为字符串返回。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def rearrangeString(self, s: str, k: int) -&gt; str:
+        # 统计每个字符出现的频率
+        temp = Counter(s)
+
+        # 将字符频率对转换为列表并按频率从大到小排序
+        temp = [[i,j] for i,j in temp.items()]
+        temp.sort(key = lambda x: -x[1])
+        
+        n = len(s)
+
+        # 检查出现频率最高的字符是否会导致无法构造有效的重排后字符串
+        count = len([i for i in temp if i[1] == temp[0][1]])
+        if (temp[0][1] - 1) * k + 1 + count - 1&gt; n:
+                return &#34;&#34;
+        
+        # 创建长度为n的ans数组，初始化为&#39;_&#39;
+        ans = [&#39;_&#39;] * n
+
+        j = 0
+
+        # 从频率最高的字符开始放置
+        for i in temp:
+            # 如果当前位置已有字符，则向后移动一位
+            while i[1] &gt; 0 and ans[j] != &#39;_&#39;:
+                j = (j + 1) % n
+            
+            # 将字符放置到ans中，每次放置后将剩余数量减1，并将位置向后移动k个位置
+            while i[1] &gt; 0:
+                ans[j] = i[0]
+                i[1] -= 1
+                if i[1] &gt; 0:
+                    j += k
+                    if j &gt;= n:
+                        j = 0
+
+                # 如果新位置已有字符，则继续向后移动直到找到空位置
+                while i[1] &gt; 0 and ans[j] != &#39;_&#39;:
+                    j = (j + 1) % n
+
+        # 将ans数组转换为字符串返回
+        return &#39;&#39;.join(ans)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在进行字符频率统计和排序后，你是如何确保在字符放置时遵循了距离间隔k的规则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在将字符根据频率从大到小排序之后，我从频率最高的字符开始进行放置。具体实施时，我设定初始位置（例如数组的起始位置），并在每次放置一个字符后，将当前位置向后移动k个位置。这样做可以保证每次放入的字符之间都至少有k-1个其他字符或者为空，从而满足题设的要求。如果当前位置超过了数组的长度，我会将其回绕到数组的开头，继续寻找空位进行放置，确保间隔k的规则得到遵守。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果在重排过程中，当前索引位置已被占用，你是如何处理这种情况以确保字符间的距离维持在k？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在我的实现中，如果我按照间隔k移动到一个新的位置，并发现该位置已经被其他字符占用，我会从当前位置开始，继续向后搜索直到找到一个空的位置。这种线性探测的方法虽然可能增加了额外的计算，但可以保证即使在位置已满的情况下也能找到合适的位置来放置当前字符，并且保持每两个相同字符之间的最小间隔为k。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你提及在重排时可能需要回到数组的开头继续放置字符，这种环状处理是否可能导致无限循环？如果是，你是如何避免这种情况的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>环状处理确实有可能导致无限循环，特别是当没有足够的空间按照间隔k放置字符时。为了避免这种情况，我在开始放置字符之前进行了一个预检查，即检测频率最高的字符数量是否会导致放置失败。此外，实际放置过程中，每放置一个字符，我都会减少该字符的剩余数量，并仅当字符还有剩余时才继续寻找新的放置位置。一旦所有字符都放置完毕，循环即会结束，从而避免了无限循环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解中，你检查了出现频率最高的字符是否会导致无法构造有效的重排后字符串，能否解释为什么使用表达式 `(temp[0][1] - 1) * k + 1 + count - 1 &gt; n` 来进行这一检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个表达式用于确保即使频率最高的字符也可以在字符串中按照间隔k被安排。这里，`(temp[0][1] - 1) * k + 1` 表示如果要放置频率最高的字符，至少需要的位置数。`temp[0][1] - 1` 代表除了第一个字符外的其他字符，每个字符后都需要至少k个间隔，`+ 1` 是放置第一个字符所需的位置。`+ count - 1` 考虑了如果有多个字符频率与最高频率相同，它们可能需要额外的位置。如果这个总需求超过了字符串长度n，则说明无法成功构造满足条件的重排字符串，因此返回空字符串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/task-scheduler" class="list-group-item list-group-item-action">
+                                任务调度器
+                            </a>
+                        
+                            <a href="/problem/reorganize-string" class="list-group-item list-group-item-action">
+                                重构字符串
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/rearrange-string-k-distance-apart')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/rearrange-string-k-distance-apart/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

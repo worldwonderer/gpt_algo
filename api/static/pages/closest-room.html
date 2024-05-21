@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最近的房间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最近的房间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个酒店里有 <code>n</code> 个房间，这些房间用二维整数数组 <code>rooms</code> 表示，其中 <code>rooms[i] = [roomId<sub>i</sub>, size<sub>i</sub>]</code> 表示有一个房间号为 <code>roomId<sub>i</sub></code> 的房间且它的面积为 <code>size<sub>i</sub></code> 。每一个房间号 <code>roomId<sub>i</sub></code> 保证是 <strong>独一无二</strong> 的。</p>
+
+<p>同时给你 <code>k</code> 个查询，用二维数组 <code>queries</code> 表示，其中 <code>queries[j] = [preferred<sub>j</sub>, minSize<sub>j</sub>]</code> 。第 <code>j</code> 个查询的答案是满足如下条件的房间 <code>id</code> ：</p>
+
+<ul>
+	<li>房间的面积 <b>至少</b> 为 <code>minSize<sub>j</sub></code> ，且</li>
+	<li><code>abs(id - preferred<sub>j</sub>)</code> 的值 <strong>最小</strong> ，其中 <code>abs(x)</code> 是 <code>x</code> 的绝对值。</li>
+</ul>
+
+<p>如果差的绝对值有 <strong>相等</strong> 的，选择 <strong>最小</strong> 的 <code>id</code> 。如果 <strong>没有满足条件的房间</strong> ，答案为 <code>-1</code> 。</p>
+
+<p>请你返回长度为 <code>k</code> 的数组 <code>answer</code> ，其中<em> </em><code>answer[j]</code> 为第 <code>j</code> 个查询的结果。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>rooms = [[2,2],[1,2],[3,2]], queries = [[3,1],[3,3],[5,2]]
+<b>输出：</b>[3,-1,3]
+<strong>解释：</strong>查询的答案如下：
+查询 [3,1] ：房间 3 的面积为 2 ，大于等于 1 ，且号码是最接近 3 的，为 abs(3 - 3) = 0 ，所以答案为 3 。
+查询 [3,3] ：没有房间的面积至少为 3 ，所以答案为 -1 。
+查询 [5,2] ：房间 3 的面积为 2 ，大于等于 2 ，且号码是最接近 5 的，为 abs(3 - 5) = 2 ，所以答案为 3 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>rooms = [[1,4],[2,3],[3,5],[4,1],[5,2]], queries = [[2,3],[2,4],[2,5]]
+<b>输出：</b>[2,1,3]
+<strong>解释：</strong>查询的答案如下：
+查询 [2,3] ：房间 2 的面积为 3 ，大于等于 3 ，且号码是最接近的，为 abs(2 - 2) = 0 ，所以答案为 2 。
+查询 [2,4] ：房间 1 和 3 的面积都至少为 4 ，答案为 1 因为它房间编号更小。
+查询 [2,5] ：房间 3 是唯一面积大于等于 5 的，所以答案为 3 。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == rooms.length</code></li>
+	<li><code>1 <= n <= 10<sup>5</sup></code></li>
+	<li><code>k == queries.length</code></li>
+	<li><code>1 <= k <= 10<sup>4</sup></code></li>
+	<li><code>1 <= roomId<sub>i</sub>, preferred<sub>j</sub> <= 10<sup>7</sup></code></li>
+	<li><code>1 <= size<sub>i</sub>, minSize<sub>j</sub> <= 10<sup>7</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 236 ms</p>
+                    <p>内存: 53.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def closestRoom(self, rooms: List[List[int]], queries: List[List[int]]) -&gt; List[int]:
+        # 获取rooms和queries的数组大小
+        m,n=len(rooms),len(queries)
+        # 将rooms和queries按照size从大到小排序
+        rooms.sort(key=lambda x:x[1],reverse=True)
+        index=sorted(range(n),key=lambda i:queries[i][1],reverse=True)
+        # ids用于存储当前大于minSize的房间的id
+        ids=[]
+        # 遍历rooms的索引
+        j=0
+        # 返回值
+        res=[-1]*n
+
+        for i in index:
+            preferred,minSize=queries[i]
+            # 二分插入大于等于minSize的id
+            while j&lt;m and rooms[j][1]&gt;=minSize:
+                bisect.insort(ids,rooms[j][0])
+                j+=1
+            # 如果没有大于等于minSize的房间，res的结果为-1，continue
+            if not ids:
+                continue
+            # 二分查找ids中大于等于preferred的索引
+            k=bisect.bisect_left(ids,preferred) 
+            # 对边界处理
+            if k==0:
+                res[i]=ids[0]
+            elif k==len(ids):
+                res[i]=ids[-1]
+            else:
+                # 非边界处理
+                if abs(ids[k]-preferred)&lt;abs(ids[k-1]-preferred):
+                    res[i]=ids[k]
+                else:
+                    res[i]=ids[k-1]
+
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用排序和二分查找的方法。首先，将房间按照面积从大到小排序，将查询按照最小面积从大到小排序。然后，遍历查询，对于每个查询，使用二分查找在已经满足面积要求的房间中找到最接近期望房间号的房间。具体而言，先二分插入所有满足面积要求的房间号，然后二分查找找到最接近期望房间号的房间。</p>
+                                <p>时间复杂度: O(m log m + n log n + n log m)</p>
+                                <p>空间复杂度: O(m + n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def closestRoom(self, rooms: List[List[int]], queries: List[List[int]]) -&gt; List[int]:
+        m, n = len(rooms), len(queries)
+        rooms.sort(key=lambda x: x[1], reverse=True)
+        index = sorted(range(n), key=lambda i: queries[i][1], reverse=True)
+        ids = []
+        j = 0
+        res = [-1] * n
+
+        for i in index:
+            preferred, minSize = queries[i]
+            while j &lt; m and rooms[j][1] &gt;= minSize:
+                bisect.insort(ids, rooms[j][0])
+                j += 1
+            if not ids:
+                continue
+            k = bisect.bisect_left(ids, preferred)
+            if k == 0:
+                res[i] = ids[0]
+            elif k == len(ids):
+                res[i] = ids[-1]
+            else:
+                if abs(ids[k] - preferred) &lt; abs(ids[k - 1] - preferred):
+                    res[i] = ids[k]
+                else:
+                    res[i] = ids[k - 1]
+
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理查询前，需要先将房间按面积从大到小排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>按面积从大到小排序房间是为了在处理查询时更高效地满足面积要求。这种排序方式使得在遍历查询时，可以从最大面积的房间开始添加到可选择列表中，确保一旦房间被添加，所有后续的查询（由于也是按面积要求从大到小排序）都不需要重新检查这些已添加的房间。这样可以避免重复工作，提高整体查询效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            排序查询的目的是什么，它是如何帮助优化查找过程的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>查询排序的目的是按照面积需求从大到小对查询进行排序，这样可以确保处理较大面积需求的查询时，已经考虑了所有可能的房间选项。这样的排序配合房间的排序，使得在遍历过程中可以持续维护一个当前符合面积条件的房间列表，而不需要为每个查询重新计算符合条件的房间列表，从而优化整体的查找效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用二分查找确定最接近的房间号时，如何处理有多个房间号与预期房间号距离相等的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当存在多个房间号与预期房间号的距离相等时，算法会选择最小的那个房间号。具体实现为，如果二分查找的结果k在已有房间列表中，且k和k-1两个位置的房间号与预期房间号的距离相同，那么选择两者中较小的房间号。这样的处理确保了在距离相等的情况下，结果具有一致的选择偏好，即偏向于房间号较小的选项。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当`bisect.bisect_left`找到的索引`k`为0或`len(ids)`时，为什么直接选择`ids[0]`或`ids[-1]`作为结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`bisect.bisect_left`返回的索引`k`为0时，意味着所有可选房间的编号都大于预期的房间编号，因此直接选择列表中最小的编号（即`ids[0]`）为最接近的选择。相反，当`k`等于`ids`的长度时，表示所有可选房间的编号都小于预期的房间编号，因此直接选择列表中最大的编号（即`ids[-1]`）为最接近的选择。这种处理方式确保了在极端情况下能够提供一个有效且逻辑上合理的选项。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/closest-room')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/closest-room/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>查找给定哈希值的子串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>查找给定哈希值的子串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定整数 <code>p</code>&nbsp;和 <code>m</code>&nbsp;，一个长度为 <code>k</code>&nbsp;且下标从 <strong>0</strong>&nbsp;开始的字符串&nbsp;<code>s</code>&nbsp;的哈希值按照如下函数计算：</p>
+
+<ul>
+	<li><code>hash(s, p, m) = (val(s[0]) * p<sup>0</sup> + val(s[1]) * p<sup>1</sup> + ... + val(s[k-1]) * p<sup>k-1</sup>) mod m</code>.</li>
+</ul>
+
+<p>其中&nbsp;<code>val(s[i])</code>&nbsp;表示&nbsp;<code>s[i]</code>&nbsp;在字母表中的下标，从&nbsp;<code>val('a') = 1</code> 到&nbsp;<code>val('z') = 26</code>&nbsp;。</p>
+
+<p>给你一个字符串&nbsp;<code>s</code>&nbsp;和整数&nbsp;<code>power</code>，<code>modulo</code>，<code>k</code>&nbsp;和&nbsp;<code>hashValue</code>&nbsp;。请你返回 <code>s</code>&nbsp;中 <strong>第一个</strong> 长度为 <code>k</code>&nbsp;的 <strong>子串</strong>&nbsp;<code>sub</code>&nbsp;，满足<em>&nbsp;</em><code>hash(sub, power, modulo) == hashValue</code>&nbsp;。</p>
+
+<p>测试数据保证一定 <strong>存在</strong>&nbsp;至少一个这样的子串。</p>
+
+<p><strong>子串</strong> 定义为一个字符串中连续非空字符组成的序列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>s = "leetcode", power = 7, modulo = 20, k = 2, hashValue = 0
+<strong>输出：</strong>"ee"
+<strong>解释：</strong>"ee" 的哈希值为 hash("ee", 7, 20) = (5 * 1 + 5 * 7) mod 20 = 40 mod 20 = 0 。
+"ee" 是长度为 2 的第一个哈希值为 0 的子串，所以我们返回 "ee" 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>s = "fbxzaad", power = 31, modulo = 100, k = 3, hashValue = 32
+<b>输出：</b>"fbx"
+<b>解释：</b>"fbx" 的哈希值为 hash("fbx", 31, 100) = (6 * 1 + 2 * 31 + 24 * 31<sup>2</sup>) mod 100 = 23132 mod 100 = 32 。
+"bxz" 的哈希值为 hash("bxz", 31, 100) = (2 * 1 + 24 * 31 + 26 * 31<sup>2</sup>) mod 100 = 25732 mod 100 = 32 。
+"fbx" 是长度为 3 的第一个哈希值为 32 的子串，所以我们返回 "fbx" 。
+注意，"bxz" 的哈希值也为 32 ，但是它在字符串中比 "fbx" 更晚出现。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= k &lt;= s.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= power, modulo &lt;= 10<sup>9</sup></code></li>
+	<li><code>0 &lt;= hashValue &lt; modulo</code></li>
+	<li><code>s</code>&nbsp;只包含小写英文字母。</li>
+	<li>测试数据保证一定 <strong>存在</strong>&nbsp;满足条件的子串。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 92 ms</p>
+                    <p>内存: 18.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def subStrHash(self, s: str, power: int, modulo: int, k: int, hashValue: int) -&gt; str:
+        # n = len(s)
+        # power %= modulo
+        # h = 0
+        # p = 1
+        
+        # for  i in range(n - k + 1, n):
+        #     p *= power
+        #     h += (ord(s[i]) - ord(&#39;a&#39;) + 1) * p
+        #     h %= modulo
+
+        # ans = n - 1
+        # for i, (in_, out_) in enumerate(zip(s[:n - k + 1][::-1], s[::-1])):
+        #     h += (ord(in_) - ord(&#39;a&#39;) + 1)
+        #     h %= modulo
+        #     if h == hashValue:
+        #         ans = n - k - i
+        #     h -= (ord(out_) - ord(&#39;a&#39;) + 1) * p
+        #     h *= power     
+        #     h %= modulo
+        # return s[ans : ans + k]
+        n = len(s) ; power %= modulo
+        
+        mp = {chr(96+i):i for i in range(1,27)}
+        
+        f,g,h=[0]*(k+1),[0]*(k+1),[1]*(k+1)
+
+        for i in range(1,k+1): h[i]=h[i-1]*power%modulo
+
+        for i in range(0,n,k):
+            for j in range(k-1,-1,-1): f[j]=(f[j+1]*power+mp[s[i+j]])%modulo
+
+            if(f[0]==hashValue): return s[i:i+k]
+
+            for j in range(1,min(k,n-i-k+1)): g[j]=(g[j-1]+mp[s[i+k+j-1]]*h[j-1])%modulo
+
+            for j in range(1,min(k,n-i-k+1)):
+                if((f[j]+g[j]*h[k-j])%modulo==hashValue): return s[(i+j):(i+j+k)]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用滑动窗口和哈希表来检索特定哈希值的子串。首先，代码创建一个映射mp，用于快速获取字符对应的字母表位置。使用数组f和g来计算子串的哈希值，数组h存储power的幂次模modulo的结果，用于优化计算。数组f从后向前计算当前窗口的哈希值。如果初始窗口的哈希值符合要求，直接返回该子串。否则，使用数组g从前向后递增地添加字符，并重新计算哈希值，检查每次添加后的新窗口哈希值是否符合要求。这种方法有效地避免了重复的计算，通过动态调整窗口来寻找正确的子串。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def subStrHash(self, s: str, power: int, modulo: int, k: int, hashValue: int) -&gt; str:
+        n = len(s) ; power %= modulo
+        # 创建字母到数字的映射
+        mp = {chr(96+i):i for i in range(1,27)}
+        # 初始化数组f, g和h
+        f, g, h = [0]*(k+1), [0]*(k+1), [1]*(k+1)
+        # 计算power的幂次mod modulo
+        for i in range(1,k+1): h[i] = h[i-1] * power % modulo
+        # 主循环遍历字符串s的每k个字符
+        for i in range(0,n,k):
+            # 从后向前计算窗口的哈希值
+            for j in range(k-1,-1,-1): f[j] = (f[j+1] * power + mp[s[i+j]]) % modulo
+            # 如果初始窗口哈希值符合，返回子串
+            if(f[0] == hashValue): return s[i:i+k]
+            # 动态调整窗口，重新计算哈希值
+            for j in range(1,min(k,n-i-k+1)): g[j] = (g[j-1] + mp[s[i+k+j-1]] * h[j-1]) % modulo
+            # 检查新窗口的哈希值
+            for j in range(1,min(k,n-i-k+1)):
+                if((f[j] + g[j] * h[k-j]) % modulo == hashValue): return s[(i+j):(i+j+k)]
+    </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算哈希值时，为什么选用了模运算，这里的`modulo`参数具体起到了什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算哈希值时使用模运算（即使用`modulo`参数）主要是为了避免数值溢出并将哈希值控制在一个合理的范围内。由于字符串可能很长，直接计算的哈希值可能非常大，不适合直接使用。通过模运算，我们可以保证所有的哈希值都在0到`modulo-1`之间，这使得哈希值更容易管理和比较。此外，使用模运算还可以减少哈希碰撞的概率，提高算法的效率和准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            数组`h`用于存储`power`的幂次模`modulo`的结果，这样做的主要目的是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>数组`h`用于存储`power`的幂次模`modulo`的结果的主要目的是为了优化哈希值的计算。在滑动窗口法中，我们经常需要计算新窗口的哈希值，这通常涉及到多次乘以`power`的操作。预先计算并存储`power`的幂次可以大大减少重复计算，提高整体算法的效率。这种预计算技术是一种常见的时间换空间的优化方法。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，如果初始窗口的哈希值符合要求就直接返回该子串，这里的初始窗口是如何定义的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，初始窗口定义为字符串`s`中的第一个长度为`k`的子串。这个窗口从字符串的起始位置开始，长度为`k`，即字符串`s`的前`k`个字符组成的子串。算法首先计算这个初始窗口的哈希值，并与给定的`hashValue`进行比较，如果匹配，则直接返回该子串。如果不匹配，算法继续调整窗口位置，寻找其他可能的匹配子串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在动态调整窗口时，使用了两个数组`f`和`g`来计算哈希值，能否详细解释这两个数组的具体作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，数组`f`和`g`被用于计算和更新不同窗口的哈希值，以便动态调整窗口。具体来说，`f`数组用于从当前窗口的末尾开始向前计算每个可能的子窗口的哈希值，这样做可以有效地利用已有的计算结果，从而减少重复计算。而`g`数组则用于从当前窗口的开始向后逐步添加新字符，计算扩展后的新窗口的哈希值。这两个数组的配合使用使得我们可以有效地检查每个新窗口的哈希值，从而找到符合条件的子串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-substring-with-given-hash-value')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-substring-with-given-hash-value/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

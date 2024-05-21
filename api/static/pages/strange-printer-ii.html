@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>奇怪的打印机 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>奇怪的打印机 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个奇怪的打印机，它有如下两个特殊的打印规则：</p>
+
+<ul>
+	<li>每一次操作时，打印机会用同一种颜色打印一个矩形的形状，每次打印会覆盖矩形对应格子里原本的颜色。</li>
+	<li>一旦矩形根据上面的规则使用了一种颜色，那么 <strong>相同的颜色不能再被使用&nbsp;</strong>。</li>
+</ul>
+
+<p>给你一个初始没有颜色的&nbsp;<code>m x n</code>&nbsp;的矩形&nbsp;<code>targetGrid</code>&nbsp;，其中&nbsp;<code>targetGrid[row][col]</code>&nbsp;是位置&nbsp;<code>(row, col)</code>&nbsp;的颜色。</p>
+
+<p>如果你能按照上述规则打印出矩形<em>&nbsp;</em><code>targetGrid</code>&nbsp;，请你返回&nbsp;<code>true</code>&nbsp;，否则返回&nbsp;<code>false</code>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/19/sample_1_1929.png" style="height: 138px; width: 483px;"></p>
+
+<pre><strong>输入：</strong>targetGrid = [[1,1,1,1],[1,2,2,1],[1,2,2,1],[1,1,1,1]]
+<strong>输出：</strong>true
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/19/sample_2_1929.png" style="height: 290px; width: 483px;"></p>
+
+<pre><strong>输入：</strong>targetGrid = [[1,1,1,1],[1,1,3,3],[1,1,3,4],[5,5,1,4]]
+<strong>输出：</strong>true
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>targetGrid = [[1,2,1],[2,1,2],[1,2,1]]
+<strong>输出：</strong>false
+<strong>解释：</strong>没有办法得到 targetGrid ，因为每一轮操作使用的颜色互不相同。</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>targetGrid = [[1,1,1],[3,1,3]]
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == targetGrid.length</code></li>
+	<li><code>n == targetGrid[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 60</code></li>
+	<li><code>1 &lt;= targetGrid[row][col] &lt;= 60</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 83 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def isPrintable(self, targetGrid: List[List[int]]) -&gt; bool:
+        dict = {}
+        m, n = len(targetGrid), len(targetGrid[0])
+        for i in range(m):
+            for j in range(n):
+                color = targetGrid[i][j]
+                if color not in dict:
+                    dict[color] = [i, i, j, j]
+                else:
+                    dict[color][1] = i
+                    dict[color][2] = min(dict[color][2], j)
+                    dict[color][3] = max(dict[color][3], j)
+        def can_be_grid(bound, color):
+            up, down, left, right = bound
+            for i in range(up, down + 1):
+                for j in range(left, right + 1):
+                    if targetGrid[i][j] not in [color, -1]:
+                        return False
+            return True
+        while dict:
+            flag = False
+            remove = []
+            for key, value in dict.items():
+                if can_be_grid(value, key):
+                    flag = True
+                    for i in range(value[0], value[1] + 1):
+                        for j in range(value[2], value[3] + 1):
+                            targetGrid[i][j] = -1
+                    remove.append(key)
+            for key in remove:
+                dict.pop(key)
+            if not flag:
+                return False
+        return True
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了模拟打印机打印过程的方法。首先，使用一个字典记录每种颜色最初和最终出现的行和列（形成一个边界框），这意味着如果颜色c在一个矩形区域内完整存在，则理论上可以通过一次打印操作实现该颜色。之后，对每个颜色尝试执行打印操作：检查其边界框内是否所有颜色都能匹配目标或已被覆盖（值为-1）。如果可以，那么该颜色对应的区域就被设置为-1以表示该区域已被完全打印覆盖。该过程反复进行，直到没有颜色可以成功打印（返回false）或所有颜色都被打印完（返回true）。</p>
+                                <p>时间复杂度: O(C * m * n)</p>
+                                <p>空间复杂度: O(C)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isPrintable(self, targetGrid: List[List[int]]) -&gt; bool:
+        dict = {}
+        m, n = len(targetGrid), len(targetGrid[0])
+        for i in range(m):
+            for j in range(n):
+                color = targetGrid[i][j]
+                if color not in dict:
+                    dict[color] = [i, i, j, j]  # 初始化颜色的边界
+                else:
+                    dict[color][1] = i  # 更新底部边界
+                    dict[color][2] = min(dict[color][2], j)  # 更新左边界
+                    dict[color][3] = max(dict[color][3], j)  # 更新右边界
+        def can_be_grid(bound, color):
+            up, down, left, right = bound
+            for i in range(up, down + 1):
+                for j in range(left, right + 1):
+                    if targetGrid[i][j] not in [color, -1]:
+                        return False
+            return True
+        while dict:
+            flag = False
+            remove = []
+            for key, value in dict.items():
+                if can_be_grid(value, key):
+                    flag = True
+                    for i in range(value[0], value[1] + 1):
+                        for j in range(value[2], value[3] + 1):
+                            targetGrid[i][j] = -1  # 打印覆盖
+                    remove.append(key)
+            for key in remove:
+                dict.pop(key)  # 删除已打印的颜色
+            if not flag:
+                return False
+        return True
+            </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在题解中使用字典来记录每种颜色的边界框而不是其他数据结构，如数组或列表？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中使用字典来记录每种颜色的边界框是因为字典提供了更高效的颜色到其边界框映射的访问方式。使用字典，可以直接通过颜色值作为键快速查找和更新对应颜色的边界框信息。如果使用数组或列表，则可能需要额外的步骤来确定哪个索引或位置对应哪个颜色，这会增加复杂性和可能的计算开销。此外，颜色的数量和具体值可能是不连续的，使用字典可以更灵活地处理这种情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的打印检查函数`can_be_grid`中，为什么判断条件包括了`-1`？这代表了什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在打印检查函数`can_be_grid`中，判断条件包括`-1`是因为`-1`代表了该区域已经被打印处理。这意味着当我们检查一个颜色的边界框是否可以通过一次打印操作成功覆盖时，只需关注尚未打印的区域（即未标记为`-1`的区域）和当前颜色。包含`-1`作为有效条件允许算法忽视已经成功打印过的区域，从而只关注剩余未处理的部分。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，一旦可以打印某种颜色，就将该区域设置为-1。这样做有可能影响后续颜色的判断吗？如何避免或解决这种潜在问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将区域设置为-1表示该区域已被打印覆盖，确实有可能影响后续的颜色判断，尤其是如果多个颜色的打印区域有重叠时。为了避免这种问题，算法中在每次成功打印一个颜色并将对应区域设置为-1后，会从记录颜色边界的字典中移除该颜色。这样，在后续迭代中，已处理的颜色不会再次参与判断，从而避免了重叠后的错误覆盖或干扰。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解的逻辑中，如果在某一轮迭代中没有任何颜色被成功打印，就直接返回`false`。这种做法是否有可能漏掉某些特殊情况，导致错误的判断？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中这种做法是基于假设：如果在任何迭代轮次中发现没有颜色可以被成功打印，这表明存在至少一个颜色的边界框内包含了其他不可移除的颜色，导致无法继续进行打印。这种情况意味着无法通过有限次的打印操作达到目标，因此返回`false`是合理的。虽然这是一个较为严格的判断，但按照题目逻辑和打印机操作的模拟，这种处理是符合实际情况的，不会漏掉特殊情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/strange-printer-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/strange-printer-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

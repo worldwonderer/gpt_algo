@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长的斐波那契子序列的长度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长的斐波那契子序列的长度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>如果序列&nbsp;<code>X_1, X_2, ..., X_n</code>&nbsp;满足下列条件，就说它是&nbsp;<em>斐波那契式&nbsp;</em>的：</p>
+
+<ul>
+	<li><code>n &gt;= 3</code></li>
+	<li>对于所有&nbsp;<code>i + 2 &lt;= n</code>，都有&nbsp;<code>X_i + X_{i+1} = X_{i+2}</code></li>
+</ul>
+
+<p>给定一个<strong>严格递增</strong>的正整数数组形成序列 <code>arr</code>&nbsp;，找到 <code>arr</code> 中最长的斐波那契式的子序列的长度。如果一个不存在，返回&nbsp;&nbsp;0 。</p>
+
+<p><em>（回想一下，子序列是从原序列&nbsp; <code>arr</code> 中派生出来的，它从 <code>arr</code> 中删掉任意数量的元素（也可以不删），而不改变其余元素的顺序。例如，&nbsp;<code>[3, 5, 8]</code>&nbsp;是&nbsp;<code>[3, 4, 5, 6, 7, 8]</code>&nbsp;的一个子序列）</em></p>
+
+
+
+<ul>
+</ul>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入: </strong>arr =<strong> </strong>[1,2,3,4,5,6,7,8]
+<strong>输出: </strong>5
+<strong>解释: </strong>最长的斐波那契式子序列为 [1,2,3,5,8] 。
+</pre>
+
+<p><strong>示例&nbsp;2：</strong></p>
+
+<pre>
+<strong>输入: </strong>arr =<strong> </strong>[1,3,7,11,12,14,18]
+<strong>输出: </strong>3
+<strong>解释</strong>: 最长的斐波那契式子序列有 [1,11,12]、[3,11,14] 以及 [7,11,18] 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= arr.length &lt;= 1000</code></li>
+	<li>
+	<p><code>1 &lt;= arr[i] &lt; arr[i + 1] &lt;= 10^9</code></p>
+	</li>
+</ul>
+
+
+
+<p><meta charset="UTF-8" />注意：本题与主站 873&nbsp;题相同：&nbsp;<a href="https://leetcode-cn.com/problems/length-of-longest-fibonacci-subsequence/">https://leetcode-cn.com/problems/length-of-longest-fibonacci-subsequence/</a></p>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 468 ms</p>
+                    <p>内存: 23.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def lenLongestFibSubseq(self, arr: List[int]) -&gt; int:
+        n = len(arr)
+        maps = {arr[i]: i for i in range(n)}
+        dp = [[0]*n for _ in range(n)]
+        res = 0
+        for i in range(2,n):
+            for j in range(i-1,0,-1):
+                if arr[j]*2 &lt;= arr[i]:
+                    break
+                if arr[i]-arr[j] in maps:
+                    k = maps[arr[i]-arr[j]]
+                    dp[i][j] = max(dp[j][k]+1,3)
+                    res = max(res, dp[i][j])
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了动态规划的方法。首先，利用哈希表maps存储数组中每个元素的索引，以便快速查找。dp[i][j]表示以arr[i]和arr[j]为最后两个元素的斐波那契子序列的最大长度。通过双层循环遍历所有可能的arr[i]和arr[j]组合，对每个组合，计算差值arr[i]-arr[j]，并检查该差值是否存在于数组中。如果存在，说明可以形成一个斐波那契子序列，dp表更新为dp[j][k]+1，k是差值对应的索引。循环中还使用一个变量res来维护全局的最长子序列长度。注意，为了避免无效计算，当arr[j]的两倍小于等于arr[i]时，内层循环会提前终止。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2"># Definition for the solution class
+
+class Solution:
+    def lenLongestFibSubseq(self, arr: List[int]) -&gt; int:
+        n = len(arr) # 获取数组长度
+        maps = {arr[i]: i for i in range(n)} # 创建哈希表存储数组元素及其索引
+        dp = [[0]*n for _ in range(n)] # 初始化动态规划表
+        res = 0 # 初始化最长斐波那契子序列的长度
+        for i in range(2, n): # 从第三个元素开始
+            for j in range(i-1, 0, -1): # 从i的前一个元素开始向前遍历
+                if arr[j]*2 &lt;= arr[i]: # 如果当前元素的两倍小于等于arr[i]，停止当前循环
+                    break
+                if arr[i]-arr[j] in maps: # 如果差值在数组中，可以形成斐波那契子序列
+                    k = maps[arr[i]-arr[j]] # 获取差值对应的索引
+                    dp[i][j] = max(dp[j][k]+1, 3) # 更新dp表，至少为3（因为斐波那契序列至少需要三个数）
+                    res = max(res, dp[i][j]) # 更新最长长度
+        return res # 返回结果</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在动态规划解法中，dp数组的初始化值是0？在更新dp[i][j]时，直接赋值dp[j][k]+1是否会导致错误的结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，dp数组的初始化值通常代表一个基础状态，对于斐波那契序列问题，0表示没有有效的斐波那契序列的初始状态。在更新dp[i][j]时，如果直接赋值为dp[j][k]+1，在没有确认存在一个有效的斐波那契子序列（即至少包含三个数）之前，这种更新可能会导致错误的结果。这是因为dp[j][k]+1可能仅仅是基于一个非斐波那契序列的两个数的错误延伸。因此，我们需要验证当前序列至少能形成一个包含三个数字的斐波那契序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划表中dp[i][j]为什么要取max(dp[j][k]+1, 3)而不是直接dp[j][k]+1？请解释这里为什么要确保最小长度为3。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>斐波那契序列定义中，至少包含三个元素，这些元素满足后一个数是前两个数的和。因此，在动态规划更新中，即使通过dp[j][k]+1找到了一个潜在的序列增长方式，我们还需要确保这个更新的序列长度至少为3，这是斐波那契序列的基本要求。如果不这样做，我们可能会错误地将长度小于3的序列计算在内，这不符合斐波那契序列的定义。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在解法中提到当arr[j]*2 &lt;= arr[i]就终止内循环，这个优化是基于什么逻辑或者数学原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这一优化的逻辑基于斐波那契数列的性质：在任何斐波那契序列中，任意两个连续的数a和b（a &lt; b），下一个数c（c = a + b）总是大于b。因此，如果在数组中存在某个元素arr[i]，使得arr[j]*2 &lt;= arr[i]，则不存在任何数k使得arr[k] + arr[j] = arr[i]（因为arr[j] &lt; arr[k]应该成立，但arr[k]至少应该为arr[i] - arr[j]，此时arr[j] &lt; arr[i] - arr[j]不成立）。所以，当arr[j]的两倍小于等于arr[i]时，意味着不可能通过当前的j和任何更小的数形成斐波那契序列，提前终止循环可以减少不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/Q91FMA')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/Q91FMA/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

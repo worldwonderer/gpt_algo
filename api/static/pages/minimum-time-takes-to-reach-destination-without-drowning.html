@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>避免淹死并到达目的地的最短时间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>避免淹死并到达目的地的最短时间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 273 ms</p>
+                    <p>内存: 18.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+class Solution:
+    def minimumSeconds(self, land: List[List[str]]) -&gt; int:
+        m = len(land)
+        n = len(land[0])
+
+        flooded = []
+        dest = None
+        src = None
+        for i in range(m):
+            for j in range(n):
+                if land[i][j] == &#39;*&#39;:
+                    land[i][j] = 0
+                    flooded.append((i, j))
+                elif land[i][j] == &#39;D&#39;:
+                    dest = (i, j)
+                elif land[i][j] == &#39;S&#39;:
+                    land[i][j] = &#39;.&#39;
+                    src = (i, j)
+
+
+        t = 1
+        while flooded:
+            nxt = []
+            for i, j in flooded:
+                if i != 0 and land[i - 1][j] == &#39;.&#39;:
+                    land[i - 1][j] = t
+                    nxt.append((i - 1, j))
+                if i != m - 1 and land[i + 1][j] == &#39;.&#39;:
+                    land[i + 1][j] = t
+                    nxt.append((i + 1, j))
+                if j != 0 and land[i][j - 1] == &#39;.&#39;:
+                    land[i][j - 1] = t
+                    nxt.append((i, j - 1))
+                if j != n - 1 and land[i][j + 1] == &#39;.&#39;:
+                    land[i][j + 1] = t
+                    nxt.append((i, j + 1))
+            t += 1
+            flooded = nxt
+        #print(land)
+        x = [src]
+        t = -1
+        while x:
+            nxt = []
+            for i, j in x:
+                if (i, j) == dest:
+                    return -t - 1
+                if i != 0 and land[i - 1][j] != &#39;X&#39; and (str(land[i - 1][j]) in &#39;.D&#39; or land[i - 1][j] &gt; abs(t)):
+                    land[i - 1][j] = t
+                    nxt.append((i - 1, j))
+                if i != m - 1 and land[i + 1][j] != &#39;X&#39; and (str(land[i + 1][j]) in &#39;.D&#39; or land[i + 1][j] &gt; abs(t)):
+                    land[i + 1][j] = t
+                    nxt.append((i + 1, j))
+                if j != 0 and land[i][j - 1] != &#39;X&#39; and (str(land[i][j - 1]) in &#39;.D&#39; or land[i][j - 1] &gt; abs(t)):
+                    land[i][j - 1] = t
+                    nxt.append((i, j - 1))
+                if j != n - 1 and land[i][j + 1] != &#39;X&#39; and (str(land[i][j + 1]) in &#39;.D&#39; or land[i][j + 1] &gt; abs(t)):
+                    land[i][j + 1] = t
+                    nxt.append((i, j + 1))
+            t -= 1
+            #print(land)
+            x = nxt
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了两个广度优先搜索（BFS）来解决问题。第一个BFS从已经被淹没的地方开始，计算每个点被淹没的时间。第二个BFS从起点开始，寻找到达终点的最短路径，同时确保在每一步行走时，该位置尚未被淹没。如果可以到达终点，则返回所需的最短时间，否则返回-1。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+class Solution:
+    def minimumSeconds(self, land: List[List[str]]) -&gt; int:
+        m = len(land)
+        n = len(land[0])
+
+        flooded = []
+        dest = None
+        src = None
+        for i in range(m):
+            for j in range(n):
+                if land[i][j] == &#39;*&#39;:
+                    land[i][j] = 0
+                    flooded.append((i, j))
+                elif land[i][j] == &#39;D&#39;:
+                    dest = (i, j)
+                elif land[i][j] == &#39;S&#39;:
+                    land[i][j] = &#39;.&#39;
+                    src = (i, j)
+
+
+        t = 1
+        while flooded:
+            nxt = []
+            for i, j in flooded:
+                if i != 0 and land[i - 1][j] == &#39;.&#39;:
+                    land[i - 1][j] = t
+                    nxt.append((i - 1, j))
+                if i != m - 1 and land[i + 1][j] == &#39;.&#39;:
+                    land[i + 1][j] = t
+                    nxt.append((i + 1, j))
+                if j != 0 and land[i][j - 1] == &#39;.&#39;:
+                    land[i][j - 1] = t
+                    nxt.append((i, j - 1))
+                if j != n - 1 and land[i][j + 1] == &#39;.&#39;:
+                    land[i][j + 1] = t
+                    nxt.append((i, j + 1))
+            t += 1
+            flooded = nxt
+        x = [src]
+        t = -1
+        while x:
+            nxt = []
+            for i, j in x:
+                if (i, j) == dest:
+                    return -t - 1
+                if i != 0 and land[i - 1][j] != &#39;X&#39; and (str(land[i - 1][j]) in &#39;.D&#39; or land[i - 1][j] &gt; abs(t)):
+                    land[i - 1][j] = t
+                    nxt.append((i - 1, j))
+                if i != m - 1 and land[i + 1][j] != &#39;X&#39; and (str(land[i + 1][j]) in &#39;.D&#39; or land[i + 1][j] &gt; abs(t)):
+                    land[i + 1][j] = t
+                    nxt.append((i + 1, j))
+                if j != 0 and land[i][j - 1] != &#39;X&#39; and (str(land[i][j - 1]) in &#39;.D&#39; or land[i][j - 1] &gt; abs(t)):
+                    land[i][j - 1] = t
+                    nxt.append((i, j - 1))
+                if j != n - 1 and land[i][j + 1] != &#39;X&#39; and (str(land[i][j + 1]) in &#39;.D&#39; or land[i][j + 1] &gt; abs(t)):
+                    land[i][j + 1] = t
+                    nxt.append((i, j + 1))
+            t -= 1
+            x = nxt
+        return -1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么题解中选择使用两次广度优先搜索（BFS）而不是其他算法，如深度优先搜索（DFS）或迪杰斯特拉算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解选择使用两次广度优先搜索（BFS）主要是因为BFS能够有效地找到从一点到另一点的最短路径，这在本题中非常关键。第一个BFS用于确定每个位置被淹没的时间，保证计算的是从最初的水源开始的全局最短淹没时间。第二个BFS用于寻找在不被淹没的情况下，从起点到终点的最短路径。使用DFS可能会导致过早探索深层节点，无法保证找到的是最短路径。而迪杰斯特拉算法在这里不是特别适用，因为它主要解决带权重的最短路径问题，而本题中每一步的权重相同，且需要额外考虑时间限制（淹没时间），这使得BFS成为更合适的选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中没有明确说明如何处理边界条件，比如起点或终点已被初始淹没的情况，这种情况下算法的输出是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中确实没有明确说明处理这些特殊边界条件的细节。在实际实现中，如果起点&#39;S&#39;已经在初始状态被淹没（例如起点就在&#39;*&#39;处或者被立即淹没的地方），则无法开始正常的路径搜索，应该立即返回-1，表示无法到达目的地。同样，如果终点&#39;D&#39;在开始搜索之前已被淹没，也应返回-1。这些情况需要在算法开始前进行检查，以确保输入数据的有效性和搜索的可行性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在代码实现中，变量`t`在第一个BFS和第二个BFS中有不同的作用和含义，请问这种设计有什么特别的考虑吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，变量`t`被用于两个不同的目的确实是一种特别的设计考虑。在第一个BFS中，`t`表示时间，用来记录地图上每个点被淹没的时间。这样可以确保在第二个BFS进行时，每一步移动都能检查该点是否已被淹没。在第二个BFS中，`t`被用作反向时间计数器，用于跟踪从起点到当前点的步数（即时间）。使用单个变量来表示不同的时间概念（淹没时间和移动时间），简化了代码的复杂性，同时也有效地利用了变量来控制算法的流程。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-time-takes-to-reach-destination-without-drowning')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-time-takes-to-reach-destination-without-drowning/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

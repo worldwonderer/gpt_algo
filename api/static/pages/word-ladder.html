@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单词接龙</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单词接龙</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>字典&nbsp;<code>wordList</code> 中从单词 <code>beginWord</code><em>&nbsp;</em>和 <code>endWord</code> 的 <strong>转换序列 </strong>是一个按下述规格形成的序列<meta charset="UTF-8" />&nbsp;<code>beginWord -&gt; s<sub>1</sub>&nbsp;-&gt; s<sub>2</sub>&nbsp;-&gt; ... -&gt; s<sub>k</sub></code>：</p>
+
+<ul>
+	<li>每一对相邻的单词只差一个字母。</li>
+	<li><meta charset="UTF-8" />&nbsp;对于&nbsp;<code>1 &lt;= i &lt;= k</code>&nbsp;时，每个<meta charset="UTF-8" />&nbsp;<code>s<sub>i</sub></code>&nbsp;都在<meta charset="UTF-8" />&nbsp;<code>wordList</code>&nbsp;中。注意， <code>beginWord</code><em>&nbsp;</em>不需要在<meta charset="UTF-8" />&nbsp;<code>wordList</code>&nbsp;中。<meta charset="UTF-8" /></li>
+	<li><code>s<sub>k</sub>&nbsp;== endWord</code></li>
+</ul>
+
+<p>给你两个单词<em> </em><code>beginWord</code><em>&nbsp;</em>和 <code>endWord</code> 和一个字典 <code>wordList</code> ，返回 <em>从&nbsp;<code>beginWord</code> 到&nbsp;<code>endWord</code> 的 <strong>最短转换序列</strong> 中的 <strong>单词数目</strong></em> 。如果不存在这样的转换序列，返回 <code>0</code> 。</p>
+&nbsp;
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+<strong>输出：</strong>5
+<strong>解释：</strong>一个最短转换序列是 "hit" -&gt; "hot" -&gt; "dot" -&gt; "dog" -&gt; "cog", 返回它的长度 5。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+<strong>输出：</strong>0
+<strong>解释：</strong>endWord "cog" 不在字典中，所以无法进行转换。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= beginWord.length &lt;= 10</code></li>
+	<li><code>endWord.length == beginWord.length</code></li>
+	<li><code>1 &lt;= wordList.length &lt;= 5000</code></li>
+	<li><code>wordList[i].length == beginWord.length</code></li>
+	<li><code>beginWord</code>、<code>endWord</code> 和 <code>wordList[i]</code> 由小写英文字母组成</li>
+	<li><code>beginWord != endWord</code></li>
+	<li><code>wordList</code> 中的所有字符串 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 136 ms</p>
+                    <p>内存: 30.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -&gt; int:
+        wordId = {}
+        edges = collections.defaultdict(list)
+        nodeNum = 0
+        
+
+        def addWord(word):
+            nonlocal nodeNum
+            if word not in wordId:
+                wordId[word] = nodeNum
+                nodeNum += 1
+
+
+        def addEdge(word):
+            addWord(word)
+            id1 = wordId[word]
+            chars = list(word)
+            for i in range(len(chars)):
+                tmp = chars[i]
+                chars[i] = &#39;*&#39;
+                newWord = &#34;&#34;.join(chars)
+                addWord(newWord)
+                id2 = wordId[newWord]
+                edges[id1].append(id2)
+                edges[id2].append(id1)
+                chars[i] = tmp
+
+
+        for word in wordList:
+            addEdge(word)
+        addEdge(beginWord)
+
+
+        if endWord not in wordId:
+            return 0
+        
+
+        beginId = wordId[beginWord]
+        queBegin = collections.deque([beginId])
+        disBegin = [float(&#39;inf&#39;)] * nodeNum
+        disBegin[beginId] = 0
+
+
+        endId = wordId[endWord]
+        queEnd = collections.deque([endId])
+        disEnd = [float(&#39;inf&#39;)] * nodeNum
+        disEnd[endId] = 0
+
+
+        while queBegin or queEnd:
+            nodeBeginNum = len(queBegin)
+            for _ in range(nodeBeginNum):
+                nodeIdBegin = queBegin.popleft()
+                if disEnd[nodeIdBegin] != float(&#39;inf&#39;):
+                    return (disBegin[nodeIdBegin] + disEnd[nodeIdBegin]) // 2 + 1
+                for it in edges[nodeIdBegin]:
+                    if disBegin[it] == float(&#39;inf&#39;):
+                        queBegin.append(it)
+                        disBegin[it] = disBegin[nodeIdBegin] + 1
+            nodeEndNum = len(queEnd)
+            for _ in range(nodeEndNum):
+                nodeEndId = queEnd.popleft()
+                if disBegin[nodeEndId] != float(&#39;inf&#39;):
+                    return (disBegin[nodeEndId] + disEnd[nodeEndId]) // 2 + 1
+                for it in edges[nodeEndId]:
+                    if disEnd[it] == float(&#39;inf&#39;):
+                        queEnd.append(it)
+                        disEnd[it] = disEnd[nodeEndId] + 1
+        
+
+        return 0            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了双向广度优先搜索（BFS）的思路来解决单词接龙问题。首先，将所有单词存储在一个字典中，并为每个单词分配一个唯一的ID。然后，构建一个无向图，其中每个节点表示一个单词，如果两个单词只相差一个字母，则在它们之间添加一条边。接下来，同时从起点单词和终点单词开始进行BFS，每次搜索一层节点。如果在某一层发现起点单词的BFS和终点单词的BFS相遇，则找到了最短转换序列，返回序列的长度。如果其中一个BFS搜索完了所有节点而没有相遇，则说明不存在转换序列，返回0。</p>
+                                <p>时间复杂度: O(N * L^2)</p>
+                                <p>空间复杂度: O(N * L)</p>
+                                <pre class="bg-light p-2">```python
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -&gt; int:
+        wordId = {}
+        edges = collections.defaultdict(list)
+        nodeNum = 0
+        
+        # 将单词加入到字典中并分配唯一ID
+        def addWord(word):
+            nonlocal nodeNum
+            if word not in wordId:
+                wordId[word] = nodeNum
+                nodeNum += 1
+
+        # 在无向图中添加单词节点和边
+        def addEdge(word):
+            addWord(word)
+            id1 = wordId[word]
+            chars = list(word)
+            for i in range(len(chars)):
+                tmp = chars[i]
+                chars[i] = &#39;*&#39;
+                newWord = &#34;&#34;.join(chars)
+                addWord(newWord)
+                id2 = wordId[newWord]
+                edges[id1].append(id2)
+                edges[id2].append(id1)
+                chars[i] = tmp
+
+        # 将所有单词加入无向图中
+        for word in wordList:
+            addEdge(word)
+        addEdge(beginWord)
+
+        # 如果endWord不在字典中，则无法进行转换
+        if endWord not in wordId:
+            return 0
+        
+        # 分别从beginWord和endWord开始进行双向BFS
+        beginId = wordId[beginWord]
+        queBegin = collections.deque([beginId])
+        disBegin = [float(&#39;inf&#39;)] * nodeNum
+        disBegin[beginId] = 0
+
+        endId = wordId[endWord]
+        queEnd = collections.deque([endId])
+        disEnd = [float(&#39;inf&#39;)] * nodeNum
+        disEnd[endId] = 0
+
+        # 双向BFS搜索
+        while queBegin or queEnd:
+            nodeBeginNum = len(queBegin)
+            for _ in range(nodeBeginNum):
+                nodeIdBegin = queBegin.popleft()
+                if disEnd[nodeIdBegin] != float(&#39;inf&#39;):
+                    return (disBegin[nodeIdBegin] + disEnd[nodeIdBegin]) // 2 + 1
+                for it in edges[nodeIdBegin]:
+                    if disBegin[it] == float(&#39;inf&#39;):
+                        queBegin.append(it)
+                        disBegin[it] = disBegin[nodeIdBegin] + 1
+            nodeEndNum = len(queEnd)
+            for _ in range(nodeEndNum):
+                nodeEndId = queEnd.popleft()
+                if disBegin[nodeEndId] != float(&#39;inf&#39;):
+                    return (disBegin[nodeEndId] + disEnd[nodeEndId]) // 2 + 1
+                for it in edges[nodeEndId]:
+                    if disEnd[it] == float(&#39;inf&#39;):
+                        queEnd.append(it)
+                        disEnd[it] = disEnd[nodeEndId] + 1
+        
+        # 如果两个BFS都搜索完了所有节点仍未相遇，则不存在转换序列
+        return 0            
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么选择双向广度优先搜索（BFS）而不是单向BFS来解决这个问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双向广度优先搜索（BFS）通常比单向BFS更有效，因为它从两个方向同时搜索路径，一旦两个搜索在中间某点相遇，即完成搜索。这样可以大大减少搜索空间。在单词接龙问题中，起点和终点已知，利用双向BFS可以从两端同时逼近对方，当两个搜索相遇时，即找到最短路径。这种方法在最坏情况下的时间复杂度通常优于单向BFS。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构建无向图时，为什么每个单词字符都替换成通配符&#39;*&#39;，这种做法有什么好处？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将每个单词字符替换成通配符&#39;*&#39;可以有效地将所有可能通过单一字符变化能相互转换的单词组合起来。这样做可以创建一个虚拟节点，该节点连接所有只有一个字母不同的单词。例如，单词&#39;log&#39;和&#39;cog&#39;都可以通过虚拟节点&#39;*og&#39;相连。这种方法简化了图的构建过程，使得每个单词与其可能的变种之间的关系更加明确，从而加快了搜索速度，尤其是在单词量大的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到如果endWord不在wordId中，就返回0。这是否意味着endWord必须在wordList中才可能有解？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，endWord必须在wordList中才可能有解。在这种实现中，所有的单词都是从wordList加入图中的，如果endWord不在wordList中，则没有将其加入图中的步骤。因此，如果endWord不在wordList或者不是初始的beginWord，那么在图中找不到对应的节点，也就无法进行有效的路径搜索。这意味着找不到从beginWord到endWord的有效转换序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            双向BFS中，如何确保两个搜索方向在恰当的位置相遇？有什么机制来判定两个搜索已经相遇？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在双向BFS中，两个搜索队列分别从起点和终点出发。每进行一轮搜索时，都会检查当前扩展的节点是否已被对方搜索过。这是通过维护两个距离数组（disBegin和disEnd）来实现的，分别记录从起点和终点到每个节点的距离。每次节点扩展时，会检查该节点是否已在对方的距离数组中有记录（即距离不是无穷大）。如果条件成立，说明两边的搜索已经在这个节点相遇，从而可以计算出最短路径长度。这种机制确保了两个搜索方向在恰当的位置相遇，并能够立即识别出相遇点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/word-ladder-ii" class="list-group-item list-group-item-action">
+                                单词接龙 II
+                            </a>
+                        
+                            <a href="/problem/minimum-genetic-mutation" class="list-group-item list-group-item-action">
+                                最小基因变化
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/word-ladder')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/word-ladder/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>回文串重新排列查询</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>回文串重新排列查询</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个长度为 <strong>偶数</strong>&nbsp;<code>n</code>&nbsp;，下标从 <strong>0</strong>&nbsp;开始的字符串&nbsp;<code>s</code>&nbsp;。</p>
+
+<p>同时给你一个下标从 <strong>0</strong>&nbsp;开始的二维整数数组&nbsp;<code>queries</code>&nbsp;，其中&nbsp;<code>queries[i] = [a<sub>i</sub>, b<sub>i</sub>, c<sub>i</sub>, d<sub>i</sub>]</code>&nbsp;。</p>
+
+<p>对于每个查询&nbsp;<code>i</code>&nbsp;，你需要执行以下操作：</p>
+
+<ul>
+	<li>将下标在范围&nbsp;<code>0 &lt;= a<sub>i</sub> &lt;= b<sub>i</sub> &lt; n / 2</code>&nbsp;内的&nbsp;<strong>子字符串</strong>&nbsp;<code>s[a<sub>i</sub>:b<sub>i</sub>]</code>&nbsp;中的字符重新排列。</li>
+	<li>将下标在范围 <code>n / 2 &lt;= c<sub>i</sub> &lt;= d<sub>i</sub> &lt; n</code>&nbsp;内的 <strong>子字符串</strong>&nbsp;<code>s[c<sub>i</sub>:d<sub>i</sub>]</code>&nbsp;中的字符重新排列。</li>
+</ul>
+
+<p>对于每个查询，你的任务是判断执行操作后能否让 <code>s</code>&nbsp;变成一个 <strong>回文串</strong> 。</p>
+
+<p>每个查询与其他查询都是 <strong>独立的</strong>&nbsp;。</p>
+
+<p>请你返回一个下标从 <strong>0</strong>&nbsp;开始的数组<em>&nbsp;</em><code>answer</code>&nbsp;，如果第&nbsp;<code>i</code>&nbsp;个查询执行操作后，可以将&nbsp;<code>s</code>&nbsp;变为一个回文串，那么<em>&nbsp;</em><code>answer[i] =&nbsp;true</code>，否则为<em>&nbsp;</em><code>false</code>&nbsp;。</p>
+
+<ul>
+	<li><strong>子字符串</strong>&nbsp;指的是一个字符串中一段连续的字符序列。</li>
+	<li><code>s[x:y]</code>&nbsp;表示 <code>s</code>&nbsp;中从下标 <code>x</code>&nbsp;到 <code>y</code>&nbsp;且两个端点 <strong>都包含</strong>&nbsp;的子字符串。</li>
+</ul>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>s = "abcabc", queries = [[1,1,3,5],[0,2,5,5]]
+<b>输出：</b>[true,true]
+<b>解释：</b>这个例子中，有 2 个查询：
+第一个查询：
+- a<sub>0</sub> = 1, b<sub>0</sub> = 1, c<sub>0</sub> = 3, d<sub>0</sub> = 5
+- 你可以重新排列 s[1:1] =&gt; a<em><strong>b</strong></em>cabc 和 s[3:5] =&gt; abc<em><strong>abc</strong></em>&nbsp;。
+- 为了让 s 变为回文串，s[3:5] 可以重新排列得到 =&gt; abc<strong><em>cba </em></strong>。
+- 现在 s 是一个回文串。所以 answer[0] = true 。
+第二个查询：
+- a<sub>1</sub> = 0, b<sub>1</sub> = 2, c<sub>1</sub> = 5, d<sub>1</sub> = 5.
+- 你可以重新排列 s[0:2] =&gt; <em><strong>abc</strong></em>abc 和 s[5:5] =&gt; abcab<strong><em>c</em></strong>&nbsp;。
+- 为了让 s 变为回文串，s[0:2] 可以重新排列得到 =&gt; <em><strong>cba</strong></em>abc 。
+- 现在 s 是一个回文串，所以 answer[1] = true 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>s = "abbcdecbba", queries = [[0,2,7,9]]
+<b>输出：</b>[false]
+<b>解释：</b>这个示例中，只有一个查询。
+a<sub>0</sub> = 0, b<sub>0</sub> = 2, c<sub>0</sub> = 7, d<sub>0</sub> = 9.
+你可以重新排列 s[0:2] =&gt; <em><strong>abb</strong></em>cdecbba 和 s[7:9] =&gt; abbcdec<em><strong>bba</strong></em>&nbsp;。
+无法通过重新排列这些子字符串使 s 变为一个回文串，因为 s[3:6] 不是一个回文串。
+所以 answer[0] = false 。</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>s = "acbcab", queries = [[1,2,4,5]]
+<b>输出：</b>[true]
+<strong>解释：</strong>这个示例中，只有一个查询。
+a<sub>0</sub> = 1, b<sub>0</sub> = 2, c<sub>0</sub> = 4, d<sub>0</sub> = 5.
+你可以重新排列 s[1:2] =&gt; a<em><strong>cb</strong></em>cab 和 s[4:5] =&gt; acbc<strong><em>ab</em></strong>&nbsp;。
+为了让 s 变为回文串，s[1:2] 可以重新排列得到 =&gt; a<em><strong>bc</strong></em>cab<code>&nbsp;</code>。
+然后 s[4:5] 重新排列得到 abcc<em><strong>ba</strong></em>&nbsp;。
+现在 s 是一个回文串，所以 answer[0] = true 。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n == s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= queries.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>queries[i].length == 4</code></li>
+	<li><code>a<sub>i</sub> == queries[i][0], b<sub>i</sub> == queries[i][1]</code></li>
+	<li><code>c<sub>i</sub> == queries[i][2], d<sub>i</sub> == queries[i][3]</code></li>
+	<li><code>0 &lt;= a<sub>i</sub> &lt;= b<sub>i</sub> &lt; n / 2</code></li>
+	<li><code>n / 2 &lt;= c<sub>i</sub> &lt;= d<sub>i</sub> &lt; n </code></li>
+	<li><code>n</code>&nbsp;是一个偶数。</li>
+	<li><code>s</code> 只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 144 ms</p>
+                    <p>内存: 49.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def canMakePalindromeQueries(self, s: str, queries: List[List[int]]) -&gt; List[bool]:
+        n=len(s)
+        left,right=0,n-1
+        count = [0]*26
+        while left&lt;right:
+            count[ord(s[left])-97]+=1
+            count[ord(s[right])-97]-=1
+            left+=1
+            right-=1
+        m=len(queries)
+        r = [False]*m
+        for x in count:
+            if x: return r 
+        start,end=-1,-1
+        for i in range(n//2):
+            if s[i] != s[n-1-i]:
+                if start == -1: start=i
+                end=i
+        if start == -1:
+            return [True]*m
+        rightIndices = [0]*(n//2 + 1)
+        leftIndices = [0]*(n + 1)
+        count = [0]*26
+        right = n-1-start
+        for i in range(start,n//2):
+            count[ord(s[i])-97]+=1
+            while count[ord(s[right])-97]&gt;0:
+                count[ord(s[right])-97]-=1
+                right-=1
+            rightIndices[i]=right
+        count = [0]*26
+        left = start
+        for i in range(n-1-start,n//2 - 1,-1):
+            count[ord(s[i])-97]+=1
+            while count[ord(s[left])-97]&gt;0:
+                count[ord(s[left])-97]-=1
+                left+=1
+            leftIndices[i]=left
+        for i in range(m):
+            a,b,c,d = queries[i]
+            if a&lt;=start and b&gt;=end or c&lt;=n-1-end and d&gt;=n-1-start or \
+            a&lt;=start and b&gt;=start and c&lt;=n-1-end and d&gt;=rightIndices[b] or \
+            c&lt;=n-1-start and d&gt;=n-1-start and a&lt;=leftIndices[c] and b&gt;=end:
+                r[i]=True
+        return r</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的核心思路是预处理字符串 s，通过对比字符串的前半部和后半部的字符频率，找到最早和最晚的不匹配点。利用这些不匹配点，我们可以高效地回答每个查询。首先，我们创建一个字符频率数组 count 来统计从字符串两端向中心移动时，左右字符出现的差异。然后，针对查询，首先判断是否整个字符串已经满足回文结构。如果不满足，我们需要进一步确定最小的子字符串区间，使得这一区间内的所有字符重新排列后能够和其对应的镜像位置字符匹配。通过逐步检查从两端向中心移动过程中字符的匹配情况，我们建立了两个索引数组 leftIndices 和 rightIndices，这两个数组帮助我们迅速定位任意查询范围内是否可能通过排列实现回文结构。最后，对于每个查询，我们根据这些预处理的信息来判断是否能够重排成回文串。</p>
+                                <p>时间复杂度: O(n + m)</p>
+                                <p>空间复杂度: O(n + m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def canMakePalindromeQueries(self, s: str, queries: List[List[int]]) -&gt; List[bool]:
+        n = len(s)
+        # 初始化计数数组和双指针
+        count = [0] * 26
+        left, right = 0, n - 1
+        # 从两端向中心统计字符出现的差异
+        while left &lt; right:
+            count[ord(s[left]) - 97] += 1
+            count[ord(s[right]) - 97] -= 1
+            left += 1
+            right -= 1
+        m = len(queries)
+        r = [False] * m
+        # 如果 count 中有非零元素，说明不能直接构成回文
+        for x in count:
+            if x: return r
+        start, end = -1, -1
+        # 确定最早和最晚的不匹配点
+        for i in range(n//2):
+            if s[i] != s[n-1-i]:
+                if start == -1: start = i
+                end = i
+        if start == -1:
+            return [True] * m
+        rightIndices = [0] * (n//2 + 1)
+        leftIndices = [0] * (n + 1)
+        count = [0] * 26
+        right = n - 1 - start
+        # 确定可以匹配的右侧索引
+        for i in range(start, n//2):
+            count[ord(s[i]) - 97] += 1
+            while count[ord(s[right]) - 97] &gt; 0:
+                count[ord(s[right]) - 97] -= 1
+                right -= 1
+            rightIndices[i] = right
+        count = [0] * 26
+        left = start
+        # 确定可以匹配的左侧索引
+        for i in range(n - 1 - start, n//2 - 1, -1):
+            count[ord(s[i]) - 97] += 1
+            while count[ord(s[left]) - 97] &gt; 0:
+                count[ord(s[left]) - 97] -= 1
+                left += 1
+            leftIndices[i] = left
+        # 根据预处理结果判断每个查询是否能重排成回文串
+        for i in range(m):
+            a, b, c, d = queries[i]
+            if a &lt;= start and b &gt;= end or c &lt;= n - 1 - end and d &gt;= n - 1 - start or \
+               a &lt;= start and b &gt;= start and c &lt;= n - 1 - end and d &gt;= rightIndices[b] or \
+               c &lt;= n - 1 - start and d &gt;= n - 1 - start and a &lt;= leftIndices[c] and b &gt;= end:
+                r[i] = True
+        return r</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定题解中提到的‘最早和最晚的不匹配点’，并且这些点如何影响到整个算法的查询处理过程？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，‘最早和最晚的不匹配点’是通过比较字符串从两端向中心的字符来确定的。从字符串的首尾开始，逐对字符比较，第一对不相同的字符的位置被标记为‘最早的不匹配点’（start），最后一对不相同的字符的位置被标记为‘最晚的不匹配点’（end）。这两个点的确定是为了辅助判断字符串的某个子区间是否可以通过字符重新排列来形成回文。在处理查询时，如果查询的区间包含了这两个点，那么该区间内的字符需要进行详细检查，以确认是否所有字符都可以通过适当的重新排列来匹配其镜像位置的字符。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的预处理步骤中用到的字符频率数组 count 是如何初始化和更新的？具体是基于什么逻辑来调整 count 数组中的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>字符频率数组 count 用来记录字符串从两端到中心过程中字符出现的差异。数组初始化为全0，表示没有任何字符差异。随着从两端向中心遍历字符串，每次遍历时，左侧字符的频率在对应的 count 数组中增加，而右侧字符的频率减少。这种增减反映了在尝试构建回文时两侧字符出现的不平衡。如果数组中所有的值都能回归到0，说明可以通过某种排列形成回文串。这个数组的更新是基于每个字符出现次数的不平衡程度，从而帮助我们在后续的查询中快速判断重排的可能性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在处理每个查询时，需要依据 start 和 end 索引来判断子字符串是否可以通过重排成为回文结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>start 和 end 索引标记了整个字符串中第一次和最后一次字符不匹配的位置。这意味着在这两个索引之间的区域是最有可能需要通过字符重排来达成回文的区域。在处理查询时，如果查询的区间完全包含从 start 到 end 的区间，这表明在考虑的子字符串中包含了所有潜在的不匹配字符。因此，只有当这部分区间可以通过重新排列来匹配其对称部分时，整个子字符串才可能被重排为回文。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解最后判断单个查询是否能重排成回文串时，使用了复合条件语句，能否详细解释其中每个条件判断的意义和必要性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>复合条件语句用于判断查询的子区间是否可以通过重排成为回文结构。具体条件如下：
+1. `a &lt;= start &amp;&amp; b &gt;= end`：查询区间包含了从 start 到 end 的全部字符，这是重排成回文的必要条件之一。
+2. `c &lt;= n - 1 - end &amp;&amp; d &gt;= n - 1 - start`：确保子区间的镜像对称部分也包含在查询中，这对于形成对称的回文结构是必要的。
+3. `a &lt;= start &amp;&amp; b &gt;= start &amp;&amp; c &lt;= n - 1 - end &amp;&amp; d &gt;= rightIndices[b]`：确保左侧的查询区间至少包括到 start 且右侧的查询区间延伸到正确匹配右侧的相关索引，意味着这部分区间可以通过重排来匹配其镜像对称区域。
+4. `c &lt;= n - 1 - start &amp;&amp; d &gt;= n - 1 - start &amp;&amp; a &lt;= leftIndices[c] &amp;&amp; b &gt;= end`：确保右侧的查询区间至少包括到最远的不匹配点，而左侧的查询区间可以延伸到对应的左侧索引，这同样是为了保证可以通过重排来实现对称。
+以上条件判断的组合确保了在回文构建过程中，查询的区间能够在逻辑上和结构上满足重排成回文的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/palindrome-rearrangement-queries')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/palindrome-rearrangement-queries/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找出网格的区域平均强度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找出网格的区域平均强度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始、大小为 <code>m x n</code> 的网格 <code>image</code> ，表示一个灰度图像，其中 <code>image[i][j]</code> 表示在范围 <code>[0..255]</code> 内的某个像素强度。另给你一个<strong> 非负 </strong>整数 <code>threshold</code> 。</p>
+
+<p>如果 <code>image[a][b]</code> 和 <code>image[c][d]</code> 满足 <code>|a - c| + |b - d| == 1</code> ，则称这两个像素是<strong> 相邻像素</strong> 。</p>
+
+<p><strong>区域 </strong>是一个 <code>3 x 3</code> 的子网格，且满足区域中任意两个 <strong>相邻</strong> 像素之间，像素强度的<strong> 绝对差 </strong><strong> 小于或等于 </strong><code>threshold</code> 。</p>
+
+<p><strong>区域</strong> 内的所有像素都认为属于该区域，而一个像素 <strong>可以 </strong>属于 <strong>多个</strong> 区域。</p>
+
+<p>你需要计算一个下标从 <strong>0</strong> 开始、大小为 <code>m x n</code> 的网格 <code>result</code> ，其中 <code>result[i][j]</code> 是 <code>image[i][j]</code> 所属区域的 <strong>平均 </strong>强度，<strong>向下取整 </strong>到最接近的整数。如果 <code>image[i][j]</code> 属于多个区域，<code>result[i][j]</code> 是这些区域的<strong> </strong><strong>“取整后的平均强度”</strong> 的<strong> 平均值</strong>，也 <strong>向下取整 </strong>到最接近的整数。如果 <code>image[i][j]</code> 不属于任何区域，则 <code>result[i][j]</code><strong> 等于 </strong><code>image[i][j]</code> 。</p>
+
+<p>返回网格 <code>result</code> 。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2023/12/21/example0corrected.png" style="width: 832px; height: 275px;" />
+<pre>
+<strong>输入：</strong>image = [[5,6,7,10],[8,9,10,10],[11,12,13,10]], threshold = 3
+<strong>输出：</strong>[[9,9,9,9],[9,9,9,9],[9,9,9,9]]
+<strong>解释：</strong>图像中存在两个区域，如图片中的阴影区域所示。第一个区域的平均强度为 9 ，而第二个区域的平均强度为 9.67 ，向下取整为 9 。两个区域的平均强度为 (9 + 9) / 2 = 9 。由于所有像素都属于区域 1 、区域 2 或两者，因此 result 中每个像素的强度都为 9 。
+注意，在计算多个区域的平均值时使用了向下取整的值，因此使用区域 2 的平均强度 9 来进行计算，而不是 9.67 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2023/12/21/example1corrected.png" style="width: 805px; height: 377px;" />
+<pre>
+<strong>输入：</strong>image = [[10,20,30],[15,25,35],[20,30,40],[25,35,45]], threshold = 12
+<strong>输出：</strong>[[25,25,25],[27,27,27],[27,27,27],[30,30,30]]
+<strong>解释：</strong>图像中存在两个区域，如图片中的阴影区域所示。第一个区域的平均强度为 25 ，而第二个区域的平均强度为 30 。两个区域的平均强度为 (25 + 30) / 2 = 27.5 ，向下取整为 27 。图像中第 0 行的所有像素属于区域 1 ，因此 result 中第 0 行的所有像素为 25 。同理，result 中第 3 行的所有像素为 30 。图像中第 1 行和第 2 行的像素属于区域 1 和区域 2 ，因此它们在 result 中的值为 27 。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>image = [[5,6,7],[8,9,10],[11,12,13]], threshold = 1
+<strong>输出：</strong>[[5,6,7],[8,9,10],[11,12,13]]
+<strong>解释：</strong>图像中不存在任何区域，因此对于所有像素，result[i][j] == image[i][j] 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= n, m &lt;= 500</code></li>
+	<li><code>0 &lt;= image[i][j] &lt;= 255</code></li>
+	<li><code>0 &lt;= threshold &lt;= 255</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1524 ms</p>
+                    <p>内存: 71.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def resultGrid(self, image: List[List[int]], threshold: int) -&gt; List[List[int]]:
+        m, n = len(image), len(image[0])
+        valid_region = [[True for _ in range(n)] for _ in range(m)]
+
+        for i in range(m):
+            for j in range(n):
+                if (j+1) &lt; n and abs(image[i][j] - image[i][j+1]) &gt; threshold:
+                    valid_region[i][j], valid_region[i][j+1] = False, False
+                    if (i-1) &gt;=0 : valid_region[i-1][j], valid_region[i-1][j+1] = False, False
+                    if (i+1) &lt; m : valid_region[i+1][j], valid_region[i+1][j+1] = False, False
+                if (i+1) &lt; m and abs(image[i][j] - image[i+1][j]) &gt; threshold:
+                    valid_region[i][j], valid_region[i+1][j] = False, False
+                    if (j-1) &gt;=0 : valid_region[i][j-1], valid_region[i+1][j-1] = False, False
+                    if (j+1) &lt; n : valid_region[i][j+1], valid_region[i+1][j+1] = False, False
+        
+        ans = [[[] for _ in range(n)] for _ in range(m)]
+        for i in range(1, m-1):
+            for j in range(1, n-1):
+                if valid_region[i][j]:
+                    avg_score = (image[i-1][j-1] + image[i-1][j] + image[i-1][j+1] + image[i][j-1] + image[i][j] + image[i][j+1] + image[i+1][j-1] + image[i+1][j] + image[i+1][j+1])//9
+                    for p in range(i-1, i+2):
+                        for q in range(j-1, j+2):
+                            ans[p][q].append(avg_score)
+        
+        for i in range(m):
+            for j in range(n):
+                ans[i][j] = sum(ans[i][j])//len(ans[i][j]) if len(ans[i][j]) &gt; 0 else image[i][j]
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是先用两个嵌套循环遍历整个网格，判断每个像素与其右侧和下侧相邻像素的强度差是否大于阈值，如果大于则将它们及其上下左右的相邻像素标记为无效区域。接着再用两个嵌套循环遍历网格的内部(即不包括最外层的像素)，对于有效区域内的每个像素，计算其 3x3 子网格的平均强度，并将该平均值添加到子网格内所有9个像素的答案数组中。最后再遍历一次网格，对于每个像素，如果它所属的区域数量大于0，则将其所有区域的平均强度取平均并向下取整作为最终答案，否则直接使用原始像素强度作为答案。</p>
+                                <p>时间复杂度: O(mn)</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">
+class Solution:
+    def resultGrid(self, image: List[List[int]], threshold: int) -&gt; List[List[int]]:
+        m, n = len(image), len(image[0])
+        # 标记有效区域的二维布尔数组
+        valid_region = [[True for _ in range(n)] for _ in range(m)]
+
+        # 遍历网格，判断每个像素与其右侧和下侧相邻像素的强度差是否大于阈值
+        for i in range(m):
+            for j in range(n):
+                if (j+1) &lt; n and abs(image[i][j] - image[i][j+1]) &gt; threshold:
+                    valid_region[i][j], valid_region[i][j+1] = False, False
+                    if (i-1) &gt;=0 : valid_region[i-1][j], valid_region[i-1][j+1] = False, False
+                    if (i+1) &lt; m : valid_region[i+1][j], valid_region[i+1][j+1] = False, False
+                if (i+1) &lt; m and abs(image[i][j] - image[i+1][j]) &gt; threshold:
+                    valid_region[i][j], valid_region[i+1][j] = False, False
+                    if (j-1) &gt;=0 : valid_region[i][j-1], valid_region[i+1][j-1] = False, False
+                    if (j+1) &lt; n : valid_region[i][j+1], valid_region[i+1][j+1] = False, False
+        
+        # 存储每个像素所属区域平均强度的二维数组
+        ans = [[[] for _ in range(n)] for _ in range(m)]
+        # 遍历网格内部，对于有效区域内的每个像素，计算其 3x3 子网格的平均强度
+        for i in range(1, m-1):
+            for j in range(1, n-1):
+                if valid_region[i][j]:
+                    avg_score = (image[i-1][j-1] + image[i-1][j] + image[i-1][j+1] + image[i][j-1] + image[i][j] + image[i][j+1] + image[i+1][j-1] + image[i+1][j] + image[i+1][j+1])//9
+                    for p in range(i-1, i+2):
+                        for q in range(j-1, j+2):
+                            ans[p][q].append(avg_score)
+        
+        # 遍历网格，对于每个像素，计算其所属区域的平均强度作为最终答案
+        for i in range(m):
+            for j in range(n):
+                ans[i][j] = sum(ans[i][j])//len(ans[i][j]) if len(ans[i][j]) &gt; 0 else image[i][j]
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，如何确保在初始遍历判断像素强度差时不会越界访问数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，通过设置循环的边界条件来确保不会越界。例如，在判断每个像素与其右侧像素的强度差时，循环中的`j`变量的条件是`(j+1) &lt; n`，这样就保证`j+1`始终是有效的数组索引，不会超过列的上限。同样，在判断与下侧像素的强度差时，`i`的条件是`(i+1) &lt; m`，确保`i+1`不会超过行的上限。这两个条件有效地防止了数组的越界访问。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在像素强度差大于阈值时，需要将当前像素及其上下左右的相邻像素全部标记为无效区域？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在像素强度差大于阈值时，将当前像素及其上下左右的相邻像素全部标记为无效区域是为了处理图像中的潜在噪声或边缘。如果两个相邻像素的强度差很大，这通常意味着这里有显著的图像变化，比如边缘或噪点。将这些像素及其邻域标记为无效，可以帮助算法忽略这些可能扭曲平均强度计算的区域，从而使得最终的图像处理结果更加平滑和稳定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算3x3区域的平均强度时，为什么选择只遍历网格的内部(不包括边缘像素)，边缘像素如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算3x3区域的平均强度时，选择遍历网格的内部是因为边缘像素没有足够的周围像素来形成一个完整的3x3子网格。如果包括边缘像素，在边缘处无法获取完整的9个像素值来计算平均值。因此，算法避免了在边缘进行这种计算，只在有完整3x3子网格的区域内进行遍历。至于边缘像素，由于它们没有足够的数据进行平均强度的计算，所以最终输出中，这些像素的值直接使用其原始强度值，除非它们被标记为无效区域的一部分。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-grid-of-region-average')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-grid-of-region-average/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

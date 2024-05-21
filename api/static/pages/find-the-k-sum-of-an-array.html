@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找出数组的第 K 大和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找出数组的第 K 大和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> 和一个 <strong>正</strong> 整数 <code>k</code> 。你可以选择数组的任一 <strong>子序列</strong> 并且对其全部元素求和。</p>
+
+<p>数组的 <strong>第 k 大和</strong> 定义为：可以获得的第 <code>k</code> 个 <strong>最大</strong> 子序列和（子序列和允许出现重复）</p>
+
+<p>返回数组的 <strong>第 k 大和</strong> 。</p>
+
+<p>子序列是一个可以由其他数组删除某些或不删除元素派生而来的数组，且派生过程不改变剩余元素的顺序。</p>
+
+<p><strong>注意：</strong>空子序列的和视作 <code>0</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [2,4,-2], k = 5
+<strong>输出：</strong>2
+<strong>解释：</strong>所有可能获得的子序列和列出如下，按递减顺序排列：
+6、4、4、2、<strong><em>2</em></strong>、0、0、-2
+数组的第 5 大和是 2 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [1,-2,3,4,-10,12], k = 16
+<strong>输出：</strong>10
+<strong>解释：</strong>数组的第 16 大和是 10 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == nums.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+	<li><code>1 &lt;= k &lt;= min(2000, 2<sup>n</sup>)</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 144 ms</p>
+                    <p>内存: 28.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def kSum(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        acc = sum(num for num in nums if num &gt; 0)
+        if k == 1: return acc
+
+        # queue = sorted(abs(num) for num in nums)
+        queue = heapq.nsmallest(k, list(abs(num) for num in nums))
+
+        heap = [(queue[0], 0)]
+
+        for _ in range(k-2):
+            res, index = heappop(heap)
+            next = index + 1
+            if next == n: continue
+            heappush(heap, (res - queue[index] + queue[next], next))
+            heappush(heap, (res + queue[next], next))
+        
+        return acc - heappop(heap)[0]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目的核心思路是利用最小堆来维护所有可能的子序列和，从而找出第 k 大的和。首先，计算所有正数的和 `acc`，这代表了最大的子序列和（即所有正数相加）。然后，使用一个最小堆来维护和操作。堆中的元素是以绝对值排序的，这是因为我们需要逐步从最大的子序列和中减去一些数值来获得次大的和。通过维护堆来迭代地计算可能的子序列和，并逐步获得第 k 大的和。代码中的每一步操作都是基于这个最小堆来进行的，我们通过弹出和推入新的元素来控制和更新堆的状态。</p>
+                                <p>时间复杂度: O(n log k + k log k)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def kSum(self, nums: List[int], k: int) -&gt; int:
+        n = len(nums)
+        acc = sum(num for num in nums if num &gt; 0)  # 计算所有正数的和
+        if k == 1: return acc  # 如果 k 为 1，直接返回最大子序列和
+
+        # 获取前 k 个最小的绝对值
+        queue = heapq.nsmallest(k, list(abs(num) for num in nums))
+
+        heap = [(queue[0], 0)]  # 初始化堆
+
+        for _ in range(k-2):
+            res, index = heappop(heap)  # 弹出堆顶元素
+            next_index = index + 1
+            if next_index == n: continue
+            heappush(heap, (res - queue[index] + queue[next_index], next_index))  # 更新堆
+            heappush(heap, (res + queue[next_index], next_index))  # 添加新可能的子序列和
+        
+        return acc - heappop(heap)[0]  # 计算第 k 大的和</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在选择绝对值排序而不是直接按原始数值排序来处理子序列和？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理子序列和的问题中，选择绝对值排序而非原始数值排序的主要原因是为了确保我们能从最大和中逐步减去的数值是最小的，即逐步探索较小的子序列和。如果我们按原始数值排序，那么负数的处理会变得复杂，因为我们需要考虑加上一个负数实际上是减小总和。而通过绝对值排序，我们可以更直观地按数值大小处理各个数，从而有效地通过最小堆来控制和更新子序列和的大小。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            堆中存储的元素为何要包含索引？这里的索引具体是表示什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在堆中存储元素时包含索引是为了追踪当前处理到哪个元素，以及从哪个元素派生出当前的子序列和。这里的索引表示的是当前元素在按绝对值排序后的数组中的位置。通过记录索引，我们可以确保每次操作都是基于正确的元素进行，避免重复处理同一个元素，同时也能按顺序探索所有可能的子序列和。这是一种有效的方式来维护和更新堆中的状态，确保我们能正确地找到第 k 大的子序列和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在代码中，如果k等于1，直接返回累加的正数和`acc`，这样做是否考虑到了所有元素都是负数的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中直接返回累加的正数和`acc`如果k等于1确实是一个问题，尤其是当数组中所有元素都是负数时。这种情况下，最大的子序列和应该是0（即不选择任何元素），而不是负数的累加和。因此，代码在处理全负数数组时应该有额外的检查，以确保当k为1且所有数都是负数时返回0。这种情况下的直接返回`acc`实际上是忽略了全负数的特殊情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果数组中包含重复元素，这种方法是否仍然有效？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组中包含重复元素，使用最小堆来维护和操作子序列和的方法仍然是有效的。重复元素在处理时会被视为独立的实体，因此在计算子序列和时，每个重复的元素都可以被单独考虑。这确保了算法的正确性和完整性，不会因为元素的重复而影响最终的结果。维护最小堆的过程考虑了所有可能的子序列和，包括由重复元素形成的所有组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-k-sum-of-an-array')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-k-sum-of-an-array/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>生成数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>生成数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定三个整数 <code>n</code>、<code>m</code> 和 <code>k</code> 。考虑使用下图描述的算法找出正整数数组中最大的元素。</p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/04/19/e.png" style="height: 372px; width: 424px;" /></p>
+
+<p>请你构建一个具有以下属性的数组 <code>arr</code> ：</p>
+
+<ul>
+	<li><code>arr</code> 中包含确切的&nbsp;<code>n</code> 个整数。</li>
+	<li><code>1 &lt;= arr[i] &lt;= m</code> 其中 <code>(0 &lt;= i &lt; n)</code> 。</li>
+	<li>将上面提到的算法应用于 <code>arr</code>&nbsp;之后，<code>search_cost</code> 的值等于 <code>k</code> 。</li>
+</ul>
+
+<p>返回在满足上述条件的情况下构建数组 <code>arr</code> 的 <em>方法数量</em>&nbsp;，由于答案可能会很大，所以 <strong>必须</strong> 对 <code>10^9 + 7</code> 取余。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 2, m = 3, k = 1
+<strong>输出：</strong>6
+<strong>解释：</strong>可能的数组分别为 [1, 1], [2, 1], [2, 2], [3, 1], [3, 2] [3, 3]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, m = 2, k = 3
+<strong>输出：</strong>0
+<strong>解释：</strong>没有数组可以满足上述条件
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 9, m = 1, k = 1
+<strong>输出：</strong>1
+<strong>解释：</strong>唯一可能的数组是 [1, 1, 1, 1, 1, 1, 1, 1, 1]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 50</code></li>
+	<li><code>1 &lt;= m &lt;= 100</code></li>
+	<li><code>0 &lt;= k &lt;= n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 75 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numOfArrays(self, n: int, m: int, k: int) -&gt; int:
+        if n&lt;k or m&lt;k:
+            return 0
+        Mod=10**9+7
+        # f=[[[0]*(m+1) for _ in range(k+1)] for _ in range(n)]
+        f0=[[0]*(m+1) for _ in range(k+1)]
+        f1=[[0]*(m+1) for _ in range(k+1)]
+        for i in range(1,m+1):
+            f0[1][i]=1
+        for i in range(1,n):
+            for s in range(1,min(i+1,k)+1):
+                presum_j=0
+                for j in range(1,m+1):
+                    f1[s][j]=(f0[s][j]*j + presum_j)%Mod
+                    presum_j+=f0[s-1][j]
+                    # f[i][s][j]=(f[i-1][s][j]*j+presum_j)%Mod
+                    # presum_j=(presum_j+f[i-1][s-1][j])%Mod
+            f0,f1=f1,f0
+
+        return sum(f0[-1])%Mod</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题目使用动态规划的方法来解决。定义动态规划数组 f[i][s][j] 表示考虑前 i 个元素，最大值为 j，且 search_cost 为 s 的数组数量。状态转移方程为：f[i][s][j] = f[i-1][s][j] * j + sum(f[i-1][s-1][1...j-1])。其中，f[i-1][s][j] * j 表示第 i 个元素可以选择 1 到 j 中的任何一个数字，而 sum(f[i-1][s-1][1...j-1]) 表示第 i 个元素选择的数字比之前的最大值 j 要大，因此 search_cost 增加了 1。为了优化空间复杂度，可以使用滚动数组的技巧，交替使用 f0 和 f1 两个数组来存储动态规划的状态。</p>
+                                <p>时间复杂度: O(n * k * m)</p>
+                                <p>空间复杂度: O(k * m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numOfArrays(self, n: int, m: int, k: int) -&gt; int:
+        if n&lt;k or m&lt;k:
+            return 0
+        Mod=10**9+7
+        f0=[[0]*(m+1) for _ in range(k+1)]
+        f1=[[0]*(m+1) for _ in range(k+1)]
+        for i in range(1,m+1):
+            f0[1][i]=1
+        for i in range(1,n):
+            for s in range(1,min(i+1,k)+1):
+                presum_j=0
+                for j in range(1,m+1):
+                    f1[s][j]=(f0[s][j]*j + presum_j)%Mod
+                    presum_j+=f0[s-1][j]
+            f0,f1=f1,f0
+
+        return sum(f0[-1])%Mod</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划的状态定义中，f[i][s][j] 的含义是什么？具体而言，i、s、j 各代表什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个动态规划的设置中，f[i][s][j] 表示考虑前 i 个元素，且这些元素中的最大值是 j，同时 search_cost 等于 s 的不同数组的数量。这里，i 表示数组的长度，s 表示搜索成本，j 表示数组中的最大值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            状态转移方程 f[i][s][j] = f[i-1][s][j] * j + sum(f[i-1][s-1][1...j-1]) 中，为什么要乘以 j 并且加上前 j-1 个元素的和？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>状态转移方程中的 f[i-1][s][j] * j 部分表示当第 i 个元素取值在 1 到 j 之间任何一个可能的值时，都不会改变数组的最大值和搜索成本，因此有 j 种可能。sum(f[i-1][s-1][1...j-1]) 部分表示当第 i 个元素选择的值比之前所有元素的最大值都要大时（即这个值是 j），它会使得数组的最大值增加，并且因为这个新的最大值，搜索成本也相应增加了一，所以需要加上所有可能的前 i-1 个元素构成的子数组的数量，其中数组最大值小于 j。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，当 n &lt; k 或 m &lt; k 时，函数返回 0。这种情况为什么会导致无法构建符合条件的数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当 n &lt; k 或 m &lt; k 时，函数返回 0 是因为在题目的设置中，数组需要有 k 个不同的最大值来满足 search_cost 为 k。如果 n（数组长度）小于 k，那么不可能在数组中放置足够数量的元素来实现 k 个不同的最大值。同样，如果 m（可选的最大值）小于 k，那么也没有足够多的不同值可以用来实现 k 个不同的最大值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            最终结果需要对 10^9 + 7 取余。这里使用模 10^9 + 7 的原因是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算中使用模 10^9 + 7 主要是为了防止计算过程中的整数溢出，同时也是为了保持结果的规模可管理。10^9 + 7 是一个大的质数，常用在算法竞赛和编程题目中，因为它可以提供良好的数学性质并且适合在多数编程环境中进行高效的模算运算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/build-array-where-you-can-find-the-maximum-exactly-k-comparisons')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/build-array-where-you-can-find-the-maximum-exactly-k-comparisons/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

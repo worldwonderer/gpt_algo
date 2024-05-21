@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>查询无效交易</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>查询无效交易</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>如果出现下述两种情况，交易 <strong>可能无效</strong>：</p>
+
+<ul>
+	<li>交易金额超过<meta charset="UTF-8" />&nbsp;<code>$1000</code></li>
+	<li>或者，它和&nbsp;<strong>另一个城市</strong>&nbsp;中 <strong>同名</strong> 的另一笔交易相隔不超过 <code>60</code> 分钟（包含 60 分钟整）</li>
+</ul>
+
+<p>给定字符串数组交易清单<meta charset="UTF-8" />&nbsp;<code>transaction</code>&nbsp;。每个交易字符串&nbsp;<code>transactions[i]</code>&nbsp;由一些用逗号分隔的值组成，这些值分别表示交易的名称，时间（以分钟计），金额以及城市。</p>
+
+<p>返回&nbsp;<code>transactions</code>，返回可能无效的交易列表。你可以按 <strong>任何顺序</strong> 返回答案。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>transactions = ["alice,20,800,mtv","alice,50,100,beijing"]
+<strong>输出：</strong>["alice,20,800,mtv","alice,50,100,beijing"]
+<strong>解释：</strong>第一笔交易是无效的，因为第二笔交易和它间隔不超过 60 分钟、名称相同且发生在不同的城市。同样，第二笔交易也是无效的。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>transactions = ["alice,20,800,mtv","alice,50,1200,mtv"]
+<strong>输出：</strong>["alice,50,1200,mtv"]
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>transactions = ["alice,20,800,mtv","bob,50,1200,mtv"]
+<strong>输出：</strong>["bob,50,1200,mtv"]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>transactions.length &lt;= 1000</code></li>
+	<li>每笔交易&nbsp;<code>transactions[i]</code>&nbsp;按&nbsp;<code>"{name},{time},{amount},{city}"</code>&nbsp;的格式进行记录</li>
+	<li>每个交易名称&nbsp;<code>{name}</code>&nbsp;和城市&nbsp;<code>{city}</code>&nbsp;都由小写英文字母组成，长度在&nbsp;<code>1</code>&nbsp;到&nbsp;<code>10</code>&nbsp;之间</li>
+	<li>每个交易时间&nbsp;<code>{time}</code>&nbsp;由一些数字组成，表示一个&nbsp;<code>0</code>&nbsp;到&nbsp;<code>1000</code>&nbsp;之间的整数</li>
+	<li>每笔交易金额&nbsp;<code>{amount}</code>&nbsp;由一些数字组成，表示一个&nbsp;<code>0</code> 到&nbsp;<code>2000</code>&nbsp;之间的整数</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 47 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def invalidTransactions(self, transactions: List[str]) -&gt; List[str]:
+        name = {}
+        for t in transactions:
+            a,b,c,d = t.split(&#39;,&#39;)
+            if a in name:
+                name[a].append([int(b),d])
+            else:
+                name[a] = [[int(b),d]]
+                
+        ans = []
+        for t in transactions:
+            a,b,c,d = t.split(&#39;,&#39;)
+            if int(c) &gt; 1000:
+                ans.append(t)
+            else:
+                lis = name[a]
+                for x,y in lis:
+                    if abs(x-int(b)) &lt;= 60 and y != d:
+                        ans.append(t)
+                        break
+        return ans
+                
+&#39;&#39;&#39;
+        for ls in name:
+            name[ls].sort()
+            print(name[ls])
+            &#39;&#39;&#39;   </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了哈希表来跟踪每个人的交易记录，并检查每个交易是否有效。首先，通过遍历每个交易字符串，它解析出交易者的姓名、时间、金额和城市，并将时间和城市存储在哈希表中，键为交易者姓名。之后，再次遍历每个交易，首先检查交易金额是否超过1000美元，如果是，则将其添加到无效交易列表中。接着，对于没有直接因金额超标而无效的交易，它会检查同一个人的其他交易记录，看是否有在不同城市且时间差在60分钟以内的交易，如果有，该交易也被认为是无效的。这个方法保证了能检测出题目中定义的所有无效交易情况。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def invalidTransactions(self, transactions: List[str]) -&gt; List[str]:
+        name = {}
+        # 建立哈希表，存储每个交易者的交易记录
+        for t in transactions:
+            a, b, c, d = t.split(&#39;,&#39;)
+            if a in name:
+                name[a].append([int(b), d])
+            else:
+                name[a] = [[int(b), d]]
+
+        ans = []
+        # 检查每一笔交易是否无效
+        for t in transactions:
+            a, b, c, d = t.split(&#39;,&#39;)
+            if int(c) &gt; 1000:
+                ans.append(t)
+            else:
+                lis = name[a]
+                for x, y in lis:
+                    if abs(x - int(b)) &lt;= 60 and y != d:
+                        ans.append(t)
+                        break
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            算法中似乎对每一笔交易都进行了遍历检查其他交易记录，这是否意味着算法效率较低？有没有可能通过优化数据结构或算法逻辑来提高效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，当前算法的效率可能较低，因为它对每个交易进行了遍历，并且对每个交易再次遍历该交易者的所有交易记录来检查条件，这使得时间复杂度接近O(n^2)，其中n是交易的数量。可以通过以下方式优化算法：1. 使用更复杂的数据结构，例如哈希表中不仅存储时间和城市，还可以存储交易索引和金额，这样可以更快速地进行查找和比较。2. 对每个交易者的交易记录按时间排序，然后使用两个指针的方法来检查60分钟内的其他交易，这样可以减少不必要的比较，从而提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在最后返回结果时，是否存在重复交易被多次添加到结果列表中的可能性？如果有，如何优化算法以避免重复添加？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，存在重复交易被多次添加到结果列表中的可能性。例如，如果一笔交易因为金额超过1000美元而被添加到结果中，而后又因为与另一笔交易在不同城市且时间差在60分钟内被再次添加，这就导致了重复。为了避免这种情况，可以在添加到结果列表之前检查该交易是否已经存在于结果中。更有效的方法是使用集合（Set）来存储结果，因为集合自动处理重复项，这样即使尝试添加重复的交易，也不会在结果集合中重复出现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/invalid-transactions')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/invalid-transactions/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

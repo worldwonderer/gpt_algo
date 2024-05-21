@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>猫和老鼠</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>猫和老鼠</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=game-theory" class="badge bg-secondary tag-link">博弈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>两位玩家分别扮演猫和老鼠，在一张 <strong>无向</strong> 图上进行游戏，两人轮流行动。</p>
+
+<p>图的形式是：<code>graph[a]</code> 是一个列表，由满足&nbsp;<code>ab</code> 是图中的一条边的所有节点 <code>b</code> 组成。</p>
+
+<p>老鼠从节点 <code>1</code> 开始，第一个出发；猫从节点 <code>2</code> 开始，第二个出发。在节点 <code>0</code> 处有一个洞。</p>
+
+<p>在每个玩家的行动中，他们 <strong>必须</strong> 沿着图中与所在当前位置连通的一条边移动。例如，如果老鼠在节点 <code>1</code> ，那么它必须移动到 <code>graph[1]</code> 中的任一节点。</p>
+
+<p>此外，猫无法移动到洞中（节点 <code>0</code>）。</p>
+
+<p>然后，游戏在出现以下三种情形之一时结束：</p>
+
+<ul>
+	<li>如果猫和老鼠出现在同一个节点，猫获胜。</li>
+	<li>如果老鼠到达洞中，老鼠获胜。</li>
+	<li>如果某一位置重复出现（即，玩家的位置和移动顺序都与上一次行动相同），游戏平局。</li>
+</ul>
+
+<p>给你一张图 <code>graph</code> ，并假设两位玩家都都以最佳状态参与游戏：</p>
+
+<ul>
+	<li>如果老鼠获胜，则返回&nbsp;<code>1</code>；</li>
+	<li>如果猫获胜，则返回 <code>2</code>；</li>
+	<li>如果平局，则返回 <code>0</code> 。</li>
+</ul>
+&nbsp;
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/11/17/cat1.jpg" style="width: 300px; height: 300px;" />
+<pre>
+<strong>输入：</strong>graph = [[2,5],[3],[0,4,5],[1,4,5],[2,3],[0,2,3]]
+<strong>输出：</strong>0
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/11/17/cat2.jpg" style="width: 200px; height: 200px;" />
+<pre>
+<strong>输入：</strong>graph = [[1,3],[0],[3],[0,2]]
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= graph.length &lt;= 50</code></li>
+	<li><code>1&nbsp;&lt;= graph[i].length &lt; graph.length</code></li>
+	<li><code>0 &lt;= graph[i][j] &lt; graph.length</code></li>
+	<li><code>graph[i][j] != i</code></li>
+	<li><code>graph[i]</code> 互不相同</li>
+	<li>猫和老鼠在游戏中总是可以移动</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 237 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def catMouseGame(self, graph: List[List[int]]) -&gt; int:
+        n = len(graph)
+        f = [[[[0, 0] for _ in range(2)] for _ in range(n)] for _ in range(n)]
+        st = []
+        for i in range(n):
+            for j in range(n):
+                for k in range(2):
+                    if i == 0 or j == 0:
+                        f[i][j][k] = [0, 1]   # 老鼠胜
+                        st.append((i, j, k))
+                    elif i == j:
+                        f[i][j][k] = [0, -1]
+                        st.append((i, j, k))
+                    else:
+                        if k == 0:
+                            f[i][j][k][0] = len(graph[i])
+                        else:
+                            f[i][j][k][0] = len(graph[j])
+        while st:
+            i, j, k = st.pop()
+            if k == 0:   # 猫动，不能走到0
+                for x in graph[j]:
+                    pre = f[i][x][1]
+                    if pre[0]:
+                        if f[i][j][k][1] == 1:
+                            pre[0] = 0
+                            pre[1] = 1
+                        else:
+                            pre[0] -= 1
+                            if pre[0] == 0:
+                                pre[0] = 0
+                                pre[1] = -1
+                        if pre[0] == 0:
+                            st.append((i, x, 1))
+            else:
+                for x in graph[i]:
+                    pre = f[x][j][0]
+                    if pre[0]:
+                        if f[i][j][k][1] == -1:
+                            pre[0] = 0
+                            pre[1] = -1
+                        else:
+                            pre[0] -= 1
+                            if pre[0] == 0:
+                                pre[0] = 0
+                                pre[1] = 1
+                        if pre[0] == 0:
+                            st.append((x, j, 0))
+        return f[2][1][1][1] % 3
+   </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划的思路。定义一个四维数组f[i][j][k]，表示当前猫在i位置，老鼠在j位置，当前移动方是k（0表示猫，1表示老鼠）时的游戏结果。首先初始化一些已知的状态，如老鼠到达0位置（胜利），猫和老鼠在同一位置（猫胜利）等。然后使用一个栈st来进行状态转移，每次弹出一个状态，根据当前移动方更新其他影响的状态，并将新状态加入栈中，直到所有状态都更新完毕。最后返回f[2][1][1][1]，表示初始状态（猫在2，老鼠在1，老鼠先移动）的游戏结果。</p>
+                                <p>时间复杂度: O(n^4)</p>
+                                <p>空间复杂度: O(n^3)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def catMouseGame(self, graph: List[List[int]]) -&gt; int:
+        n = len(graph)
+        # 定义状态数组 f[i][j][k]，表示猫在i，老鼠在j，当前移动方为k时的游戏结果
+        f = [[[[0, 0] for _ in range(2)] for _ in range(n)] for _ in range(n)]
+        st = []
+        for i in range(n):
+            for j in range(n):
+                for k in range(2):
+                    if i == 0 or j == 0:
+                        f[i][j][k] = [0, 1]   # 老鼠到达0，老鼠胜
+                        st.append((i, j, k))
+                    elif i == j:
+                        f[i][j][k] = [0, -1]  # 猫和老鼠在同一位置，猫胜
+                        st.append((i, j, k))
+                    else:
+                        if k == 0:
+                            f[i][j][k][0] = len(graph[i])
+                        else:
+                            f[i][j][k][0] = len(graph[j])
+        while st:
+            i, j, k = st.pop()
+            if k == 0:   # 猫移动
+                for x in graph[j]:
+                    if x == 0: # 猫不能移动到0
+                        continue
+                    pre = f[i][x][1]
+                    if pre[0]:
+                        if f[i][j][k][1] == 1:
+                            pre[0] = 0
+                            pre[1] = 1
+                        else:
+                            pre[0] -= 1
+                            if pre[0] == 0:
+                                pre[0] = 0
+                                pre[1] = -1
+                        if pre[0] == 0:
+                            st.append((i, x, 1))
+            else:  # 老鼠移动 
+                for x in graph[i]:
+                    pre = f[x][j][0]
+                    if pre[0]:
+                        if f[i][j][k][1] == -1:
+                            pre[0] = 0
+                            pre[1] = -1
+                        else:
+                            pre[0] -= 1
+                            if pre[0] == 0:
+                                pre[0] = 0
+                                pre[1] = 1
+                        if pre[0] == 0:
+                            st.append((x, j, 0))
+        return f[2][1][1][1] % 3</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到的状态数组f[i][j][k]中的k表示当前移动方，它有两个值0和1。这两个值具体代表猫和老鼠中的哪个？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在状态数组f[i][j][k]中，k的值为0代表当前是猫的移动回合，k的值为1代表当前是老鼠的移动回合。因此，k=0时表示判断猫在i位置，老鼠在j位置时的游戏结果，而k=1时表示判断老鼠在j位置，猫在i位置时的游戏结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划的实现中，为什么状态转移时考虑的是对手的移动影响当前结果，而不是当前玩家的移动直接决定结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个游戏模型中，每个玩家的决策不仅取决于当前的位置，还受到对手未来动作的影响。因此，动态规划在计算状态时，需要考虑对手的所有可能移动如何影响当前玩家的最终结果。这种方法能够确保无论对手如何响应，都能找到最优的策略。状态转移时，我们需要从对手的可能决策中推断出最不利或最有利的结果，来更新当前状态，从而确保策略的全局最优。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的状态转移逻辑使用了一个栈来更新状态，这种`栈`的使用与传统的动态规划有何不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在传统的动态规划中，状态通常是按照某种固定顺序（如递增、递减等）逐步填表或更新的。而使用栈的动态规划则是基于依赖关系动态地进行状态更新。当一个状态改变时，可能会影响其他依赖此状态的多个状态，这些状态会被加入到栈中等待处理。这种方法允许算法灵活地处理那些复杂依赖关系的问题，尤其适用于游戏类问题，在这类问题中，各个状态之间的依赖关系可能非常复杂且难以预测。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中初始化状态时，为什么当猫和老鼠在同一个位置时，直接判断为猫胜利，即使这是老鼠的回合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这是因为游戏规则通常假设猫和老鼠在同一个位置时，猫能够捕捉到老鼠，因此无论当前是哪个玩家的回合，结果都是猫胜。这种规则反映了游戏的基本目标和机制，即猫的目标是捕捉老鼠，而老鼠的目标是逃到安全的地方。因此，一旦他们处于同一位置，游戏立即以猫的胜利结束。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/cat-and-mouse')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/cat-and-mouse/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

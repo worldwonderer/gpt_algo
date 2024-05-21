@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>求解方程</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>求解方程</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>求解一个给定的方程，将<code>x</code>以字符串 <code>"x=#value"</code>&nbsp;的形式返回。该方程仅包含 <code>'+'</code> ， <code>'-'</code> 操作，变量&nbsp;<code>x</code>&nbsp;和其对应系数。</p>
+
+<p>如果方程没有解或存在的解不为整数，请返回&nbsp;<code>"No solution"</code>&nbsp;。如果方程有无限解，则返回 <code>“Infinite solutions”</code> 。</p>
+
+<p>题目保证，如果方程中只有一个解，则 <font color="#c7254e"><font face="Menlo, Monaco, Consolas, Courier New, monospace"><span style="font-size:12.6px"><span style="background-color:#f9f2f4">'x'</span></span></font></font> 的值是一个整数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入:</strong> equation = "x+5-3+x=6+x-2"
+<strong>输出:</strong> "x=2"
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> equation = "x=x"
+<strong>输出:</strong> "Infinite solutions"
+</pre>
+
+<p><strong>示例 3:</strong></p>
+
+<pre>
+<strong>输入:</strong> equation = "2x=x"
+<strong>输出:</strong> "x=0"
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>3 &lt;= equation.length &lt;= 1000</code></li>
+	<li><code>equation</code>&nbsp;只有一个&nbsp;<code>'='</code>.&nbsp;</li>
+	<li>方程由绝对值在&nbsp;<code>[0, 100]</code>&nbsp; 范围内且无任何前导零的整数和变量 <code>'x'</code>&nbsp;组成。<span style="display:block"><span style="height:0px"><span style="position:absolute">​​​</span></span></span></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 15.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def solveEquation(self, equation: str) -&gt; str:
+        def f(s):
+            x = y = 0
+            if s[0] != &#39;-&#39;:
+                s = &#39;+&#39; + s
+            i, n = 0, len(s)
+            while i &lt; n:
+                sign = 1 if s[i] == &#39;+&#39; else -1
+                i += 1
+                j = i
+                while j &lt; n and s[j] not in &#39;+-&#39;:
+                    j += 1
+                v = s[i:j]
+                if v[-1] == &#39;x&#39;:
+                    x += sign * (int(v[:-1]) if len(v) &gt; 1 else 1)
+                else:
+                    y += sign * int(v)
+                i = j
+            return x, y
+
+        a, b = equation.split(&#39;=&#39;)
+        x1, y1 = f(a)
+        x2, y2 = f(b)
+        if x1 == x2:
+            return &#39;Infinite solutions&#39; if y1 == y2 else &#39;No solution&#39;
+        return f&#39;x={(y2 - y1) // (x1 - x2)}&#39;
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是将方程按 &#39;=&#39; 符号拆分成左右两部分，然后分别处理每一部分。对于每一部分，从左到右遍历，记录 &#39;x&#39; 的系数之和以及常数项之和。最后对比左右两部分 &#39;x&#39; 的系数是否相等，如果相等，再判断常数项之和是否相等，相等则有无穷多解，不等则无解；如果 &#39;x&#39; 的系数不等，则可以求出唯一解。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def solveEquation(self, equation: str) -&gt; str:
+        def f(s):
+            x = y = 0
+            if s[0] != &#39;-&#39;:
+                s = &#39;+&#39; + s
+            i, n = 0, len(s)
+            while i &lt; n:
+                sign = 1 if s[i] == &#39;+&#39; else -1  # 获取符号
+                i += 1
+                j = i
+                while j &lt; n and s[j] not in &#39;+-&#39;:  # 获取当前数字或者变量
+                    j += 1
+                v = s[i:j]
+                if v[-1] == &#39;x&#39;:  # 变量 x
+                    x += sign * (int(v[:-1]) if len(v) &gt; 1 else 1)  # 获取 x 的系数
+                else:  # 数字
+                    y += sign * int(v)  # 计算数字之和
+                i = j
+            return x, y
+
+        a, b = equation.split(&#39;=&#39;)
+        x1, y1 = f(a)  # 左半部分 x 的系数和数字之和
+        x2, y2 = f(b)  # 右半部分 x 的系数和数字之和
+        if x1 == x2:
+            return &#39;Infinite solutions&#39; if y1 == y2 else &#39;No solution&#39;
+        return f&#39;x={(y2 - y1) // (x1 - x2)}&#39;  # 计算 x 的值
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解析方程的过程中，针对系数为1的x（例如单个&#39;x&#39;或&#39;+x&#39;），你是如何处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理方程时，如果遇到单个的&#39;x&#39;或&#39;+x&#39;，这意味着x前没有具体数字表示其系数，因此默认此时x的系数为1。在代码中，这通过检查变量`v`是否以&#39;x&#39;结尾且长度为1或者变量`v`除去最后的&#39;x&#39;后为空（适用于&#39;+x&#39;和&#39;-x&#39;的情况）来判断。如果符合这些条件，就将系数设置为1（对应的正负号由之前的符号决定）。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            函数`f(s)`中的变量`v`在末尾是&#39;x&#39;时，为什么会检查`v`的长度，然后决定是否只用1作为系数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在函数`f(s)`中，如果变量`v`的末尾是&#39;x&#39;，这表示`v`是一个表示x的系数的字符串。检查`v`的长度是为了处理不同情况下的输入格式，例如&#39;2x&#39;、&#39;+3x&#39;、&#39;-x&#39;或仅仅是&#39;x&#39;。如果`v`的长度大于1，那么除去末尾的&#39;x&#39;后，剩下的部分将被转换为整数，这个整数就是x的系数。如果`v`的长度为1（即只有&#39;x&#39;），或者去除&#39;x&#39;后为空（如&#39;+x&#39;或&#39;-x&#39;），则默认x的系数为1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在处理字符串时首先给`s`加上一个&#39;+&#39;符号？这样做有什么特殊的目的吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理字符串`s`时，首先加上一个&#39;+&#39;符号是为了简化接下来的处理逻辑。这样做可以确保每个数字或变量前都明确地有一个符号（不管是正号&#39;+&#39;还是负号&#39;-&#39;），这使得在遍历字符串时，可以统一地处理每个数字或变量前的符号，而不需要在字符串开头特殊处理缺失符号的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当左右两部分的x系数相等时，你是如何确定是返回&#39;Infinite solutions&#39;还是&#39;No solution&#39;的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当方程的左右两部分中x的系数相等时，这意味着所有x项在方程两边相互抵消，因此方程简化为一个常数等式。此时，如果左右两边的常数项也相等（即`y1 == y2`），则方程有无限多解，即任何x的值都满足方程，因此返回&#39;Infinite solutions&#39;。如果常数项不相等（即`y1 != y2`），则方程无解，因为没有x的值能满足这样的不等式，因此返回&#39;No solution&#39;。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/fraction-addition-and-subtraction" class="list-group-item list-group-item-action">
+                                分数加减运算
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/solve-the-equation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/solve-the-equation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

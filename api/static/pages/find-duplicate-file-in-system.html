@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>在系统中查找重复文件</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>在系统中查找重复文件</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个目录信息列表&nbsp;<code>paths</code> ，包括目录路径，以及该目录中的所有文件及其内容，请你按路径返回文件系统中的所有重复文件。答案可按 <strong>任意顺序</strong> 返回。</p>
+
+<p>一组重复的文件至少包括 <strong>两个 </strong>具有完全相同内容的文件。</p>
+
+<p><strong>输入 </strong>列表中的单个目录信息字符串的格式如下：</p>
+
+<ul>
+	<li><code>"root/d1/d2/.../dm f1.txt(f1_content) f2.txt(f2_content) ... fn.txt(fn_content)"</code></li>
+</ul>
+
+<p>这意味着，在目录&nbsp;<code>root/d1/d2/.../dm</code>&nbsp;下，有 <code>n</code> 个文件 ( <code>f1.txt</code>,&nbsp;<code>f2.txt</code>&nbsp;...&nbsp;<code>fn.txt</code> ) 的内容分别是 ( <code>f1_content</code>,&nbsp;<code>f2_content</code>&nbsp;...&nbsp;<code>fn_content</code> ) 。注意：<code>n &gt;= 1</code> 且 <code>m &gt;= 0</code> 。如果 <code>m = 0</code> ，则表示该目录是根目录。</p>
+
+<p><strong>输出 </strong>是由 <strong>重复文件路径组</strong> 构成的列表。其中每个组由所有具有相同内容文件的文件路径组成。文件路径是具有下列格式的字符串：</p>
+
+<ul>
+	<li><code>"directory_path/file_name.txt"</code></li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>paths = ["root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)","root 4.txt(efgh)"]
+<strong>输出：</strong>[["root/a/2.txt","root/c/d/4.txt","root/4.txt"],["root/a/1.txt","root/c/3.txt"]]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>paths = ["root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)"]
+<strong>输出：</strong>[["root/a/2.txt","root/c/d/4.txt"],["root/a/1.txt","root/c/3.txt"]]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= paths.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= paths[i].length &lt;= 3000</code></li>
+	<li><code>1 &lt;= sum(paths[i].length) &lt;= 5 * 10<sup>5</sup></code></li>
+	<li><code>paths[i]</code> 由英文字母、数字、字符 <code>'/'</code>、<code>'.'</code>、<code>'('</code>、<code>')'</code> 和 <code>' '</code> 组成</li>
+	<li>你可以假设在同一目录中没有任何文件或目录共享相同的名称。</li>
+	<li>你可以假设每个给定的目录信息代表一个唯一的目录。目录路径和文件信息用单个空格分隔。</li>
+</ul>
+
+
+
+<p><strong>进阶：</strong></p>
+
+<ul>
+	<li>假设您有一个真正的文件系统，您将如何搜索文件？广度搜索还是宽度搜索？</li>
+	<li>如果文件内容非常大（GB级别），您将如何修改您的解决方案？</li>
+	<li>如果每次只能读取 1 kb 的文件，您将如何修改解决方案？</li>
+	<li>修改后的解决方案的时间复杂度是多少？其中最耗时的部分和消耗内存的部分是什么？如何优化？</li>
+	<li>如何确保您发现的重复文件不是误报？</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 43 ms</p>
+                    <p>内存: 22.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:      
+    def findDuplicate(self, paths: List[str]) -&gt; List[List[str]]:
+        dict_file_content = {}
+        res = []
+        for path in paths:
+            temp = path.split(&#34; &#34;)
+            path_root = temp[0]
+            for i in range(1, len(temp)):
+                file = temp[i].split(&#34;(&#34;)
+                file_path = path_root + &#39;/&#39; + file[0]
+                file_content = file[1][:-1]
+
+                if file_content in dict_file_content:
+                    dict_file_content[file_content].append(file_path)
+                else:
+                    dict_file_content[file_content] = [file_path]
+        
+        for key, value in dict_file_content.items():
+            if len(value) &gt; 1:
+                res.append(value)
+
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路如下：
+1. 遍历 paths 列表中的每一个目录信息字符串
+2. 将目录信息按空格拆分成根目录路径和文件信息
+3. 遍历文件信息，将每个文件拆分成文件路径和文件内容
+4. 使用一个哈希表 dict_file_content 存储文件内容和对应的文件路径列表的映射关系
+   - 如果文件内容已存在于哈希表中，将当前文件路径追加到对应的路径列表
+   - 如果文件内容不存在于哈希表中，创建一个新的路径列表并存储到哈希表
+5. 遍历哈希表，将路径列表长度大于1的所有路径列表加入结果 res 中
+6. 返回结果 res，即所有重复文件的路径列表</p>
+                                <p>时间复杂度: O(n * m)</p>
+                                <p>空间复杂度: O(n * m)</p>
+                                <pre class="bg-light p-2">class Solution:      
+    def findDuplicate(self, paths: List[str]) -&gt; List[List[str]]:
+        # 创建哈希表用于存储文件内容和对应的文件路径列表
+        dict_file_content = {}
+        # 创建结果列表
+        res = []
+        # 遍历目录信息列表
+        for path in paths:
+            # 按空格拆分目录信息为根目录路径和文件信息
+            temp = path.split(&#34; &#34;)
+            path_root = temp[0]
+            # 遍历文件信息
+            for i in range(1, len(temp)):
+                # 将文件信息拆分为文件名和文件内容
+                file = temp[i].split(&#34;(&#34;)
+                file_path = path_root + &#39;/&#39; + file[0]
+                file_content = file[1][:-1]
+
+                # 判断文件内容是否已存在于哈希表中
+                if file_content in dict_file_content:
+                    # 如果存在，将当前文件路径追加到对应的路径列表
+                    dict_file_content[file_content].append(file_path)
+                else:
+                    # 如果不存在，创建一个新的路径列表并存储到哈希表
+                    dict_file_content[file_content] = [file_path]
+        
+        # 遍历哈希表
+        for key, value in dict_file_content.items():
+            # 如果路径列表长度大于1，说明存在重复文件
+            if len(value) &gt; 1:
+                # 将重复文件的路径列表加入结果中
+                res.append(value)
+
+        # 返回所有重复文件的路径列表
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用哈希表来存储文件内容与路径的映射关系，能否详细解释为什么这种数据结构适合这个问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表（也称为字典或映射）非常适合这个问题，因为它提供了快速的查找、插入和删除操作。在这个题解中，需要频繁地检查某个文件内容是否已存在于映射中，并根据这个检查结果迅速更新文件路径列表。使用哈希表可以在平均情况下达到常数时间复杂度的查找性能，这使得处理大量数据时更为高效。此外，哈希表通过键（本题中为文件内容）到值（文件路径列表）的映射，自然地支持这种类型的数据关联，使得数据的组织和访问都变得直接和简单。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理文件信息时，你是如何确保文件内容的提取正确性的，尤其是当文件内容包含多个括号时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解代码中，文件信息是以括号 &#39;(&#39; 分隔文件名和文件内容的。为了正确提取文件内容，代码首先使用 &#39;(&#39; 将字符串分割成文件名和文件内容两部分。然后，通过字符串切片 file[1][:-1] 移除文件内容字符串的最后一个字符，即闭合的括号 &#39;)&#39;。这种方式假设文件内容中的最后一个括号是闭合括号，并且没有考虑文件内容内部可能包含括号的情况。若文件内容中确实包含多个括号，则需要进一步的处理，例如查找最后一个 &#39;)&#39; 来正确切分字符串。当前的简单实现可能不足以处理所有复杂情况，但在题目给定的格式约定下是有效的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            哈希表中的冲突是如何处理的？你在代码中使用的哈希表处理冲突的策略是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表中的冲突指的是两个不同的键通过哈希函数得到了相同的哈希值。在Python中，字典（内部使用哈希表实现）处理哈希冲突的常见策略是使用开放寻址或链表法。在开放寻址法中，如果一个索引已被占用，哈希表会尝试找到下一个空闲的索引。在链表法中，每个槽位存储一个指向键值对链表的指针，冲突发生时，新的键值对会被添加到链表的末尾。由于这些细节通常是由Python语言的实现（如CPython）封装的，用户不需要自己处理冲突，可以直接利用字典的高效和便捷性质。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-duplicate-file-in-system')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-duplicate-file-in-system/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

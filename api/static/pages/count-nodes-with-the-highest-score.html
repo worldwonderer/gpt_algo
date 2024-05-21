@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计最高分的节点数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计最高分的节点数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵根节点为 <code>0</code> 的&nbsp;<strong>二叉树</strong>&nbsp;，它总共有 <code>n</code>&nbsp;个节点，节点编号为&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;。同时给你一个下标从&nbsp;<strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>parents</code>&nbsp;表示这棵树，其中&nbsp;<code>parents[i]</code>&nbsp;是节点 <code>i</code>&nbsp;的父节点。由于节点 <code>0</code>&nbsp;是根，所以&nbsp;<code>parents[0] == -1</code>&nbsp;。</p>
+
+<p>一个子树的 <strong>大小</strong>&nbsp;为这个子树内节点的数目。每个节点都有一个与之关联的&nbsp;<strong>分数</strong>&nbsp;。求出某个节点分数的方法是，将这个节点和与它相连的边全部 <strong>删除</strong>&nbsp;，剩余部分是若干个 <strong>非空</strong>&nbsp;子树，这个节点的 <strong>分数</strong>&nbsp;为所有这些子树 <strong>大小的乘积</strong>&nbsp;。</p>
+
+<p>请你返回有 <strong>最高得分</strong>&nbsp;节点的 <strong>数目</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例&nbsp;1:</strong></p>
+
+<p><img alt="example-1" src="https://assets.leetcode.com/uploads/2021/10/03/example-1.png" style="width: 604px; height: 266px;"></p>
+
+<pre><b>输入：</b>parents = [-1,2,0,2,0]
+<b>输出：</b>3
+<strong>解释：</strong>
+- 节点 0 的分数为：3 * 1 = 3
+- 节点 1 的分数为：4 = 4
+- 节点 2 的分数为：1 * 1 * 2 = 2
+- 节点 3 的分数为：4 = 4
+- 节点 4 的分数为：4 = 4
+最高得分为 4 ，有三个节点得分为 4 （分别是节点 1，3 和 4 ）。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="example-2" src="https://assets.leetcode.com/uploads/2021/10/03/example-2.png" style="width: 95px; height: 143px;"></p>
+
+<pre><b>输入：</b>parents = [-1,2,0]
+<b>输出：</b>2
+<strong>解释：</strong>
+- 节点 0 的分数为：2 = 2
+- 节点 1 的分数为：2 = 2
+- 节点 2 的分数为：1 * 1 = 1
+最高分数为 2 ，有两个节点分数为 2 （分别为节点 0 和 1 ）。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == parents.length</code></li>
+	<li><code>2 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>parents[0] == -1</code></li>
+	<li>对于&nbsp;<code>i != 0</code>&nbsp;，有&nbsp;<code>0 &lt;= parents[i] &lt;= n - 1</code></li>
+	<li><code>parents</code>&nbsp;表示一棵二叉树。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 308 ms</p>
+                    <p>内存: 47.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># class Solution:
+#     def countHighestScoreNodes(self, parents: List[int]) -&gt; int:
+#         # 使用图表示树结构，图的键是父节点，值是子节点的列表
+#         graph = collections.defaultdict(list)
+#         n = len(parents)  # 总节点数
+#         scores = [1] * n  # 初始化每个节点的得分为1
+
+#         # 构建图结构
+#         for i, num in enumerate(parents):
+#             if num != -1:  # 如果不是根节点
+#                 graph[num].append(i)  # 将子节点添加到父节点的列表中
+#         # print(graph):  {2: [1, 3], 0: [2, 4]
+
+#         # 深度优先搜索计算每个节点的得分
+#         def dfs(node):
+#             res = 1 # 以节点node为根的子树的节点数目
+#             for child in graph[node]:  # 遍历当前节点的所有子节点(left and right)
+#                 val = dfs(child)  # 递归计算子树的节点数
+#                 res += val  # 更新当前子树的节点数
+#                 scores[node] *= val  # *x*y
+    
+#             # 如果当前节点不是根节点，则还需要乘以其parent树的节点数
+#             if node: # 不是0
+#                 scores[node] *= (n - res) # n - x -y -1
+
+#             return res  
+
+#         dfs(0)
+#         # 计算得分最高的节点数量
+#         max_score = max(scores)  # 最高得分
+#         return scores.count(max_score)  # 返回最高得分的节点数量
+
+class Solution:
+    def countHighestScoreNodes(self, parents: List[int]) -&gt; int:
+        self.maxScore = 0  # 记录最大分数，用于cnt++
+        self.cnt = 0  # 返回值，即最高得分节点数目
+        self.n = len(parents)  # 节点总数，用于得到size用于计算三种情况下节点的个数
+        self.children = [[] for _ in range(self.n)]  # 构图，用于dfs
+
+        # 构建每个节点的子节点列表
+        for i in range(self.n):
+            p = parents[i]
+            if p != -1:
+                self.children[p].append(i)
+
+        # 从根节点开始dfs搜索
+        self.dfs(0)
+
+        # 返回有最高得分节点的数目
+        return self.cnt
+
+    def dfs(self, node: int) -&gt; int:
+        score = 1
+        size = self.n - 1  # 当前节点被删除
+        for c in self.children[node]:
+            t = self.dfs(c)  # 得到以当前节点孩子节点为根节点的树的节点个数
+            score *= t  # 乘左右孩子数量
+            size -= t  # 保存剩余节点个数
+
+        # 判断是否为最初根节点，否则导致size=0
+        if node != 0:
+            score *= size  # 乘被删节点父节点所在树节点的节点个数
+
+        # 代表出现了与最高分相同的节点，返回答案计数+1
+        if score == self.maxScore:
+            self.cnt += 1
+        elif score &gt; self.maxScore:
+            self.maxScore = score
+            self.cnt = 1
+
+        return self.n - size  # 返回以当前节点node为根节点组成的树的节点总数
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用深度优先搜索(DFS)的方法来解决问题。首先，通过父节点数组构建一个树的子节点列表表示。对每个节点，使用DFS来计算以该节点为根的子树的大小，并计算删除该节点后其他部分的大小乘积作为该节点的得分。在DFS过程中，同时更新最高得分和得分最高的节点数。整体过程避免了重复计算，每个节点只被访问一次，确保了效率。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># class Solution:
+#     def countHighestScoreNodes(self, parents: List[int]) -&gt; int:
+        self.maxScore = 0  # 最大分数
+        self.cnt = 0  # 最高得分的节点数量
+        self.n = len(parents)  # 节点总数
+        self.children = [[] for _ in range(self.n)]  # 子节点列表
+
+        # 构建每个节点的子节点列表
+        for i in range(self.n):
+            p = parents[i]
+            if p != -1:
+                self.children[p].append(i)
+
+        # 从根节点开始深度优先搜索
+        self.dfs(0)
+
+        # 返回最高得分的节点数目
+        return self.cnt
+
+    def dfs(self, node: int) -&gt; int:
+        score = 1  # 初始化分数为1
+        size = self.n - 1  # 当前节点被删除后的剩余节点数
+        for c in self.children[node]:
+            t = self.dfs(c)  # 计算子树大小
+            score *= t  # 更新分数
+            size -= t  # 更新剩余节点数
+
+        # 如果不是根节点，计算其父节点子树的大小
+        if node != 0:
+            score *= size  # 更新分数
+
+        # 更新最高得分和计数
+        if score == self.maxScore:
+            self.cnt += 1
+        elif score &gt; self.maxScore:
+            self.maxScore = score
+            self.cnt = 1
+
+        return self.n - size  # 返回子树大小</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建树的子节点列表时，你是如何确保每个节点都正确地被分配到其父节点的子列表中的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建子节点列表的过程中，通过遍历`parents`数组来完成。对于数组中的每个元素（除了根节点，其父节点索引为-1），我会将当前节点索引（即遍历的索引）添加到父节点的子列表中。这里使用`self.children[p].append(i)`实现，其中`p`是当前节点的父节点索引，`i`是当前节点索引。由于是直接根据`parents`数组进行操作，每个节点都会被正确地分配到其父节点的子列表中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你的DFS函数是如何确保每个节点只被访问一次的，并且它是怎样避免重复计算的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>DFS函数通过递归的方式访问每个节点。对于每个节点，它首先计算其所有子节点的大小，并在此过程中累计分数。由于每个节点在DFS中只调用一次`dfs(c)`（其中`c`是子节点），这保证了每个节点只被访问一次。关于避免重复计算，每个节点的子树大小在首次计算后通过返回值传递给父节点，而不需要重新计算，这样有效避免了重复工作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在计算节点分数时要初始化分数为1，并在遍历子节点时累乘子树大小？这种方法是否可能导致分数的溢出？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化分数为1是因为分数的计算依赖于乘积操作，且乘法的单位元是1。在遍历子节点时，每个子树大小与当前分数相乘，这样可以得到分离该节点后其他部分的大小乘积，作为该节点的得分。这种方法确实可能导致分数溢出，尤其是在处理大数据集或树深度较大时。在实际应用中，可能需要使用更大范围的变量类型或在某些语言中处理大整数操作以防止溢出。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当节点为根节点时，你是如何处理其分数计算的？为什么根节点的处理逻辑与其他节点不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在根节点的分数计算中，不需要包括其父节点子树的大小，因为根节点没有父节点。因此，对于根节点，其得分仅取决于其所有子树的大小的乘积。这与其他节点不同，因为非根节点需要计算包括其父节点中其余部分的大小。根节点的特殊处理是因为它在树结构中具有唯一性，作为树的最顶层节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-nodes-with-the-highest-score')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-nodes-with-the-highest-score/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

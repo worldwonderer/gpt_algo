@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二维网格图中探测环</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二维网格图中探测环</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个二维字符网格数组&nbsp;<code>grid</code>&nbsp;，大小为&nbsp;<code>m x n</code>&nbsp;，你需要检查&nbsp;<code>grid</code>&nbsp;中是否存在 <strong>相同值</strong> 形成的环。</p>
+
+<p>一个环是一条开始和结束于同一个格子的长度 <strong>大于等于 4</strong>&nbsp;的路径。对于一个给定的格子，你可以移动到它上、下、左、右四个方向相邻的格子之一，可以移动的前提是这两个格子有 <strong>相同的值&nbsp;</strong>。</p>
+
+<p>同时，你也不能回到上一次移动时所在的格子。比方说，环&nbsp;&nbsp;<code>(1, 1) -&gt; (1, 2) -&gt; (1, 1)</code>&nbsp;是不合法的，因为从 <code>(1, 2)</code>&nbsp;移动到 <code>(1, 1)</code> 回到了上一次移动时的格子。</p>
+
+<p>如果 <code>grid</code>&nbsp;中有相同值形成的环，请你返回 <code>true</code>&nbsp;，否则返回 <code>false</code>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/22/5482e1.png" style="height: 152px; width: 231px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[&quot;a&quot;,&quot;a&quot;,&quot;a&quot;,&quot;a&quot;],[&quot;a&quot;,&quot;b&quot;,&quot;b&quot;,&quot;a&quot;],[&quot;a&quot;,&quot;b&quot;,&quot;b&quot;,&quot;a&quot;],[&quot;a&quot;,&quot;a&quot;,&quot;a&quot;,&quot;a&quot;]]
+<strong>输出：</strong>true
+<strong>解释：</strong>如下图所示，有 2 个用不同颜色标出来的环：
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/22/5482e11.png" style="height: 163px; width: 225px;">
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/22/5482e2.png" style="height: 154px; width: 236px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[&quot;c&quot;,&quot;c&quot;,&quot;c&quot;,&quot;a&quot;],[&quot;c&quot;,&quot;d&quot;,&quot;c&quot;,&quot;c&quot;],[&quot;c&quot;,&quot;c&quot;,&quot;e&quot;,&quot;c&quot;],[&quot;f&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;]]
+<strong>输出：</strong>true
+<strong>解释：</strong>如下图所示，只有高亮所示的一个合法环：
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/22/5482e22.png" style="height: 157px; width: 229px;">
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/08/22/5482e3.png" style="height: 120px; width: 183px;"></strong></p>
+
+<pre><strong>输入：</strong>grid = [[&quot;a&quot;,&quot;b&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;z&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;b&quot;,&quot;a&quot;]]
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m &lt;= 500</code></li>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>grid</code>&nbsp;只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 163 ms</p>
+                    <p>内存: 58.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class UnionFind:
+    def __init__(self, n: int):
+        self.parent = list(range(n))
+    
+    def find(self, x: int) -&gt; int:
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+    
+    def unite(self, x: int, y: int):
+        self.parent[y] = x
+    
+    def findAndUnite(self, x: int, y: int) -&gt; bool:
+        parentX, parentY = self.find(x), self.find(y)
+        if parentX != parentY:
+            self.unite(parentX, parentY)
+            return True
+        return False
+
+class Solution:
+    def containsCycle(self, grid: List[List[str]]) -&gt; bool:
+        m, n = len(grid), len(grid[0])
+        uf = UnionFind(m * n)
+        for i in range(m):
+            for j in range(n):
+                if i &gt; 0 and grid[i][j] == grid[i - 1][j]:
+                    if not uf.findAndUnite(i * n + j, (i - 1) * n + j):
+                        return True
+                if j &gt; 0 and grid[i][j] == grid[i][j - 1]:
+                    if not uf.findAndUnite(i * n + j, i * n + j - 1):
+                        return True
+        return False
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了并查集(Union-Find)的数据结构来解决问题。并查集是一种用于处理一些不相交集合的合并及查询问题的数据结构。这里，我们将二维网格中的每个格子视为一个节点，节点的编号可以通过行号和列号转换得到，即 i * n + j（i为行号，j为列号，n为列数）。当两个相邻的格子具有相同的值时，我们将它们所在的集合进行合并。如果在尝试合并两个集合时发现它们已经在同一个集合中，说明存在一个环。这是因为我们只有在发现两个相同的字符时才进行合并操作，所以如果两个已经在同一个集合中的节点尝试合并，意味着这两个节点是通过同一种字符相连的，因此形成了环。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class UnionFind:
+    def __init__(self, n: int):
+        self.parent = list(range(n))  # 初始化每个节点的父节点为自身
+    
+    def find(self, x: int) -&gt; int:
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # 路径压缩
+        return self.parent[x]
+    
+    def unite(self, x: int, y: int):
+        self.parent[y] = x  # 将y的父节点设置为x
+    
+    def findAndUnite(self, x: int, y: int) -&gt; bool:
+        parentX, parentY = self.find(x), self.find(y)
+        if parentX != parentY:
+            self.unite(parentX, parentY)
+            return True
+        return False
+
+class Solution:
+    def containsCycle(self, grid: List[List[str]]) -&gt; bool:
+        m, n = len(grid), len(grid[0])
+        uf = UnionFind(m * n)  # 初始化并查集
+        for i in range(m):
+            for j in range(n):
+                if i &gt; 0 and grid[i][j] == grid[i - 1][j]:
+                    if not uf.findAndUnite(i * n + j, (i - 1) * n + j):
+                        return True  # 发现环
+                if j &gt; 0 and grid[i][j] == grid[i][j - 1]:
+                    if not uf.findAndUnite(i * n + j, i * n + j - 1):
+                        return True  # 发现环
+        return False  # 未发现环</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，并查集的`find`函数使用了路径压缩技术，请问这是如何帮助提高并查集操作效率的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>路径压缩是并查集优化技术中的一种，它可以显著减少在查找节点的根节点时所需的时间。具体来说，当我们在执行`find`函数寻找某个元素的根节点时，路径压缩技术会使得这个元素及其所有祖先节点直接或间接地指向根节点。这样，下一次再查找这些节点或它们的任何子节点时，可以更快地直接到达根节点。因此，路径压缩减少了树的高度，有效地减少了查询和合并操作的时间复杂度，从而提高了并查集的整体效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果两个格子已经在同一个集合中还尝试进行合并，就表示存在环。能否详细解释为什么这种情况下一定形成了环？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在并查集中，每个集合表示一组互相连接的节点。当尝试合并两个已处于同一集合中的节点时，意味着这两个节点可以通过集合内的其他节点间接连接。这种情况下，如果再通过一个直接的连接尝试将它们合并，实际上在这两个节点之间就形成了至少两条不同的路径连接它们，从而形成了一个环。因此，当并查集检测到两个已经在同一个集合中的节点尝试合并时，我们可以确信在这个集合中存在至少一个环。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            并查集中的`unite`函数直接将一个节点的父节点设置为另一个节点，这是否意味着并查集使用的是按秩合并优化？如果不是，这种做法可能有什么潜在问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题解中，`unite`函数简单地将一个节点的父节点设置为另一个节点，并没有使用按秩合并优化。按秩合并是另一种优化技术，其中“秩”通常代表集合的大小或树的深度。在按秩合并中，我们通常将较小或较浅的树合并到较大或较深的树上，这样可以防止树的深度快速增加，从而保持操作的效率。没有使用按秩合并的潜在问题是，合并操作可能导致树的深度增加，尤其是在频繁合并时，可能会形成较深的树结构，从而增加后续操作的时间复杂度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/detect-cycles-in-2d-grid')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/detect-cycles-in-2d-grid/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

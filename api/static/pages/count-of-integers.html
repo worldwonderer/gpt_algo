@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计整数数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计整数数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个数字字符串&nbsp;<code>num1</code>&nbsp;和&nbsp;<code>num2</code>&nbsp;，以及两个整数&nbsp;<code>max_sum</code> 和&nbsp;<code>min_sum</code>&nbsp;。如果一个整数&nbsp;<code>x</code>&nbsp;满足以下条件，我们称它是一个好整数：</p>
+
+<ul>
+	<li><code>num1 &lt;= x &lt;= num2</code></li>
+	<li><code>min_sum &lt;= digit_sum(x) &lt;= max_sum</code>.</li>
+</ul>
+
+<p>请你返回好整数的数目。答案可能很大，请返回答案对&nbsp;<code>10<sup>9</sup> + 7</code>&nbsp;取余后的结果。</p>
+
+<p>注意，<code>digit_sum(x)</code>&nbsp;表示&nbsp;<code>x</code>&nbsp;各位数字之和。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>num1 = "1", num2 = "12", min_num = 1, max_num = 8
+<b>输出：</b>11
+<b>解释：</b>总共有 11 个整数的数位和在 1 到 8 之间，分别是 1,2,3,4,5,6,7,8,10,11 和 12 。所以我们返回 11 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>num1 = "1", num2 = "5", min_num = 1, max_num = 5
+<b>输出：</b>5
+<b>解释：</b>数位和在 1 到 5 之间的 5 个整数分别为 1,2,3,4 和 5 。所以我们返回 5 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= num1 &lt;= num2 &lt;= 10<sup>22</sup></code></li>
+	<li><code>1 &lt;= min_sum &lt;= max_sum &lt;= 400</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 44 ms</p>
+                    <p>内存: 17.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def count(self, num1: str, num2: str, min_sum: int, max_sum: int) -&gt; int:
+        n=len(num2)
+        num1=str(int(num1)-1)
+        num1=&#39;0&#39;*(n-len(num1))+num1
+        num1,num2=tuple(map(int,num1)),tuple(map(int,num2))
+        MOD=1_000_000_007
+        @cache
+        def ndn(n,dsum):
+            if dsum&lt;0:
+                return 0
+            if n==0:
+                return 1
+            res=0
+            for cd in range(10):
+                res=(res+ndn(n-1,dsum-cd))%MOD
+            return res
+        def ddn(num,max_sum):
+            if max_sum&lt;0:
+                return 0
+            if len(num)==0:
+                return 1
+            res=0
+            for cd in range(num[0]):
+                res=(res+ndn(len(num)-1,max_sum-cd))%MOD
+            return (res+ddn(num[1:],max_sum-num[0]))%MOD
+        return ((ddn(num2,max_sum)-ddn(num2,min_sum-1))-(ddn(num1,max_sum)-ddn(num1,min_sum-1)))%MOD
+
+
+
+@cache
+def free_digits(N, limit):
+    if limit &lt; 0:
+        return 0
+    if N == 0:
+        return 1
+    return sum(free_digits(N - 1, limit - i) for i in range(10)) % 1000000007
+
+
+class Solution:
+    def count(self, num1: str, num2: str, min_sum: int, max_sum: int) -&gt; int:
+
+        def total(num, max_sum):
+            if max_sum &lt; 0:
+                return 0
+            if not num:
+                return 1
+            ans = 0
+            for i in range(ord(num[0]) - ord(&#39;0&#39;)):
+                ans += free_digits(len(num) - 1, max_sum - i)
+            ans += total(num[1:], max_sum - (ord(num[0]) - ord(&#39;0&#39;)))
+            #print(&#34;total&#34;, num, max_sum, ans)
+            return ans % 1000000007
+        num1d = str(int(num1) - 1)
+        return ((total(num2, max_sum) - total(num2, min_sum - 1)) - (total(num1d, max_sum) - total(num1d, min_sum - 1))) % 1000000007</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>The solution uses a digit dynamic programming approach to efficiently count numbers within a specific range whose digit sum falls between given bounds. It considers two main functions: 1) &#39;ndn(n, dsum)&#39;, which calculates how many n-digit numbers have a digit sum exactly equal to &#39;dsum&#39;. 2) &#39;ddn(num, max_sum)&#39;, which calculates the count of numbers up to &#39;num&#39; that have a digit sum of at most &#39;max_sum&#39;. The main idea is to count the numbers satisfying the conditions up to &#39;num2&#39; and subtract the count of numbers up to &#39;num1&#39; - 1 (thus counting numbers between &#39;num1&#39; and &#39;num2&#39;), and adjust this for the specified digit sum range.</p>
+                                <p>时间复杂度: O(D^2 * 10 * max_sum) where D is the number of digits in &#39;num2&#39;. This complexity stems from the iteration over all possible first digits and recursive processing for each subsequent digit.</p>
+                                <p>空间复杂度: O(D * max_sum), which accounts for the maximum depth of recursion multiplied by the range of digit sums cached.</p>
+                                <pre class="bg-light p-2">class Solution:
+    def count(self, num1: str, num2: str, min_sum: int, max_sum: int) -&gt; int:
+        MOD = 1_000_000_007
+        num1 = str(int(num1) - 1) # Convert num1 to one less to include it in range during subtraction
+        n = len(num2)
+        num1 = &#39;0&#39; * (n - len(num1)) + num1 # Pad num1 to match the length of num2
+        num1, num2 = tuple(map(int, num1)), tuple(map(int, num2)) # Convert strings to tuple of digits
+        @cache
+        def ndn(n, dsum): # Count of n-digit numbers with digit sum exactly &#39;dsum&#39;
+            if dsum &lt; 0: return 0
+            if n == 0: return 1 # Base case: one way (the number 0)
+            res = 0
+            for cd in range(10): # Loop through each digit from 0 to 9
+                res = (res + ndn(n-1, dsum-cd)) % MOD
+            return res
+        def ddn(num, max_sum): # Dynamic digit sum calculation up to &#39;num&#39;
+            if max_sum &lt; 0: return 0
+            if not num: return 1 # Base case: one way if no digits left
+            res = 0
+            for cd in range(num[0]): # Try all digits less than the first digit of num
+                res = (res + ndn(len(num)-1, max_sum-cd)) % MOD
+            return (res + ddn(num[1:], max_sum-num[0])) % MOD # Include the case where first digit is num[0]
+        return ((ddn(num2, max_sum) - ddn(num2, min_sum-1)) - (ddn(num1, max_sum) - ddn(num1, min_sum-1))) % MOD</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决方案中，`ndn(n, dsum)`函数的基本情况是什么意义，为什么当`n == 0`时返回1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`ndn(n, dsum)`函数中，基本情况是当`n == 0`时返回1。这表示没有更多的数字可以选择，如果此时`dsum`也正好为0，则唯一可能的“数字”是数值0（没有任何数字组成的数）。因此，这里返回1表示存在一种方法（即选择数字0）使得数字总和为0。如果`dsum`不为0，会由函数其他部分返回0，因为无法通过非零数量的数字达到非零的`dsum`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于`ddn(num, max_sum)`函数，如何确保所有可能的数位组合都被正确考虑，特别是在处理数字的最高位时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`ddn(num, max_sum)`函数中，它首先考虑所有小于给定数字`num`的最高位的可能数字，并使用`ndn`递归计算每种情况的结果。对每个小于最高位的数字，它计算剩下的位数可以形成的所有数字和。这确保了除了最高位的所有其他位的组合都被考虑到。接着，函数递归地考虑最高位数字正好等于`num`的第一个数字的情况，并处理剩余的数字。这种方法确保了从最高位到最低位的每一位都被正确地考虑到，从而可以生成所有小于或等于`num`的数字。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            解释为什么需要在计算`num1`对应的好整数时，将`num1`减去1，并在后续处理中如何确保这种调整的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算区间`[num1, num2]`内满足条件的数字数量时，需要将`num1`减去1，因为`ddn`函数计算的是小于或等于给定数字的所有可能的数字。如果不减1，那么计算结果会包括`num1`，而我们需要的是从`num1`开始的区间。通过将`num1`减去1并计算到`num1-1`为止的数字，然后从`num2`的结果中减去这个结果，我们可以确保区间是正确的`[num1, num2]`。这种处理确保了在边界的处理上，我们不会错过或多计算任何数字。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在`ddn`函数中，递归调用遇到的边界条件`max_sum &lt; 0`是如何影响结果的，为什么返回0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`ddn`函数中，如果`max_sum &lt; 0`，这意味着不可能有任何有效的数字组合其数位和为一个负数。因此，在这种情况下直接返回0是合理的，表示不存在任何数位组合能够满足数位和小于0的条件。这是一个必要的边界条件检查，它阻止了无效计算的进行，并确保递归能在合适的条件下正确终止。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-of-integers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-of-integers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

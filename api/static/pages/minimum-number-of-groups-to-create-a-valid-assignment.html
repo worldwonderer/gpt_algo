@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>合法分组的最少组数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>合法分组的最少组数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一组带编号的&nbsp;<code>balls</code> 并要求将它们分类到盒子里，以便均衡地分配。你必须遵守两条规则：</p>
+
+<ul>
+	<li>同一个盒子里的球必须具有相同的编号。但是，如果你有多个相同编号的球，你可以把它们放在不同的盒子里。</li>
+	<li>最大的盒子只能比最小的盒子多一个球。</li>
+</ul>
+
+<p>返回遵循上述规则排列这些球所需要的盒子的最小数目。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>balls = [3,2,3,2,3]
+<b>输出：</b>2
+<b>解释：</b>一个得到 2 个分组的方案如下，中括号内的数字都是下标：
+我们可以如下排列 balls 到盒子里：
+- [3,3,3]
+- [2,2]
+两个盒子之间的大小差没有超过 1。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>balls = [10,10,10,3,1,1]
+<b>输出：</b>4
+<b>解释：</b>我们可以如下排列 balls 到盒子里：
+- [10]
+- [10,10]
+- [3]
+- [1,1]
+无法得到一个遵循上述规则且小于 4 盒的答案。例如，把所有三个编号为 10 的球都放在一个盒子里，就会打破盒子之间最大尺寸差异的规则。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= balls.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= balls[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 84 ms</p>
+                    <p>内存: 38.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minGroupsForValidAssignment(self, nums: List[int]) -&gt; int:
+        # groups = dict()
+        # for num in nums:
+        #     if num in groups:
+        #         groups[num] += 1
+        #     else:
+        #         groups[num] = 1
+        G = list(Counter(nums).values())
+        G.sort()
+        m = G[0]
+        while(True):
+            flag = True
+            for g in G:
+                if g &gt;= m*(m-1):
+                    break
+                q, r = divmod(g, m)
+                if q &lt; r:
+                    flag = False
+                    m = g//(q+1)
+                    break
+            if flag:
+                break
+        res = 0
+        for g in G:
+            res += (g+m)//(m+1)
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解首先使用Counter来统计每种编号的球的数量，并将这些数量存储在列表G中。接着将G排序，目的是为了从最小的组开始处理。变量m初始化为G中的最小值，这代表着在迭代过程中尝试的最小盒子大小。接下来，代码通过一个循环不断调整m的值，以找到能满足条件的最小的m。内部循环检查每个g（即每种球的数量）是否能够被当前的m整除，如果不能，就调整m的值。最后，代码计算每种球按照最终确定的m分组后需要的盒子数，累加这些数得到最终结果。</p>
+                                <p>时间复杂度: O(n + k log k)</p>
+                                <p>空间复杂度: O(k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minGroupsForValidAssignment(self, nums: List[int]) -&gt; int:
+        # 使用Counter统计每个编号球的数量
+        G = list(Counter(nums).values())
+        # 对数量进行排序
+        G.sort()
+        # 初始化m为最小的球的数量
+        m = G[0]
+        while(True):
+            flag = True
+            for g in G:
+                if g &gt;= m*(m-1):
+                    break
+                q, r = divmod(g, m)
+                if q &lt; r:
+                    flag = False
+                    m = g//(q+1)
+                    break
+            if flag:
+                break
+        res = 0
+        for g in G:
+            res += (g+m)//(m+1)
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到`m初始化为G中的最小值`，为什么选择这个起始值，它与最终结果有什么直接关系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择G中的最小值作为m的初始值是基于算法效率和逻辑简化的考虑。实际上，最小值提供了一个可能的最小组大小的下界，从而确保我们从可能的最小分组开始探索，逐步增加组大小以找到合适的值。这种方法可以避免在不可能的小组大小上浪费计算资源，因为任何比G中最小数量还小的组大小都不可能合法地分配所有元素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在内部循环中，`if g &gt;= m*(m-1)`这个条件是如何确定的，它在算法中起什么作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件用于检查当前的分组大小m是否有可能导致非法的分组。如果某个g（即某种球的数量）大于或等于m*(m-1)，这意味着当前的分组大小m可能过小，不能有效地分配所有元素。这是一种优化检查，用于避免在不合适的m值上进行过多无效计算。这个条件帮助快速调整m至一个更可能的合理值，以减少不必要的迭代。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您提到的`q, r = divmod(g, m)`步骤中，为什么通过比较q和r的值来决定是否调整m的大小？这里的逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这一步中，q代表整除结果，即每组m个元素可以分多少组，而r代表余数，即不能完整形成一组的剩余元素。如果q（完整组数）小于r（剩余元素数），这表明当前的m值过大，导致无法将所有元素均匀分配。因此，需要调整m的值，使得我们可以更合理地分配元素，至少确保每个组中元素的数量不会低于剩余元素的数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中调整m值时使用的`m = g//(q+1)`公式是如何得出的？它能确保什么样的结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个公式是在当前m值导致不能均匀分配的情况下调整m的尝试。通过将g除以(q+1)，我们试图找到一个新的组大小，这个大小可以使得每组至少分得q+1个元素，从而更加平均地分配剩余的元素。这种调整可以确保每组的元素数量尽可能地接近，避免某些组元素数量过多而其他组过少。这有助于找到一个更合理的m值，以达到更优的分组效果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-number-of-groups-to-create-a-valid-assignment')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-number-of-groups-to-create-a-valid-assignment/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

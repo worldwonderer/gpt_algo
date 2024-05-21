@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>两棵二叉搜索树中的所有元素</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>两棵二叉搜索树中的所有元素</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-search-tree" class="badge bg-secondary tag-link">二叉搜索树</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你&nbsp;<code>root1</code> 和 <code>root2</code>&nbsp;这两棵二叉搜索树。请你返回一个列表，其中包含&nbsp;<strong>两棵树&nbsp;</strong>中的所有整数并按 <strong>升序</strong> 排序。.</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/12/29/q2-e1.png" /></p>
+
+<pre>
+<strong>输入：</strong>root1 = [2,1,4], root2 = [1,0,3]
+<strong>输出：</strong>[0,1,1,2,3,4]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/12/29/q2-e5-.png" /></p>
+
+<pre>
+<strong>输入：</strong>root1 = [1,null,8], root2 = [8,1]
+<strong>输出：</strong>[1,1,8,8]
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>每棵树的节点数在&nbsp;<code>[0, 5000]</code> 范围内</li>
+	<li><code>-10<sup>5</sup>&nbsp;&lt;= Node.val &lt;= 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 304 ms</p>
+                    <p>内存: 18.7 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class BSTIterator:
+
+    def __init__(self, root: Optional[TreeNode]):
+        self.stack = []
+        self.dfsLeft(root)
+
+    def next(self) -&gt; int:
+        if len(self.stack) == 0:
+            return None
+        root = self.stack.pop()
+        self.dfsLeft(root.right)
+        return root.val
+
+    def dfsLeft(self, root):
+        while root is not None:
+            self.stack.append(root)
+            root = root.left
+
+class Solution:
+    def getAllElements(self, root1: TreeNode, root2: TreeNode) -&gt; List[int]:
+        i1 = BSTIterator(root1)
+        i2 = BSTIterator(root2)
+        v1 = i1.next()
+        v2 = i2.next()
+        ret = []
+        while v1 is not None or v2 is not None:
+            if v1 is not None and (v2 is None or v1 &lt;= v2):
+                ret.append(v1)
+                v1 = i1.next()
+            else:
+                ret.append(v2)
+                v2 = i2.next()  
+        return ret</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用了两个 BSTIterator 实例分别对两棵二叉搜索树进行中序遍历，从而得到两个按升序排序的值流。然后，将这两个值流合并成一个有序列表。BSTIterator 类通过迭代的方式实现了中序遍历，它使用一个栈来存储节点，按需进行遍历，从而避免了一次性读取整棵树的开销。在合并过程中，通过比较两个迭代器返回的当前最小值，将较小值添加到结果列表中，并从相应的迭代器获取下一个值，直到两个迭代器都耗尽。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+class BSTIterator:
+
+    def __init__(self, root: Optional[TreeNode]):
+        self.stack = []
+        self.dfsLeft(root)  # 初始化时进行一次左侧深度优先搜索
+
+    def next(self) -&gt; int:
+        if len(self.stack) == 0:
+            return None
+        root = self.stack.pop()  # 弹出栈顶元素，即当前最小元素
+        self.dfsLeft(root.right)  # 探索右子树，寻找下一个最小值
+        return root.val
+
+    def dfsLeft(self, root):
+        while root is not None:
+            self.stack.append(root)  # 将当前节点压栈
+            root = root.left  # 持续向左走
+
+class Solution:
+    def getAllElements(self, root1: TreeNode, root2: TreeNode) -&gt; List[int]:
+        i1 = BSTIterator(root1)
+        i2 = BSTIterator(root2)
+        v1 = i1.next()  # 从第一棵树获取第一个元素
+        v2 = i2.next()  # 从第二棵树获取第一个元素
+        ret = []
+        while v1 is not None or v2 is not None:
+            if v1 is not None and (v2 is None or v1 &lt;= v2):
+                ret.append(v1)  # 添加较小值到结果列表
+                v1 = i1.next()  # 更新v1为下一个值
+            else:
+                ret.append(v2)  # 添加较小值到结果列表
+                v2 = i2.next()  # 更新v2为下一个值
+        return ret</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在定义BSTIterator类时，初始化过程中进行的左侧深度优先搜索（dfsLeft）具体是如何实现的，能否详细说明其过程和目的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在BSTIterator类的初始化过程中，`dfsLeft`方法被用来执行一次深度优先搜索，专注于树的左侧。这个方法的目的是找到并访问二叉搜索树中的最小元素，这通常是树的最左侧节点。具体实现是通过一个循环，其中将当前节点推入栈中，并将当前节点更新为其左子节点，直到当前节点为`None`。这样做可以确保栈顶始终保存着下一个最小元素。当`next`方法被调用时，栈顶元素（当前最小）被弹出，并对其右子树执行相同的左侧深度优先搜索，以寻找新的最小元素。这种设计允许`BSTIterator`以延迟的方式遍历树，只有在必要时才访问树的部分节点，从而优化性能和内存使用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何处理两个迭代器中一个已经耗尽而另一个尚有元素的情况？题解中的逻辑是否完全处理了这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在合并两个迭代器生成的值流时，如果一个迭代器已经耗尽（即`next`方法返回`None`），而另一个迭代器仍有元素，题解中的逻辑通过检查每个迭代器返回的值是否为`None`来处理这种情况。如果其中一个值为`None`，则只从另一个仍有元素的迭代器中继续取值。这种方法确保了所有剩余的元素都能被正确地加入到最终的结果列表中，从而完全处理了这种情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            合并两个有序列表的过程中，比较两个值并选择较小者添加到结果列表的逻辑为什么是高效的？是否存在更优的合并策略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>合并两个有序列表通过比较两个迭代器返回的当前元素，并选择较小者添加到结果列表中，这是高效的因为它保证了每次比较只处理最前面的元素，从而以线性时间复杂度完成合并。这种方法类似于归并排序中的合并过程，是处理两个有序列表合并的标准且高效的策略。虽然这个策略已经很优化，但在特定情况下，如当一个迭代器中的所有元素都比另一个的小，可以通过一些检测来进一步减少比较的次数，直接将剩余元素追加到结果列表中，这可能会带来微小的性能提升。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/all-elements-in-two-binary-search-trees')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/all-elements-in-two-binary-search-trees/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

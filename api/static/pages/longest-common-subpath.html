@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长公共子路径</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长公共子路径</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=suffix-array" class="badge bg-secondary tag-link">后缀数组</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个国家由 <code>n</code> 个编号为 <code>0</code> 到 <code>n - 1</code> 的城市组成。在这个国家里，<strong>每两个</strong> 城市之间都有一条道路连接。</p>
+
+<p>总共有 <code>m</code> 个编号为 <code>0</code> 到 <code>m - 1</code> 的朋友想在这个国家旅游。他们每一个人的路径都会包含一些城市。每条路径都由一个整数数组表示，每个整数数组表示一个朋友按顺序访问过的城市序列。同一个城市在一条路径中可能 <strong>重复</strong> 出现，但同一个城市在一条路径中不会连续出现。</p>
+
+<p>给你一个整数 <code>n</code> 和二维数组 <code>paths</code> ，其中 <code>paths[i]</code> 是一个整数数组，表示第 <code>i</code> 个朋友走过的路径，请你返回 <strong>每一个</strong> 朋友都走过的 <strong>最长公共子路径</strong> 的长度，如果不存在公共子路径，请你返回 <code>0</code> 。</p>
+
+<p>一个 <strong>子路径</strong> 指的是一条路径中连续的城市序列。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>n = 5, paths = [[0,1,<strong>2,3</strong>,4],
+                     [<strong>2,3</strong>,4],
+                     [4,0,1,<strong>2,3</strong>]]
+<b>输出：</b>2
+<b>解释：</b>最长公共子路径为 [2,3] 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>n = 3, paths = [[0],[1],[2]]
+<b>输出：</b>0
+<b>解释：</b>三条路径没有公共子路径。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>n = 5, paths = [[<strong>0</strong>,1,2,3,4],
+                     [4,3,2,1,<strong>0</strong>]]
+<b>输出：</b>1
+<b>解释：</b>最长公共子路径为 [0]，[1]，[2]，[3] 和 [4] 。它们长度都为 1 。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= n <= 10<sup>5</sup></code></li>
+	<li><code>m == paths.length</code></li>
+	<li><code>2 <= m <= 10<sup>5</sup></code></li>
+	<li><code>sum(paths[i].length) <= 10<sup>5</sup></code></li>
+	<li><code>0 <= paths[i][j] < n</code></li>
+	<li><code>paths[i]</code> 中同一个城市不会连续重复出现。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1443 ms</p>
+                    <p>内存: 92.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">def inducedSort(s: List[int], sa1: List[int], t: List[int], m: int):
+    n = len(s)
+    cnt = [0] * m
+    for i in range(n):
+        cnt[s[i]] += 1
+    for i in range(1, m):
+        cnt[i] += cnt[i - 1]
+    start, end = [0] + cnt[:-1], cnt[:]
+    sa = [-1] * n + [n]
+    for x in reversed(sa1[1:]):
+        cnt[s[x]] -= 1 
+        sa[cnt[s[x]]] = x  
+    for i in range(-1, n):
+        if sa[i] &gt; 0:
+            c = sa[i] - 1 
+            if not t[c]:
+                sa[start[s[c]]] = c
+                start[s[c]] += 1
+    for i in range(n - 1, -1, -1):
+        if sa[i] &gt; 0:
+            c = sa[i] - 1
+            if t[c]:
+                end[s[c]] -= 1
+                sa[end[s[c]]] = c
+    return sa[:-1]
+
+def suffixArray(s: List[int], bucketNum: int):  
+    n = len(s)
+    t = [False] * (n + 1)
+    for i in reversed(range(n - 1)):
+        t[i] = t[i + 1] if s[i] == s[i + 1] else (s[i] &lt; s[i + 1])
+    critical = list()
+    for i in range(1, n):
+        if t[i] and not t[i - 1]:
+            critical.append(i)
+    nc = len(critical)
+    index = [-1] * n + [n]
+    for i, x in enumerate(critical):
+        index[x] = i
+    sa0 = inducedSort(s, [n] + critical, t, bucketNum) 
+    s1 = [0] * (nc + 1)
+    critical.append(n)
+    last, p, repeat = &#34;&#34;, 0, False
+    for x in sa0:
+        if index[x] &gt;= 0:
+            c = s[x : critical[index[x] + 1]]
+            if c != last:
+                p += 1
+                last = c
+            else:
+                repeat = True
+            s1[index[x]] = p
+    if repeat:
+        sa1 = [critical[x] for x in suffixArray(s1, p + 1)]
+    else:
+        sa1 = [n] + [x for x in sa0 if index[x] &gt;= 0]
+    return inducedSort(s, sa1, t, bucketNum)
+
+def getHeight(s: List[int], sa: List[int]) -&gt; List[int]:
+    n, k = len(s), 0
+    rk = [0] * n
+    for i in range(n):
+        rk[sa[i]] = i
+    height = [0] * n
+    s += [-1]
+    for i in range(n):
+        if rk[i]:
+            if k &gt; 0:
+                k -= 1
+            while s[i + k] == s[sa[rk[i] - 1] + k]:
+                k += 1
+            height[rk[i]] = k
+    return height, rk
+
+class Solution:
+    def longestCommonSubpath(self, n: int, paths: List[List[int]]) -&gt; int:
+        label, s = [], []
+        m = len(paths)
+        for i, path in enumerate(paths):
+            label += [i] * (len(path) + 1)
+            s += [x + m for x in path]
+            s.append(m-i)
+
+        sa = suffixArray(s, n + m)
+        height, _ = getHeight(s, sa)
+        height[0] = float(&#39;inf&#39;)
+
+        cnt = [0] * m
+        p, cntcnt, ans = 0, 0, 0
+        q = deque()
+        for i, x in enumerate(sa):
+            cl = label[x]
+            cnt[cl] += 1
+            if cnt[cl] == 1:
+                cntcnt += 1
+            while q and q[-1][0] &gt; height[i]:
+                q.pop()
+            q.append((height[i], i))
+            while cnt[label[sa[p]]] &gt; 1:
+                if q[0][1] == p + 1:
+                    q.popleft()
+                cnt[label[sa[p]]] -= 1
+                p += 1
+            if cntcnt == m:
+                c = q[0][0]
+                if c &gt; ans:
+                    ans = c
+        
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用后缀数组和LCP数组结合滑动窗口的方法来寻找最长公共子路径。首先，构建一个由所有路径组成的超级字符串，每个路径之间用一个特殊的分隔符隔开。然后对这个超级字符串构建后缀数组，这样就可以在O(n log n)的时间内找到所有后缀的排序。接下来，使用后缀数组计算出最长公共前缀（LCP）数组。利用LCP数组，通过滑动窗口技术来维护所有路径在当前窗口内的最小LCP值，确保窗口内包含所有路径至少一次。最后，窗口的最小LCP值即为我们要找的最长公共子路径的长度。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">def inducedSort(s, sa1, t, m):
+    # 数组s表示待排序的数字，sa1表示已排序的部分，t是类型数组，m是桶的数量
+    n = len(s)
+    cnt = [0] * m
+    for i in range(n):
+        cnt[s[i]] += 1
+    for i in range(1, m):
+        cnt[i] += cnt[i - 1]
+    start, end = [0] + cnt[:-1], cnt[:]
+    sa = [-1] * n + [n]
+    for x in reversed(sa1[1:]):
+        cnt[s[x]] -= 1
+        sa[cnt[s[x]]] = x
+    for i in range(-1, n):
+        if sa[i] &gt; 0:
+            c = sa[i] - 1
+            if not t[c]:
+                sa[start[s[c]]] = c
+                start[s[c]] += 1
+    for i in range(n - 1, -1, -1):
+        if sa[i] &gt; 0:
+            c = sa[i] - 1
+            if t[c]:
+                end[s[c]] -= 1
+                sa[end[s[c]]] = c
+    return sa[:-1]
+
+def suffixArray(s, bucketNum):
+    # 构建后缀数组
+    n = len(s)
+    t = [False] * (n + 1)
+    for i in reversed(range(n - 1)):
+        t[i] = t[i + 1] if s[i] == s[i + 1] else s[i] &lt; s[i + 1]
+    critical = [i for i in range(1, n) if t[i] and not t[i - 1]]
+    index = [-1] * n + [n]
+    for i, x in enumerate(critical):
+        index[x] = i
+    sa0 = inducedSort(s, [n] + critical, t, bucketNum)
+    s1 = [0] * (nc + 1)
+    critical.append(n)
+    last, p, repeat = &#34;&#34;, 0, False
+    for x in sa0:
+        if index[x] &gt;= 0:
+            c = s[x : critical[index[x] + 1]]
+            if c != last:
+                p += 1
+                last = c
+            else:
+                repeat = True
+            s1[index[x]] = p
+    if repeat:
+        sa1 = [critical[x] for x in suffixArray(s1, p + 1)]
+    else:
+        sa1 = [n] + [x for x in sa0 if index[x] &gt;= 0]
+    return inducedSort(s, sa1, t, bucketNum)
+
+def getHeight(s, sa):
+    # 计算LCP数组
+    n, k = len(s), 0
+    rk = [0] * n
+    for i in range(n):
+        rk[sa[i]] = i
+    height = [0] * n
+    s += [-1]
+    for i in range(n):
+        if rk[i]:
+            if k &gt; 0:
+                k -= 1
+            while s[i + k] == s[sa[rk[i] - 1] + k]:
+                k += 1
+            height[rk[i]] = k
+    return height, rk
+
+class Solution:
+    def longestCommonSubpath(self, n, paths):
+        # 寻找最长公共子路径
+        label, s = [], []
+        m = len(paths)
+        for i, path in enumerate(paths):
+            label += [i] * (len(path) + 1)
+            s += [x + m for x in path]
+            s.append(m-i)
+
+        sa = suffixArray(s, n + m)
+        height, _ = getHeight(s, sa)
+        height[0] = float(&#39;inf&#39;)
+
+        cnt = [0] * m
+        p, cntcnt, ans = 0, 0, 0
+        q = deque()
+        for i, x in enumerate(sa):
+            cl = label[x]
+            cnt[cl] += 1
+            if cnt[cl] == 1:
+                cntcnt += 1
+            while q and q[-1][0] &gt; height[i]:
+                q.pop()
+            q.append((height[i], i))
+            while cnt[label[sa[p]]] &gt; 1:
+                if q[0][1] == p + 1:
+                    q.popleft()
+                cnt[label[sa[p]]] -= 1
+                p += 1
+            if cntcnt == m:
+                c = q[0][0]
+                if c &gt; ans:
+                    ans = c
+
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建后缀数组的过程中，你如何处理每个路径之间的特殊分隔符，以确保这些分隔符不会与城市编号混淆？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建后缀数组的过程中，为了避免城市编号与特殊分隔符混淆，我们对城市编号进行了偏移处理，将每个城市编号加上路径的数量 m。这样，所有城市编号都会大于任何一个分隔符编号，分隔符的编号为 m-i（其中 i 是路径的索引）。通过这种方式，我们确保了城市编号与分隔符的值不会重叠，从而在后缀数组和LCP数组的计算中正确区分不同的路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中提到了使用滑动窗口来维护路径的最小LCP值，但具体如何初始化窗口，并确保窗口中始终包含所有路径至少一次？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口在算法中用于确保每个窗口内包含所有路径至少一次。窗口初始化时，开始和结束指针都设为数组的起始位置。随着结束指针向右移动，我们增加对应后缀起始位置的路径计数，并将当前LCP值与窗口的最小值进行比较，如果有必要，更新窗口的最小值。如果发现某路径的计数超过1，开始指针向右移动，直到每个路径在窗口中至少出现一次。通过这种方式，我们可以找到同时涵盖所有路径的最小LCP区间，即为我们要找的最长公共子路径的长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在计算LCP数组时需要在字符串末尾添加一个特殊字符（-1）？这对于结果有什么具体影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算LCP数组时，在字符串末尾添加一个特殊字符（-1）是为了确保最后一个字符是全局最小的，这样可以避免在进行LCP计算时越界。因为比较时我们会检查当前后缀与前一个后缀的共同前缀，添加-1确保了在字符串尾部的比较会立即停止，因为没有其他字符会比-1更小。这样，我们能够正确地终止比较过程，避免错误地扩展LCP值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在使用后缀数组和LCP数组寻找最长公共子路径时，你如何确保不会将不同路径中的重复城市作为公共子路径的一部分？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用后缀数组和LCP数组寻找最长公共子路径时，我们通过在每个路径末尾添加唯一的分隔符来区分不同路径。这些分隔符在计算过程中保证了任何找到的公共子序列不会跨越多个路径。此外，通过滑动窗口技术确保每个窗口至少包含每个路径一次，我们可以保证找到的最长公共子路径是所有路径共有的，而不是由于路径内部的重复城市引起的误匹配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-common-subpath')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-common-subpath/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

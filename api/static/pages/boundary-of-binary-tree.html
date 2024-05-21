@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树的边界</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树的边界</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def boundaryOfBinaryTree(self, root: Optional[TreeNode]) -&gt; List[int]:
+        if not root: 
+            return []   
+        if not root.left and not root.right:
+            return [root.val]
+       
+        def leftBoundary(root): # preorder
+            if not root or (not root.left and not root.right): # exclude leaf
+                return            
+            res.append(root.val)           
+            if root.left: # 如果有left substree, 描left as boundary
+                leftBoundary(root.left)
+            else: # if no substree, then use right as boundary
+                leftBoundary(root.right)
+           
+        def rightBoundary(root): # postorder (so reversed order)
+            if not root or (not root.left and not root.right):
+                return
+            if root.right: # 如果有right substree, 描right as boundary
+                rightBoundary(root.right)
+            else:
+                rightBoundary(root.left)
+            res.append(root.val)
+       
+        def leaves(node): # postorder
+            if not node: 
+                return
+            if not node.left and not node.right:
+                res.append(node.val)
+            leaves(node.left)
+            leaves(node.right)
+        # eg 2
+        # step 0
+        res = [root.val]   # [1]
+        # step 1: preorder to get the left boundary node value
+        leftBoundary(root.left) # [2] # must use root.left, otherwise will add root twice
+        # step 2: use dfs to find the leaves node value and append to the left boundary node value.  
+        leaves(root) # [4, 7, 8, 9, 10]
+         # step 3: use postorder to find the right boundary and append to the previous node values.   
+        rightBoundary(root.right) # [6, 3]
+        return res
+        
+        
+     
+        
+        
+&#34;&#34;&#34;   
+Gist: 二叉树的 边界 是由 根节点 、左边界 、按从左到右顺序的 叶节点 和 逆序的右边界 ，按顺序依次连接组成。
+
+This question can be solved by Depth First Search.
+
+This question applied various of knowledge of tree. To solve this question, we first use preorder to get the left boundary node value, then we use dfs to find the leaves node value and append to the left boundary node value. At last, we use postorder to find the right boundary and append to the previous node values.
+
+https://zhenyu0519.github.io/2020/03/13/lc545/
+&#34;&#34;&#34;   </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题目可以通过深度优先搜索（DFS）来解决。解题思路如下：
+1. 先将根节点的值加入结果列表。
+2. 通过先序遍历（preorder）得到左边界节点的值，并加入结果列表。注意要排除叶子节点。
+3. 通过DFS找到所有叶子节点的值，按从左到右的顺序加入结果列表。
+4. 通过后序遍历（postorder）得到右边界节点的值，并以逆序的方式加入结果列表。注意要排除叶子节点。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def boundaryOfBinaryTree(self, root: Optional[TreeNode]) -&gt; List[int]:
+        if not root: 
+            return []   
+        if not root.left and not root.right:
+            return [root.val]
+       
+        def leftBoundary(root): # 先序遍历得到左边界节点值
+            if not root or (not root.left and not root.right): # 排除叶子节点
+                return            
+            res.append(root.val)           
+            if root.left: # 如果有左子树，以左子树为边界  
+                leftBoundary(root.left)
+            else: # 如果没有左子树，以右子树为边界
+                leftBoundary(root.right)
+           
+        def rightBoundary(root): # 后序遍历得到右边界节点值（逆序） 
+            if not root or (not root.left and not root.right): # 排除叶子节点
+                return
+            if root.right: # 如果有右子树，以右子树为边界
+                rightBoundary(root.right)
+            else: # 如果没有右子树，以左子树为边界
+                rightBoundary(root.left)
+            res.append(root.val)
+       
+        def leaves(node): # DFS寻找所有叶子节点
+            if not node: 
+                return
+            if not node.left and not node.right:
+                res.append(node.val)
+            leaves(node.left)
+            leaves(node.right)
+        
+        res = [root.val]   # 步骤1：加入根节点值
+        leftBoundary(root.left) # 步骤2：先序遍历得到左边界节点值
+        leaves(root) # 步骤3：DFS寻找叶子节点值，加入到结果列表
+        rightBoundary(root.right) # 步骤4：后序遍历得到右边界节点值，逆序加入结果列表
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在定义左边界和右边界的节点时，为什么选择排除叶子节点而不是包括它们在内？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造二叉树边界的过程中，如果在左边界和右边界中包含叶子节点，那么当这些叶子节点同时被计算为底部边界时，它们会在结果列表中被重复计算。为了避免这种重复，我们在左边界和右边界的计算中排除叶子节点，只在专门寻找叶子节点的步骤中将它们包括进来，确保每个节点在最终结果中只出现一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在进行左边界的先序遍历时，如果遇到一个节点既没有左子树也没有右子树时，函数直接返回，这是否意味着可能会漏掉一些边界条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在左边界的定义中，一个没有左子树也没有右子树的节点即为叶子节点，因此在定义左边界时会跳过这样的节点。这种设计是故意的，以避免叶子节点在左边界或右边界中被重复计算。因此，这并不会漏掉边界条件，而是为了保持结果的一致性与准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当根节点只有一侧子树（例如只有左子树或只有右子树）时，这种情况下的边界处理逻辑是否有所不同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果根节点只有一侧子树，处理逻辑会略有不同。例如，如果只有左子树而无右子树，左边界就是从根节点开始直到最左侧的路径，而右边界不存在。在这种情况下，右边界的递归函数不会有任何执行，因此只需要确保左边界和叶子节点正确收集。如果只有右子树，情况相反，需要正确处理右边界而忽略左边界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在递归函数`leftBoundary`和`rightBoundary`中，如果节点的左或右子树为null，你选择遍历另一侧子树。这种选择是否可能影响到最终边界的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种设计中，如果一个节点的一侧子树为null，选择遍历另一侧子树是为了确保边界的完整性。这种方法确保了在没有传统边界（如左子树或右子树）的情况下仍能尽可能地追踪边界。虽然这样做可能会导致边界看起来不是很直观（例如，边界可能包含了通常不认为是边界的节点），但这是为了保持边界的连续性，并确保所有外围的节点被考虑在内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/binary-tree-right-side-view" class="list-group-item list-group-item-action">
+                                二叉树的右视图
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/boundary-of-binary-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/boundary-of-binary-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>元素和小于等于 k 的子矩阵的数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>元素和小于等于 k 的子矩阵的数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的整数矩阵 <code>grid</code> 和一个整数 <code>k</code>。</p>
+
+<p>返回包含 <code>grid</code> 左上角元素、元素和小于或等于 <code>k</code> 的 <strong><span data-keyword="submatrix">子矩阵</span></strong>的数目。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2024/01/01/example1.png" style="padding: 10px; background: #fff; border-radius: .5rem;" />
+<pre>
+<strong>输入：</strong>grid = [[7,6,3],[6,6,1]], k = 18
+<strong>输出：</strong>4
+<strong>解释：</strong>如上图所示，只有 4 个子矩阵满足：包含 grid 的左上角元素，并且元素和小于或等于 18 。</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2024/01/01/example21.png" style="padding: 10px; background: #fff; border-radius: .5rem;" />
+<pre>
+<strong>输入：</strong>grid = [[7,2,9],[1,5,0],[2,6,6]], k = 20
+<strong>输出：</strong>6
+<strong>解释：</strong>如上图所示，只有 6 个子矩阵满足：包含 grid 的左上角元素，并且元素和小于或等于 20 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length </code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= n, m &lt;= 1000 </code></li>
+	<li><code>0 &lt;= grid[i][j] &lt;= 1000</code></li>
+	<li><code>1 &lt;= k &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 87 ms</p>
+                    <p>内存: 50.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countSubmatrices(self, grid: List[List[int]], k: int) -&gt; int:#按行转移
+        m,n=len(grid),len(grid[0])
+        rowPrev=[0]#算行列前缀和on2
+        sm=0#sum(grid[0])
+        res=0#终止于每行的子矩阵数
+        for i in range(m):
+            if n&lt;1:break
+            sm+=sum(grid[i][:n])
+            while sm&gt;k:
+                sm-=sum(grid[j][n-1] for j in range(i+1))
+                n-=1
+            res+=n
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的思路是通过逐行累加行的和，并同时在每一行中逐列考虑减少列的数量以保证子矩阵的和小于等于k。具体来说，首先初始化行前缀和为0，然后逐行计算当前行到第一行的矩阵和。如果这个和超过k，就减少列数，直到和小于等于k或者列数减到0。每减少一次列数，就从当前的总和中减去所有行在该列的元素和。这样，每一行结束时，n的值就是从第一列开始到第n列的子矩阵的数量，我们将这个数量累加到结果中。</p>
+                                <p>时间复杂度: O(m * n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countSubmatrices(self, grid: List[List[int]], k: int) -&gt; int: # 按行处理子矩阵
+        m, n = len(grid), len(grid[0])
+        rowPrev = [0] # 初始化行前缀和
+        sm = 0 # 初始化第一行的和
+        res = 0 # 初始化结果
+        for i in range(m): # 遍历每一行
+            if n &lt; 1: break # 如果列数为0，则停止
+            sm += sum(grid[i][:n]) # 计算当前行到第一行的和
+            while sm &gt; k: # 当子矩阵的和大于k时，减少列数
+                sm -= sum(grid[j][n-1] for j in range(i+1)) # 减去每行在当前最后一列的元素和
+                n -= 1 # 减少列数
+            res += n # 将当前行的子矩阵数量加到结果中
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，为什么选择以行为基础进行累加和的计算，而不是列或其他方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择以行为基础进行累加和的计算主要是因为这种方式可以有效地利用二维数组的行连续存储特性，从而简化计算过程。在大多数编程环境中，二维数组是按行优先存储的，这意味着行内的数据在内存中是连续的。因此，按行累加可以更高效地访问内存，减少缓存未命中的可能性，提高算法的执行效率。此外，以行为单位处理子矩阵可以较容易地实现前缀和的动态更新，便于处理和计算各种范围内的子矩阵和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在减少列数来调整子矩阵的和小于等于k时，是否有可能错过某些满足条件的子矩阵配置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，该算法在减少列数来调整子矩阵的和小于等于k时，有可能错过某些满足条件的子矩阵配置。算法通过逐步减少列数来确保当前考虑的子矩阵的和不超过k，但这种方法可能没有考虑到通过移除非连续列（非最右侧列）或通过在某些行中移除列而在其他行中保留更多列的可能配置。这种策略本质上是贪心的，并且仅考虑了从第一列开始到当前列的连续子矩阵，遗漏了其它潜在的、不连续的或从中间某列开始的子矩阵配置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法描述中提到，当子矩阵和超过k时减少列数，这种方法是否能保证找到所有可能的子矩阵配置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法不能保证找到所有可能的子矩阵配置。如前面所述，算法主要是在当前行的基础上连续减少列数，以确保子矩阵的和小于等于k。这种连续的、基于当前行的列减少策略可能忽略了一些非连续的列配置或者某些特定行列组合，这些组合可能同样满足总和小于等于k的条件。因此，虽然这种方法在特定情况下效率较高，但它不是一个全局最优解，不能覆盖所有可能的满足条件的子矩阵配置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-submatrices-with-top-left-element-and-sum-less-than-k')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-submatrices-with-top-left-element-and-sum-less-than-k/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

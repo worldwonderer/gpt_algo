@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>矩阵的最大非负积</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>矩阵的最大非负积</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为 <code>m x n</code> 的矩阵 <code>grid</code> 。最初，你位于左上角 <code>(0, 0)</code> ，每一步，你可以在矩阵中 <strong>向右</strong> 或 <strong>向下</strong> 移动。</p>
+
+<p>在从左上角 <code>(0, 0)</code> 开始到右下角 <code>(m - 1, n - 1)</code> 结束的所有路径中，找出具有 <strong>最大非负积</strong> 的路径。路径的积是沿路径访问的单元格中所有整数的乘积。</p>
+
+<p>返回 <strong>最大非负积 </strong>对<strong><em> </em><code>10<sup>9</sup>&nbsp;+ 7</code></strong> <strong>取余</strong> 的结果。如果最大积为 <strong>负数</strong> ，则返回<em> </em><code>-1</code> 。</p>
+
+<p><strong>注意，</strong>取余是在得到最大积之后执行的。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/12/23/product1.jpg" style="width: 244px; height: 245px;" />
+<pre>
+<strong>输入：</strong>grid = [[-1,-2,-3],[-2,-3,-3],[-3,-3,-2]]
+<strong>输出：</strong>-1
+<strong>解释：</strong>从 (0, 0) 到 (2, 2) 的路径中无法得到非负积，所以返回 -1 。</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/12/23/product2.jpg" style="width: 244px; height: 245px;" />
+<pre>
+<strong>输入：</strong>grid = [[1,-2,1],[1,-2,1],[3,-4,1]]
+<strong>输出：</strong>8
+<strong>解释：</strong>最大非负积对应的路径如图所示 (1 * 1 * -2 * -4 * 1 = 8)
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/12/23/product3.jpg" style="width: 164px; height: 165px;" />
+<pre>
+<strong>输入：</strong>grid = [[1,3],[0,-4]]
+<strong>输出：</strong>0
+<strong>解释：</strong>最大非负积对应的路径如图所示 (1 * 0 * -4 = 0)
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= m, n &lt;= 15</code></li>
+	<li><code>-4 &lt;= grid[i][j] &lt;= 4</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 26 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxProductPath(self, grid: List[List[int]]) -&gt; int:
+        MOD = 10 ** 9 + 7
+        m, n = len(grid), len(grid[0])
+        
+        # 初始化最大积和最小积矩阵
+        max_product = [[0] * n for _ in range(m)]
+        min_product = [[0] * n for _ in range(m)]
+        
+        # 填充第一行和第一列
+        max_product[0][0] = min_product[0][0] = grid[0][0]
+        for i in range(1, m):
+            max_product[i][0] = max_product[i-1][0] * grid[i][0]
+            min_product[i][0] = min_product[i-1][0] * grid[i][0]
+        for j in range(1, n):
+            max_product[0][j] = max_product[0][j-1] * grid[0][j]
+            min_product[0][j] = min_product[0][j-1] * grid[0][j]
+        
+        # 填充其他格子
+        for i in range(1, m):
+            for j in range(1, n):
+                if grid[i][j] &gt;= 0:
+                    max_product[i][j] = max(max_product[i-1][j], max_product[i][j-1]) * grid[i][j]
+                    min_product[i][j] = min(min_product[i-1][j], min_product[i][j-1]) * grid[i][j]
+                else:
+                    max_product[i][j] = min(min_product[i-1][j], min_product[i][j-1]) * grid[i][j]
+                    min_product[i][j] = max(max_product[i-1][j], max_product[i][j-1]) * grid[i][j]
+        
+        # 检查最大非负积是否为负数
+        if max_product[-1][-1] &lt; 0:
+            return -1
+        
+        # 取余并返回结果
+        return max_product[-1][-1] % MOD
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用动态规划的方法来解决问题。定义两个二维数组 max_product 和 min_product，其中 max_product[i][j] 存储到达单元格 (i, j) 的所有路径中可能的最大积，min_product[i][j] 存储可能的最小积。这是因为负数的存在，最小积乘以负数可能变成最大积。初始状态设置为 max_product[0][0] 和 min_product[0][0] 等于 grid[0][0]。然后分别初始化矩阵的第一行和第一列。对于其他单元格，根据当前单元格值的正负来决定如何更新 max_product 和 min_product。遍历完成后，max_product[m-1][n-1] 存储的就是到达右下角的最大积。如果这个最大积小于 0，直接返回 -1；否则，返回其对 10^9+7 取模的结果。</p>
+                                <p>时间复杂度: O(m*n)</p>
+                                <p>空间复杂度: O(m*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxProductPath(self, grid: List[List[int]]) -&gt; int:
+        MOD = 10 ** 9 + 7
+        m, n = len(grid), len(grid[0])
+        
+        # 初始化最大积和最小积矩阵
+        max_product = [[0] * n for _ in range(m)]
+        min_product = [[0] * n for _ in range(m)]
+        
+        # 填充第一行和第一列
+        max_product[0][0] = min_product[0][0] = grid[0][0]
+        for i in range(1, m):
+            max_product[i][0] = max_product[i-1][0] * grid[i][0]
+            min_product[i][0] = min_product[i-1][0] * grid[i][0]
+        for j in range(1, n):
+            max_product[0][j] = max_product[0][j-1] * grid[0][j]
+            min_product[0][j] = min_product[0][j-1] * grid[0][j]
+        
+        # 填充其他格子
+        for i in range(1, m):
+            for j in range(1, n):
+                if grid[i][j] &gt;= 0:
+                    max_product[i][j] = max(max_product[i-1][j], max_product[i][j-1]) * grid[i][j]
+                    min_product[i][j] = min(min_product[i-1][j], min_product[i][j-1]) * grid[i][j]
+                else:
+                    max_product[i][j] = min(min_product[i-1][j], min_product[i][j-1]) * grid[i][j]
+                    min_product[i][j] = max(max_product[i-1][j], max_product[i][j-1]) * grid[i][j]
+        
+        # 检查最大非负积是否为负数
+        if max_product[-1][-1] &lt; 0:
+            return -1
+        
+        # 取余并返回结果
+        return max_product[-1][-1] % MOD</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划中，为什么需要同时维护最大积`max_product`和最小积`min_product`两个矩阵？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，同时维护最大积`max_product`和最小积`min_product`两个矩阵是非常关键的，尤其是在矩阵中存在负数的情况下。由于负数乘以一个较小的负数可以得到一个较大的正数，因此最小积乘以一个负数可能会变成最大积。同时维护这两个值可以确保在每个步骤中，无论当前元素是正是负，我们都能正确地计算出到达当前单元格的最大可能积和最小可能积。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            该算法如何处理矩阵中的负数值，以确保最终可能得到一个非负的最大积？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>该算法通过在每个单元格更新`max_product`和`min_product`时特别注意元素的符号来处理负数。如果当前元素是正数，我们假设最大积是由之前的最大积计算得到的，而最小积是由之前的最小积计算得到的。如果元素是负数，我们将之前的最小积（可能是一个负值）和当前元素相乘，这可能会得到一个大的正数，因此更新最大积；同样，最大积（如果是正数）乘以负数将会得到一个更小的数，所以用它来更新最小积。这种处理确保了不会错过由于负数乘积反转而产生的最大正积的可能性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在初始化第一行和第一列时，如果遇到0或负数，这对`max_product`和`min_product`的更新有什么特别影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化第一行和第一列时，如果遇到0，那么从这一点开始到达任何后续点的积将会是0，因为任何数与0的乘积都是0。这意味着`max_product`和`min_product`在该位置及之后的所有位置都应被更新为0。如果遇到负数，则需要注意`max_product`和`min_product`的更新，因为一个负数乘以另一个负数可能得到一个正数，所以起始点的负数对后续的产品积有重要影响，特别是在计算路径最大积时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在填充每个格子时，需要同时考虑来自上方和左侧的路径？是否有可能只考虑一个方向会导致结果不准确？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在填充每个格子时，需要同时考虑来自上方和左侧的路径，因为这两个方向都可能提供到达当前单元格的最优路径（即最大积或最小积）。如果只考虑一个方向，则可能会忽略通过另一个方向到达该单元格时可能获得的更大的积。例如，从左侧到达的路径可能有一个很大的积，而从上方到达的路径可能因为某些负数的存在而提供一个更小或更大的积。忽略任何一个方向都可能导致不能计算出真正的最大或最小积，因此考虑所有可能的路径是确保算法准确性的关键。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-non-negative-product-in-a-matrix')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-non-negative-product-in-a-matrix/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

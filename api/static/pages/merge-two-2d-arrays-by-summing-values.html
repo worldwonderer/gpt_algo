@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>合并两个二维数组 - 求和法</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>合并两个二维数组 - 求和法</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个 <strong>二维</strong> 整数数组 <code>nums1</code> 和 <code>nums2.</code></p>
+
+<ul>
+	<li><code>nums1[i] = [id<sub>i</sub>, val<sub>i</sub>]</code> 表示编号为 <code>id<sub>i</sub></code> 的数字对应的值等于 <code>val<sub>i</sub></code> 。</li>
+	<li><code>nums2[i] = [id<sub>i</sub>, val<sub>i</sub>]</code>&nbsp;表示编号为 <code>id<sub>i</sub></code> 的数字对应的值等于 <code>val<sub>i</sub></code> 。</li>
+</ul>
+
+<p>每个数组都包含 <strong>互不相同</strong> 的 id ，并按 id 以 <strong>递增</strong> 顺序排列。</p>
+
+<p>请你将两个数组合并为一个按 id 以递增顺序排列的数组，并符合下述条件：</p>
+
+<ul>
+	<li>只有在两个数组中至少出现过一次的 id 才能包含在结果数组内。</li>
+	<li>每个 id 在结果数组中 <strong>只能出现一次</strong> ，并且其对应的值等于两个数组中该 id 所对应的值求和。如果某个数组中不存在该 id ，则认为其对应的值等于 <code>0</code> 。</li>
+</ul>
+
+<p>返回结果数组。返回的数组需要按 id 以递增顺序排列。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>nums1 = [[1,2],[2,3],[4,5]], nums2 = [[1,4],[3,2],[4,1]]
+<strong>输出：</strong>[[1,6],[2,3],[3,2],[4,6]]
+<strong>解释：</strong>结果数组中包含以下元素：
+- id = 1 ，对应的值等于 2 + 4 = 6 。
+- id = 2 ，对应的值等于 3 。
+- id = 3 ，对应的值等于 2 。
+- id = 4 ，对应的值等于5 + 1 = 6 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>nums1 = [[2,4],[3,6],[5,5]], nums2 = [[1,3],[4,3]]
+<strong>输出：</strong>[[1,3],[2,4],[3,6],[4,3],[5,5]]
+<strong>解释：</strong>不存在共同 id ，在结果数组中只需要包含每个 id 和其对应的值。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums1.length, nums2.length &lt;= 200</code></li>
+	<li><code>nums1[i].length == nums2[j].length == 2</code></li>
+	<li><code>1 &lt;= id<sub>i</sub>, val<sub>i</sub> &lt;= 1000</code></li>
+	<li>数组中的 id 互不相同</li>
+	<li>数据均按 id 以严格递增顺序排列</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+class Solution:
+    def mergeArrays(self, nums1: List[List[int]], nums2: List[List[int]]) -&gt; List[List[int]]:
+        merged_dict = {}  # 用于存储合并后的结果，键为id，值为对应的值
+        i, j = 0, 0  # 双指针，分别指向nums1和nums2的当前位置
+        
+        # 遍历nums1和nums2，将元素添加到merged_dict中
+        while i &lt; len(nums1) and j &lt; len(nums2):
+            id1, val1 = nums1[i]
+            id2, val2 = nums2[j]
+            
+            if id1 == id2:
+                merged_dict[id1] = val1 + val2
+                i += 1
+                j += 1
+            elif id1 &lt; id2:
+                merged_dict[id1] = merged_dict.get(id1, 0) + val1
+                i += 1
+            else:
+                merged_dict[id2] = merged_dict.get(id2, 0) + val2
+                j += 1
+        
+        # 处理剩余的nums1元素
+        while i &lt; len(nums1):
+            id1, val1 = nums1[i]
+            merged_dict[id1] = merged_dict.get(id1, 0) + val1
+            i += 1
+        
+        # 处理剩余的nums2元素
+        while j &lt; len(nums2):
+            id2, val2 = nums2[j]
+            merged_dict[id2] = merged_dict.get(id2, 0) + val2
+            j += 1
+        
+        # 将merged_dict转换为按id递增顺序排列的二维数组
+        merged_list = sorted(merged_dict.items(), key=lambda x: x[0])
+        
+        # 返回最终结果
+        return [[id, val] for id, val in merged_list]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题的解题思路是使用哈希表（字典）来合并和累加两个二维数组中相同id的值。首先，我们初始化一个空字典`merged_dict`来存储每个id及其对应的累加值。使用双指针技术，分别遍历两个已按id递增排序的数组`nums1`和`nums2`。在遍历的过程中，比较两个数组当前元素的id，根据id的大小决定如何移动指针，并更新字典中的累加值。如果两个数组的当前id相同，则两个值相加后存入字典，并同时移动两个数组的指针。如果不相同，则将较小id的值加到字典中，并移动相应的指针。在完成双数组的遍历后，可能有一个数组还有剩余的元素未处理，继续遍历剩余数组并更新字典。最后，将字典转换为列表，并按id排序，以满足题目要求的输出格式。</p>
+                                <p>时间复杂度: O(n + m + k log k)</p>
+                                <p>空间复杂度: O(n + m)</p>
+                                <pre class="bg-light p-2">
+from typing import List
+
+class Solution:
+    def mergeArrays(self, nums1: List[List[int]], nums2: List[List[int]]) -&gt; List[List[int]]:
+        merged_dict = {}  # 初始化字典，用于存储id和累加值
+        i, j = 0, 0  # 初始化双指针分别指向两个数组
+
+        # 使用双指针遍历两个数组
+        while i &lt; len(nums1) and j &lt; len(nums2):
+            id1, val1 = nums1[i]
+            id2, val2 = nums2[j]
+
+            if id1 == id2:
+                merged_dict[id1] = val1 + val2  # 如果id相同，合并值
+                i += 1
+                j += 1
+            elif id1 &lt; id2:
+                merged_dict[id1] = merged_dict.get(id1, 0) + val1  # 只更新nums1的当前项
+                i += 1
+            else:
+                merged_dict[id2] = merged_dict.get(id2, 0) + val2  # 只更新nums2的当前项
+                j += 1
+
+        # 处理剩余的nums1元素
+        while i &lt; len(nums1):
+            id1, val1 = nums1[i]
+            merged_dict[id1] = merged_dict.get(id1, 0) + val1
+            i += 1
+
+        # 处理剩余的nums2元素
+        while j &lt; len(nums2):
+            id2, val2 = nums2[j]
+            merged_dict[id2] = merged_dict.get(id2, 0) + val2
+            j += 1
+
+        # 将字典结果转换为列表，并按id排序
+        merged_list = sorted(merged_dict.items(), key=lambda x: x[0])
+
+        # 构造最终结果格式
+        return [[id, val] for id, val in merged_list]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理两个数组中的相同id时，选择将它们的值相加而不是取最大或最小值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题的上下文中，目标是合并两个数组并累加相同id的值。这种设计选择反映了一种假设，即相同id对应的值应该是累积的，例如在某些应用场景中，id可能代表同一实体或项目的不同记录，而累加则是为了得到一个综合的结果。如果选择取最大或最小值，那么会丢失原始数据中的信息量，无法反映出所有相关记录的总和，这可能不符合题目要求或实际的业务需求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当一个数组中的元素先遍历完毕，剩下另一个数组还有未处理元素时，为什么选择继续加入剩余元素到字典中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，继续将剩余数组中的元素加入字典是为了确保所有的数据都被充分利用。由于题目没有指定只处理两个数组中都有的id，因此单独存在于一个数组中的id也应该被计入最终结果。这样可以保证结果的完整性，确保每个数组中的所有id都得到了处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用双指针遍历两个数组时，如何确保不会因数组长度不同而导致越界错误？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了避免越界错误，解题代码中使用了两个指针分别指向两个数组的起始位置，并在循环条件中检查每个指针是否已经达到对应数组的长度。这意味着只要任何一个数组还有未处理的元素，循环就会继续执行。当一个数组中的元素被完全遍历后，另一个数组可能还有剩余的元素，这时通过单独的循环来继续处理剩余的元素，确保所有元素都被遍历，从而防止了越界错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/merge-two-2d-arrays-by-summing-values')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/merge-two-2d-arrays-by-summing-values/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

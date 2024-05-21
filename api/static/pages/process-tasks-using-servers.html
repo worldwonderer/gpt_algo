@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>使用服务器处理任务</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>使用服务器处理任务</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个 <strong>下标从 0 开始</strong> 的整数数组 <code>servers</code> 和 <code>tasks</code> ，长度分别为 <code>n</code>​​​​​​ 和 <code>m</code>​​​​​​ 。<code>servers[i]</code> 是第 <code>i<sup>​​​​​​</sup></code>​​​​ 台服务器的 <strong>权重</strong> ，而 <code>tasks[j]</code> 是处理第 <code>j<sup>​​​​​​</sup></code> 项任务 <strong>所需要的时间</strong>（单位：秒）。</p>
+
+<p>你正在运行一个仿真系统，在处理完所有任务后，该系统将会关闭。每台服务器只能同时处理一项任务。第 <code>0</code> 项任务在第 <code>0</code> 秒可以开始处理，相应地，第 <code>j</code> 项任务在第 <code>j</code> 秒可以开始处理。处理第 <code>j</code> 项任务时，你需要为它分配一台 <strong>权重最小</strong> 的空闲服务器。如果存在多台相同权重的空闲服务器，请选择 <strong>下标最小</strong> 的服务器。如果一台空闲服务器在第 <code>t</code> 秒分配到第 <code>j</code> 项任务，那么在 <code>t + tasks[j]</code> 时它将恢复空闲状态。</p>
+
+<p>如果没有空闲服务器，则必须等待，直到出现一台空闲服务器，并 <strong>尽可能早</strong> 地处理剩余任务。 如果有多项任务等待分配，则按照 <strong>下标递增</strong> 的顺序完成分配。</p>
+
+<p>如果同一时刻存在多台空闲服务器，可以同时将多项任务分别分配给它们。</p>
+
+<p>构建长度为 <code>m</code> 的答案数组 <code>ans</code> ，其中 <code>ans[j]</code> 是第 <code>j</code> 项任务分配的服务器的下标。</p>
+
+<p>返回答案数组<em> </em><code>ans</code>​​​​ 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>servers = [3,3,2], tasks = [1,2,3,2,1,2]
+<strong>输出：</strong>[2,2,0,2,1,2]
+<strong>解释：</strong>事件按时间顺序如下：
+- 0 秒时，第 0 项任务加入到任务队列，使用第 2 台服务器处理到 1 秒。
+- 1 秒时，第 2 台服务器空闲，第 1 项任务加入到任务队列，使用第 2 台服务器处理到 3 秒。
+- 2 秒时，第 2 项任务加入到任务队列，使用第 0 台服务器处理到 5 秒。
+- 3 秒时，第 2 台服务器空闲，第 3 项任务加入到任务队列，使用第 2 台服务器处理到 5 秒。
+- 4 秒时，第 4 项任务加入到任务队列，使用第 1 台服务器处理到 5 秒。
+- 5 秒时，所有服务器都空闲，第 5 项任务加入到任务队列，使用第 2 台服务器处理到 7 秒。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>servers = [5,1,4,3,2], tasks = [2,1,2,4,5,2,1]
+<strong>输出：</strong>[1,4,1,4,1,3,2]
+<strong>解释：</strong>事件按时间顺序如下：
+- 0 秒时，第 0 项任务加入到任务队列，使用第 1 台服务器处理到 2 秒。
+- 1 秒时，第 1 项任务加入到任务队列，使用第 4 台服务器处理到 2 秒。
+- 2 秒时，第 1 台和第 4 台服务器空闲，第 2 项任务加入到任务队列，使用第 1 台服务器处理到 4 秒。
+- 3 秒时，第 3 项任务加入到任务队列，使用第 4 台服务器处理到 7 秒。
+- 4 秒时，第 1 台服务器空闲，第 4 项任务加入到任务队列，使用第 1 台服务器处理到 9 秒。
+- 5 秒时，第 5 项任务加入到任务队列，使用第 3 台服务器处理到 7 秒。
+- 6 秒时，第 6 项任务加入到任务队列，使用第 2 台服务器处理到 7 秒。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>servers.length == n</code></li>
+	<li><code>tasks.length == m</code></li>
+	<li><code>1 <= n, m <= 2 * 10<sup>5</sup></code></li>
+	<li><code>1 <= servers[i], tasks[j] <= 2 * 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 577 ms</p>
+                    <p>内存: 58.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def assignTasks(self, servers: List[int], tasks: List[int]) -&gt; List[int]:
+        idle, busy = [], []
+        for i, weight in enumerate(servers):
+            heappush(idle, (weight, i))
+        res = []
+        for start, cost in enumerate(tasks):
+            while busy and busy[0][0] &lt;= start:
+                _, s, i = heappop(busy)
+                heappush(idle, (s, i))
+            if idle:
+                s, i = heappop(idle)
+                heappush(busy, (start + cost, s, i))
+            else:
+                t, s, i = heappop(busy)
+                heappush(busy, (t + cost, s, i))
+            res.append(i)
+        return res
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了两个优先队列（堆）来管理服务器的状态：一个是空闲服务器堆（idle），另一个是忙碌服务器堆（busy）。空闲服务器堆按服务器权重和索引排序，确保总是从权重最小且索引最小的服务器分配任务。忙碌服务器堆则按服务器空闲的时间、权重和索引排序，确保最早空闲的服务器可以重新被分配。对于每一个任务，首先检查是否有服务器已经完成任务并因此变为空闲，如果有，则将其从忙碌堆移到空闲堆。然后，如果有空闲的服务器，立即分配当前任务；如果没有，则从忙碌堆中取出最早空闲的服务器，并将其继续排入忙碌堆，更新其空闲时间。最后记录分配的服务器索引。</p>
+                                <p>时间复杂度: O(m log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def assignTasks(self, servers: List[int], tasks: List[int]) -&gt; List[int]:
+        idle, busy = [], []  # 空闲和忙碌的服务器堆
+        for i, weight in enumerate(servers):  # 初始化空闲服务器堆
+            heappush(idle, (weight, i))
+        res = []  # 存储任务分配结果的列表
+        for start, cost in enumerate(tasks):  # 遍历任务
+            while busy and busy[0][0] &lt;= start:  # 释放已经空闲的服务器
+                _, s, i = heappop(busy)
+                heappush(idle, (s, i))
+            if idle:  # 有空闲服务器时直接分配
+                s, i = heappop(idle)
+                heappush(busy, (start + cost, s, i))  # 更新服务器状态为忙碌
+            else:  # 无空闲服务器时等待最早的一个
+                t, s, i = heappop(busy)
+                heappush(busy, (t + cost, s, i))  # 更新服务器忙碌时间
+            res.append(i)  # 记录任务分配的服务器索引
+        return res
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理任务时，如何确保同时有多项任务等待和多台服务器同时空闲时，能够正确地按照题目要求的权重最小和下标最小的规则进行分配？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，我们使用了一个最小堆（优先队列）来处理空闲服务器。堆中的元素是一个元组，其中包括服务器的权重和索引，且元组的排序首先是按权重升序，其次是按索引升序。这样的排序规则确保了每次从空闲堆中取出的服务器都是当前权重最小的，如果权重相同则取索引最小的。因此，当多项任务等待和多台服务器同时空闲时，堆的这种特性保证了能够按照题目要求的权重最小和下标最小的规则进行服务器的分配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择使用两个优先队列来管理服务器的状态，而不是使用其他数据结构如列表或单一队列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用两个优先队列（堆）来管理服务器状态的主要理由是优先队列能够有效地支持动态数据的插入和删除操作，并且能够保证每次取出的都是最优（最小或最大）的元素。在这个场景中，一个优先队列用于管理空闲服务器，另一个用于管理忙碌服务器。空闲服务器堆能够确保每次都能快速地按权重和索引的优先级分配服务器，而忙碌服务器堆则按服务器空闲的时间排序，这样可以确保最早空闲的服务器能够优先重新被分配。如果使用列表或单一队列，我们不仅需要手动维护排序，每次服务器状态更新时还可能需要进行复杂的插入或删除操作，这会使得时间复杂度上升，效率降低。因此，两个优先队列的使用是为了最大化效率和符合题目分配逻辑的需要。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/process-tasks-using-servers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/process-tasks-using-servers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

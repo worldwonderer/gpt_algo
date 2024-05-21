@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>你能拿走的最大图书数量</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>你能拿走的最大图书数量</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=stack" class="badge bg-secondary tag-link">栈</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=monotonic-stack" class="badge bg-secondary tag-link">单调栈</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 174 ms</p>
+                    <p>内存: 36.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+
+    def maximumBooks(self, books: List[int]) -&gt; int:
+
+        n=k=len(books) 
+
+        dp=[0]*k 
+
+        dp[0]=books[0]
+
+        firstJ = [-1] * n  # !对每个i找到左边第一个j 满足 arr[j] - j &lt; arr[i] - i
+
+        nums = [num - i for i, num in enumerate(books)]  # !对每个位置找到左边第一个比他严格小的数的位置 从右往左维护一个递增的单调栈
+
+        
+
+        stack = []
+
+        for i in range(n - 1, -1, -1):
+
+            while stack and nums[stack[-1]] &gt; nums[i]:
+
+                firstJ[stack.pop()] = i
+
+            stack.append(i)
+
+
+
+        for i in range(1, n):
+
+            j = firstJ[i]
+
+            r=books[i]
+
+            #fen 2种情况处理 j在很远的左侧，，
+
+            count =i-j
+
+            if count &gt;=r:
+
+                #1,2,3,4,5,...r
+
+                dp[i]=r*(r+1)//2
+
+            else:
+
+                #gong count 个数字相加  如，5,4,3， 三个数相加
+
+                tou= r - count + 1 
+
+                he = (tou + r)*count//2
+
+                dp[i]=he +dp[j]
+
+            
+
+        return max(dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划和单调栈的技巧来解决问题。首先，我们使用一个数组 dp 来存储以每个位置结尾时能拿走的最大图书数量。为了计算 dp[i]，我们需要找到最左边的位置 j，使得在 j 到 i 之间的图书数量能形成一个连续递增序列。为了快速找到这样的 j，我们可以使用一个单调递增栈来维护一个递增序列，并使用一个辅助数组 firstJ 来记录每个位置 i 左边第一个满足条件的位置 j。然后，根据 j 到 i 之间的图书数量和 books[i] 的值，我们可以分两种情况计算 dp[i]。最后，返回 dp 数组中的最大值即为结果。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximumBooks(self, books: List[int]) -&gt; int:
+        n = k = len(books)
+        dp = [0] * k
+        dp[0] = books[0]
+        firstJ = [-1] * n  # 对每个i找到左边第一个j 满足 arr[j] - j &lt; arr[i] - i
+        nums = [num - i for i, num in enumerate(books)]  # 对每个位置找到左边第一个比他严格小的数的位置 从右往左维护一个递增的单调栈
+
+        stack = []
+        for i in range(n - 1, -1, -1):
+            while stack and nums[stack[-1]] &gt; nums[i]:
+                firstJ[stack.pop()] = i
+            stack.append(i)
+
+        for i in range(1, n):
+            j = firstJ[i]
+            r = books[i]
+            count = i - j
+            if count &gt;= r:
+                dp[i] = r * (r + 1) // 2
+            else:
+                tou = r - count + 1
+                he = (tou + r) * count // 2
+                dp[i] = he + dp[j]
+
+        return max(dp)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么需要使用单调栈来维护递增序列？这种数据结构在解决这个问题中起到了什么核心作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>单调栈用于维护一个递增序列，其核心作用在于快速地找到对于每个位置i，左侧第一个满足条件的位置j，使得在 j 到 i 之间的图书序列能构成连续递增。这样的处理可以减少重复的比较和计算，提高算法的效率。在这个问题中，单调栈帮助我们维持一个递增的状态，以便于快速定位和更新dp数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            单调栈中元素的出栈条件是`nums[stack[-1]] &gt; nums[i]`，这里的比较逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个出栈条件基于的是我们需要维持栈内元素在`nums`数组中严格单调递增的特性。`nums`数组是通过`books[i] - i`计算得到的，所以这个比较逻辑是为了保证能找到每个位置i左边的第一个j，使得`nums[j] &lt; nums[i]`。当栈顶元素的值大于当前元素值时，栈顶元素不再满足作为i的满足条件的j的要求，因此需要出栈。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算`dp[i]`时，依据何种规则选择是使用`r * (r + 1) // 2`或者`(tou + r) * count // 2 + dp[j]`的计算方式？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>选择计算方式基于i与j之间的距离（count）与books[i]的值（r）。如果count（即i与j之间的位置数）大于等于r，则可以直接使用`r * (r + 1) // 2`计算，因为可以从1累加到r。如果count小于r，则不能直接从1加到r，这时需要计算从`tou`（即r - count + 1）加到r的和，再加上`dp[j]`的值来得到`dp[i]`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            数组`firstJ`的作用是记录什么？它如何影响`dp`数组的计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>数组`firstJ`记录对于每个位置i，其左侧第一个满足`nums[j] &lt; nums[i]`的位置j。这个信息是用来确定从哪里开始可以形成一个有效的连续递增序列，从而影响`dp[i]`的计算。知道这个位置j后，可以根据j到i的距离和books[i]的值决定如何计算`dp[i]`，从而有效地利用之前计算的结果（通过`dp[j]`），使得整体解决方案更加高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-books-you-can-take')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-books-you-can-take/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树的垂序遍历</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树的垂序遍历</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你二叉树的根结点 <code>root</code> ，请你设计算法计算二叉树的<em> </em><strong>垂序遍历</strong> 序列。</p>
+
+<p>对位于 <code>(row, col)</code> 的每个结点而言，其左右子结点分别位于 <code>(row + 1, col - 1)</code> 和 <code>(row + 1, col + 1)</code> 。树的根结点位于 <code>(0, 0)</code> 。</p>
+
+<p>二叉树的 <strong>垂序遍历</strong> 从最左边的列开始直到最右边的列结束，按列索引每一列上的所有结点，形成一个按出现位置从上到下排序的有序列表。如果同行同列上有多个结点，则按结点的值从小到大进行排序。</p>
+
+<p>返回二叉树的 <strong>垂序遍历</strong> 序列。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/01/29/vtree1.jpg" style="width: 431px; height: 304px;" />
+<pre>
+<strong>输入：</strong>root = [3,9,20,null,null,15,7]
+<strong>输出：</strong>[[9],[3,15],[20],[7]]
+<strong>解释：</strong>
+列 -1 ：只有结点 9 在此列中。
+列  0 ：只有结点 3 和 15 在此列中，按从上到下顺序。
+列  1 ：只有结点 20 在此列中。
+列  2 ：只有结点 7 在此列中。</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/01/29/vtree2.jpg" style="width: 512px; height: 304px;" />
+<pre>
+<strong>输入：</strong>root = [1,2,3,4,5,6,7]
+<strong>输出：</strong>[[4],[2],[1,5,6],[3],[7]]
+<strong>解释：</strong>
+列 -2 ：只有结点 4 在此列中。
+列 -1 ：只有结点 2 在此列中。
+列  0 ：结点 1 、5 和 6 都在此列中。
+          1 在上面，所以它出现在前面。
+          5 和 6 位置都是 (2, 0) ，所以按值从小到大排序，5 在 6 的前面。
+列  1 ：只有结点 3 在此列中。
+列  2 ：只有结点 7 在此列中。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/01/29/vtree3.jpg" style="width: 512px; height: 304px;" />
+<pre>
+<strong>输入：</strong>root = [1,2,3,4,6,5,7]
+<strong>输出：</strong>[[4],[2],[1,5,6],[3],[7]]
+<strong>解释：</strong>
+这个示例实际上与示例 2 完全相同，只是结点 5 和 6 在树中的位置发生了交换。
+因为 5 和 6 的位置仍然相同，所以答案保持不变，仍然按值从小到大排序。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树中结点数目总数在范围 <code>[1, 1000]</code> 内</li>
+	<li><code>0 <= Node.val <= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 16 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def verticalTraversal(self, root: TreeNode) -&gt; List[List[int]]:
+        nodes = list()
+
+        def dfs(node: TreeNode, row: int, col: int) -&gt; None:
+            if not node:
+                return
+
+            nodes.append((col, row, node.val))
+            dfs(node.left, row + 1, col - 1)
+            dfs(node.right, row + 1, col + 1)
+
+        dfs(root, 0, 0)
+        nodes.sort()
+        ans, lastcol = list(), float(&#34;-inf&#34;)
+
+        for col, row, value in nodes:
+            if col != lastcol:
+                lastcol = col
+                ans.append(list())
+            ans[-1].append(value)
+        
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用深度优先搜索（DFS）遍历二叉树，将每个节点的列、行、值信息存储到一个列表中。然后对列表进行排序，按照列、行、值的顺序进行排序。最后遍历排序后的列表，将相同列的节点值放入同一个子列表中，最终得到按垂序遍历顺序排列的结果列表。</p>
+                                <p>时间复杂度: O(nlogn)</p>
+                                <p>空间复杂度: O(n + w)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def verticalTraversal(self, root: TreeNode) -&gt; List[List[int]]:
+        nodes = list()
+
+        def dfs(node: TreeNode, row: int, col: int) -&gt; None:
+            if not node:
+                return
+
+            # 将节点的列、行、值信息存储到列表中
+            nodes.append((col, row, node.val))
+            # 递归遍历左子树，列减 1，行加 1
+            dfs(node.left, row + 1, col - 1)
+            # 递归遍历右子树，列加 1，行加 1
+            dfs(node.right, row + 1, col + 1)
+
+        # 执行 DFS 遍历
+        dfs(root, 0, 0)
+        # 对存储节点信息的列表进行排序
+        nodes.sort()
+        ans, lastcol = list(), float(&#34;-inf&#34;)
+
+        # 遍历排序后的列表，生成结果列表
+        for col, row, value in nodes:
+            if col != lastcol:
+                lastcol = col
+                ans.append(list())
+            ans[-1].append(value)
+        
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在深度优先搜索（DFS）中，您是如何处理不同的分支以确保列和行的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中，每次递归调用时，都会根据当前节点的位置（列col和行row）以及是左子树还是右子树来调整新的列和行的值。对于左子节点，列值会减1（col - 1），行值会加1（row + 1）；对于右子节点，列值会加1（col + 1），行值同样加1（row + 1）。这样的递归调整确保了每个节点根据其在二叉树中的位置被正确地归类到相应的列和行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            您是如何确定排序时列、行和值的优先级的？为什么选择这种特定的排序顺序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>排序的目的是为了按照题目要求的垂序遍历输出顺序组织节点。首先按列排序是因为垂序遍历首先需要按列分组。其次，在同一列内，节点按行排序，这是因为在同一列中，更高的行（更深的节点）应该在输出中排在更低的行之后。最后，在相同的列和行中，按节点的值进行排序，确保在输出中值较小的节点先显示。这种排序顺序确保了最终的输出列表能够正确反映垂序遍历的顺序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            代码中使用了`nodes.sort()`直接对元组进行排序。在存在多个节点在同一行同一列的情况下，这种排序方式是否能保证按节点值的升序排列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，直接使用`nodes.sort()`对元组列表进行排序时，Python默认按元组中的元素顺序进行升序排序。因为元组中的第一个元素是列号，第二个是行号，第三个是节点值，所以在同一列和行的情况下，节点值作为第三排序关键字，确保了同列同行的节点按值升序排列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在遍历排序后的列表生成结果列表时，您如何处理和区分不同列的节点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在遍历排序后的列表时，使用了变量`lastcol`来跟踪上一个处理的列号。遍历时，若当前节点的列号与`lastcol`不同，这表示已经达到一个新的列，因此会开始一个新的子列表，并更新`lastcol`为当前列号。若列号相同，则继续在当前的子列表中添加节点值。这样可以确保不同列的节点被正确地分组到不同的子列表中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/vertical-order-traversal-of-a-binary-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/vertical-order-traversal-of-a-binary-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

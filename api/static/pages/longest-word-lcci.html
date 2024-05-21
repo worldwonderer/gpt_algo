@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长单词</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长单词</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一组单词<code>words</code>，编写一个程序，找出其中的最长单词，且该单词由这组单词中的其他单词组合而成。若有多个长度相同的结果，返回其中字典序最小的一项，若没有符合要求的单词则返回空字符串。</p>
+
+<p><strong>示例：</strong></p>
+
+<pre><strong>输入：</strong> [&quot;cat&quot;,&quot;banana&quot;,&quot;dog&quot;,&quot;nana&quot;,&quot;walk&quot;,&quot;walker&quot;,&quot;dogwalker&quot;]
+<strong>输出：</strong> &quot;dogwalker&quot;
+<strong>解释：</strong> &quot;dogwalker&quot;可由&quot;dog&quot;和&quot;walker&quot;组成。
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>0 &lt;= len(words) &lt;= 200</code></li>
+	<li><code>1 &lt;= len(words[i]) &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def longestWord(self, words: List[str]) -&gt; str:
+        words.sort(key=lambda x: (-len(x), x))
+
+        def recursive(word, array):
+            if not word:
+                return True
+
+            for x in array:
+                if word[:len(x)] == x:
+                    if recursive(word[len(x):], array):
+                        return True
+            return False
+
+        for i, word in enumerate(words):
+            if recursive(word, words[i + 1:]):
+                return word
+        
+        return &#34;&#34;</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了递归的方法来检查一个单词是否可以由其他单词组成。首先，对输入的单词列表进行排序，排序规则是先按照单词长度降序排列，长度相同的情况下按字典序升序排列。这样做的目的是为了先检查最长的单词，以及在长度相同的情况下，优先检查字典序较小的单词。接着，遍历排序后的单词列表，对每个单词使用递归函数来判断它是否可以由列表中其他的单词组成。递归函数的基本思路是：如果当前单词为空，表示已经成功找到了一种组合方式，返回True；否则，遍历单词列表中剩余的单词，检查当前单词是否以列表中的某个单词开头，如果是，则递归地检查去掉开头后剩余部分的单词是否也可以由列表中的单词组成。如果遍历完所有剩余的单词都没有找到合适的组合，则返回False。如果找到了一个可以由其他单词组成的最长单词，就直接返回这个单词，否则返回空字符串。</p>
+                                <p>时间复杂度: O(nlogn + n^2 * m)</p>
+                                <p>空间复杂度: O(m)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def longestWord(self, words: List[str]) -&gt; str:
+        words.sort(key=lambda x: (-len(x), x))  # 对单词列表按长度降序、字典序升序排序
+
+        def recursive(word, array):
+            if not word:  # 递归基准情况：如果当前单词为空，返回True
+                return True
+
+            for x in array:
+                if word[:len(x)] == x:  # 检查当前单词是否以列表中的某个单词开头
+                    if recursive(word[len(x):], array):  # 递归检查剩余部分
+                        return True
+            return False
+
+        for i, word in enumerate(words):  # 遍历单词列表
+            if recursive(word, words[i + 1:]):  # 检查每个单词是否可以由其他单词组成
+                return word
+        
+        return &#34;&#34;  # 如果没有符合条件的单词，返回空字符串
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在排序单词时选择先按长度降序然后按字典序升序进行？这样的排序策略对解决问题有什么具体帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种排序策略能够确保程序首先尝试使用最长的单词来形成解答，这是因为题目要求找到可以由其他单词组成的“最长单词”。通过这样的排序，程序可以优先检查较长的单词是否可以由其他单词组成，从而更快地找到可能的最长解。此外，字典序升序排列确保了在有多个长度相同的单词可以作为答案时，返回字典顺序最小的一个，满足题目对输出格式的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在递归函数中，如果当前单词是由另一个单词重复组成（例如&#39;nananana&#39;由&#39;nana&#39;组成），这种情况如何处理？是否会影响递归的终止条件或效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数中处理这种情况时，递归会持续进行，直到当前单词为空。对于&#39;nananana&#39;这类由&#39;nana&#39;重复组成的单词，每次递归都会切割掉&#39;nana&#39;的部分，再对剩余部分进行相同的操作。这种情况可能会导致递归调用次数显著增加，从而影响程序的运行效率。为了优化这一点，可以使用动态规划或记忆化递归来存储已经计算过的中间结果，避免重复计算，从而提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            递归函数中，若递归检查剩余部分返回True，是否就直接结束整个递归，还是继续检查其他可能的组合？这会如何影响算法的性能？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据题解的逻辑，一旦递归检查剩余部分返回True，说明当前单词已经成功地被其他单词组成，因此可以直接结束当前的递归调用返回True，无需继续检查其他可能的组合。这种方法可以减少不必要的递归调用，提高算法的效率。如果继续检查，可能会导致大量不必要的计算，从而降低算法性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-word-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-word-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

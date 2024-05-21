@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>翻转数位</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>翻转数位</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个32位整数 <code>num</code>，你可以将一个数位从0变为1。请编写一个程序，找出你能够获得的最长的一串1的长度。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入:</strong> <code>num</code> = 1775(11011101111<sub>2</sub>)
+<strong>输出:</strong> 8
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入:</strong> <code>num</code> = 7(0111<sub>2</sub>)
+<strong>输出:</strong> 4
+</pre>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def reverseBits(self, num: int):
+        bi = [int(x) for x in (bin(num &amp; 0xFFFFFFFF) if num &lt; 0 else bin(num)).split(&#39;0b&#39;)[1]]
+        n = len(bi)
+        dp = [[0, 0, False] for x in range(n)]
+        dp[0] = [1 if bi[0] == 1 else 0, 1, False if bi[0] == 1 else True]
+        for i in range(1, n):
+            if bi[i] == 1:
+                dp[i][0] = dp[i-1][0] + 1
+                dp[i][1], dp[i][2] = dp[i-1][1] + 1, dp[i-1][2]
+            else:
+                dp[i][0] = 0
+                dp[i][1] = dp[i-1][0] + 1 
+                dp[i][2] = not dp[i-1][2]
+        t1 = max([dp[i][0] for i in range(n)])
+        t2 = max([dp[i][1] for i in range(n)])
+        # add a zero at the first to reverse if num &gt; 0
+        return max(t1+1, t2) if num &gt;= 0 else max(t1, t2)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了动态规划的方式来处理问题。首先，将输入的整数 `num` 转换为二进制表示的列表 `bi`。每个元素 `bi[i]` 代表二进制位上的 0 或 1。动态规划表 `dp` 用于记录到当前位为止的无需翻转和翻转一次后的连续 1 的最大长度。 每个 `dp[i]` 包含三个元素：`dp[i][0]` 表示不翻转当前位时前 `i` 位的最长连续 1 的长度；`dp[i][1]` 表示翻转一次后前 `i` 位的最长连续 1 的长度，`dp[i][2]` 表示是否已经翻转过位值。初始状态和状态转移都针对当前位是否为 1 或 0 进行不同的处理。最后，从 `dp` 中找出最长的连续 1 的长度，并根据 `num` 的正负情况决定是否加一（针对全 1 的情况）。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def reverseBits(self, num: int):
+        # 将num转换为二进制列表，其中每个元素存储一个位的值
+        bi = [int(x) for x in (bin(num &amp; 0xFFFFFFFF) if num &lt; 0 else bin(num)).split(&#39;0b&#39;)[1]]
+        n = len(bi)
+        # 初始化动态规划表，每个元素包含三个值：不翻转时的长度、翻转一次后的长度、是否翻转过
+        dp = [[0, 0, False] for x in range(n)]
+        dp[0] = [1 if bi[0] == 1 else 0, 1, False if bi[0] == 1 else True]
+        # 遍历二进制位，填充动态规划表
+        for i in range(1, n):
+            if bi[i] == 1:
+                dp[i][0] = dp[i-1][0] + 1
+                dp[i][1], dp[i][2] = dp[i-1][1] + 1, dp[i-1][2]
+            else:
+                dp[i][0] = 0
+                dp[i][1] = dp[i-1][0] + 1 
+                dp[i][2] = not dp[i-1][2]
+        # 计算最长连续1的长度
+        t1 = max([dp[i][0] for i in range(n)])
+        t2 = max([dp[i][1] for i in range(n)])
+        # 根据num的符号决定是否需要在结果上加一
+        return max(t1+1, t2) if num &gt;= 0 else max(t1, t2)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中的动态规划表`dp`三个元素分别代表什么？如何理解`dp[i][2]`表示的是否已翻转过位值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`dp[i][0]`表示在第i位不进行翻转时，从开始到当前位的最长连续1的长度。`dp[i][1]`表示如果在第i位或之前的某一位进行了一次翻转，从开始到当前位的最长连续1的长度。`dp[i][2]`是一个布尔值，表示到当前位为止是否已经进行过翻转。如果`dp[i][2]`为True，表示在第i位或之前的某一位已经进行了翻转；如果为False，表示到第i位为止还没有进行翻转。这有助于决定在后续位是否还可以进行翻转。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么初始化`dp[0]`时，即使`bi[0]`为0，翻转后的长度也被设为1？这是否意味着我们默认翻转了第一个位？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化`dp[0]`时，如果`bi[0]`为0，则将`dp[0][1]`设为1，这代表我们选择翻转第一个位，从而使得从第一个位开始的连续1的长度为1。这确实意味着我们默认翻转了第一个位，以此来考虑最优解的情况，即使用一次翻转机会获得尽可能长的连续1序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划的状态转移方程中，对于`bi[i] == 0`的情况，为什么`dp[i][1]`的值是`dp[i-1][0] + 1`而不是`dp[i-1][1] + 1`？这是否意味着我们只考虑从未翻转到翻转的转变？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>对于`bi[i] == 0`的情况，`dp[i][1]`的值设置为`dp[i-1][0] + 1`表示我们选择在第i位进行翻转（将0翻转为1），并且在此之前的位没有进行过翻转。这样，我们使用了一次翻转机会，以将当前0位转变为1。这确实意味着我们在此处考虑的是从未翻转的状态转变到翻转的状态，以最大化利用单次翻转的优势。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/reverse-bits-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/reverse-bits-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

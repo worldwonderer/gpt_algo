@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>数组的均值分割</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>数组的均值分割</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定你一个整数数组<meta charset="UTF-8" />&nbsp;<code>nums</code></p>
+
+<p>我们要将<meta charset="UTF-8" />&nbsp;<code>nums</code>&nbsp;数组中的每个元素移动到&nbsp;<code>A</code>&nbsp;数组 或者&nbsp;<code>B</code>&nbsp;数组中，使得&nbsp;<code>A</code>&nbsp;数组和<meta charset="UTF-8" />&nbsp;<code>B</code>&nbsp;数组不为空，并且<meta charset="UTF-8" />&nbsp;<code>average(A) == average(B)</code>&nbsp;。</p>
+
+<p>如果可以完成则返回<code>true</code>&nbsp;， 否则返回 <code>false</code>&nbsp;&nbsp;。</p>
+
+<p><strong>注意：</strong>对于数组<meta charset="UTF-8" />&nbsp;<code>arr</code>&nbsp;, <meta charset="UTF-8" />&nbsp;<code>average(arr)</code>&nbsp;是<meta charset="UTF-8" />&nbsp;<code>arr</code>&nbsp;的所有元素的和除以<meta charset="UTF-8" />&nbsp;<code>arr</code>&nbsp;长度。</p>
+
+
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入:</strong> nums = [1,2,3,4,5,6,7,8]
+<strong>输出:</strong> true
+<strong>解释: </strong>我们可以将数组分割为 [1,4,5,8] 和 [2,3,6,7], 他们的平均值都是4.5。
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> nums = [3,1]
+<strong>输出:</strong> false
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 30</code></li>
+	<li><code>0 &lt;= nums[i] &lt;= 10<sup>4</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 157 ms</p>
+                    <p>内存: 39.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def splitArraySameAverage(self, nums: List[int]) -&gt; bool:
+        n = len(nums)
+        m = n // 2
+        s = sum(nums)
+        if all(s * i % n for i in range(1, m + 1)):
+            return False
+
+        dp = [set() for _ in range(m + 1)]
+        dp[0].add(0)
+        for num in nums:
+            for i in range(m, 0, -1):
+                for x in dp[i - 1]:
+                    curr = x + num
+                    if curr * n == s * i:
+                        return True
+                    dp[i].add(curr)
+        return False
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用动态规划的思路来判断是否可以将数组分割成两个平均值相等的子数组。首先判断数组总和 s 是否存在可以被 n 整除的子数组长度 i，如果不存在则直接返回 False。然后使用一个长度为 m+1 的 dp 数组，其中 m 为数组长度的一半，dp[i] 表示长度为 i 的子数组的所有可能的元素和集合。遍历数组 nums 中的每个元素，对于每个 dp[i-1] 中的元素和 x，判断 x+num 是否等于 s*i/n，即是否存在一个长度为 i 平均值等于 s/n 的子数组，如果存在则返回 True。最后如果找不到则返回 False。</p>
+                                <p>时间复杂度: O(n * m * sum(nums))</p>
+                                <p>空间复杂度: O(m * sum(nums))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def splitArraySameAverage(self, nums: List[int]) -&gt; bool:
+        n = len(nums)
+        m = n // 2
+        s = sum(nums)
+        
+        # 判断是否存在长度为 i 的子数组平均值等于 s/n
+        if all(s * i % n for i in range(1, m + 1)):
+            return False
+
+        dp = [set() for _ in range(m + 1)]  # dp[i] 表示长度为 i 的子数组的所有可能的元素和集合
+        dp[0].add(0)
+        
+        for num in nums:  # 遍历数组 nums 中的每个元素
+            for i in range(m, 0, -1):  # 遍历 m 到 1
+                for x in dp[i - 1]:  # 遍历 dp[i-1] 中的每个元素和
+                    curr = x + num
+                    if curr * n == s * i:  # 判断是否存在长度为 i 平均值等于 s/n 的子数组
+                        return True
+                    dp[i].add(curr)
+                    
+        return False
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么题解中首先检查`s * i % n`对每个i从1到m+1，这个条件的意义是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个检查是为了确认是否存在某个子数组长度i，使得该子数组的平均值可能等于整个数组的平均值。算法首先计算整个数组的平均值s/n，而一个子数组的平均值为其元素和除以其长度。如果存在一个长度为i的子数组其平均值也为s/n，那么其元素和必须是s*i/n。但是s*i/n必须是一个整数，因此我们需要检查s*i是否能整除n。如果对所有1到m+1的i都不能整除，说明不可能分割出任何符合条件的子数组，因此直接返回False。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划解法中，每遍历一个新元素就更新dp数组，这里为什么要从m遍历到1而不是从1到m？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中更新dp数组时，从m遍历到1可以避免元素重复使用的问题。如果从1到m更新，新增加的元素可能会在同一轮中被重复用于更新多个dp[i]，这会导致计算错误。而从m到1更新，保证每个元素在每一轮中只加入一次，确保了元素组合的唯一性和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            当`num`很大时，`dp[i]`中的元素和可能会非常大，对于大数处理有没有什么特别的考量或是优化方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当处理大数时，确实可能会面临性能和存储的问题。一种优化方法是使用模运算来减少数字的大小，即在每次加入新的元素和到dp[i]后，可以对某个大的质数取模，从而减小数字的规模。这种方法可能会引入冲突，但在实际应用中可以适当选择模数来平衡正确性和效率。此外，也可以考虑使用更高效的数据结构或算法来优化处理过程，例如利用空间换时间的策略，或者更精细的状态定义来减小状态空间。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中如果`curr * n == s * i`成立则直接返回True，为什么这个条件成立就能确保存在两个子数组平均值相等？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件成立表明找到了一个子数组，其元素和为curr，长度为i，并且满足其平均值等于整个数组的平均值s/n。因为curr * n == s * i等价于curr/n = s/i。由于数组可以被分割成多个子数组，其中一个子数组平均值已经证实等于整个数组的平均值，因此剩余部分的平均值也必然等于整个数组的平均值。这样就找到了两个子数组，它们的平均值相等，满足题目条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/split-array-with-same-average')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/split-array-with-same-average/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

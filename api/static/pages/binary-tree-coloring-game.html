@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树着色游戏</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树着色游戏</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有两位极客玩家参与了一场「二叉树着色」的游戏。游戏中，给出二叉树的根节点&nbsp;<code>root</code>，树上总共有 <code>n</code> 个节点，且 <code>n</code> 为奇数，其中每个节点上的值从&nbsp;<code>1</code> 到&nbsp;<code>n</code>&nbsp;各不相同。</p>
+
+<p>最开始时：</p>
+
+<ul>
+	<li>「一号」玩家从 <code>[1, n]</code>&nbsp;中取一个值&nbsp;<code>x</code>（<code>1 &lt;= x &lt;= n</code>）；</li>
+	<li>「二号」玩家也从&nbsp;<code>[1, n]</code>&nbsp;中取一个值&nbsp;<code>y</code>（<code>1 &lt;= y &lt;= n</code>）且&nbsp;<code>y != x</code>。</li>
+</ul>
+
+<p>「一号」玩家给值为&nbsp;<code>x</code>&nbsp;的节点染上红色，而「二号」玩家给值为&nbsp;<code>y</code>&nbsp;的节点染上蓝色。</p>
+
+<p>之后两位玩家轮流进行操作，「一号」玩家先手。每一回合，玩家选择一个被他染过色的节点，将所选节点一个 <strong>未着色 </strong>的邻节点（即左右子节点、或父节点）进行染色（「一号」玩家染红色，「二号」玩家染蓝色）。</p>
+
+<p>如果（且仅在此种情况下）当前玩家无法找到这样的节点来染色时，其回合就会被跳过。</p>
+
+<p>若两个玩家都没有可以染色的节点时，游戏结束。着色节点最多的那位玩家获得胜利 ✌️。</p>
+
+<p>现在，假设你是「二号」玩家，根据所给出的输入，假如存在一个&nbsp;<code>y</code>&nbsp;值可以确保你赢得这场游戏，则返回&nbsp;<code>true</code> ；若无法获胜，就请返回 <code>false</code> 。</p>
+&nbsp;
+
+<p><strong class="example">示例 1 ：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2019/08/01/1480-binary-tree-coloring-game.png" style="width: 500px; height: 310px;" />
+<pre>
+<strong>输入：</strong>root = [1,2,3,4,5,6,7,8,9,10,11], n = 11, x = 3
+<strong>输出：</strong>true
+<strong>解释：</strong>第二个玩家可以选择值为 2 的节点。</pre>
+
+<p><strong class="example">示例 2 ：</strong></p>
+
+<pre>
+<strong>输入：</strong>root = [1,2,3], n = 3, x = 1
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树中节点数目为 <code>n</code></li>
+	<li><code>1 &lt;= x &lt;= n &lt;= 100</code></li>
+	<li><code>n</code> 是奇数</li>
+	<li><code>1 &lt;= Node.val &lt;= n</code></li>
+	<li>树中所有值 <strong>互不相同</strong></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 19 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def btreeGameWinningMove(self, root: Optional[TreeNode], n: int, x: int) -&gt; bool:
+        q, head = [root], -1
+        parent = [None]
+        while head + 1 &lt; len(q):
+            head += 1
+            for node in [q[head].left, q[head].right]:
+                if node is not None:
+                    q.append(node)
+                    parent.append(q[head])
+        prev, current = None, None
+        for i in range(n):
+            if q[i].val == x:
+                current = q[i]
+                prev = parent[i]
+        num_parent = num_parent = self.count_nodes(root) - self.count_nodes(current)
+        num_left = self.count_nodes(current.left)
+        num_right = self.count_nodes(current.right)
+        return num_parent * 2 &gt; n or num_left * 2 &gt; n or num_right * 2 &gt; n
+
+    def count_nodes(self, root: Optional[TreeNode]) -&gt; int:
+        if root is None:
+            return 0
+        num_nodes = 1
+        if root.left is not None:
+            num_nodes += self.count_nodes(root.left)
+        if root.right is not None:
+            num_nodes += self.count_nodes(root.right)
+        return num_nodes</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的核心思路是通过分析三个部分的节点数量来确定第二号玩家是否可以获胜。具体地，这三个部分是：1. 以x为根节点的子树的父节点及其祖先节点；2. x节点的左子树；3. x节点的右子树。如果其中任何一个部分的节点数超过总节点数的一半，那么第二号玩家选择该部分的任意一个节点作为初始着色点，都可以在游戏中取得优势。首先，代码通过层序遍历找到x节点并标记其父节点。然后，分别计算三个部分的节点数，并判断是否有超过总节点数一半的情况。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def btreeGameWinningMove(self, root: Optional[TreeNode], n: int, x: int) -&gt; bool:
+        # 使用层序遍历以找到x节点以及其父节点
+        q, head = [root], -1
+        parent = [None]
+        while head + 1 &lt; len(q):
+            head += 1
+            for node in [q[head].left, q[head].right]:
+                if node is not None:
+                    q.append(node)
+                    parent.append(q[head])
+        prev, current = None, None
+        for i in range(n):
+            if q[i].val == x:
+                current = q[i]
+                prev = parent[i]
+        # 计算不同部分的节点数
+        num_parent = self.count_nodes(root) - self.count_nodes(current)
+        num_left = self.count_nodes(current.left)
+        num_right = self.count_nodes(current.right)
+        # 判断是否有超过总节点数一半的部分
+        return num_parent * 2 &gt; n or num_left * 2 &gt; n or num_right * 2 &gt; n
+
+    def count_nodes(self, root: Optional[TreeNode]) -&gt; int:
+        if root is None:
+            return 0
+        num_nodes = 1
+        if root.left is not None:
+            num_nodes += self.count_nodes(root.left)
+        if root.right is not None:
+            num_nodes += self.count_nodes(root.right)
+        return num_nodes</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在层序遍历中，如何确保每个节点的父节点能被正确地记录和使用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在层序遍历过程中，我们可以使用一个额外的列表（比如`parent`）来存储每个节点的父节点。对于每个节点`node`，当我们将其子节点添加到队列中时，同时将`node`记录为这些子节点的父节点。因此，当我们访问任何节点时，可以通过索引直接获取其父节点。这种方法确保了每个节点的父节点能够被正确记录并在后续处理中使用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的`num_parent`计算方式似乎有误，因为应该包括除`x`节点的子树外的所有节点。请问如何准确计算`x`节点的父节点及其祖先节点的数量？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实，题解中的`num_parent`计算方式有误，应该包括`x`的父节点及其所有祖先节点的数量。正确的方式是从根节点开始计数，直到`x`节点，然后从总节点数`n`中减去`x`节点的子树节点数。这样，我们可以使用`n - self.count_nodes(current)`来得到`x`节点的父节点及其祖先节点的数量。这会包括整棵树的节点数减去`x`及其所有子节点的数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            递归函数`count_nodes`是否有考虑过优化以减少重复的节点计算，例如使用备忘录化的技术？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>递归函数`count_nodes`在原始题解中并没有使用备忘录化，这可能导致对于重复子结构的多次计算，从而增加算法的时间复杂度。为了优化，我们可以使用一个哈希表（或字典）作为备忘录，来存储每个节点的子树节点数。这样，当计算一个节点的子树节点数时，首先检查这个节点是否已经在备忘录中计算过，如果是，则直接返回存储的值，否则进行计算并存储。这样可以显著减少重复计算，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/binary-tree-coloring-game')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/binary-tree-coloring-game/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

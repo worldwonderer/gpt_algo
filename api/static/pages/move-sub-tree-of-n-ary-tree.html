@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>移动 N 叉树的子树</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>移动 N 叉树的子树</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 61 ms</p>
+                    <p>内存: 17.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">&#34;&#34;&#34;
+# Definition for a Node.
+class Node:
+    def __init__(self, val=None, children=None):
+        self.val = val
+        self.children = children if children is not None else []
+&#34;&#34;&#34;
+
+class Solution:
+    def moveSubTree(self, root: &#39;Node&#39;, p: &#39;Node&#39;, q: &#39;Node&#39;) -&gt; &#39;Node&#39;:
+        dummy = Node(children = [root])
+        p_fa,q_fa,is_p_over_q = None,None,False # p是不是q的fa
+
+        def dfs(u,fa,is_under_p):
+            nonlocal p_fa,q_fa,is_p_over_q
+            if u == p:
+                p_fa,is_under_p = fa,True
+            if u == q:
+                q_fa = fa
+                is_p_over_q = is_under_p
+            for v in u.children:
+                dfs(v,u,is_under_p)
+
+        dfs(root,dummy,False)
+
+        if p_fa == q:
+            return root
+        if is_p_over_q:# p是q的fa
+            q_fa.children.remove(q)
+            idx = p_fa.children.index(p)
+            p_fa.children[idx] = q
+        else:
+            p_fa.children.remove(p)
+        q.children.append(p)
+
+        return dummy.children[0]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解的核心思路是通过一次深度优先搜索（DFS）找到节点p和q的父节点以及判断p是否位于q的子树中。首先，创建一个虚拟根节点，其唯一的子节点是真实的根节点，这样可以统一处理边界条件。在DFS过程中，如果遇到节点p，则记录其父节点并标记当前路径下所有节点都在p的子树中。类似地，遇到节点q时记录其父节点。若此时已标记在p的子树中，则表明q在p的子树中。处理移动逻辑时，考虑两种情况：若p直接是q的父节点，则不需要移动；若p在q的子树中，需要先从q的父节点子列表中移除q，再将q作为p的子节点。若p不在q的子树中，则从p的父节点子列表中移除p，并将p作为q的子节点。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">
+# Definition for a Node.
+class Node:
+    def __init__(self, val=None, children=None):
+        self.val = val
+        self.children = children if children is not None else []
+
+class Solution:
+    def moveSubTree(self, root: &#39;Node&#39;, p: &#39;Node&#39;, q: &#39;Node&#39;) -&gt; &#39;Node&#39;:
+        dummy = Node(children = [root])  # 创建虚拟根节点
+        p_fa,q_fa,is_p_over_q = None,None,False # 初始化父节点和位置关系
+
+        def dfs(u,fa,is_under_p):  # 深度优先搜索
+            nonlocal p_fa,q_fa,is_p_over_q
+            if u == p:  # 找到p
+                p_fa,is_under_p = fa,True
+            if u == q:  # 找到q
+                q_fa = fa
+                is_p_over_q = is_under_p
+            for v in u.children:
+                dfs(v,u,is_under_p)
+
+        dfs(root,dummy,False)  # 从虚拟根开始DFS
+
+        if p_fa == q:  # p是q的直接父节点
+            return root
+        if is_p_over_q: # p是q的fa
+            q_fa.children.remove(q)
+            idx = p_fa.children.index(p)
+            p_fa.children[idx] = q
+        else:
+            p_fa.children.remove(p)
+        q.children.append(p)  # 将p移动为q的子节点
+
+        return dummy.children[0]  # 返回真实的根节点
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS过程中，如何确保只访问每个节点一次，避免重复访问造成的性能问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中，确保每个节点只被访问一次的关键在于递归的结构。每当进入一个节点时，它会自动递归地访问其所有子节点。由于树结构的特性，没有回路，因此每个节点只会在其父节点被访问时被访问一次，不需要额外的机制来防止重复访问。这种深度优先搜索确保了每个节点只被访问一次，从而避免了性能损失。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            创建虚拟根节点的策略主要是为了解决哪些边界条件？具体是如何简化问题的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>创建虚拟根节点主要是为了处理根节点也可能是移动操作的目标或源节点的情况，这样可以避免处理根节点的特殊情况。虚拟根节点作为所有节点（包括原始根节点）的父节点，这样在处理节点的父子关系时，即使是根节点也可以像处理其他节点一样，简化了代码逻辑，避免了在处理根节点时需要额外的条件判断。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在执行`q_fa.children.remove(q)`和`p_fa.children.remove(p)`时，如果子节点列表很大，这些操作的效率如何？是否有更高效的数据结构来处理这种删除操作？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在子节点列表很大时，执行`remove`操作效率较低，因为这需要遍历整个子节点列表来找到要删除的节点，其时间复杂度为O(n)。若要提高效率，可以考虑使用哈希集合（HashSet）来存储子节点，这样删除和查找操作的平均时间复杂度都是O(1)。然而，这需要额外的空间来存储哈希值，并可能需要更复杂的节点管理策略来维护父子关系的一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中如何处理p和q是同一个节点的情况？这种情况下的移动逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果p和q是同一个节点，根据题解的逻辑，首先会确定p（即q）的父节点，然后检查是否p在q的子树中，这里会发现p确实在自己的子树中。然后，根据算法逻辑，会尝试将p（作为q）移动到其自身为子节点，这实际是不需要任何操作的。因此，在p和q为同一节点时，本质上不会进行任何移动操作，算法会直接返回原始的根节点。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/move-sub-tree-of-n-ary-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/move-sub-tree-of-n-ary-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

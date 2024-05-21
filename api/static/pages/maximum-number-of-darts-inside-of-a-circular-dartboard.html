@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>圆形靶内的最大飞镖数量</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>圆形靶内的最大飞镖数量</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>Alice 向一面非常大的墙上掷出 <code>n</code> 支飞镖。给你一个数组 <code>darts</code> ，其中 <code>darts[i] = [x<sub>i</sub>, y<sub>i</sub>]</code> 表示 Alice 掷出的第 <code>i</code> 支飞镖落在墙上的位置。</p>
+
+<p>Bob 知道墙上所有 <code>n</code> 支飞镖的位置。他想要往墙上放置一个半径为 <code>r</code> 的圆形靶。使 Alice 掷出的飞镖尽可能多地落在靶上。</p>
+
+<p>给你整数 <code>r</code> ，请返回能够落在 <strong>任意</strong> 半径为 <code>r</code> 的圆形靶内或靶上的最大飞镖数。</p>
+
+
+
+<p><strong class="example">示例 1 ：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/04/29/sample_1_1806.png" style="width: 248px; height: 211px;" />
+<pre>
+<strong>输入：</strong>darts = [[-2,0],[2,0],[0,2],[0,-2]], r = 2
+<strong>输出：</strong>4
+<strong>解释：</strong>如果圆形靶的圆心为 (0,0) ，半径为 2 ，所有的飞镖都落在靶上，此时落在靶上的飞镖数最大，值为 4 。
+</pre>
+
+<p><strong class="example">示例 2 ：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/04/29/sample_2_1806.png" style="width: 306px; height: 244px;" />
+<pre>
+<strong>输入：</strong>darts = [[-3,0],[3,0],[2,6],[5,4],[0,9],[7,8]], r = 5
+<strong>输出：</strong>5
+<strong>解释：</strong>如果圆形靶的圆心为 (0,4) ，半径为 5 ，则除了 (7,8) 之外的飞镖都落在靶上，此时落在靶上的飞镖数最大，值为 5 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= darts.length &lt;= 100</code></li>
+	<li><code>darts[i].length == 2</code></li>
+	<li><code>-10<sup>4</sup> &lt;= x<sub>i</sub>, y<sub>i</sub> &lt;= 10<sup>4</sup></code></li>
+	<li><code>darts</code> 中的元素互不相同</li>
+	<li><code>1 &lt;= r &lt;= 5000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 109 ms</p>
+                    <p>内存: 17.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">
+class Solution:
+    def numPoints(self, points: List[List[int]], r: int) -&gt; int:
+        def helper(i, r, n):
+            angles = []
+            for j in range(n):
+                if i != j and (l2 := sum([_ ** 2 for _ in vec[i][j]])) &lt;= (2 * r) ** 2 + 1e-8:
+                    C = math.acos(math.sqrt(l2) / (2 * r))
+                    T = math.atan2(vec[i][j][1], vec[i][j][0])
+                    _in = T - C
+                    _out = T + C
+                    angles.append([_in, True])
+                    angles.append([_out, False])
+            # 这里排序是重点, 考虑边界条件
+            # 比如有 [0, False], [0, True]
+            # 要让[0, True] 排到 [0, False]前面
+            angles.sort(key=lambda x: [x[0], - x[1]])
+            cnt = res = 1
+            for item in angles:
+                if item[1]:
+                    cnt += 1
+                else:
+                    cnt -= 1
+                if cnt &gt; res:
+                    res = cnt
+            return res
+
+        n = len(points)
+        if n == 1:
+            return 1
+        # vec[i][j] = [Jx - Ix, J_y - Iy]
+        # vec 存入两点之间的方向向量
+        vec = [[[0, 0] for _ in range(n)] for __ in range(n)]
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                JxIx = points[j][0] - points[i][0]
+                JyIy = points[j][1] - points[i][1]
+                vec[i][j] = [JxIx, JyIy]
+                vec[j][i] = [-JxIx, -JyIy]
+        ans = 0
+        for i in range(n):
+            ans = max(ans, helper(i, r, n))
+
+        return ans
+
+# 作者：lih627
+# 链接：https://leetcode.cn/problems/maximum-number-of-darts-inside-of-a-circular-dartboard/solutions/250547/python3-angular-sweepsuan-fa-by-lih/
+# 来源：力扣（LeetCode）
+# 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题的解决方案使用了角度扫描的方法。首先，对于每个点，计算它与其他所有点之间的角度，如果两点之间的距离小于等于直径，则这两点可以由同一个圆覆盖。基于这两点之间的中点和向量方向，我们可以计算出两个角度——入圈和出圈的角度。将这些角度事件存储起来，并进行排序。排序后，通过遍历这些角度事件，并用一个计数器来追踪当前圆内飞镖的数量，就可以找到最多的飞镖数量。通过比较所有点作为圆心时的最大值，得到最终答案。</p>
+                                <p>时间复杂度: O(n^3 log n)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numPoints(self, points: List[List[int]], r: int) -&gt; int:
+        def helper(i, r, n):
+            angles = []
+            for j in range(n):
+                if i != j and (l2 := sum([_ ** 2 for _ in vec[i][j]])) &lt;= (2 * r) ** 2 + 1e-8:
+                    C = math.acos(math.sqrt(l2) / (2 * r))
+                    T = math.atan2(vec[i][j][1], vec[i][j][0])
+                    _in = T - C
+                    _out = T + C
+                    angles.append([_in, True])
+                    angles.append([_out, False])
+            angles.sort(key=lambda x: [x[0], -x[1]])
+            cnt = res = 1
+            for item in angles:
+                if item[1]:
+                    cnt += 1
+                else:
+                    cnt -= 1
+                if cnt &gt; res:
+                    res = cnt
+            return res
+        n = len(points)
+        if n == 1:
+            return 1
+        vec = [[[0, 0] for _ in range(n)] for __ in range(n)]
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                JxIx = points[j][0] - points[i][0]
+                JyIy = points[j][1] - points[i][1]
+                vec[i][j] = [JxIx, JyIy]
+                vec[j][i] = [-JxIx, -JyIy]
+        ans = 0
+        for i in range(n):
+            ans = max(ans, helper(i, r, n))
+        return ans
+# 在这里提供了每个重要代码段的注释，描述了它的作用。</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在计算两点之间的距离时，为什么要加上一个非常小的值`1e-8`？这对结果有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算两点之间的距离时加上一个非常小的值`1e-8`，主要是为了处理浮点数运算中的精度问题。由于计算机中浮点数的存储和计算通常会有精度误差，当两点之间的距离非常接近圆的直径时，直接的计算可能导致一些本应在圆内的点被错误地判定为在圆外。通过加上一个微小的值，可以确保这种边界情况下，计算更加偏向于将点包含在圆内，从而避免由于浮点误差导致的错误判定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理角度事件时，需要将退出圆的事件设为负（`False`）？这样的设置有什么特定的理由或优势吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理角度事件时，将退出圆的事件设为负（`False`）主要是为了方便在遍历这些事件时管理圆内飞镖的数量。每当遇到一个入圈事件（`True`），计数器增加，表示新的飞镖进入了圆内；每当遇到一个出圈事件（`False`），计数器减少，表示有飞镖离开了圆内。这种设置使得算法可以简单地通过增加和减少计数器的值来更新当前圆内的飞镖数量，从而快速地计算出任何时间点圆内包含的最大飞镖数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            您提到的角度排序中使用了`lambda x: [x[0], -x[1]]`，这里为什么要对第二个元素使用负号进行排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在角度排序中使用`lambda x: [x[0], -x[1]]`对第二个元素使用负号进行排序的主要原因是确保在相同的角度上，入圈事件（`True`）优先于出圈事件（`False`）处理。这是因为在实际场景中，一个飞镖恰好在某一个角度同时入圈和出圈，我们希望首先考虑它进入圈内（增加计数），然后再考虑它离开（减少计数）。这样的排序确保了计数器逻辑的正确性，允许我们准确地计算出任何时刻圆内的飞镖数量。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-darts-inside-of-a-circular-dartboard')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-darts-inside-of-a-circular-dartboard/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

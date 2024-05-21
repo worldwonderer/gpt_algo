@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>由子序列构造的最长回文串的长度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>由子序列构造的最长回文串的长度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个字符串 <code>word1</code> 和 <code>word2</code> ，请你按下述方法构造一个字符串：</p>
+
+<ul>
+	<li>从 <code>word1</code> 中选出某个 <strong>非空</strong> 子序列 <code>subsequence1</code> 。</li>
+	<li>从 <code>word2</code> 中选出某个 <strong>非空</strong> 子序列 <code>subsequence2</code> 。</li>
+	<li>连接两个子序列 <code>subsequence1 + subsequence2</code> ，得到字符串。</li>
+</ul>
+
+<p>返回可按上述方法构造的最长 <strong>回文串</strong> 的 <strong>长度</strong> 。如果无法构造回文串，返回 <code>0</code> 。</p>
+
+<p>字符串 <code>s</code> 的一个 <strong>子序列</strong> 是通过从 <code>s</code> 中删除一些（也可能不删除）字符而不更改其余字符的顺序生成的字符串。</p>
+
+<p><strong>回文串</strong> 是正着读和反着读结果一致的字符串。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>word1 = "cacb", word2 = "cbba"
+<strong>输出：</strong>5
+<strong>解释：</strong>从 word1 中选出 "ab" ，从 word2 中选出 "cba" ，得到回文串 "abcba" 。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>word1 = "ab", word2 = "ab"
+<strong>输出：</strong>3
+<strong>解释：</strong>从 word1 中选出 "ab" ，从 word2 中选出 "a" ，得到回文串 "aba" 。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>word1 = "aa", word2 = "bb"
+<strong>输出：</strong>0
+<strong>解释：</strong>无法按题面所述方法构造回文串，所以返回 0 。</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= word1.length, word2.length &lt;= 1000</code></li>
+	<li><code>word1</code> 和 <code>word2</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 868 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def longestPalindrome(self, word1: str, word2: str) -&gt; int:
+        w = word1 + word2
+        n = len(w)
+        res = 0
+        dp = [0] * n
+        for i in range(n - 1, -1, -1):
+            newDp = [0] * n
+            newDp[i] = 1
+            for j in range(i + 1, n):
+                if w[i] == w[j]:
+                    newDp[j] = dp[j - 1] + 2
+                    if i &lt; len(word1) and j &gt;= len(word1):
+                        res = max(res,newDp[j])
+                else:
+                    newDp[j] = max(dp[j],newDp[j - 1])
+            dp = newDp
+
+        return res</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用动态规划来寻找连接后的字符串中最长的回文子序列的长度。首先，将两个字符串word1和word2连接成一个新字符串w。然后利用一个二维动态规划的技巧，但只使用一维数组dp来减少空间复杂度。遍历这个合并后的字符串，利用两层循环，外层从后向前，内层从外层的当前索引向后，来更新dp数组。若字符w[i]和w[j]相同，则dp[j]被更新为dp[j-1]加2；否则，dp[j]为dp[j]和dp[j-1]的最大值。特别地，如果i属于word1的部分，而j属于word2的部分，且形成了新的回文字符串，则更新最大长度res。最后，返回res。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def longestPalindrome(self, word1: str, word2: str) -&gt; int:
+        w = word1 + word2  # 连接两个字符串
+        n = len(w)  # 计算新字符串的长度
+        res = 0  # 初始化最长回文长度为0
+        dp = [0] * n  # 初始化dp数组
+        for i in range(n - 1, -1, -1):  # 从后向前遍历
+            newDp = [0] * n  # 创建新的dp数组
+            newDp[i] = 1  # 单字符总是回文
+            for j in range(i + 1, n):  # 从i+1到n遍历
+                if w[i] == w[j]:  # 如果字符相等
+                    newDp[j] = dp[j - 1] + 2  # 更新dp[j]
+                    if i &lt; len(word1) and j &gt;= len(word1):  # 检查是否跨越了word1和word2
+                        res = max(res,newDp[j])  # 更新最大回文长度
+                else:
+                    newDp[j] = max(dp[j],newDp[j - 1])  # 选择最大的dp值
+            dp = newDp  # 更新dp数组
+
+        return res  # 返回最长回文长度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确保连接的子序列最终形成的字符串中包含的回文串是最长的，而不仅仅是任意回文串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过维护一个动态更新的dp数组来确保每次比较都取最长可能的回文长度。每次对于字符w[i]和w[j]相等的情况，dp[j]会被更新为dp[j-1]加2，这种方法是基于回文串的对称性质，并且通过不断比较和取较大值来确保任何时刻dp[j]存储的都是到目前为止最长的回文子序列长度。因此，通过这种方式，我们能够确保找到的是最长的回文子序列，而不是任意一个回文子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划中，当w[i] != w[j]时，dp[j]取dp[j]与newDp[j-1]中的较大值。这种方法为何能确保跟踪到最长的回文长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当w[i] != w[j]时，说明当前的i和j位置的字符不能形成回文对，因此需要考虑不包含w[i]或w[j]的子序列。dp[j]代表了包含w[j]但不包含w[i]的最长回文序列长度，而newDp[j-1]代表了包含w[i]但不包含w[j]的最长回文序列长度。通过取这两者的最大值，算法能够确保至少一个字符（w[i]或w[j]）被排除在外时，仍然能够追踪到目前为止的最长回文序列。这样的更新策略确保了在每一步都不丢失可能的最长回文长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在初始化newDp数组时，设置newDp[i] = 1，这代表了什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化newDp数组时，设置newDp[i] = 1是因为任何单个字符本身就是一个长度为1的回文串。这种初始化是基于回文串定义的基本性质 —— 单个字符总是对称的，因此总是一个回文。设置newDp[i] = 1提供了动态规划过程中的基础情况，即每个字符被视为最短的回文子序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到，只有当i属于word1且j属于word2时，才更新最大长度res。为什么这样的条件是必要的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的这个条件是为了确保计算的回文长度是由两个不同的输入字符串word1和word2的字符组成的。这一条件确保了回文串跨越了这两个字符串的边界，使得这个回文串确实是连接后字符串的子序列，并且利用了两个字符串的元素。如果没有这个条件，算法可能会错误地计算只来自word1或只来自word2的回文长度，而忽略了题目要求的通过连接两个字符串构造回文的目的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-palindrome-length-from-subsequences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-palindrome-length-from-subsequences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

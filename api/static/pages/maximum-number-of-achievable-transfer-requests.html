@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最多可达成的换楼请求数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最多可达成的换楼请求数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>我们有&nbsp;<code>n</code>&nbsp;栋楼，编号从&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;。每栋楼有若干员工。由于现在是换楼的季节，部分员工想要换一栋楼居住。</p>
+
+<p>给你一个数组 <code>requests</code>&nbsp;，其中&nbsp;<code>requests[i] = [from<sub>i</sub>, to<sub>i</sub>]</code>&nbsp;，表示一个员工请求从编号为&nbsp;<code>from<sub>i</sub></code>&nbsp;的楼搬到编号为&nbsp;<code>to<sub>i</sub></code><sub>&nbsp;</sub>的楼。</p>
+
+<p>一开始&nbsp;<strong>所有楼都是满的</strong>，所以从请求列表中选出的若干个请求是可行的需要满足 <strong>每栋楼员工净变化为 0&nbsp;</strong>。意思是每栋楼 <strong>离开</strong>&nbsp;的员工数目 <strong>等于</strong>&nbsp;该楼 <strong>搬入</strong>&nbsp;的员工数数目。比方说&nbsp;<code>n = 3</code>&nbsp;且两个员工要离开楼&nbsp;<code>0</code>&nbsp;，一个员工要离开楼&nbsp;<code>1</code>&nbsp;，一个员工要离开楼 <code>2</code>&nbsp;，如果该请求列表可行，应该要有两个员工搬入楼&nbsp;<code>0</code>&nbsp;，一个员工搬入楼&nbsp;<code>1</code>&nbsp;，一个员工搬入楼&nbsp;<code>2</code>&nbsp;。</p>
+
+<p>请你从原请求列表中选出若干个请求，使得它们是一个可行的请求列表，并返回所有可行列表中最大请求数目。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/26/move1.jpg" style="height: 406px; width: 600px;"></p>
+
+<pre><strong>输入：</strong>n = 5, requests = [[0,1],[1,0],[0,1],[1,2],[2,0],[3,4]]
+<strong>输出：</strong>5
+<strong>解释：</strong>请求列表如下：
+从楼 0 离开的员工为 x 和 y ，且他们都想要搬到楼 1 。
+从楼 1 离开的员工为 a 和 b ，且他们分别想要搬到楼 2 和 0 。
+从楼 2 离开的员工为 z ，且他想要搬到楼 0 。
+从楼 3 离开的员工为 c ，且他想要搬到楼 4 。
+没有员工从楼 4 离开。
+我们可以让 x 和 b 交换他们的楼，以满足他们的请求。
+我们可以让 y，a 和 z 三人在三栋楼间交换位置，满足他们的要求。
+所以最多可以满足 5 个请求。</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/26/move2.jpg" style="height: 327px; width: 450px;"></p>
+
+<pre><strong>输入：</strong>n = 3, requests = [[0,0],[1,2],[2,1]]
+<strong>输出：</strong>3
+<strong>解释：</strong>请求列表如下：
+从楼 0 离开的员工为 x ，且他想要回到原来的楼 0 。
+从楼 1 离开的员工为 y ，且他想要搬到楼 2 。
+从楼 2 离开的员工为 z ，且他想要搬到楼 1 。
+我们可以满足所有的请求。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>n = 4, requests = [[0,3],[3,1],[1,2],[2,0]]
+<strong>输出：</strong>4
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 20</code></li>
+	<li><code>1 &lt;= requests.length &lt;= 16</code></li>
+	<li><code>requests[i].length == 2</code></li>
+	<li><code>0 &lt;= from<sub>i</sub>, to<sub>i</sub> &lt; n</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 16.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maximumRequests(self, n: int, requests: List[List[int]]) -&gt; int:
+        graph = defaultdict(list)
+        N = len(requests)
+        for i in range(N):
+            f,t = requests[i]
+            graph[f].append([t,i])
+
+        MASK = 2**N - 1
+        def find(mask,start,f,cnt):
+            # print(bin(mask),start,f,cnt,graph[f])
+            if f==start:
+                return [(mask,cnt)]
+            ret = []
+            for t,i in graph[f]:
+                if mask &amp; (1&lt;&lt;i)&gt;0:
+                    
+                    ret += find(mask^(1&lt;&lt;i),start,t,cnt+1)
+            return ret 
+
+
+        @cache
+        def dfs(mask):
+            if mask==0:
+                return 0
+            selectMask = mask&amp;(-mask)
+            i = int(log(selectMask,2))
+            print(i)
+            nmask = selectMask^mask
+            f,t = requests[i]
+            # use current i 
+            candidates = find(nmask,f,t,1)
+            ret = 0
+            # print(i,bin(mask),candidates)
+            for m,c in candidates:
+                ret = max(dfs(m)+c,ret)
+            # skip current i 
+            ret = max(dfs(nmask),ret)
+            return ret 
+        return dfs(MASK)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了回溯（枚举所有可能的请求组合通过二进制掩码表示）结合深度优先搜索（DFS）来找到最多可以满足的请求。首先，创建一个图来表示每个楼栋的请求，即从某楼出发的目标楼和对应的请求索引。然后使用一个二进制掩码来表示所有的请求是否被选择（1代表被选择，0代表未被选择）。对于每个掩码，如果最低位为1，意味着当前请求被选择。根据这个请求，我们尝试寻找一个环路，使得从一个楼栋出发，最终可以回到原楼栋，并在此过程中满足其他的请求。使用DFS来递归地尝试所有可能的选择或不选择当前请求的情况，从而找到最大的可满足请求数。如果找到一个有效的环路，将其加入到结果中并继续尝试其他可能性。这个策略通过枚举所有子集和验证每个子集的合法性来尝试找到最优解。</p>
+                                <p>时间复杂度: O(N*2^N)</p>
+                                <p>空间复杂度: O(N + 2^N)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maximumRequests(self, n: int, requests: List[List[int]]) -&gt; int:
+        graph = defaultdict(list)
+        N = len(requests)
+        for i in range(N):
+            f, t = requests[i]
+            graph[f].append([t, i])
+
+        MASK = 2**N - 1
+        def find(mask, start, f, cnt):
+            if f == start:
+                return [(mask, cnt)]
+            ret = []
+            for t, i in graph[f]:
+                if mask &amp; (1 &lt;&lt; i) &gt; 0:
+                    ret += find(mask ^ (1 &lt;&lt; i), start, t, cnt + 1)
+            return ret 
+
+        @cache
+        def dfs(mask):
+            if mask == 0:
+                return 0
+            selectMask = mask &amp; (-mask)
+            i = int(log(selectMask, 2))
+            nmask = selectMask ^ mask
+            f, t = requests[i]
+            candidates = find(nmask, f, t, 1)
+            ret = 0
+            for m, c in candidates:
+                ret = max(dfs(m) + c, ret)
+            ret = max(dfs(nmask), ret)
+            return ret 
+        return dfs(MASK)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用回溯和二进制掩码来表示请求的选择，这种方法在所有情况下都是可行的吗，还是存在某些特殊情况下会导致效率低下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用回溯和二进制掩码的方法虽然可行，但在请求的数量非常大时可能导致效率低下。这种方法的时间复杂度是指数级的，因为需要枚举所有可能的请求组合，这些组合的总数是2的N次幂（N是请求的数量）。当N较大时，比如超过20，计算量会非常巨大，导致运行时间非常长。因此，这种方法适用于请求数量较少的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中使用DFS来验证请求组合的合法性，你能解释一下这里的DFS是如何确保每栋楼的员工净变化为0的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>DFS在这里用于寻找是否存在一个合法的路径，即从一个楼栋出发，经过一系列的请求后，可以返回到原始的楼栋。这样的路径形成了一个闭环，确保了在这个环路中，每个楼栋的员工数量的净变化为0（即每个楼栋移出的员工数量等于移入的员工数量）。通过递归地探索所有可能的请求组合，并验证这些组合能否形成闭环，DFS帮助确保了每个楼栋的员工净变化为0。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的`find`函数设计是为了寻找什么样的环路？能详细解释一下这个环路是如何帮助验证请求组合的合法性的吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`find`函数的目的是寻找从某个楼栋出发，经过一系列请求后，能够返回到原始楼栋的环路。这个环路是由请求组成的，其中每个请求代表从一个楼栋移动到另一个楼栋的员工。当我们找到这样的环路时，就表明这组请求是合法的，因为它保证了所有涉及的楼栋在完成所有请求后，员工数量保持不变（即每个楼栋的员工净输入和输出相等）。这样的验证是必要的，因为只有当所有相关的请求都能形成闭环，这些请求才是可行的，从而确保了总请求的最大化可以在合法的条件下实现。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在处理掩码时需要使用`mask &amp; (-mask)`来选取最低位的1？这里的逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二进制数中，`mask &amp; (-mask)`的操作用于快速找到最低位的1，这是因为`-mask`是`mask`的二进制补码表示形式。该操作的结果是一个只含有最低位1的数，其他位均为0。这种方法用于确定在遍历子集或请求组合时，哪个请求是当前考虑的第一个请求。此技术是基于位运算的效率高的特性，可以快速地在回溯算法中进行选择和剔除，帮助减少不必要的计算和简化逻辑处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-of-achievable-transfer-requests')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-of-achievable-transfer-requests/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>倒水</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>倒水</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 40 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def pourWater(self, heights: List[int], V: int, K: int) -&gt; List[int]:
+        self.leftStack = []
+        self.rightStack = []
+        self.length = len(heights)
+        
+        self.findLeft(heights, K)
+        self.findRight(heights, K)
+        
+        for i in range(V):
+            if len(self.leftStack) &gt; 0:
+                low = self.leftStack[-1]
+                heights[low] += 1
+                if heights[low] &gt;= heights[low + 1]:
+                    self.leftStack.pop()
+                        
+                if low &gt; 0 and heights[low] &gt;= heights[low - 1]:
+                    self.findLeft(heights, low)
+                
+            
+            elif len(self.rightStack) &gt; 0:
+                low = self.rightStack[-1]
+                heights[low] += 1
+                if heights[low] &gt;= heights[low - 1]:
+                    self.rightStack.pop()
+                        
+                if low &lt; self.length - 1 and heights[low] &gt;= heights[low + 1]:
+                    self.findRight(heights, low)
+                        
+            else:
+                heights[K] += 1
+                self.findLeft(heights, K)
+                self.findRight(heights, K)
+                    
+        return heights    
+        
+        
+    def findLeft(self, heights, index):
+        for i in range(index - 1, -1, -1):
+            if heights[i] &lt; heights[i + 1]:
+                self.leftStack.append(i)
+            elif heights[i] &gt; heights[i + 1]:
+                break
+    
+    
+    def findRight(self, heights, index):
+        for i in range(index + 1, self.length):
+            if heights[i] &lt; heights[i - 1]:
+                self.rightStack.append(i)
+            elif heights[i] &gt; heights[i - 1]:
+                break
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了模拟倒水的过程，使用了两个单调栈分别记录倒水过程中左右两侧的可倒水的低洼位置。具体思路如下：
+1. 首先利用 findLeft 和 findRight 两个函数分别找出初始位置 K 左右两侧的所有可倒水的低洼位置，并分别存入 leftStack 和 rightStack 中。
+2. 开始模拟倒水过程，总共倒 V 次水：
+   - 如果 leftStack 非空，则将水倒在 leftStack 的栈顶位置，并更新该位置的高度。如果该位置已经不再是低洼，则将其从 leftStack 中弹出。然后检查其左侧相邻位置是否因为高度改变而成为新的低洼，如果是则将其加入 leftStack。
+   - 如果 leftStack 为空但 rightStack 非空，则将水倒在 rightStack 的栈顶位置，并更新该位置的高度。如果该位置已经不再是低洼，则将其从 rightStack 中弹出。然后检查其右侧相邻位置是否因为高度改变而成为新的低洼，如果是则将其加入 rightStack。
+   - 如果 leftStack 和 rightStack 均为空，则将水倒在初始位置 K 上，并更新 K 位置的高度。然后重新调用 findLeft 和 findRight 函数更新 leftStack 和 rightStack。
+3. 倒完 V 次水后，返回更新后的高度数组 heights 即可。</p>
+                                <p>时间复杂度: O(V*n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def pourWater(self, heights: List[int], V: int, K: int) -&gt; List[int]:
+        self.leftStack = []  # 记录左侧低洼位置的单调栈
+        self.rightStack = []  # 记录右侧低洼位置的单调栈
+        self.length = len(heights)  # 高度数组的长度
+        
+        self.findLeft(heights, K)  # 初始查找 K 左侧的低洼位置
+        self.findRight(heights, K)  # 初始查找 K 右侧的低洼位置
+        
+        for i in range(V):  # 倒水 V 次
+            if len(self.leftStack) &gt; 0:  # 如果左侧有低洼位置
+                low = self.leftStack[-1]  # 取左侧最低洼位置
+                heights[low] += 1  # 将水倒在该位置
+                if heights[low] &gt;= heights[low + 1]:  # 如果该位置已经不再是低洼
+                    self.leftStack.pop()  # 将其从左侧低洼栈中弹出
+                        
+                if low &gt; 0 and heights[low] &gt;= heights[low - 1]:  # 如果左侧相邻位置成为新的低洼
+                    self.findLeft(heights, low)  # 重新查找左侧低洼位置
+                
+            
+            elif len(self.rightStack) &gt; 0:  # 如果右侧有低洼位置
+                low = self.rightStack[-1]  # 取右侧最低洼位置
+                heights[low] += 1  # 将水倒在该位置
+                if heights[low] &gt;= heights[low - 1]:  # 如果该位置已经不再是低洼
+                    self.rightStack.pop()  # 将其从右侧低洼栈中弹出
+                        
+                if low &lt; self.length - 1 and heights[low] &gt;= heights[low + 1]:  # 如果右侧相邻位置成为新的低洼
+                    self.findRight(heights, low)  # 重新查找右侧低洼位置
+                        
+            else:  # 如果左右均无低洼位置
+                heights[K] += 1  # 将水倒在初始位置 K
+                self.findLeft(heights, K)  # 重新查找 K 左侧的低洼位置
+                self.findRight(heights, K)  # 重新查找 K 右侧的低洼位置
+                    
+        return heights  # 返回更新后的高度数组
+        
+        
+    def findLeft(self, heights, index):
+        for i in range(index - 1, -1, -1):  # 从 index-1 开始向左遍历
+            if heights[i] &lt; heights[i + 1]:  # 如果当前位置是低洼
+                self.leftStack.append(i)  # 将其加入左侧低洼栈
+            elif heights[i] &gt; heights[i + 1]:  # 如果当前位置高于右侧位置
+                break  # 停止遍历
+    
+    
+    def findRight(self, heights, index):
+        for i in range(index + 1, self.length):  # 从 index+1 开始向右遍历
+            if heights[i] &lt; heights[i - 1]:  # 如果当前位置是低洼
+                self.rightStack.append(i)  # 将其加入右侧低洼栈
+            elif heights[i] &gt; heights[i - 1]:  # 如果当前位置高于左侧位置
+                break  # 停止遍历
+        </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在模拟倒水的过程中，如果同时左右两侧栈均非空，你是如何决定优先倒水到左侧还是右侧的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，如果左右两侧的单调栈均非空时，优先倒水到左侧。这是基于一个常见的倒水模拟原则，即优先填充左侧的低洼位置。这种选择可能是为了模拟自然界中水流由高处向低处流动的趋势，通常左侧的低洼位置在空间位置上更接近倒水初始点的左侧，因此先进行处理。这也可以视为一种设计选择，以保持算法的一致性和可预测性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当左或右侧的单调栈为空时，你是如何确保继续倒水操作不会导致非最低点被选择的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当左或右侧的单调栈为空时，若另一侧的栈仍然非空，则会继续在非空的那侧的栈顶位置进行倒水。这保证了水总是被倒在当前可识别的最低洼位置。如果两个栈都为空，水会被倒在初始位置K上。在倒水之后，会重新评估并更新左右两侧的单调栈，确保接下来的倒水仍然是在最低点进行。这种机制确保了倒水操作始终聚焦于当前的最低位置或潜在的新低洼位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新高度信息后，你是如何判断并处理位置变为非低洼的情况？特别是在复杂的地形变化中。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在每次倒水后，会检查倒水位置的新高度是否还符合低洼位置的条件。如果该位置的高度不再低于其相邻位置，这个位置就会从单调栈中被移除，表示它不再是一个低洼位置。同时，会检查该位置的相邻位置是否因为高度的改变而变成新的低洼地形。如果是，这些新的低洼位置将被加入到相应的单调栈中。这个动态更新过程帮助算法适应复杂的地形变化，并确保始终能够在最低的可用位置进行倒水操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当你说如果 &#39;左右均无低洼位置，则将水倒在初始位置 K&#39;，这种情况下如何处理 K 位置周围可能产生的新低洼位置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当左右均无低洼位置，且水被倒在初始位置K后，会立即调用findLeft和findRight函数重新检查K位置左右两侧是否由于K位置高度的改变而产生新的低洼位置。如果检测到新的低洼位置，这些位置会被加入到相应的单调栈中。这确保了即使在初始位置K周围由于倒水导致地形变化，算法也能及时识别并处理新产生的低洼位置，维持倒水过程的正确性和效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/trapping-rain-water" class="list-group-item list-group-item-action">
+                                接雨水
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/pour-water')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/pour-water/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

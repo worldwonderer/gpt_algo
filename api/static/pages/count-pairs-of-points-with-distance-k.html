@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计距离为 k 的点对</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计距离为 k 的点对</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <strong>二维</strong>&nbsp;整数数组&nbsp;<code>coordinates</code>&nbsp;和一个整数&nbsp;<code>k</code>&nbsp;，其中&nbsp;<code>coordinates[i] = [x<sub>i</sub>, y<sub>i</sub>]</code>&nbsp;是第 <code>i</code>&nbsp;个点在二维平面里的坐标。</p>
+
+<p>我们定义两个点&nbsp;<code>(x<sub>1</sub>, y<sub>1</sub>)</code>&nbsp;和&nbsp;<code>(x<sub>2</sub>, y<sub>2</sub>)</code>&nbsp;的 <strong>距离</strong>&nbsp;为&nbsp;<code>(x1 XOR x2) + (y1 XOR y2)</code> ，<code>XOR</code>&nbsp;指的是按位异或运算。</p>
+
+<p>请你返回满足<em>&nbsp;</em><code>i &lt; j</code><em>&nbsp;</em>且点<em>&nbsp;</em><code>i</code><em> </em>和点<em>&nbsp;</em><code>j</code>之间距离为<em>&nbsp;</em><code>k</code>&nbsp;的点对数目。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>coordinates = [[1,2],[4,2],[1,3],[5,2]], k = 5
+<b>输出：</b>2
+<b>解释：</b>以下点对距离为 k ：
+- (0, 1)：(1 XOR 4) + (2 XOR 2) = 5 。
+- (2, 3)：(1 XOR 5) + (3 XOR 2) = 5 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>coordinates = [[1,3],[1,3],[1,3],[1,3],[1,3]], k = 0
+<b>输出：</b>10
+<b>解释：</b>任何两个点之间的距离都为 0 ，所以总共有 10 组点对。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= coordinates.length &lt;= 50000</code></li>
+	<li><code>0 &lt;= x<sub>i</sub>, y<sub>i</sub> &lt;= 10<sup>6</sup></code></li>
+	<li><code>0 &lt;= k &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1582 ms</p>
+                    <p>内存: 32.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countPairs(self, coordinates: List[List[int]], k: int) -&gt; int:
+        #两数之和
+        #用枚举所有满足条件的所有可能来 代替  枚举所有选法
+
+        #对于xj,yj 与前面的坐标匹配也就(k+1)种可能,最多只有(k+1)个数与它匹配
+        #即 0+k , 1+(k-1),2+(k-2)...,k+0 枚举所有情况即可
+
+        
+        n=len(coordinates)
+        Map={}
+        ans=0
+        for xj,yj in coordinates:
+            #两数之和 枚举所有可能然后用哈希表找出答案
+            for a in range(k+1):
+                xi,yi=( a^xj ),( yj^(k-a) )
+                if (xi,yi) in Map:
+                    ans+=Map[(xi,yi)]
+            Map[(xj,yj)]=Map.get(  (xj,yj),0 )+1
+        
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了哈希表来记录遍历过的坐标点，以减少查找与计算时间。对于每个点(xj, yj)，通过枚举可能的(xi, yi)，计算可能满足条件的(xi XOR xj) + (yi XOR yj) = k的情况。这是通过固定一个点，然后为每个可能的a值（从0到k），计算出可能的xi和yi，然后在哈希表中查找是否有这样的(xi, yi)存在。如果存在，这意味着这对点满足距离为k。通过这种方式，每个点只需要考虑k+1种可能的配对点，大大减少了必须考虑的总配对数。</p>
+                                <p>时间复杂度: O(n*k)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countPairs(self, coordinates: List[List[int]], k: int) -&gt; int:
+        # 初始化计数器和哈希表
+        n = len(coordinates)
+        Map = {}
+        ans = 0
+        # 遍历每个点(xj, yj)
+        for xj, yj in coordinates:
+            # 枚举所有可能的(xi, yi)使得(xi XOR xj) + (yi XOR yj) == k
+            for a in range(k+1):
+                xi, yi = (a ^ xj), (yj ^ (k - a))
+                # 检查是否存在已遍历的(xi, yi)
+                if (xi, yi) in Map:
+                    ans += Map[(xi, yi)]
+            # 更新当前点(xj, yj)在哈希表中的出现次数
+            Map[(xj, yj)] = Map.get((xj, yj), 0) + 1
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，对每个点(xj, yj)的处理是否保证了所有的(xi, yi)配对都是唯一的？如果不是，是否会导致计数重复？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，对于每个点(xj, yj)，算法确实可能会对某些(xi, yi)配对进行重复计数。这是因为对于不同的(xj, yj)，可能会有相同的(xi, yi)满足条件。由于算法在检查(xi, yi)时没有考虑它们是否已经作为(xj, yj)被计算过，因此算法可能会对某些配对进行重复计数。为了避免这种重复计数，可以在哈希表中记录每个点作为(xi, yi)已经被考虑过的其他点(xj, yj)，这样可以确保每个配对只被计数一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的枚举可能的(xi, yi)，是否考虑了(xi, yi)可能不在给定的coordinates数组中的情况？如果(xi, yi)不在数组中，这是否会影响最终的结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的算法确实没有明确地检查(xi, yi)是否在给定的coordinates数组中。这意味着如果计算出的(xi, yi)不在数组中，它们不会在哈希表中找到匹配，从而不会被计算为有效的点对。因此，只有当(xi, yi)同时在数组中时，这个点对才会被计入最终的结果。这种方式确保了只有实际存在于输入数组中的点对才被计数，符合题目的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中使用了哈希表来记录点的出现次数，这种方法是否考虑了坐标点可能重复出现的情况？如果有重复点，如何处理计数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中使用的哈希表确实考虑了坐标点可能重复出现的情况。通过记录每个坐标点(xj, yj)在哈希表中的出现次数，算法能够在计算有效点对时考虑到这种重复情况。例如，如果一个点(xi, yi)在输入数组中出现多次，则每次这个点与另一个有效点(xj, yj)配对时，都会根据(xi, yi)的出现次数增加相应的计数。这样可以确保重复的点被正确地计入总数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在题解算法中，是否有考虑到k的值非常小或非常大时，算法的表现如何？对于极端值，是否需要优化算法以防止性能问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的算法中，如果k的值非常小，算法的性能会比较好，因为每个点(xj, yj)需要考虑的(xi, yi)数量减少。然而，如果k的值非常大，算法的性能可能会受到影响，因为每个点需要考虑的(xi, yi)可能会非常多，导致计算量增加。为了优化这种情况，可以考虑使用更高效的数据结构如空间划分树或KD树来快速查找和计算距离，或者优化哈希表的使用策略，减少不必要的计算和查找。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-pairs-of-points-with-distance-k')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-pairs-of-points-with-distance-k/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

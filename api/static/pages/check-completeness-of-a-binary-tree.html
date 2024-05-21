@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树的完全性检验</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树的完全性检验</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵二叉树的根节点<meta charset="UTF-8" />&nbsp;<code>root</code> ，请你判断这棵树是否是一棵 <strong>完全二叉树</strong>&nbsp;。</p>
+
+<p>在一棵 <strong><a href="https://baike.baidu.com/item/完全二叉树/7773232?fr=aladdin" target="_blank">完全二叉树</a></strong> 中，除了最后一层外，所有层都被完全填满，并且最后一层中的所有节点都尽可能靠左。最后一层（第 <code>h</code> 层）中可以包含<meta charset="UTF-8" />&nbsp;<code>1</code>&nbsp;到<meta charset="UTF-8" />&nbsp;<code>2<sup>h</sup></code> 个节点。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/15/complete-binary-tree-1.png" /></p>
+
+<pre>
+<strong>输入：</strong>root = [1,2,3,4,5,6]
+<strong>输出：</strong>true
+<strong>解释：</strong>最后一层前的每一层都是满的（即，节点值为 {1} 和 {2,3} 的两层），且最后一层中的所有节点（{4,5,6}）尽可能靠左。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/15/complete-binary-tree-2.png" /></strong></p>
+
+<pre>
+<strong>输入：</strong>root = [1,2,3,4,5,null,7]
+<strong>输出：</strong>false
+<strong>解释：</strong>值为 7 的节点不满足条件「节点尽可能靠左」。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>树中节点数目在范围 <code>[1, 100]</code> 内</li>
+	<li><code>1 &lt;= Node.val &lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 19 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isCompleteTree(self, root: Optional[TreeNode]) -&gt; bool:
+        d = deque([root])
+        deep = 1
+        deepflag = 0
+        while d:
+            newd = deque()
+            flag = False
+            while d:
+                cur = d.popleft()
+                if flag:
+                    if cur.left or cur.right:
+                        return False
+                else:
+                    if cur.left and cur.right:
+                        newd.append(cur.left)
+                        newd.append(cur.right)
+                    elif not cur.left and not cur.right:
+                        flag = True
+                        if deepflag==0:deepflag = deep+1
+                    elif cur.left:
+                        flag = True
+                        newd.append(cur.left)
+                        if deepflag==0:deepflag = deep+1
+                    else:
+                        return False
+            d = newd
+            if d:deep+=1
+        print(deep)
+        print(deepflag)
+        return True if deep==deepflag or deepflag==0 or deepflag&gt;deep else False</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用广度优先搜索的方式遍历二叉树。它使用一个双端队列来保存每一层的节点。在遍历过程中，如果当前节点的左右子节点都存在，则将其加入到下一层的队列中。如果遇到一个节点只有左子节点或者没有子节点，则将标记置为True，表示后续节点都必须是叶子节点。如果后续遇到非叶子节点，则说明该二叉树不是完全二叉树。在遍历的同时记录下最大深度和第一次遇到叶子节点时的深度，最后根据这两个深度判断是否为完全二叉树。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def isCompleteTree(self, root: Optional[TreeNode]) -&gt; bool:
+        # 初始化双端队列，并将根节点加入队列
+        d = deque([root])
+        # 初始化树的深度为1
+        deep = 1
+        # 初始化第一次遇到叶子节点时的深度为0
+        deepflag = 0
+        
+        # 广度优先搜索遍历二叉树
+        while d:
+            # 初始化下一层节点的双端队列
+            newd = deque()
+            # 初始化标记为False，表示当前层还没有遇到叶子节点
+            flag = False
+            
+            # 遍历当前层的所有节点
+            while d:
+                # 取出当前节点
+                cur = d.popleft()
+                
+                # 如果已经遇到叶子节点
+                if flag:
+                    # 如果当前节点有子节点，则说明不是完全二叉树，返回False
+                    if cur.left or cur.right:
+                        return False
+                else:
+                    # 如果当前节点有两个子节点，将其加入下一层队列中
+                    if cur.left and cur.right:
+                        newd.append(cur.left)
+                        newd.append(cur.right)
+                    # 如果当前节点没有子节点，将标记置为True，并记录第一次遇到叶子节点的深度
+                    elif not cur.left and not cur.right:
+                        flag = True
+                        if deepflag==0:deepflag = deep+1
+                    # 如果当前节点只有左子节点，将标记置为True，将左子节点加入下一层队列，并记录第一次遇到叶子节点的深度
+                    elif cur.left:
+                        flag = True
+                        newd.append(cur.left)
+                        if deepflag==0:deepflag = deep+1
+                    # 如果当前节点只有右子节点，说明不是完全二叉树，返回False
+                    else:
+                        return False
+                        
+            # 将下一层节点赋值给当前层节点
+            d = newd
+            # 如果下一层还有节点，将深度加1
+            if d:deep+=1
+            
+        # 如果树的最大深度等于第一次遇到叶子节点的深度，或者第一次遇到叶子节点的深度为0（只有一个节点），或者第一次遇到叶子节点的深度大于树的最大深度，则说明是完全二叉树，返回True；否则返回False
+        return True if deep==deepflag or deepflag==0 or deepflag&gt;deep else False
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在广度优先搜索中，如何确保所有层除最后一层外都被完全填满？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在广度优先搜索（BFS）中，每一层的节点都是依次从队列中取出，并将其子节点按照从左到右的顺序加入队列中。通过这种方法，只要一个节点有子节点，这些子节点就会被添加到队列中，从而保证除最后一层外的每一层都被完全填满。如果在某一层中发现节点不符合完全二叉树的子节点存在规则（如只有右子节点，没有左子节点），则可以立即判断该二叉树不是完全二叉树。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当发现一个节点只有右子节点而没有左子节点时直接返回False，是基于什么完全二叉树的性质？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>完全二叉树的性质要求，除了最后一层外，每一层必须是完全填满的，并且最后一层的节点都尽可能地向左对齐。因此，如果在某个节点处发现它只有右子节点而没有左子节点，这违反了节点必须从左到右连续存在的规则，因此可以立即判断该二叉树不是完全二叉树。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在发现第一个叶子节点后，还需要继续检查后续节点是否为叶子节点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在完全二叉树中，一旦在某一层中出现了叶子节点（无子节点的节点），该层的所有后续节点以及所有更深层的节点都必须是叶子节点。这是因为完全二叉树的节点必须从左到右连续填充。如果在发现第一个叶子节点之后的任何位置出现非叶子节点，这将违反完全二叉树的定义，因此必须继续检查以确保所有后续节点都满足完全二叉树的条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            您提到使用双端队列（deque），为什么选择双端队列而不是普通队列？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>双端队列（deque）提供了从两端高效地添加和移除元素的能力。虽然在本题中主要使用了从左端出队和从右端入队的操作，这些操作在普通队列中也可以高效地完成。但是，使用双端队列可以为可能的需要进行双向操作提供灵活性，尤其是在其他需要频繁从队列两端操作的场景中。实际上，对于本题的需求，使用普通队列就足够了，因为我们主要是进行从队列一端的入队和出队操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/check-completeness-of-a-binary-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/check-completeness-of-a-binary-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

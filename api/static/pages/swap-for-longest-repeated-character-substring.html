@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单字符重复子串的最大长度</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单字符重复子串的最大长度</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>如果字符串中的所有字符都相同，那么这个字符串是单字符重复的字符串。</p>
+
+<p>给你一个字符串&nbsp;<code>text</code>，你只能交换其中两个字符一次或者什么都不做，然后得到一些单字符重复的子串。返回其中最长的子串的长度。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;ababa&quot;
+<strong>输出：</strong>3
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;aaabaaa&quot;
+<strong>输出：</strong>6
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;aaabbaaa&quot;
+<strong>输出：</strong>4
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;aaaaa&quot;
+<strong>输出：</strong>5
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;abcdef&quot;
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= text.length &lt;= 20000</code></li>
+	<li><code>text</code> 仅由小写英文字母组成。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 43 ms</p>
+                    <p>内存: 17.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxRepOpt1(self, text: str) -&gt; int:
+        appear_times = [0 for _ in range(26)]
+        max_consec = [0 for _ in range(26)]
+        max_gap = [0 for _ in range(26)]
+        dp = [(1,1) for _ in range(len(text))]
+        dp[0] = (1,1)
+        appear_times[ord(text[0]) - ord(&#39;a&#39;)] += 1
+        max_consec[ord(text[0]) - ord(&#39;a&#39;)] = 1
+        for i in range(1, len(text)):
+            index = ord(text[i]) - ord(&#39;a&#39;)
+            if text[i] == text[i - 1]:
+                dp[i] = (dp[i-1][0] + 1, dp[i - 1][1] + 1)
+                if dp[i][0] &gt; max_consec[index]:
+                    max_consec[index] = dp[i][0]
+                if dp[i][1] &gt; max_gap[index]:
+                    max_gap[index] = dp[i][1]
+            else:
+                appear_times[index] += 1
+                if i &gt;= 2 and text[i] == text[i - 2]:
+                    dp[i] = (1, dp[i - 2][0] + 1)
+                else:
+                    dp[i] = (1, 1)
+                if dp[i][0] &gt; max_consec[index]:
+                    max_consec[index] = dp[i][0]
+                if dp[i][1] &gt; max_gap[index]:
+                    max_gap[index] = dp[i][1]
+                
+        ans = 0
+        for i in range(26):
+            if appear_times[i] &gt; 2:
+                ans = max(max_gap[i] + 1, ans)
+            elif appear_times[i] == 2:
+                ans = max(ans, max_consec[i] + 1, max_gap[i])
+            elif appear_times[i] == 1:
+                ans = max(ans, max_consec[i])
+        return ans
+
+
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解的主要思路是通过动态规划和额外的统计数组来解决问题。首先，使用一个数组 `appear_times` 来记录每个字符在文本中出现的次数。同时，使用两个数组 `max_consec` 和 `max_gap` 分别记录每个字符连续出现的最大长度和可能通过一次交换后能达到的最大长度。动态规划数组 `dp` 的每个元素包含两个值，分别表示当前位置连续的字符长度和可能的最长交换后长度。在遍历字符串时，根据当前字符是否与前一个字符相同来更新 `dp` 数组，以及对应的 `max_consec` 和 `max_gap`。最后，根据字符的出现次数，利用 `max_consec` 和 `max_gap` 计算可能的最大长度。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxRepOpt1(self, text: str) -&gt; int:
+        # 初始化字符计数器和动态规划数组
+        appear_times = [0 for _ in range(26)]
+        max_consec = [0 for _ in range(26)]
+        max_gap = [0 for _ in range(26)]
+        dp = [(1,1) for _ in range(len(text))]
+        dp[0] = (1,1)
+        appear_times[ord(text[0]) - ord(&#39;a&#39;)] += 1
+        max_consec[ord(text[0]) - ord(&#39;a&#39;)] = 1
+        for i in range(1, len(text)):
+            index = ord(text[i]) - ord(&#39;a&#39;)
+            if text[i] == text[i - 1]:
+                # 更新连续相同字符的统计
+                dp[i] = (dp[i-1][0] + 1, dp[i - 1][1] + 1)
+                if dp[i][0] &gt; max_consec[index]:
+                    max_consec[index] = dp[i][0]
+                if dp[i][1] &gt; max_gap[index]:
+                    max_gap[index] = dp[i][1]
+            else:
+                appear_times[index] += 1
+                if i &gt;= 2 and text[i] == text[i - 2]:
+                    # 考虑通过一次交换修正为更长的子串
+                    dp[i] = (1, dp[i - 2][0] + 1)
+                else:
+                    dp[i] = (1, 1)
+                if dp[i][0] &gt; max_consec[index]:
+                    max_consec[index] = dp[i][0]
+                if dp[i][1] &gt; max_gap[index]:
+                    max_gap[index] = dp[i][1]
+        
+        ans = 0
+        for i in range(26):
+            if appear_times[i] &gt; 2:
+                # 可以通过交换获得更长的子串
+                ans = max(max_gap[i] + 1, ans)
+            elif appear_times[i] == 2:
+                ans = max(ans, max_consec[i] + 1, max_gap[i])
+            elif appear_times[i] == 1:
+                ans = max(ans, max_consec[i])
+        return ans
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在代码中`dp`数组的每个元素包含两个值，其中第二个值是如何计算的，特别是在字符不连续时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，`dp`数组的每个元素为一个元组，其中第一个值记录当前位置连续的相同字符的最大长度，而第二个值记录可能通过一次交换后能够达到的最大长度。当字符不连续时，此时`dp[i][1]`的计算需要判断当前字符与前前一个字符是否相同（即`text[i] == text[i - 2]`）。如果相同，表示通过交换`text[i - 1]`和`text[i]`之间的字符，可以将`text[i]`连到`text[i - 2]`之前形成的连续子串上，因此`dp[i][1] = dp[i - 2][0] + 1`。这种情况下，我们假设通过一次交换可以修正一个间断，从而增加连续子串的长度。如果不相同，则`dp[i][1]`重置为1，因为当前字符未能通过交换与前面的字符形成更长的连续子串。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到`可能通过一次交换后能达到的最大长度`，具体是如何确定一个字符通过交换可以增加的最大长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>代码中通过动态规划在`dp[i][1]`中记录可能通过一次交换后能达到的最大长度。这一计算基于当前字符是否能与它前面非连续的字符形成连续串。如果当前字符与前前字符相同，并且中间只有一个不同的字符，那么可以通过交换这个不同字符，将当前字符加入到前面的连续字符串中。因此，`dp[i][1]`在这种情况下会设置为`dp[i - 2][0] + 1`。此外，代码在更新`max_gap`数组时，会检查每个字符的`dp[i][1]`值，以确定通过一次交换可能达到的最大长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在更新`max_gap`数组时使用`dp[i][1]`的值，这里的逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`max_gap`数组用于记录每个字符通过一次交换后可能达到的最大连续长度。在每次更新`dp[i][1]`时，它记录了当前字符通过一次交换后可能形成的最大连续区间。因此，每当`dp[i][1]`被计算时，代码会检查并更新`max_gap`数组中对应字符的最大值。这样，`max_gap`可以为每个字符存储通过一次优化交换后可能获得的最长连续子串长度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中对于只出现一次的字符，返回的最大长度直接是`max_consec[i]`，这是否意味着对于单个字符的交换没有考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实如此，对于在字符串中只出现一次的字符，它的最大连续长度当然是1（因为它本身就是一个单独的字符），而`max_gap[i]`在此情况下也不会超过1，因为没有其他相同的字符进行交换。因此，对于只出现一次的字符，考虑交换来增加长度是没有意义的，所以最大长度直接是`max_consec[i]`，即1。这里的处理逻辑正确地反映了对于单个字符交换的不可行性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/swap-for-longest-repeated-character-substring')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/swap-for-longest-repeated-character-substring/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

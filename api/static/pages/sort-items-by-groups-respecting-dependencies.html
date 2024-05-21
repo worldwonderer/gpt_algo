@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>项目管理</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>项目管理</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=topological-sort" class="badge bg-secondary tag-link">拓扑排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>有 <code>n</code> 个项目，每个项目或者不属于任何小组，或者属于 <code>m</code> 个小组之一。<code>group[i]</code> 表示第 <code>i</code> 个项目所属的小组，如果第 <code>i</code> 个项目不属于任何小组，则 <code>group[i]</code> 等于 <code>-1</code>。项目和小组都是从零开始编号的。可能存在小组不负责任何项目，即没有任何项目属于这个小组。</p>
+
+<p>请你帮忙按要求安排这些项目的进度，并返回排序后的项目列表：</p>
+
+<ul>
+	<li>同一小组的项目，排序后在列表中彼此相邻。</li>
+	<li>项目之间存在一定的依赖关系，我们用一个列表 <code>beforeItems</code> 来表示，其中 <code>beforeItems[i]</code> 表示在进行第 <code>i</code> 个项目前（位于第 <code>i</code> 个项目左侧）应该完成的所有项目。</li>
+</ul>
+
+<p>如果存在多个解决方案，只需要返回其中任意一个即可。如果没有合适的解决方案，就请返回一个 <strong>空列表 </strong>。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/09/22/1359_ex1.png" style="height: 181px; width: 191px;" /></strong></p>
+
+<pre>
+<strong>输入：</strong>n = 8, m = 2, group = [-1,-1,1,0,0,1,0,-1], beforeItems = [[],[6],[5],[6],[3,6],[],[],[]]
+<strong>输出：</strong>[6,3,4,1,5,2,0,7]
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>n = 8, m = 2, group = [-1,-1,1,0,0,1,0,-1], beforeItems = [[],[6],[5],[6],[3],[],[4],[]]
+<strong>输出：</strong>[]
+<strong>解释：</strong>与示例 1 大致相同，但是在排序后的列表中，4 必须放在 6 的前面。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= m <= n <= 3 * 10<sup>4</sup></code></li>
+	<li><code>group.length == beforeItems.length == n</code></li>
+	<li><code>-1 <= group[i] <= m - 1</code></li>
+	<li><code>0 <= beforeItems[i].length <= n - 1</code></li>
+	<li><code>0 <= beforeItems[i][j] <= n - 1</code></li>
+	<li><code>i != beforeItems[i][j]</code></li>
+	<li><code>beforeItems[i]</code> 不含重复元素</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 103 ms</p>
+                    <p>内存: 32.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def sortItems(self, n: int, m: int, group: List[int], beforeItems: List[List[int]]) -&gt; List[int]:
+        for i in range(len(group)):
+            if group[i] == -1:
+                group[i] = m
+                m += 1
+        item_in = [0] * n
+        group_in = [0] * m
+        g1 = [[] for _ in range(n)]
+        g2 = [[] for _ in range(m)]
+        for i,t in enumerate(beforeItems):
+            cur = group[i]
+            for j in t:
+                bef = group[j]
+                if bef != cur:
+                    g2[bef].append(cur)
+                    group_in[cur] += 1
+                else:
+                    g1[j].append(i)
+                    item_in[i] += 1
+        def typo_sort(indgree,gra):
+            q = [i for i,x in enumerate(indgree) if not x]
+            ans = []
+            while q:
+                t = q.pop()
+                ans.append(t)
+                for nxt in gra[t]:
+                    indgree[nxt] -= 1
+                    if indgree[nxt] == 0:
+                        q.append(nxt)
+            return ans
+        
+        res1 = typo_sort(group_in,g2)
+        res2 = typo_sort(item_in,g1)
+        if len(res1) != m or len(res2) != n:
+            return []
+        grk = [-1] * m
+       
+        for i,x in enumerate(res1):
+            grk[x] = i
+    
+        res2.sort(key=lambda x:grk[group[x]])
+        return res2
+        
+
+                
+             </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用两级拓扑排序来解决问题。首先，对于不属于任何小组的项目，将其各自分配到一个新的单独小组中。然后，创建两个图：一个是项目的依赖图（同一小组内的项目间依赖），另一个是小组间的依赖图。对每个项目和小组，我们分别维护一个入度数组，表示每个节点的依赖数。使用拓扑排序首先对小组进行排序，然后对单个项目进行排序。如果在任何一级排序中未能包含所有项目或所有小组，则返回空数组表示无法完成排序。最后，根据小组的排序结果，对项目进行排序并返回最终结果。</p>
+                                <p>时间复杂度: O(m + n + E)</p>
+                                <p>空间复杂度: O(m + n + E)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def sortItems(self, n: int, m: int, group: List[int], beforeItems: List[List[int]]) -&gt; List[int]:
+        # 对不属于任何小组的项目分配独立小组
+        for i in range(len(group)):
+            if group[i] == -1:
+                group[i] = m
+                m += 1
+        # 初始化项目和小组的入度以及依赖图
+        item_in = [0] * n
+        group_in = [0] * m
+        g1 = [[] for _ in range(n)]
+        g2 = [[] for _ in range(m)]
+        # 建立依赖关系
+        for i, t in enumerate(beforeItems):
+            cur = group[i]
+            for j in t:
+                bef = group[j]
+                if bef != cur:
+                    g2[bef].append(cur)
+                    group_in[cur] += 1
+                else:
+                    g1[j].append(i)
+                    item_in[i] += 1
+        # 拓扑排序函数
+        def typo_sort(indgree, gra):
+            q = [i for i, x in enumerate(indgree) if not x]
+            ans = []
+            while q:
+                t = q.pop()
+                ans.append(t)
+                for nxt in gra[t]:
+                    indgree[nxt] -= 1
+                    if indgree[nxt] == 0:
+                        q.append(nxt)
+            return ans
+        # 对小组和项目进行拓扑排序
+        res1 = typo_sort(group_in, g2)
+        res2 = typo_sort(item_in, g1)
+        # 检查是否所有的项目和小组都被排序了
+        if len(res1) != m or len(res2) != n:
+            return []
+        # 小组排序结果映射
+        grk = [-1] * m
+        for i, x in enumerate(res1):
+            grk[x] = i
+        # 根据小组的排序结果对项目进行最终排序
+        res2.sort(key=lambda x: grk[group[x]])
+        return res2</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在初始化小组和项目的入度数组时，如何确保正确处理了所有的依赖关系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在初始化入度数组时，我们遍历每个项目的依赖项列表。对于每个项目，我们检查其依赖的项目是否属于同一小组。如果属于同一小组，则项目的入度增加；如果属于不同的小组，则该项目所在小组的入度增加。这样确保了每个项目和小组的入度准确反映了其所有的外部依赖关系。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到将不属于任何小组的项目分配到新的独立小组，这种方法是否可能导致小组间的依赖图更加复杂？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将不属于任何小组的项目分配到新的独立小组确实会增加小组的总数量，从而可能增加小组间依赖的复杂度。每个独立项目形成一个单独的小组，可能导致更多的小组间依赖关系，尤其是当这些独立项目与其他小组或项目有依赖关系时。然而，这种方法是必要的，因为它允许我们在拓扑排序中有效地处理那些没有明确归属的项目。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于小组间的依赖图和项目的依赖图，题解如何确保没有循环依赖？如果存在循环依赖，拓扑排序的结果会怎样？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中并没有直接确保依赖图中不存在循环依赖，这通常是依赖于输入数据的约束。拓扑排序的基本前提是依赖图必须是有向无环图（DAG）。如果存在循环依赖，即图中存在环，拓扑排序过程中将无法完成所有节点的排序。在这种情况下，排序过程中未能被完全处理的节点数量将不等于总节点数，最终返回的结果将是空数组，表示无法进行有效的排序。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在拓扑排序的过程中，题解选择了使用一个队列来处理节点，为什么使用队列而不是栈？这对排序结果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在拓扑排序中使用队列而不是栈，是因为队列实现了广度优先搜索（BFS），这有助于按逻辑顺序（即从无依赖到有依赖的顺序）处理节点。使用队列可以保证每次处理的都是当前没有任何未解决依赖的节点。如果使用栈（实现深度优先搜索DFS），虽然同样能实现拓扑排序，但生成的顺序可能会不同，这在某些情况下可能会影响到结果的使用或理解，尤其是在有多种有效拓扑排序的情况下。使用队列通常可以提供更直观和一致的排序结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/sort-items-by-groups-respecting-dependencies')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/sort-items-by-groups-respecting-dependencies/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

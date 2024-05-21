@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>划分数字的方案数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>划分数字的方案数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=suffix-array" class="badge bg-secondary tag-link">后缀数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>你写下了若干 <strong>正整数</strong>&nbsp;，并将它们连接成了一个字符串&nbsp;<code>num</code>&nbsp;。但是你忘记给这些数字之间加逗号了。你只记得这一列数字是 <strong>非递减</strong>&nbsp;的且&nbsp;<strong>没有</strong> 任何数字有前导 0 。</p>
+
+<p>请你返回有多少种可能的 <strong>正整数数组</strong>&nbsp;可以得到字符串&nbsp;<code>num</code>&nbsp;。由于答案可能很大，将结果对 <code>10<sup>9</sup> + 7</code>&nbsp;<b>取余</b>&nbsp;后返回。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>num = "327"
+<b>输出：</b>2
+<b>解释：</b>以下为可能的方案：
+3, 27
+327
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>num = "094"
+<b>输出：</b>0
+<b>解释：</b>不能有数字有前导 0 ，且所有数字均为正数。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><b>输入：</b>num = "0"
+<b>输出：</b>0
+<strong>解释：</strong>不能有数字有前导 0 ，且所有数字均为正数。
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><b>输入：</b>num = "9999999999999"
+<b>输出：</b>101
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= num.length &lt;= 3500</code></li>
+	<li><code>num</code>&nbsp;只含有数字&nbsp;<code>'0'</code> 到&nbsp;<code>'9'</code>&nbsp;。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 2113 ms</p>
+                    <p>内存: 538.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numberOfCombinations(self, num: str) -&gt; int:
+        mod = 10**9 + 7
+
+        if num[0] == &#34;0&#34;:
+            return 0
+
+        n = len(num)
+
+        # 预处理 lcp
+        lcp = [[0] * n for _ in range(n)]
+        for i in range(n - 1, -1, -1):
+            lcp[i][n - 1] = int(num[i] == num[n - 1])
+            for j in range(i + 1, n - 1):
+                lcp[i][j] = (lcp[i + 1][j + 1] + 1 if num[i] == num[j] else 0)
+
+        # 动态规划
+        f = [[0] * n for _ in range(n)]
+        # 边界 f[0][..] = 1
+        for i in range(n):
+            f[0][i] = 1
+        
+        for i in range(1, n):
+            # 有前导零，无需转移
+            if num[i] == &#34;0&#34;:
+                continue
+            
+            # 前缀和
+            presum = 0
+            for j in range(i, n):
+                length = j - i + 1
+                f[i][j] = presum % mod
+                if i - length &gt;= 0:
+                    # 使用 lcp 比较 num(2i-j-1,i-1) 与 num(i,j) 的大小关系
+                    if lcp[i - length][i] &gt;= length or num[i - length + lcp[i - length][i]] &lt; num[i + lcp[i - length][i]]:
+                        f[i][j] = (f[i][j] + f[i - length][i - 1]) % mod
+                    # 更新前缀和
+                    presum += f[i - length][i - 1]
+
+        # 最终答案即为所有 f[..][n-1] 的和
+        ans = sum(f[i][n - 1] for i in range(n)) % mod
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题使用动态规划的方法。首先进行特殊情况的判断：如果字符串的第一个字符为&#39;0&#39;，由于不能有前导0，直接返回0。定义dp数组f[i][j]，表示考虑num的子串num[0..j]，且最后一个数字为num[i..j]时的方案数。初始化f[0][i]=1，即当第一个数字扩展到i时，只有一种划分方案。对于每个位置i到j，若num[i]==&#39;0&#39;，则跳过，因为不能有前导0。为了保证非递减，需要比较当前数字与前一个数字的大小。这通过预处理一个最长公共前缀数组lcp来辅助，减少比较次数。动态规划递推时，若当前数字大于等于前一个数字，则累加前面的方案数。最后，将所有以n-1结尾的方案数相加，得到总方案数。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numberOfCombinations(self, num: str) -&gt; int:
+        mod = 10**9 + 7
+
+        # 特殊情况处理，如果首字符为0，则无有效方案
+        if num[0] == &#39;0&#39;:
+            return 0
+
+        n = len(num)
+
+        # 预处理最长公共前缀数组lcp
+        lcp = [[0] * n for _ in range(n)]
+        for i in range(n - 1, -1, -1):
+            lcp[i][n - 1] = int(num[i] == num[n - 1])
+            for j in range(i + 1, n - 1):
+                lcp[i][j] = (lcp[i + 1][j + 1] + 1 if num[i] == num[j] else 0)
+
+        # 初始化动态规划数组
+        f = [[0] * n for _ in range(n)]
+        for i in range(n):
+            f[0][i] = 1
+
+        for i in range(1, n):
+            if num[i] == &#39;0&#39;:
+                continue
+
+            presum = 0
+            for j in range(i, n):
+                length = j - i + 1
+                f[i][j] = presum % mod
+                if i - length &gt;= 0:
+                    # 判断当前数字是否大于等于前一个数字
+                    if lcp[i - length][i] &gt;= length or num[i - length + lcp[i - length][i]] &lt; num[i + lcp[i - length][i]]:
+                        f[i][j] = (f[i][j] + f[i - length][i - 1]) % mod
+                presum += f[i - length][i - 1] if i - length &gt;= 0 else 0
+
+        # 计算最终的方案数
+        ans = sum(f[i][n - 1] for i in range(n)) % mod
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            动态规划数组f[i][j]表示什么意义，为什么它的初始值f[0][i]设为1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>动态规划数组f[i][j]表示考虑数字字符串num的子串num[0..j]，且最后一个数字为num[i..j]时的方案数。这意味着，f[i][j]计算的是所有以num[i..j]结尾的划分方案的数量。初始化f[0][i]=1是因为当只考虑从头开始到i位置的子串时，整个子串作为一个数字是唯一的划分方式，因此初始方案数为1。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何理解和计算最长公共前缀数组lcp[i][j]，它在算法中扮演什么角色？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>最长公共前缀数组lcp[i][j]表示字符串num中从位置i开始和从位置j开始的子串的最长公共前缀的长度。计算lcp数组是通过动态规划完成的，从字符串的末尾向前计算，确保lcp[i][j]正确反映两个位置的子串前缀匹配的长度。在算法中，lcp数组用于快速判断两个子串的大小关系，这有助于减少重复的字符串比较，提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在dp递推过程中，为何需要判断`num[i] == &#39;0&#39;`然后跳过某些步骤？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在数字字符串的划分中，任何部分如果以&#39;0&#39;开头且长度大于1，则这样的划分是不合法的（例如&#39;012&#39;或&#39;00123&#39;）。因此，在动态规划过程中，如果某个位置i的字符为&#39;0&#39;，则跳过这一步是因为以i开始的任何长度大于1的划分都是无效的，从而保证所有划分都是合法的数字。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么在计算dp值时，需要比较`lcp[i - length][i]`与`length`，这个比较的逻辑是基于什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算dp值时，需要确保新形成的数字（子串num[i..j]）与前一个数字（子串num[i-length..i-1]）的大小关系符合非递减顺序。比较`lcp[i - length][i]`与`length`是为了快速判断这两个子串的大小关系。如果最长公共前缀长度小于子串长度，则可以直接通过公共前缀后的第一个不同字符判断两个子串的大小；如果等于或大于，表示这两个子串相等，满足非递减条件。这种比较方法避免了完整的字符串比较，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-ways-to-separate-numbers')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-ways-to-separate-numbers/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

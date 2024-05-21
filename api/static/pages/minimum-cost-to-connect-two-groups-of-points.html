@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>连通两组点的最小成本</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>连通两组点的最小成本</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两组点，其中第一组中有 <code>size<sub>1</sub></code> 个点，第二组中有 <code>size<sub>2</sub></code> 个点，且 <code>size<sub>1</sub> &gt;= size<sub>2</sub></code> 。</p>
+
+<p>任意两点间的连接成本 <code>cost</code> 由大小为 <code>size<sub>1</sub> x size<sub>2</sub></code> 矩阵给出，其中 <code>cost[i][j]</code> 是第一组中的点 <code>i</code> 和第二组中的点 <code>j</code> 的连接成本。<strong>如果两个组中的每个点都与另一组中的一个或多个点连接，则称这两组点是连通的。</strong>换言之，第一组中的每个点必须至少与第二组中的一个点连接，且第二组中的每个点必须至少与第一组中的一个点连接。</p>
+
+<p>返回连通两组点所需的最小成本。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/20/ex1.jpg" style="height: 243px; width: 322px;"></p>
+
+<pre><strong>输入：</strong>cost = [[15, 96], [36, 2]]
+<strong>输出：</strong>17
+<strong>解释：</strong>连通两组点的最佳方法是：
+1--A
+2--B
+总成本为 17 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/09/20/ex2.jpg" style="height: 403px; width: 322px;"></p>
+
+<pre><strong>输入：</strong>cost = [[1, 3, 5], [4, 1, 1], [1, 5, 3]]
+<strong>输出：</strong>4
+<strong>解释：</strong>连通两组点的最佳方法是：
+1--A
+2--B
+2--C
+3--A
+最小成本为 4 。
+请注意，虽然有多个点连接到第一组中的点 2 和第二组中的点 A ，但由于题目并不限制连接点的数目，所以只需要关心最低总成本。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>cost = [[2, 5, 1], [3, 4, 7], [8, 1, 2], [6, 2, 4], [3, 8, 8]]
+<strong>输出：</strong>10
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>size<sub>1</sub> == cost.length</code></li>
+	<li><code>size<sub>2</sub> == cost[i].length</code></li>
+	<li><code>1 &lt;= size<sub>1</sub>, size<sub>2</sub> &lt;= 12</code></li>
+	<li><code>size<sub>1</sub> &gt;=&nbsp;size<sub>2</sub></code></li>
+	<li><code>0 &lt;= cost[i][j] &lt;= 100</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 371 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def connectTwoGroups(self, cost: List[List[int]]) -&gt; int:
+        f = [0] * (1 &lt;&lt; len(cost[0]))
+        for j, mn in enumerate(map(min, zip(*cost))):
+            bit = 1 &lt;&lt; j
+            for mask in range(bit):
+                f[bit | mask] = f[mask] + mn
+        for row in cost:
+            for j in range(len(f) - 1, -1, -1):
+                f[j] = min(f[j &amp; ~(1 &lt;&lt; k)] + c for k, c in enumerate(row))
+        return f[-1]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这道题本质上是一个最小成本完全匹配问题，可以通过动态规划的方式解决。动态规划数组 `f` 的大小为 `1 &lt;&lt; size2`，代表第二组中的点的所有可能的连接状态。每个位对应一个点，若该位为1，则表示对应的点已被连接。\n\n1. 初始化 `f` 数组，其中 `f[0]` 为0，表示没有点被连接的状态。对于每个点j，计算如果仅连接该点的最小成本，更新 `f` 数组中对应状态的值。\n2. 针对第一组中的每个点，更新 `f` 数组。对于每一个已有的状态 `j`，遍历第二组中的所有点，并尝试将当前的点与第二组中的每个点相连接，更新状态。\n3. 最终，`f[-1]` 即包含所有第二组点都被连接的状态，其值为所需的最小成本。</p>
+                                <p>时间复杂度: O(size1 * size2 * 2^size2)</p>
+                                <p>空间复杂度: O(2^size2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def connectTwoGroups(self, cost: List[List[int]]) -&gt; int:
+        # 动态规划数组, 大小为2^size2
+        f = [float(&#39;inf&#39;)] * (1 &lt;&lt; len(cost[0]))
+        f[0] = 0
+        # 初始化只连接一个点的情况
+        for j, mn in enumerate(map(min, zip(*cost))):
+            bit = 1 &lt;&lt; j
+            for mask in range(bit):
+                f[bit | mask] = min(f[bit | mask], f[mask] + mn)
+        # 更新所有点的连接状态
+        for row in cost:
+            new_f = [float(&#39;inf&#39;)] * (1 &lt;&lt; len(cost[0]))
+            for j in range(len(f)):
+                # 尝试将当前行的点与第二组中的每个点连接
+                for k, c in enumerate(row):
+                    new_f[j | (1 &lt;&lt; k)] = min(new_f[j | (1 &lt;&lt; k)], f[j] + c)
+            f = new_f
+        # 返回所有第二组点都被连接的最小成本
+        return f[-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在动态规划解法中，数组`f`的索引表示什么含义？每个位的0和1分别代表什么状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个动态规划解法中，数组`f`的每个索引是一个整数，这个整数的二进制表示形式用于表示第二组中点的连接状态。这里的每个位代表对应序号的点是否已经被连接。如果某一位为1，那么表示对应的点已经被连接；如果为0，则表示对应的点尚未连接。例如，索引为5（二进制为0101）表示第二组中第0位和第2位的点已被连接，而第1位和其他位的点尚未连接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么初始化动态规划数组`f`时，除了`f[0]`设置为0，其他都设置为无穷大`float(&#39;inf&#39;)`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化动态规划数组`f`时，`f[0]`设为0表示一开始没有任何点被连接的状态，其成本为0。其他所有值初设为无穷大（`float(&#39;inf&#39;)`）是为了在后续的动态规划过程中，通过比较和更新来找到实际可达的最小成本。这样做确保了只有那些通过实际操作可以达到的状态（即连接某些点的组合）才会被更新为较小的成本值，未被实际访问的状态成本保持无穷大，表示不可达。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            解法中提到的`尝试将当前行的点与第二组中的每个点连接`具体是如何实现的？请详细解释更新`f`数组的过程。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在解法中，尝试将当前行（即第一组中的某个点）与第二组中的每个点连接的过程是通过嵌套循环实现的。对于每个已存在的状态`j`（表示已经有一些第二组的点被连接的状态），再遍历第二组中的每个点的索引`k`。对于每个点`k`，通过`j | (1 &lt;&lt; k)`这个操作来生成一个新状态，这个新状态表示在原有的连接状态基础上再连接第`k`个点。接着，更新`f[j | (1 &lt;&lt; k)]`的值，这个值是通过比较原状态`f[j]`加上连接点`k`的额外成本`c`与当前`f[j | (1 &lt;&lt; k)]`的值，选择其中的较小值来实现的。这个过程确保了每个连接组合的最小成本都被计算和更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在动态规划中，为什么需要单独处理只连接一个点的情况？这一步是如何优化整体解决方案的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，单独处理只连接一个点的情况是为了建立基础状态，这可以看作是对动态规划数组`f`的初始化优化。通过计算每个单独点的最小连接成本，并更新对应的`f`数组状态，我们可以确保在开始处理复杂的多点连接状态之前，每个单点连接的最优解已经被考虑。这样做可以简化后续的计算，因为复杂的状态（连接多个点的状态）可以通过比较和组合这些基础的单点最优解来构建，从而优化整体解决方案的效率和准确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-connect-two-groups-of-points')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-connect-two-groups-of-points/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最常见的单词</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最常见的单词</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=counting" class="badge bg-secondary tag-link">计数</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串 <code>paragraph</code> 和一个表示禁用词的字符串数组 <code>banned</code> ，返回出现频率最高的非禁用词。题目数据 <strong>保证 </strong>至少存在一个非禁用词，且答案<strong> 唯一 </strong>。</p>
+
+<p><code>paragraph</code> 中的单词 <strong>不区分大小写</strong> ，答案应以 <strong>小写 </strong>形式返回。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>paragraph = "Bob hit a ball, the hit BALL flew far after it was hit.", banned = ["hit"]
+<strong>输出：</strong>"ball"
+<strong>解释：</strong>
+"hit" 出现了 3 次，但它是禁用词。
+"ball" 出现了两次（没有其他单词出现这么多次），因此它是段落中出现频率最高的非禁用词。
+请注意，段落中的单词不区分大小写，
+标点符号会被忽略（即使它们紧挨着单词，如 "ball,"），
+并且尽管 "hit" 出现的次数更多，但它不能作为答案，因为它是禁用词。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>paragraph = "a.", banned = []
+<strong>输出：</strong>"a"
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= paragraph.length &lt;= 1000</code></li>
+	<li><code>paragraph</code> 由英文字母、空格 <code>' '</code>、和以下符号组成：<code>"!?',;."</code></li>
+	<li><code>0 &lt;= banned.length &lt;= 100</code></li>
+	<li><code>1 &lt;= banned[i].length &lt;= 10</code></li>
+	<li><code>banned[i]</code> 仅由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 27 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def mostCommonWord(self, paragraph: str, banned: List[str]) -&gt; str:
+        paragraph = paragraph.lower()
+        paragraph = re.sub(r&#39;[^\w\s]&#39;, &#39; &#39;, paragraph)
+        paragraph1 = paragraph.split()
+        n = len(paragraph1)
+        dic = defaultdict()
+        if len(banned):
+            banned[0] = banned[0].lower()
+        for i in range(n):
+            if paragraph1[i] not in banned:
+                if paragraph1[i] in dic.keys():
+                    dic[paragraph1[i]] += 1
+                else:
+                    dic[paragraph1[i]] = 1
+        ans = &#39;&#39;
+        res = 0
+        for item in dic.items():
+            if item[1] &gt; res:
+                res = item[1]
+                ans = item[0]
+        return ans
+
+        
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的思路是：首先将整个段落转为小写，并使用正则表达式将所有非字母、数字、空格的字符替换为空格。然后将处理后的段落按空格分割成单词列表。如果存在禁用词，则将禁用词列表的第一个元素转为小写（假设禁用词列表中的单词都是小写）。接下来遍历单词列表，对于不在禁用词列表中的单词，统计其出现的频率，并使用哈希表存储每个单词及其对应的频率。最后遍历哈希表，找出频率最高的单词作为答案返回。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def mostCommonWord(self, paragraph: str, banned: List[str]) -&gt; str:
+        # 将段落转为小写
+        paragraph = paragraph.lower()
+        # 使用正则表达式将非字母、数字、空格的字符替换为空格
+        paragraph = re.sub(r&#39;[^\w\s]&#39;, &#39; &#39;, paragraph)
+        # 将处理后的段落按空格分割成单词列表
+        paragraph1 = paragraph.split()
+        n = len(paragraph1)
+        # 使用默认字典存储单词及其频率
+        dic = defaultdict()
+        # 如果存在禁用词，将禁用词列表的第一个元素转为小写
+        if len(banned):
+            banned[0] = banned[0].lower()
+        # 遍历单词列表，统计不在禁用词列表中的单词的频率
+        for i in range(n):
+            if paragraph1[i] not in banned:
+                if paragraph1[i] in dic.keys():
+                    dic[paragraph1[i]] += 1
+                else:
+                    dic[paragraph1[i]] = 1
+        ans = &#39;&#39;
+        res = 0
+        # 遍历哈希表，找出频率最高的单词作为答案
+        for item in dic.items():
+            if item[1] &gt; res:
+                res = item[1]
+                ans = item[0]
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，为什么选择使用正则表达式来处理段落中的非字母、数字、空格字符，而不是其他方法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用正则表达式来处理非字母、数字、空格字符是因为正则表达式提供了一种灵活、高效的方式来匹配和替换文本中满足特定模式的字符串。这种方法可以一次性替换所有不符合条件的字符，大大简化了代码的复杂性，并且提高了处理速度。相比之下，其他方法如逐字符判断和替换可能会更加繁琐且执行效率较低。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解假设了禁用词列表中的单词都是小写，如果禁用词列表中存在大写怎么处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果禁用词列表中存在大写单词，为了确保所有的禁用词都能被正确识别和过滤，应该在处理之前将禁用词列表中的所有单词转换为小写。这样做可以保证无论输入单词的大小写如何，都能与处理后统一为小写的段落文本匹配，确保算法的准确性和一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到，如果存在禁用词则仅将禁用词列表的第一个元素转为小写，这种处理方式是否适用于所有可能的输入情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式并不适用于所有可能的输入情况。只将禁用词列表的第一个元素转为小写可能导致其他未转化的禁用词无法被正确识别和过滤。正确的做法应该是将禁用词列表中的所有单词都转换为小写，以确保所有禁用词无论原始格式如何，都能被算法正确处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在统计单词频率时，题解使用了默认字典（defaultdict），请问这种数据结构的选择与普通字典有何优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用默认字典（defaultdict）主要的优势在于它可以自动为尚未存在于字典中的键提供一个默认值。这在统计词频时特别有用，因为它免去了每次在增加计数之前检查键是否存在的需求。这样不仅可以简化代码，还能提高执行效率。与普通字典相比，使用默认字典在处理不存在的键时更加方便和高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/most-common-word')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/most-common-word/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

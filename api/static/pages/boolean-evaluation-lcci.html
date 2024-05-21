@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>布尔运算</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>布尔运算</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=memoization" class="badge bg-secondary tag-link">记忆化搜索</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个布尔表达式和一个期望的布尔结果 result，布尔表达式由 <code>0</code> (false)、<code>1</code> (true)、<code>&amp;</code> (AND)、 <code>|</code> (OR) 和 <code>^</code> (XOR) 符号组成。实现一个函数，算出有几种可使该表达式得出 result 值的括号方法。</p>
+
+<p><strong>示例 1:</strong></p>
+
+<pre><strong>输入: </strong>s = &quot;1^0|0|1&quot;, result = 0
+
+<strong>输出: </strong>2
+<strong>解释:</strong>&nbsp;两种可能的括号方法是
+1^(0|(0|1))
+1^((0|0)|1)
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre><strong>输入: </strong>s = &quot;0&amp;0&amp;0&amp;1^1|0&quot;, result = 1
+
+<strong>输出: </strong>10</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li>运算符的数量不超过 19 个</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 34 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def countEval(self, s: str, result: int) -&gt; int:
+        n = len(s)
+        dp = [[[0] * 2 for _ in range(n)] for _ in range(n)]
+        for i in range(len(s)):
+            if s[i] in [&#39;0&#39;, &#39;1&#39;]:
+                dp[i][i][ord(s[i])-ord(&#39;0&#39;)] = 1
+        for l in range(2, len(s) + 1, 2):
+            for i in range(0, len(s) - l + 1, 2):
+                j = i + l
+                for k in range(i + 1, j, 2):
+                    if s[k] == &#39;&amp;&#39;:
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][0] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1] + dp[i][k - 1][0] * dp[k + 1][j][0]
+                    elif s[k] == &#39;|&#39;:
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1] + dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][0] += dp[i][k - 1][0] * dp[k + 1][j][0]
+                    elif s[k] == &#39;^&#39;:
+                        dp[i][j][0] += dp[i][k - 1][0] * dp[k + 1][j][0] + dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1]
+        # print(dp)
+        return dp[0][n - 1][result]                        
+
+
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用动态规划的方式来解决问题。定义dp[i][j][0]和dp[i][j][1]为布尔表达式从索引i到j计算结果为False和True的方法数。初始化时，如果字符是&#39;0&#39;或&#39;1&#39;，则相应的dp[i][i][0]或dp[i][i][1]设为1。对于表达式中的每个可能的子段，使用变量k遍历所有可能的操作符位置，根据操作符的类型（AND、OR、XOR），更新dp数组。例如，对于AND操作，当两边都为True时结果才为True；对于OR操作，任意一边为True结果即为True；对于XOR操作，两边不同结果才为True。这样从最小的子表达式逐步扩大范围，直至得出整个表达式的结果。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def countEval(self, s: str, result: int) -&gt; int:
+        n = len(s)
+        dp = [[[0] * 2 for _ in range(n)] for _ in range(n)]
+        for i in range(len(s)):
+            if s[i] in [&#39;0&#39;, &#39;1&#39;]:
+                dp[i][i][ord(s[i])-ord(&#39;0&#39;)] = 1
+        for l in range(2, len(s) + 1, 2):
+            for i in range(0, len(s) - l + 1, 2):
+                j = i + l
+                for k in range(i + 1, j, 2):
+                    if s[k] == &#39;&amp;&#39;:
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][0] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1] + dp[i][k - 1][0] * dp[k + 1][j][0]
+                    elif s[k] == &#39;|&#39;:
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1] + dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][0] += dp[i][k - 1][0] * dp[k + 1][j][0]
+                    elif s[k] == &#39;^&#39;:
+                        dp[i][j][0] += dp[i][k - 1][0] * dp[k + 1][j][0] + dp[i][k - 1][1] * dp[k + 1][j][1]
+                        dp[i][j][1] += dp[i][k - 1][1] * dp[k + 1][j][0] + dp[i][k - 1][0] * dp[k + 1][j][1]
+        return dp[0][n - 1][result]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确保动态规划数组dp[i][j][0]和dp[i][j][1]正确初始化，特别是对于非&#39;0&#39;和&#39;1&#39;的字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个动态规划解法中，数组dp[i][j][0]和dp[i][j][1]应仅在i等于j时进行初始化，即仅初始化布尔值字符&#39;0&#39;和&#39;1&#39;的情况。对于非&#39;0&#39;和&#39;1&#39;的字符（即操作符&#39;&amp;&#39;, &#39;|&#39;, &#39;^&#39;），它们在初始化时并不直接影响dp数组，因为它们不代表布尔值。初始化时，如果s[i]是&#39;0&#39;，则设置dp[i][i][0]为1；如果s[i]是&#39;1&#39;，则设置dp[i][i][1]为1。对于操作符位置的dp值，它们将在后续的动态规划过程中根据操作符两边的布尔表达式的值来计算更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划解法中，变量k表示的操作符位置如何选择以确保所有可能的子表达式都被考虑到？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划解法中，变量k用于表示操作符的位置，并且在每个子段的遍历中从i+1到j-1进行遍历。这样确保考虑了所有可能的操作符位置。变量k按照步长2遍历，因为操作符总是位于布尔值字符之间，即在两个布尔值字符的索引之间。这种遍历方式确保了所有可能的布尔表达式的分割方式都被考虑到，从而可以正确地计算出从i到j的结果为True或False的所有方法数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中对于操作符&#39;&amp;&#39;、&#39;|&#39;和&#39;^&#39;的处理逻辑是否考虑了所有可能的操作数组合，如果有遗漏，请指出？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中对于操作符&#39;&amp;&#39;、&#39;|&#39;和&#39;^&#39;的处理逻辑已经覆盖了所有可能的操作组合。对于&#39;&amp;&#39;操作符，它只有当两边结果都为True时，结果才为True；其它组合结果为False。对于&#39;|&#39;操作符，它当任意一边为True时结果为True，只有当两边都为False时结果才为False。对于&#39;^&#39;操作符，它当两边结果不相同时结果为True，当两边结果相同时结果为False。这些逻辑覆盖了所有可能的情况，因此没有遗漏。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/boolean-evaluation-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/boolean-evaluation-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

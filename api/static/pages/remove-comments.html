@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>删除注释</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>删除注释</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给一个 C++ 程序，删除程序中的注释。这个程序<code>source</code>是一个数组，其中<code>source[i]</code>表示第&nbsp;<code>i</code>&nbsp;行源码。&nbsp;这表示每行源码由 <code>'\n'</code>&nbsp;分隔。</p>
+
+<p>在 C++ 中有两种注释风格，行内注释和块注释。</p>
+
+<ul>
+	<li>字符串<code>//</code> 表示行注释，表示<code>//</code>和其右侧的其余字符应该被忽略。</li>
+	<li>字符串<code>/*</code> 表示一个块注释，它表示直到下一个（非重叠）出现的<code>*/</code>之间的所有字符都应该被忽略。（阅读顺序为从左到右）非重叠是指，字符串<code>/*/</code>并没有结束块注释，因为注释的结尾与开头相重叠。</li>
+</ul>
+
+<p>第一个有效注释优先于其他注释。</p>
+
+<ul>
+	<li>如果字符串<code>//</code>出现在块注释中会被忽略。</li>
+	<li>同样，如果字符串<code>/*</code>出现在行或块注释中也会被忽略。</li>
+</ul>
+
+<p>如果一行在删除注释之后变为空字符串，那么<strong>不要</strong>输出该行。即，答案列表中的每个字符串都是非空的。</p>
+
+<p>样例中<strong>没有</strong>控制字符，单引号或双引号字符。</p>
+
+<ul>
+	<li>比如，<code>source = "string s = "/* Not a comment. */";"</code> 不会出现在测试样例里。</li>
+</ul>
+
+<p>此外，没有其他内容（如定义或宏）会干扰注释。</p>
+
+<p>我们保证每一个块注释最终都会被闭合， 所以在行或块注释之外的<code>/*</code>总是开始新的注释。</p>
+
+<p>最后，隐式换行符<strong>可以</strong>通过块注释删除。 有关详细信息，请参阅下面的示例。</p>
+
+<p>从源代码中删除注释后，需要以相同的格式返回源代码。</p>
+
+
+
+<p><strong>示例&nbsp;1:</strong></p>
+
+<pre>
+<strong>输入:</strong> source = ["/*Test program */", "int main()", "{ ", "  // variable declaration ", "int a, b, c;", "/* This is a test", "   multiline  ", "   comment for ", "   testing */", "a = b + c;", "}"]
+<strong>输出:</strong> ["int main()","{ ","  ","int a, b, c;","a = b + c;","}"]
+<strong>解释:</strong> 示例代码可以编排成这样:
+/*Test program */
+int main()
+{ 
+  // variable declaration 
+int a, b, c;
+/* This is a test
+   multiline  
+   comment for 
+   testing */
+a = b + c;
+}
+第 1 行和第 6-9 行的字符串 /* 表示块注释。第 4 行的字符串 // 表示行注释。
+编排后: 
+int main()
+{ 
+  
+int a, b, c;
+a = b + c;
+}</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> source = ["a/*comment", "line", "more_comment*/b"]
+<strong>输出:</strong> ["ab"]
+<strong>解释:</strong> 原始的 source 字符串是 "a/*comment<strong>\n</strong>line<strong>\n</strong>more_comment*/b", 其中我们用粗体显示了换行符。删除注释后，隐含的换行符被删除，留下字符串 "ab" 用换行符分隔成数组时就是 ["ab"].
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= source.length &lt;= 100</code></li>
+	<li><code>0 &lt;= source[i].length &lt;= 80</code></li>
+	<li><code>source[i]</code>&nbsp;由可打印的 <strong>ASCII</strong> 字符组成。</li>
+	<li>每个块注释都会被闭合。</li>
+	<li>给定的源码中不会有单引号、双引号或其他控制字符。</li>
+</ul>
+<span style="display:block"><span style="height:0px"><span style="position:absolute"><span style="top:0px"><span style="left:-9999px"><span style="opacity:0"><span style="overflow:hidden">&nbsp;</span></span></span></span></span></span>​​​​​​</span>
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 29 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def removeComments(self, source: List[str]) -&gt; List[str]:
+        result = []
+        in_block_comment = False
+        current_line = &#39;&#39;
+        
+        for line in source:
+            i = 0
+            while i &lt; len(line):
+                if not in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;/*&#39;:
+                    in_block_comment = True
+                    i += 1
+                elif in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;*/&#39;:
+                    in_block_comment = False
+                    i += 1
+                elif not in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;//&#39;:
+                    break
+                elif not in_block_comment:
+                    current_line += line[i]
+                i += 1
+            
+            if not in_block_comment and current_line:
+                result.append(current_line)
+                current_line = &#39;&#39;
+        
+        return result
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解是用迭代的方式来处理每一行代码。它维护了一个布尔变量 in_block_comment 来表示当前是否处于块注释中，以及一个字符串 current_line 来存储当前正在构建的有效代码行。通过遍历每一行代码中的每个字符，根据不同的情况来判断是否需要忽略某些字符：
+1. 如果当前不在块注释中，并且遇到了 /* ，则进入块注释状态；
+2. 如果当前在块注释中，并且遇到了 */ ，则退出块注释状态；
+3. 如果当前不在块注释中，并且遇到了 // ，则忽略该行的剩余部分；
+4. 如果当前不在块注释中，则将当前字符加入 current_line 。
+在处理完每一行后，如果当前不在块注释中并且 current_line 不为空，则将 current_line 加入结果列表 result ，并清空 current_line 以便处理下一行。</p>
+                                <p>时间复杂度: O(n * m)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def removeComments(self, source: List[str]) -&gt; List[str]:
+        result = []
+        in_block_comment = False
+        current_line = &#39;&#39;
+        
+        for line in source:  # 遍历每一行代码
+            i = 0
+            while i &lt; len(line):  # 遍历当前行的每个字符
+                if not in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;/*&#39;:  # 进入块注释
+                    in_block_comment = True
+                    i += 1
+                elif in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;*/&#39;:  # 退出块注释
+                    in_block_comment = False
+                    i += 1
+                elif not in_block_comment and i + 1 &lt; len(line) and line[i:i+2] == &#39;//&#39;:  # 忽略行注释
+                    break
+                elif not in_block_comment:  # 当前字符是有效代码
+                    current_line += line[i]
+                i += 1
+            
+            if not in_block_comment and current_line:  # 当前行处理完毕，且不在块注释中
+                result.append(current_line)  # 将当前行加入结果列表
+                current_line = &#39;&#39;  # 清空当前行
+        
+        return result
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在实现中，如果`/*`后紧跟`*/`（如`/**/`），算法如何确保这种情况下正确退出块注释状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法实现中，当检测到`/*`时，会立即进入块注释状态，并将索引`i`增加以跳过`/*`。接下来的迭代中，如果紧接着出现`*/`，即使它们是连续的，算法也会识别并处理这种情况。具体来说，当`i`和`i+1`位置上的字符是`*/`时，它会将`in_block_comment`标志设为`false`并将`i`再次增加，从而正确退出块注释状态。因此，无论`/*`和`*/`是否紧密相连，算法都能正确处理块注释的开始和结束。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到，如果在块注释中遇到`//`，则会被忽略。请问如果在行注释中遇到`/*`，该如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据算法的逻辑，当遇到行注释标志`//`，算法会忽略该行剩余的所有字符，包括任何出现的`/*`。这意味着，在行注释开始之后的所有内容，无论是另一个注释的开始符号还是其他任何字符，都会被算法忽视，不会对块注释状态造成影响。因此，如果在`//`之后出现`/*`，它将被视为行注释的一部分并被忽略。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法在判断进入块注释(`/*`)时，同时增加了索引`i`，这是否意味着在退出块注释(`*/`)后，紧接着的字符会被忽略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，每次识别到块注释的开始(`/*`)或结束(`*/`)时，`i`会增加以跳过这两个字符。这确保了`/*`和`*/`本身不会被加入到最终的代码行中。但是，紧跟在`*/`之后的字符不会被忽略；索引`i`在处理完`*/`后会指向`*/`之后的下一个字符，然后继续正常处理这些字符。只有当结束块注释的同时达到行的末尾，后续字符才不会被处理，但这是由于行的结束，而非注释处理逻辑本身。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在处理完每一行后，如果还处于块注释状态，当前行的有效代码（如果有）是否会被错误地丢弃？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据算法的设计，如果在处理完一行后仍处于块注释状态，该行中任何在块注释开始之前的有效代码都不会被添加到最终的结果中。`current_line`仅在不处于块注释状态时才会被添加到结果列表`result`中。这意味着，即使在块注释开始之前的部分有有效代码，如果块注释没有在该行结束，这部分代码也会被丢弃，只有当块注释结束后，后续行中的代码才会被处理并可能被添加到结果中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/mini-parser" class="list-group-item list-group-item-action">
+                                迷你语法分析器
+                            </a>
+                        
+                            <a href="/problem/ternary-expression-parser" class="list-group-item list-group-item-action">
+                                三元表达式解析器
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/remove-comments')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/remove-comments/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

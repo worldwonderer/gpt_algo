@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>UTF-8 编码验证</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>UTF-8 编码验证</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个表示数据的整数数组&nbsp;<code>data</code>&nbsp;，返回它是否为有效的 <strong>UTF-8</strong> 编码。</p>
+
+<p><strong>UTF-8</strong> 中的一个字符可能的长度为 <strong>1 到 4 字节</strong>，遵循以下的规则：</p>
+
+<ol>
+	<li>对于 <strong>1 字节</strong>&nbsp;的字符，字节的第一位设为 0 ，后面 7 位为这个符号的 unicode 码。</li>
+	<li>对于 <strong>n 字节</strong>&nbsp;的字符 (n &gt; 1)，第一个字节的前 n 位都设为1，第 n+1 位设为 0 ，后面字节的前两位一律设为 10 。剩下的没有提及的二进制位，全部为这个符号的 unicode 码。</li>
+</ol>
+
+<p>这是 UTF-8 编码的工作方式：</p>
+
+<pre>
+<code>      </code>Number of Bytes<code>  |        UTF-8 octet sequence
+                       |              (binary)
+   --------------------+---------------------------------------------
+            1          | 0xxxxxxx
+            2          | 110xxxxx 10xxxxxx
+            3          | 1110xxxx 10xxxxxx 10xxxxxx
+            4          | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+</code></pre>
+
+<p><code>x</code>&nbsp;表示二进制形式的一位，可以是 <code>0</code>&nbsp;或 <code>1</code>。</p>
+
+<p><strong>注意：</strong>输入是整数数组。只有每个整数的 <strong>最低 8 个有效位</strong> 用来存储数据。这意味着每个整数只表示 1 字节的数据。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>data = [197,130,1]
+<strong>输出：</strong>true
+<strong>解释：</strong>数据表示字节序列:<strong>11000101 10000010 00000001</strong>。
+这是有效的 utf-8 编码，为一个 2 字节字符，跟着一个 1 字节字符。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>data = [235,140,4]
+<strong>输出：</strong>false
+<strong>解释：</strong>数据表示 8 位的序列: <strong>11101011 10001100 00000100</strong>.
+前 3 位都是 1 ，第 4 位为 0 表示它是一个 3 字节字符。
+下一个字节是开头为 10 的延续字节，这是正确的。
+但第二个延续字节不以 10 开头，所以是不符合规则的。
+</pre>
+
+
+
+<p><strong>提示:</strong></p>
+
+<ul>
+	<li><code>1 &lt;= data.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= data[i] &lt;= 255</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def validUtf8(self, data: List[int]) -&gt; bool:
+        tail_flag = 0
+        for byte in data:
+            if tail_flag == 0:
+                if 0b10000000 &amp; byte == 0:
+                    continue
+                else:
+                    if 0b01000000 &amp; byte == 0:
+                        # 10xx xxxx
+                        return False
+                    if 0b00100000 &amp; byte == 0:
+                        # 110x xxxx
+                        tail_flag = 1
+                    elif 0b00010000 &amp; byte == 0:
+                        # 1110 xxxx
+                        tail_flag = 2
+                    elif 0b00001000 &amp; byte == 0:
+                        # 1111 0xxx:
+                        tail_flag = 3
+                    else:
+                        # 1111 1xxx
+                        return False
+            elif tail_flag &gt; 0:
+                if 0b11000000 &amp; byte == 0b10000000:
+                    tail_flag -= 1
+                else:
+                    return False
+            else:
+                return False
+        return tail_flag == 0</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用迭代的方式遍历字节数组，对每个字节进行分析。如果当前字节是一个 UTF-8 编码的开始字节，根据其前缀的 1 的个数确定后续应该有几个字节（用 tail_flag 变量表示）。如果当前字节是一个后续字节，则检查其前两位是否为 10。迭代结束后，如果 tail_flag 为 0，说明所有字节都符合 UTF-8 编码规则。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def validUtf8(self, data: List[int]) -&gt; bool:
+        tail_flag = 0
+        for byte in data:
+            if tail_flag == 0:
+                if 0b10000000 &amp; byte == 0:
+                    # 0xxx xxxx，单字节字符
+                    continue
+                else:
+                    if 0b01000000 &amp; byte == 0:
+                        # 10xx xxxx，非法的起始字节
+                        return False
+                    if 0b00100000 &amp; byte == 0:
+                        # 110x xxxx，双字节字符
+                        tail_flag = 1
+                    elif 0b00010000 &amp; byte == 0:
+                        # 1110 xxxx，三字节字符
+                        tail_flag = 2
+                    elif 0b00001000 &amp; byte == 0:
+                        # 1111 0xxx，四字节字符
+                        tail_flag = 3
+                    else:
+                        # 1111 1xxx，非法字节
+                        return False
+            elif tail_flag &gt; 0:
+                if 0b11000000 &amp; byte == 0b10000000:
+                    # 10xx xxxx，合法的后续字节
+                    tail_flag -= 1
+                else:
+                    # 非法的后续字节
+                    return False
+            else:
+                # tail_flag 小于 0，非法情况
+                return False
+        # 确保所有字节都被处理完
+        return tail_flag == 0
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在检测字节是否为有效 UTF-8 编码的起始字节时，您是如何决定使用哪些位运算以及这些运算对应的二进制模式是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在UTF-8编码中，一个字符的起始字节和后续字节的格式不同。起始字节的最高位的连续1的个数决定了该字符占用的字节数。例如，单字节字符以0开头，双字节字符以110开头，三字节字符以1110开头，四字节字符以11110开头。相应的位运算检测就是通过按位与操作（&amp;）与特定的掩码比较来实现的。例如，对于双字节字符，我们检查是否符合110xxxxx的模式，可以使用掩码0b11100000（即224）来检查前三位是否为110，并确保第四位为0（通过0b00010000即16检查）。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于多字节字符的起始字节，为什么需要检查除第一位之外的其余位是否为0，以确定是两字节、三字节还是四字节字符？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>UTF-8编码规则中，多字节字符的起始字节的前几位是固定的，这些位标志了后续字节数。例如，一个两字节字符的起始字节以110开头，三字节字符以1110开头，四字节字符以11110开头。通过检查这些位，我们可以确定字符所需的字节总数。检查除第一位之外的其余位是否为0是为了验证后续的位模式是否符合预期的格式。这样的检查确保了解码过程的正确性，防止解释错误的数据格式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果数组中的数据不完整，例如在一个四字节字符中只包含了两个字节，您的算法如何处理这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>我的算法通过维护一个tail_flag变量来记录一个多字节字符还需要多少后续字节。如果在处理完所有输入字节后tail_flag不为0，这意味着数据不完整，即某个多字节字符的后续字节没有完全出现。在这种情况下，算法会返回False，表示输入数据不是有效的UTF-8编码。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            您的算法中如果遇到非法的起始字节或后续字节，会立即返回 False。这种设计是否考虑了所有可能的错误数据情况，还有其他可能的错误情况吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，这种设计考虑了起始字节和后续字节的合法性。起始字节必须符合UTF-8的编码规则，后续字节必须以10开头。如果不符合这些规则，数据显然是错误的，算法会立即返回False。除此之外，算法还处理了数据不完整的情况。虽然这些检查覆盖了大多数错误情况，但是还有一些极端情况，如输入数据为空或数据异常大等边缘情况，这些可能需要在实际应用中额外处理。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/utf-8-validation')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/utf-8-validation/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

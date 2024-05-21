@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大人工岛</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大人工岛</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个大小为 <code>n x n</code> 二进制矩阵 <code>grid</code> 。<strong>最多</strong> 只能将一格&nbsp;<code>0</code> 变成&nbsp;<code>1</code> 。</p>
+
+<p>返回执行此操作后，<code>grid</code> 中最大的岛屿面积是多少？</p>
+
+<p><strong>岛屿</strong> 由一组上、下、左、右四个方向相连的&nbsp;<code>1</code> 形成。</p>
+
+
+
+<p><strong class="example">示例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>grid = [[1, 0], [0, 1]]
+<strong>输出:</strong> 3
+<strong>解释:</strong> 将一格0变成1，最终连通两个小岛得到面积为 3 的岛屿。
+</pre>
+
+<p><strong class="example">示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>grid =<strong> </strong>[[1, 1], [1, 0]]
+<strong>输出:</strong> 4
+<strong>解释:</strong> 将一格0变成1，岛屿的面积扩大为 4。</pre>
+
+<p><strong class="example">示例 3:</strong></p>
+
+<pre>
+<strong>输入: </strong>grid = [[1, 1], [1, 1]]
+<strong>输出:</strong> 4
+<strong>解释:</strong> 没有0可以让我们变成1，面积依然为 4。</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= n &lt;= 500</code></li>
+	<li><code>grid[i][j]</code> 为 <code>0</code> 或 <code>1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 413 ms</p>
+                    <p>内存: 27.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def largestIsland(self, grid: list[list]):
+        dum=1
+        dtom={0:0}
+        li=len(grid)
+        lj=len(grid[0])
+        def biaozhu(i,j):
+            if(i&lt;0 or j&lt;0 or i&gt;=li or j&gt;=lj):
+                return
+            elif grid[i][j]==1:
+                grid[i][j]=dum
+                dtom[dum]+=1
+                biaozhu(i+1,j)
+                biaozhu(i-1,j)
+                biaozhu(i,j+1)
+                biaozhu(i,j-1)
+            else:
+                return
+            
+
+
+        for i in range(li):
+            for j in range(lj):
+                if grid[i][j]==1:
+                    dum+=1
+                    dtom[dum]=0
+                    biaozhu(i,j)
+        
+        if(dum==1):
+            return 1
+        elif dtom[2]==li*lj:
+            return dtom[2]
+
+        maxmian=0
+        def countmian(i,j):
+            tem=1
+            tlist=[]
+            if i+1&lt;li:
+                tem+=dtom[grid[i+1][j]]
+                tlist.append(grid[i+1][j])
+
+            if i-1&gt;=0 and not grid[i-1][j] in tlist:
+                tem+=dtom[grid[i-1][j]]
+                tlist.append(grid[i-1][j])
+
+            if j+1&lt;lj and not grid[i][j+1] in tlist:
+                tem+=dtom[grid[i][j+1]]
+                tlist.append(grid[i][j+1])
+            if j-1&gt;=0 and not grid[i][j-1] in tlist:
+                tem+=dtom[grid[i][j-1]]
+            
+            return tem
+
+
+        for i in range(li):
+            for j in range(lj):
+                if grid[i][j]==0:
+                    tem=countmian(i,j)
+                    maxmian=tem if tem&gt;maxmian else maxmian
+        
+        return maxmian
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解采用了深度优先搜索（DFS）的思路。首先，遍历整个网格，对于每个值为1的格子，执行DFS遍历其连通的1，并标记为一个新的岛屿编号（dum），同时记录该岛屿的面积。接着，再次遍历网格，对于每个值为0的格子，计算若将其变为1后，能够连接到的岛屿的面积之和，更新最大面积。最后返回最大面积。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def largestIsland(self, grid: list[list]):
+        dum=1
+        dtom={0:0}  # 用于存储岛屿编号和对应的面积
+        li=len(grid)
+        lj=len(grid[0])
+    
+        def biaozhu(i,j):  # DFS遍历连通的1，并标记岛屿编号
+            if(i&lt;0 or j&lt;0 or i&gt;=li or j&gt;=lj): 
+                return 
+            elif grid[i][j]==1:
+                grid[i][j]=dum 
+                dtom[dum]+=1
+                biaozhu(i+1,j)
+                biaozhu(i-1,j)
+                biaozhu(i,j+1)
+                biaozhu(i,j-1)
+            else:
+                return
+
+        for i in range(li):  # 遍历网格，对每个值为1的格子执行DFS标记
+            for j in range(lj):
+                if grid[i][j]==1:
+                    dum+=1
+                    dtom[dum]=0
+                    biaozhu(i,j)
+        
+        if(dum==1):  # 特殊情况处理
+            return 1
+        elif dtom[2]==li*lj:
+            return dtom[2]
+
+        maxmian=0
+        def countmian(i,j):  # 统计将(i,j)变为1后，连接到的岛屿面积之和
+            tem=1
+            tlist=[]
+            if i+1&lt;li:
+                tem+=dtom[grid[i+1][j]]
+                tlist.append(grid[i+1][j])
+            if i-1&gt;=0 and not grid[i-1][j] in tlist:
+                tem+=dtom[grid[i-1][j]]
+                tlist.append(grid[i-1][j])
+            if j+1&lt;lj and not grid[i][j+1] in tlist:
+                tem+=dtom[grid[i][j+1]]
+                tlist.append(grid[i][j+1])
+            if j-1&gt;=0 and not grid[i][j-1] in tlist:
+                tem+=dtom[grid[i][j-1]]
+            return tem
+
+        for i in range(li):  # 遍历网格，对每个值为0的格子，统计连接的岛屿面积之和，更新最大面积
+            for j in range(lj):
+                if grid[i][j]==0:
+                    tem=countmian(i,j)
+                    maxmian=tem if tem&gt;maxmian else maxmian
+        
+        return maxmian
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在执行DFS时，为何选择将已访问的&#39;1&#39;改为岛屿编号&#39;dum&#39;而不是其他标记方式？这种方式在处理复杂网格时有什么优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在执行DFS时，将已访问的&#39;1&#39;改为岛屿编号&#39;dum&#39;而不是统一的其他标记（如-1或特定字符），可以在同一次遍历中同时完成标记和岛屿识别。这样可以避免后续再次遍历来确定不同岛屿的归属，提高效率。此外，这种方式可以直接利用岛屿编号来记录和查询每个岛屿的面积，简化数据结构和逻辑处理，尤其在处理复杂或大型网格时，可以有效地管理和更新岛屿相关信息。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到对于每个&#39;0&#39;格子，通过计算与其相邻的岛屿面积来更新最大面积。请问如果一个&#39;0&#39;格子相邻四个方向都是不同的岛屿，算法是如何避免重复计算相邻岛屿面积的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中采用了一个列表`tlist`来避免重复计算相邻岛屿面积。每当计算一个0格子相邻的岛屿面积时，首先检查该岛屿编号是否已在`tlist`中记录。如果未记录，则将其面积加到总和中，并把这个编号添加到`tlist`中。这样可以确保即使0格子相邻四个方向为不同岛屿，每个岛屿的面积只被计算一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中在所有岛屿标记完成后检查了&#39;dum==1&#39;和&#39;dtom[2]==li*lj&#39;的情况，这两个检查分别处理了什么特殊情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这两个检查处理了所有格子都是水（0）和所有格子都是陆地（1）的两种特殊情况。当&#39;dum==1&#39;时，表示没有任何岛屿被标记，即整个网格全是水，返回1因为可以将一个0转换为1形成一个大小为1的岛屿。当&#39;dtom[2]==li*lj&#39;时，表示唯一的岛屿编号为2且面积等于网格的总格数，此时整个网格全是陆地，所以返回这个陆地的面积。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果n非常大接近500，递归的DFS方法可能会引起栈溢出。题解是否考虑了这个问题？如果没有，有什么其他方法可以避免这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中用的递归DFS确实可能在非常大的网格中引起栈溢出。为避免这种情况，可以使用迭代的DFS来代替递归DFS。在迭代的DFS中，可以使用一个显式的栈来模拟递归调用栈，这样可以更好地控制栈的大小和避免溢出。另外，也可以考虑使用广度优先搜索（BFS），它通常使用队列来实现，对于大规模数据也较为稳定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/making-a-large-island')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/making-a-large-island/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

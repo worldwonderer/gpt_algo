@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>阈值距离内邻居最少的城市</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>阈值距离内邻居最少的城市</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>有 <code>n</code> 个城市，按从 <code>0</code> 到 <code>n-1</code> 编号。给你一个边数组 <code>edges</code>，其中 <code>edges[i] = [from<sub>i</sub>, to<sub>i</sub>, weight<sub>i</sub>]</code> 代表 <code>from<sub>i</sub></code> 和 <code>to<sub>i</sub></code><sub> </sub>两个城市之间的双向加权边，距离阈值是一个整数 <code>distanceThreshold</code>。</p>
+
+<p>返回能通过某些路径到达其他城市数目最少、且路径距离 <strong>最大</strong> 为 <code>distanceThreshold</code> 的城市。如果有多个这样的城市，则返回编号最大的城市。</p>
+
+<p>注意，连接城市 <em><strong>i</strong></em> 和 <em><strong>j</strong></em> 的路径的距离等于沿该路径的所有边的权重之和。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/26/find_the_city_01.png" style="height: 225px; width: 300px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 4, edges = [[0,1,3],[1,2,1],[1,3,4],[2,3,1]], distanceThreshold = 4
+<strong>输出：</strong>3
+<strong>解释：</strong>城市分布图如上。
+每个城市阈值距离 distanceThreshold = 4 内的邻居城市分别是：
+城市 0 -> [城市 1, 城市 2] 
+城市 1 -> [城市 0, 城市 2, 城市 3] 
+城市 2 -> [城市 0, 城市 1, 城市 3] 
+城市 3 -> [城市 1, 城市 2] 
+城市 0 和 3 在阈值距离 4 以内都有 2 个邻居城市，但是我们必须返回城市 3，因为它的编号最大。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/26/find_the_city_02.png" style="height: 225px; width: 300px;" /></strong></p>
+
+<pre>
+<strong>输入：</strong>n = 5, edges = [[0,1,2],[0,4,8],[1,2,3],[1,4,2],[2,3,1],[3,4,1]], distanceThreshold = 2
+<strong>输出：</strong>0
+<strong>解释：</strong>城市分布图如上。 
+每个城市阈值距离 distanceThreshold = 2 内的邻居城市分别是：
+城市 0 -> [城市 1] 
+城市 1 -> [城市 0, 城市 4] 
+城市 2 -> [城市 3, 城市 4] 
+城市 3 -> [城市 2, 城市 4]
+城市 4 -> [城市 1, 城市 2, 城市 3] 
+城市 0 在阈值距离 2 以内只有 1 个邻居城市。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 <= n <= 100</code></li>
+	<li><code>1 <= edges.length <= n * (n - 1) / 2</code></li>
+	<li><code>edges[i].length == 3</code></li>
+	<li><code>0 <= from<sub>i</sub> < to<sub>i</sub> < n</code></li>
+	<li><code>1 <= weight<sub>i</sub>, distanceThreshold <= 10^4</code></li>
+	<li>所有 <code>(from<sub>i</sub>, to<sub>i</sub>)</code> 都是不同的。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 101 ms</p>
+                    <p>内存: 17.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findTheCity(self, n: int, edges: List[List[int]], distanceThreshold: int) -&gt; int:
+        e = [[] for _ in range(n)]
+        for x, y, c in edges:
+            e[x].append((y,c))
+            e[y].append((x,c))
+        ans = [-1]*n
+        for i in range(n):
+            d = [inf]*n
+            d[i] = 0
+            q = [(0,i)]
+            while q:
+                dis, x = heappop(q)
+                if dis&gt;d[x]:
+                    continue
+                ans[i] += 1
+                for y, c in e[x]:
+                    if (new_d:=dis+c)&lt;d[y] and new_d&lt;=distanceThreshold:
+                        d[y] = new_d
+                        heappush(q, (d[y], y))
+        mn = min(ans)
+        for i in range(n-1,-1,-1):
+            if ans[i] == mn:
+                return i </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了Dijkstra算法的变体来解决问题。对于每个城市i，我们使用Dijkstra算法来找到从城市i出发到达所有其他城市的最短路径长度，并记录下来。在这个过程中，我们只考虑那些路径长度不超过distanceThreshold的城市。最后，我们找到那个能够到达其他城市数量最少的城市，如果有多个这样的城市，返回编号最大的那个。</p>
+                                <p>时间复杂度: O(n^3logn)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2"># 增加了注释的题解代码
+
+class Solution:
+    def findTheCity(self, n: int, edges: List[List[int]], distanceThreshold: int) -&gt; int:
+        e = [[] for _ in range(n)]
+        for x, y, c in edges:
+            e[x].append((y,c))
+            e[y].append((x,c))
+        ans = [-1]*n
+        for i in range(n):
+            d = [inf]*n
+            d[i] = 0
+            q = [(0,i)]
+            while q:
+                dis, x = heappop(q)
+                if dis&gt;d[x]:
+                    continue
+                ans[i] += 1
+                for y, c in e[x]:
+                    if (new_d:=dis+c)&lt;d[y] and new_d&lt;=distanceThreshold:
+                        d[y] = new_d
+                        heappush(q, (d[y], y))
+        mn = min(ans)
+        for i in range(n-1,-1,-1):
+            if ans[i] == mn:
+                return i</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用Dijkstra算法时，为什么选择使用优先队列（小顶堆）来实现，这对算法的效率有何帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>Dijkstra算法的核心在于每次从未处理的节点中选择一个距离起始节点最短的节点进行扩展。使用优先队列（小顶堆）可以高效地实现这一点。优先队列能够保证在任何时候都快速地访问到当前未访问节点中距离最小的节点。当使用普通队列时，每次寻找最小距离节点需要O(n)时间；而使用小顶堆后，插入操作和删除最小元素的操作平均时间复杂度是O(log n)，大大提升了算法整体的效率，特别是在节点和边很多的情况下更显著。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解中提到，只考虑路径长度不超过distanceThreshold的城市。这个条件是如何在代码中实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解的代码中，这个条件是通过在更新节点最短路径时加入一个额外的判断来实现的。具体地，当计算到某个邻接节点y的新的可能路径长度new_d时，除了比较new_d是否小于已知的最短距离d[y]，还额外检查new_d是否小于等于distanceThreshold。只有当这两个条件都满足时，才会更新节点y的最短路径长度并将其加入优先队列中继续处理。这确保了算法只考虑那些路径长度不超过给定阈值的城市。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            对于每个城市使用Dijkstra算法计算最短路径时，如果某个城市由于路径长度超过distanceThreshold而被忽略，这是否可能影响到找到真正的最少邻居城市数目？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>不会影响。题目的目标是找到在给定距离阈值内可达的邻居城市数量最少的城市。因此，只关心在distanceThreshold范围内可达的城市。如果某个城市的路径长度超过了distanceThreshold，这意味着它不应该被计入任何城市的邻居城市数量中。因此，忽略这些城市是符合题目要求的，并不会影响结果的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中提到返回编号最大的城市，如果有多个城市到达其他城市的数量相同。这个逻辑是如何在代码中体现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，这个逻辑是通过在找到最少邻居数量后反向遍历城市列表来实现的。具体地，首先计算每个城市的可达邻居数量，并找出最小的邻居数量。然后，代码从最后一个城市开始向前遍历（即从编号最大的城市向编号最小的城市遍历），第一个其邻居数量等于最小邻居数量的城市就是结果。这样，如果有多个城市的邻居数量相同并且都是最小的，返回的将是编号最大的那个城市。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>前往目标城市的最小费用</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>前往目标城市的最小费用</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 260 ms</p>
+                    <p>内存: 29.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">### 网：dijkstra+dp(折扣)
+from collections import defaultdict
+import heapq
+class Solution:
+    def minimumCost(self, n: int, highways: List[List[int]], discounts: int) -&gt; int:
+        g=defaultdict(list)
+        for x,y,w in highways:
+            g[x].append([y,w])
+            g[y].append([x,w])
+
+        dist=[[float(&#34;inf&#34;)]*(discounts+1) for _ in range(n)]
+
+        q=[(0,0,-1,discounts)]
+        while q:
+            dis,x,fa,k=heapq.heappop(q)
+            if x==n-1:
+                return dis 
+            for y,w in g[x]:
+                if y==fa:
+                    continue 
+                if dist[y][k]&gt;dis+w:
+                    dist[y][k]=dis+w
+                    heapq.heappush(q,(dist[y][k],y,x,k))
+                if k&gt;0 and dist[y][k-1]&gt;dis+w//2:
+                    dist[y][k-1]=dis+w//2
+                    heapq.heappush(q,(dist[y][k-1],y,x,k-1))
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了Dijkstra算法结合动态规划来解决最小费用寻路问题。首先，建立图的邻接表。然后，使用一个优先队列（通过heapq实现）来进行最小距离的贪心选择。维护一个二维数组dist，其中dist[i][j]表示到达节点i使用了j次折扣的最小费用。从源点开始，每次从优先队列中选出当前费用最小的点进行扩展，考虑两种情况：不使用折扣和使用折扣（如果剩余折扣次数大于0）。如果通过当前路线得到的新费用小于已记录的费用，则更新费用，并将新状态加入队列。如果到达终点，则返回当前的费用。若队列为空仍未到达终点，则返回-1表示无法到达。</p>
+                                <p>时间复杂度: O((E+V) * log(V) * D)</p>
+                                <p>空间复杂度: O(E + V * D)</p>
+                                <pre class="bg-light p-2">### 网：dijkstra+dp(折扣)
+from collections import defaultdict
+import heapq
+class Solution:
+    def minimumCost(self, n: int, highways: List[List[int]], discounts: int) -&gt; int:
+        g=defaultdict(list)
+        for x,y,w in highways:
+            g[x].append([y,w])
+            g[y].append([x,w])
+
+        dist=[[float(&#39;inf&#39;)] * (discounts + 1) for _ in range(n)]
+
+        q=[(0,0,-1,discounts)]
+        while q:
+            dis, x, fa, k = heapq.heappop(q)
+            if x == n-1:
+                return dis
+            for y, w in g[x]:
+                if y == fa:
+                    continue
+                if dist[y][k] &gt; dis + w:
+                    dist[y][k] = dis + w
+                    heapq.heappush(q, (dist[y][k], y, x, k))
+                if k &gt; 0 and dist[y][k-1] &gt; dis + w // 2:
+                    dist[y][k-1] = dis + w // 2
+                    heapq.heappush(q, (dist[y][k-1], y, x, k-1))
+        return -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在Dijkstra算法结合动态规划的实现中，如何确保每个节点的最小费用都得到正确更新，特别是在使用折扣的情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种实现中，我们使用一个二维数组`dist`来记录每个节点在不同折扣次数下的最小费用。对于每个节点`x`，每当从`x`扩展到邻接节点`y`时，我们会考虑两种情况：一是直接连接不使用折扣，二是使用一次折扣（如果折扣次数`k`大于0）。我们会检查通过当前路径到达`y`（无论是使用折扣还是不使用）得到的新费用是否比`dist[y][k]`（或`dist[y][k-1]`）更小。如果是，我们就更新相应的费用，并将这个新状态（包括新的费用、节点、父节点和剩余折扣次数）加入优先队列。这种方法确保了每个节点的费用在考虑折扣的情况下都能得到正确且最优的更新。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你是如何决定何时使用折扣以及何时不使用折扣的？此决策是否基于某种优化逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在每次扩展节点时，我们同时考虑使用折扣和不使用折扣两种情况，并比较哪种选择可以获得较低的费用。具体来说，对于每一个邻接节点`y`和边的权重`w`，我们不仅考虑`dis + w`（不使用折扣的费用），还考虑`dis + w // 2`（使用一次折扣的费用），前提是剩余折扣次数`k`大于0。我们会比较这两个值与当前记录在`dist[y][k]`和`dist[y][k-1]`中的值，然后选择更小的一个来更新。这种决策基于贪心算法的优化逻辑，旨在每一步都选择当前可能的最小费用。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在更新节点费用时，需要考虑是否来自同一个父节点（if y == fa continue）？这一步是否对算法的正确性或效率有重要影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这一设计主要是为了避免无意义的循环更新，即防止算法在相邻的两个节点之间来回更新，造成不必要的计算和可能的错误。当我们从节点`x`向节点`y`进行扩展时，如果`y`又回到了`x`的父节点`fa`，则意味着我们正在尝试重新进入已经处理过的路径，这并不会产生更优的结果，反而可能导致算法效率降低。因此，跳过这种情况可以减少冗余操作，提高算法效率，同时保持算法逻辑的清晰和正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-reach-city-with-discounts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-reach-city-with-discounts/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

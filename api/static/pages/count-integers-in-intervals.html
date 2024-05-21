@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>统计区间中的整数数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>统计区间中的整数数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你区间的 <strong>空</strong> 集，请你设计并实现满足要求的数据结构：</p>
+
+<ul>
+	<li><strong>新增：</strong>添加一个区间到这个区间集合中。</li>
+	<li><strong>统计：</strong>计算出现在 <strong>至少一个</strong> 区间中的整数个数。</li>
+</ul>
+
+<p>实现 <code>CountIntervals</code> 类：</p>
+
+<ul>
+	<li><code>CountIntervals()</code> 使用区间的空集初始化对象</li>
+	<li><code>void add(int left, int right)</code> 添加区间 <code>[left, right]</code> 到区间集合之中。</li>
+	<li><code>int count()</code> 返回出现在 <strong>至少一个</strong> 区间中的整数个数。</li>
+</ul>
+
+<p><strong>注意：</strong>区间 <code>[left, right]</code> 表示满足 <code>left &lt;= x &lt;= right</code> 的所有整数 <code>x</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入</strong>
+["CountIntervals", "add", "add", "count", "add", "count"]
+[[], [2, 3], [7, 10], [], [5, 8], []]
+<strong>输出</strong>
+[null, null, null, 6, null, 8]
+
+<strong>解释</strong>
+CountIntervals countIntervals = new CountIntervals(); // 用一个区间空集初始化对象
+countIntervals.add(2, 3);  // 将 [2, 3] 添加到区间集合中
+countIntervals.add(7, 10); // 将 [7, 10] 添加到区间集合中
+countIntervals.count();    // 返回 6
+                           // 整数 2 和 3 出现在区间 [2, 3] 中
+                           // 整数 7、8、9、10 出现在区间 [7, 10] 中
+countIntervals.add(5, 8);  // 将 [5, 8] 添加到区间集合中
+countIntervals.count();    // 返回 8
+                           // 整数 2 和 3 出现在区间 [2, 3] 中
+                           // 整数 5 和 6 出现在区间 [5, 8] 中
+                           // 整数 7 和 8 出现在区间 [5, 8] 和区间 [7, 10] 中
+                           // 整数 9 和 10 出现在区间 [7, 10] 中</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= left &lt;= right &lt;= 10<sup>9</sup></code></li>
+	<li>最多调用&nbsp; <code>add</code> 和 <code>count</code> 方法 <strong>总计</strong> <code>10<sup>5</sup></code> 次</li>
+	<li>调用 <code>count</code> 方法至少一次</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 416 ms</p>
+                    <p>内存: 57.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Node:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.prev = None
+        self.next = None
+
+class CountIntervals:
+    def __init__(self):
+        self.head = Node(0, 0)
+        self.tail = Node(0, 0)
+        self.head.next, self.tail.prev =  self.tail, self.head
+        self.cnt = 0
+
+    def add(self, left: int, right: int) -&gt; None:
+        if left &gt; self.tail.prev.right:
+            self.insert(self.tail.prev, Node(left, right))
+            self.cnt += right - left + 1
+            return
+        p = self.head
+        while p.next != self.tail and p.next.right &lt; left:
+            p = p.next
+        # print(f&#34;add, p got to {p.left} {p.right}&#34;)
+        # self.print_all()
+        if p.next == self.tail or p.next.left &gt; right:
+            self.insert(p, Node(left, right))
+            self.cnt += right - left + 1
+        else:
+            if left &lt; p.next.left:
+                self.cnt += p.next.left - left
+                p.next.left = left
+            if p.next.right &lt; right:
+                self.update(p.next, right)
+    
+    def update(self, node, right):
+        p = node
+        # self.print_all()
+        while p.next != self.tail and right &gt;= p.next.left:
+            p = p.next
+            self.cnt -= p.right - p.left + 1
+        right = max(right, p.right)
+        self.cnt += right - node.right
+        node.right = right
+        node.next = p.next
+        node.next.prev = node
+    
+    def insert(self, p, node):
+        node.next = p.next
+        node.next.prev = node
+        p.next = node
+        node.prev = p
+
+    def count(self) -&gt; int:
+        return self.cnt</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了双向链表来维护区间集合，每个节点代表一个区间。每次添加新区间时，会尝试与现有区间合并以避免重叠，并维护一个计数器cnt来统计所有涵盖的整数数量。具体操作包括：1. 如果新区间在所有现有区间的右边，则直接添加，并更新计数器。2. 如果新区间和现有区间有重叠，则进行合并，并适当地更新计数器以反映合并后的区间的变化。3. 使用双向链表可以方便地插入和删除节点，同时更新前后节点的链接。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">
+
+class Node:
+    def __init__(self, left, right):
+        self.left = left  # 区间左端点
+        self.right = right  # 区间右端点
+        self.prev = None  # 指向前一个节点的指针
+        self.next = None  # 指向下一个节点的指针
+
+class CountIntervals:
+    def __init__(self):
+        self.head = Node(0, 0)  # 虚拟头节点
+        self.tail = Node(0, 0)  # 虚拟尾节点
+        self.head.next, self.tail.prev =  self.tail, self.head
+        self.cnt = 0  # 维护区间涵盖的整数数量
+
+    def add(self, left: int, right: int) -&gt; None:
+        if left &gt; self.tail.prev.right:  # 如果新区间在所有区间的右侧
+            self.insert(self.tail.prev, Node(left, right))
+            self.cnt += right - left + 1
+            return
+        p = self.head
+        while p.next != self.tail and p.next.right &lt; left:
+            p = p.next
+        if p.next == self.tail or p.next.left &gt; right:
+            self.insert(p, Node(left, right))
+            self.cnt += right - left + 1
+        else:
+            if left &lt; p.next.left:
+                self.cnt += p.next.left - left
+                p.next.left = left
+            if p.next.right &lt; right:
+                self.update(p.next, right)
+    
+    def update(self, node, right):
+        p = node
+        while p.next != self.tail and right &gt;= p.next.left:
+            p = p.next
+            self.cnt -= p.right - p.left + 1
+        right = max(right, p.right)
+        self.cnt += right - node.right
+        node.right = right
+        node.next = p.next
+        node.next.prev = node
+    
+    def insert(self, p, node):
+        node.next = p.next
+        node.next.prev = node
+        p.next = node
+        node.prev = p
+
+    def count(self) -&gt; int:
+        return self.cnt  # 返回当前总数量
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何处理新添加的区间完全嵌套在现有区间中的情况，例如添加[4,5]到已有的[1,10]区间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果新添加的区间完全嵌套在现有区间中，例如添加[4,5]到已有的[1,10]区间，实际上不需要对现有区间进行任何修改，也不影响整体的整数数目。在题解的算法中，当寻找到一个现有区间，该区间的左端点小于或等于新增区间的左端点，并且其右端点大于或等于新增区间的右端点时，就可以确定新区间已被现有区间完全包含，因此无需进行插入或计数器更新。这种情况在题解中没有直接体现，可能需要增加逻辑来处理这种特殊情况，避免不必要的合并或区间更新操作。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在更新现有区间时，如果新增区间导致多个现有区间合并，`update`函数如何确保所有相关区间都被正确处理并合并？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`update`函数中，通过从当前节点开始向后遍历，检查每个相邻区间是否与新区间有重叠或相邻。如果有，就将这些区间合并到当前节点中，并更新计数器来反映合并后的整数数目的变化。该函数会减掉所有被合并区间的整数数目，并添加新的合并后的区间的整数数目。遍历继续直到找到一个区间的左端点大于新区间的右端点，确保所有重叠或相邻的区间都被合并。这种方法确保了合并操作的完整性并防止了区间的遗漏。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在`add`方法中，如果`left`值比`self.tail.prev.right`大，直接插入新区间，但是如果left值恰好是`self.tail.prev.right+1`，是否应该合并区间而不是新增？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，如果新区间的左端点`left`恰好等于最后一个区间的右端点加一（`self.tail.prev.right + 1`），则应该将这两个区间合并，而不是创建一个新的区间。这种情况在题解算法中未明确处理，需要修改逻辑以检测这种边界条件并进行合并，从而维护区间的连续性和减少不必要的区间分割。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当通过`update`方法合并区间时，为什么要从当前节点开始向后遍历，而不是从头开始或者使用其他优化策略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从当前节点开始向后遍历的原因是，新区间与当前节点已经有了重叠，表明合并应该从此处开始。从头开始遍历虽然可以处理所有情况，但效率较低，因为它不利用到当前位置的信息。对于优化策略，可以考虑使用平衡树（如红黑树）或区间树，这些数据结构可以更高效地处理区间的插入、删除和合并，尤其是在处理大量区间操作时可以显著提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-integers-in-intervals')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-integers-in-intervals/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

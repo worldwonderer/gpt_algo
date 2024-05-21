@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>得到整数零需要执行的最少操作数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>得到整数零需要执行的最少操作数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=brainteaser" class="badge bg-secondary tag-link">脑筋急转弯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你两个整数：<code>num1</code> 和 <code>num2</code> 。</p>
+
+<p>在一步操作中，你需要从范围&nbsp;<code>[0, 60]</code> 中选出一个整数 <code>i</code> ，并从 <code>num1</code> 减去 <code>2<sup>i</sup> + num2</code> 。</p>
+
+<p>请你计算，要想使 <code>num1</code> 等于 <code>0</code> 需要执行的最少操作数，并以整数形式返回。</p>
+
+<p>如果无法使 <code>num1</code> 等于 <code>0</code> ，返回 <code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>num1 = 3, num2 = -2
+<strong>输出：</strong>3
+<strong>解释：</strong>可以执行下述步骤使 3 等于 0 ：
+- 选择 i = 2 ，并从 3 减去 2<sup>2</sup> + (-2) ，num1 = 3 - (4 + (-2)) = 1 。
+- 选择 i = 2 ，并从 1 减去 2<sup>2</sup> + (-2) ，num1 = 1 - (4 + (-2)) = -1 。
+- 选择 i = 0 ，并从 -1 减去 2<sup>0</sup>&nbsp;+ (-2) ，num1 = (-1) - (1 + (-2)) = 0 。
+可以证明 3 是需要执行的最少操作数。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>num1 = 5, num2 = 7
+<strong>输出：</strong>-1
+<strong>解释：</strong>可以证明，执行操作无法使 5 等于 0 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= num1 &lt;= 10<sup>9</sup></code></li>
+	<li><code>-10<sup>9</sup>&nbsp;&lt;= num2 &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 15.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def makeTheIntegerZero(self, num1: int, num2: int) -&gt; int:
+        def bits(x: int) -&gt; int:
+            n = 0
+            while x &gt; 0:
+                x = x &amp; (x - 1)
+                n += 1
+            return n
+
+        n = 0
+        while n &lt; num1.bit_count():
+            #print(n, num1, bin(num1))
+            num1 -= num2
+            if num1 &lt;= n:
+                return -1
+            n += 1
+        #print(n, num1, bin(num1))
+        return n
+
+#1, num1-(2^x1+num2)
+#2, num1-(2^x1+num2) - (2^x2+num2) = num1-2*num2-2^x1-2^x2
+#3, num1-(2^x1+num2) - (2^x2+num2) - (2^x3+num2) = num1-3*num2-2^x1-2^x2-2^x3</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的主要思路是通过不断地从num1中减去num2并检查num1的位数，尝试将num1减至0。函数中首先定义了一个辅助函数bits(x)，用于计算整数x的二进制表示中1的个数。在主函数makeTheIntegerZero中，采用了一个循环，每次循环将num1减去num2并逐渐增加操作次数n。循环的终止条件是num1的二进制表示中1的个数小于或等于n。如果在过程中num1小于或等于n，则返回-1表示无法通过规定的操作将num1减至0。否则，返回操作次数n。</p>
+                                <p>时间复杂度: O(log num1)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># Class to perform the operations to make integer zero
+class Solution:
+    def makeTheIntegerZero(self, num1: int, num2: int) -&gt; int:
+        # Function to count the number of 1s in the binary representation of x
+        def bits(x: int) -&gt; int:
+            n = 0
+            while x &gt; 0:
+                x = x &amp; (x - 1)  # Brian Kernighan&#39;s Algorithm to count bits
+                n += 1
+            return n
+
+        n = 0  # Initialize count of operations
+        while n &lt; num1.bit_count():  # while number of operations is less than the bit count of num1
+            #print(n, num1, bin(num1))
+            num1 -= num2  # perform the operation by subtracting num2 from num1
+            if num1 &lt;= n:  # if num1 is less than or equal to number of operations
+                return -1  # return -1 indicating it&#39;s not possible to reduce num1 to zero
+            n += 1  # increment the operation count
+        #print(n, num1, bin(num1))
+        return n  # return the count of operations</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题目描述中提到的操作`num1减去2^i + num2`与题解中的操作`num1减去num2`似乎不一致，请问这是为何？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这是一个错误或遗漏。题目描述中明确要求从`num1`减去`2^i + num2`，其中`i`可以从0到60选择。而题解中仅仅将`num2`从`num1`中减去，没有考虑`2^i`的部分。这可能是题解作者误解题目要求或者是编写时的疏忽。正确的实现应该是在每个操作中考虑所有`i`的可能值，并选择一个使得`num1`最接近0或者直接变为0的`i`值，而不是简单地重复减去`num2`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中使用了`num1.bit_count()`作为循环条件，这个函数的功能是什么，以及为什么它是循环的适当条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`num1.bit_count()`函数返回`num1`的二进制表示中1的个数。在题解中，作者使用这个值作为循环的结束条件，可能是基于这样的考虑：如果操作次数超过了`num1`的二进制中1的个数，那么理论上应该已经有足够的操作来将每个1位减到0。然而，这个逻辑存在问题，因为它未考虑到每次操作的实际效果和`2^i + num2`的具体值，这可能导致无法准确控制`num1`的减少至0。更合适的方式是，确保每次操作都有效地接近目标0，而不仅仅是简单地依赖1的个数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的循环终止条件是基于num1的二进制中1的个数，这种方法在哪些情况下可能失败导致无法将num1减至0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的方法可能会在以下情况下失败：1. 如果`num2`的值非常大或者与`2^i`的组合无法有效减小`num1`，仅仅依赖1的个数作为操作次数可能不足以将`num1`减至0。2. 如果`num2`是负数，那么每次操作可能实际上会增加`num1`的值，使得减少到0变得不可能。3. 特定的`i`选择可能导致无法有效利用二进制中的1位，尤其是在高位1较多的情况下。因此，一个更全面的方法应该考虑所有可能的`i`值，并检查它们对达成目标的具体影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-operations-to-make-the-integer-zero')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-operations-to-make-the-integer-zero/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

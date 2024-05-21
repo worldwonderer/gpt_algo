@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>粉刷房子 III</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>粉刷房子 III</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>在一个小城市里，有 <code>m</code> 个房子排成一排，你需要给每个房子涂上 <code>n</code> 种颜色之一（颜色编号为 <code>1</code> 到 <code>n</code> ）。有的房子去年夏天已经涂过颜色了，所以这些房子不可以被重新涂色。</p>
+
+<p>我们将连续相同颜色尽可能多的房子称为一个街区。（比方说 <code>houses = [1,2,2,3,3,2,1,1]</code> ，它包含 5 个街区 <code> [{1}, {2,2}, {3,3}, {2}, {1,1}]</code> 。）</p>
+
+<p>给你一个数组 <code>houses</code> ，一个 <code>m * n</code> 的矩阵 <code>cost</code> 和一个整数 <code>target</code> ，其中：</p>
+
+<ul>
+	<li><code>houses[i]</code>：是第 <code>i</code> 个房子的颜色，<strong>0</strong> 表示这个房子还没有被涂色。</li>
+	<li><code>cost[i][j]</code>：是将第 <code>i</code> 个房子涂成颜色 <code>j+1</code> 的花费。</li>
+</ul>
+
+<p>请你返回房子涂色方案的最小总花费，使得每个房子都被涂色后，恰好组成 <code>target</code> 个街区。如果没有可用的涂色方案，请返回 <strong>-1</strong> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>houses = [0,0,0,0,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], m = 5, n = 2, target = 3
+<strong>输出：</strong>9
+<strong>解释：</strong>房子涂色方案为 [1,2,2,1,1]
+此方案包含 target = 3 个街区，分别是 [{1}, {2,2}, {1,1}]。
+涂色的总花费为 (1 + 1 + 1 + 1 + 5) = 9。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>houses = [0,2,1,2,0], cost = [[1,10],[10,1],[10,1],[1,10],[5,1]], m = 5, n = 2, target = 3
+<strong>输出：</strong>11
+<strong>解释：</strong>有的房子已经被涂色了，在此基础上涂色方案为 [2,2,1,2,2]
+此方案包含 target = 3 个街区，分别是 [{2,2}, {1}, {2,2}]。
+给第一个和最后一个房子涂色的花费为 (10 + 1) = 11。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>houses = [0,0,0,0,0], cost = [[1,10],[10,1],[1,10],[10,1],[1,10]], m = 5, n = 2, target = 5
+<strong>输出：</strong>5
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre>
+<strong>输入：</strong>houses = [3,1,2,3], cost = [[1,1,1],[1,1,1],[1,1,1],[1,1,1]], m = 4, n = 3, target = 3
+<strong>输出：</strong>-1
+<strong>解释：</strong>房子已经被涂色并组成了 4 个街区，分别是 [{3},{1},{2},{3}] ，无法形成 target = 3 个街区。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>m == houses.length == cost.length</code></li>
+	<li><code>n == cost[i].length</code></li>
+	<li><code>1 <= m <= 100</code></li>
+	<li><code>1 <= n <= 20</code></li>
+	<li><code>1 <= target <= m</code></li>
+	<li><code>0 <= houses[i] <= n</code></li>
+	<li><code>1 <= cost[i][j] <= 10^4</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 72 ms</p>
+                    <p>内存: 19.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minCost(self, houses: List[int], cost: List[List[int]], m: int, n: int, target: int) -&gt; int:
+        dp = [[[1e6+1]*n for j in range(target)] for i in range(m)]
+        if houses[0] == 0:
+            for i in range(n):
+                dp[0][0][i] = cost[0][i]
+        else:
+            dp[0][0][houses[0]-1] = 0
+        for i in range(1,m):
+            min_t = max(target-(m-i-1)-1,1)
+            max_t = min(target,i+2)
+            if houses[i] == 0:
+                for t in range(min_t,max_t):
+                    tmp = dp[i-1][t-1]
+                    min_idx = -1
+                    min_idx_ = -1
+                    for j in range(n):
+                        if min_idx == -1 or tmp[min_idx] &gt;= tmp[j]:
+                            min_idx_ = min_idx
+                            min_idx = j
+                        elif min_idx_ == -1 or tmp[min_idx_] &gt;= tmp[j]:
+                            min_idx_ = j
+                    for j in range(n):
+                        if j == min_idx:
+                            dp[i][t][j] = min(tmp[min_idx_], dp[i-1][t][j]) + cost[i][j]
+                        else:
+                            dp[i][t][j] = min(tmp[min_idx], dp[i-1][t][j]) + cost[i][j]
+                        dp[i][0][j] = dp[i-1][0][j] + cost[i][j]
+            else:
+                j = houses[i]-1
+                for t in range(min_t,max_t):
+                    tmp = dp[i-1][t-1][:]
+                    tmp[j] = dp[i-1][t][j]
+                    dp[i][t][j] = min(tmp)
+                dp[i][0][j] = dp[i-1][0][j]
+        res = min(dp[-1][-1])
+        if res &gt;= 1e6+1:
+            return -1
+        return res
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了动态规划的方法。状态定义为 dp[i][t][j]，表示前 i+1 个房子构成 t+1 个街区，且第 i 个房子颜色为 j+1 时的最小花费。初始状态处理第一个房子的颜色和花费。对于每个房子，如果未涂色，考虑涂不同颜色的花费；如果已涂色，则直接更新花费。计算时，保持两个最小值（min_idx 和 min_idx_），用于优化时间复杂度，避免重复计算。最后返回所有情况中的最小花费，如果不存在有效方案则返回 -1。</p>
+                                <p>时间复杂度: O(m * target * n * n)</p>
+                                <p>空间复杂度: O(m * target * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minCost(self, houses: List[int], cost: List[List[int]], m: int, n: int, target: int) -&gt; int:
+        # 初始化动态规划数组，所有值设为一个极大数
+        dp = [[[1e6+1]*n for j in range(target)] for i in range(m)]
+        # 处理第一个房子的初始情况
+        if houses[0] == 0:
+            for i in range(n):
+                dp[0][0][i] = cost[0][i]
+        else:
+            dp[0][0][houses[0]-1] = 0
+        # 遍历每个房子
+        for i in range(1,m):
+            min_t = max(target-(m-i-1)-1,1)
+            max_t = min(target,i+2)
+            if houses[i] == 0:
+                for t in range(min_t,max_t):
+                    tmp = dp[i-1][t-1]
+                    min_idx = -1
+                    min_idx_ = -1
+                    for j in range(n):
+                        if min_idx == -1 or tmp[min_idx] &gt;= tmp[j]:
+                            min_idx_ = min_idx
+                            min_idx = j
+                        elif min_idx_ == -1 or tmp[min_idx_] &gt;= tmp[j]:
+                            min_idx_ = j
+                    for j in range(n):
+                        if j == min_idx:
+                            dp[i][t][j] = min(tmp[min_idx_], dp[i-1][t][j]) + cost[i][j]
+                        else:
+                            dp[i][t][j] = min(tmp[min_idx], dp[i-1][t][j]) + cost[i][j]
+                        dp[i][0][j] = dp[i-1][0][j] + cost[i][j]
+            else:
+                j = houses[i]-1
+                for t in range(min_t,max_t):
+                    tmp = dp[i-1][t-1][:]
+                    tmp[j] = dp[i-1][t][j]
+                    dp[i][t][j] = min(tmp)
+                dp[i][0][j] = dp[i-1][0][j]
+        res = min(dp[-1][-1])
+        if res &gt;= 1e6+1:
+            return -1
+        return res</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理第一个房子的初始化状态时，只有当houses[0]为0时才从cost数组中取值，已涂色的房子花费为0而不是其实际花费？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题的上下文中，当`houses[0]`为0，意味着第一个房子尚未被涂色，因此需要从`cost`数组中选择一个颜色来涂色，并且支付相应的费用。而如果`houses[0]`不为0，表示第一个房子已经预先涂有一种颜色，这种情况下不需要再支付涂色费用，因此初始化花费为0。这种设定是基于只考虑额外的涂色费用，预设的颜色被视为无需额外费用的初始状态。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划中的状态转移方程是如何确保只形成target个街区的，能详细解释下其中的逻辑吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>状态转移方程通过控制`target`个街区的形成来确保正确的街区数量。在动态规划中，`t`表示已形成的街区数量。当我们考虑第`i`个房子时，如果将其涂成与前一个房子不同的颜色，则街区数量增加（即`t+1`），并且在`dp[i][t][j]`的计算中使用`dp[i-1][t-1][j]`的值；如果颜色与前一个房子相同，则街区数量不变，使用`dp[i-1][t][j]`来更新。通过这种方式，算法确保最终形成的街区数量正好是`target`。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在代码中，min_t和max_t的计算公式是如何得出的，这两个值分别代表什么含义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，`min_t`和`max_t`用于确定在处理第`i`个房子时可能的街区数的范围。`min_t`表示在考虑到剩余房子数量后能形成的最小街区数，它确保了即使每个后续房子都形成一个新的街区，也不会超过`target`个街区。`max_t`表示考虑到当前房子位置时能形成的最大街区数，它确保不会因为房子数量不足而无法形成足够的街区。这两个值的计算保证了动态规划在合理的街区数范围内进行，避免无效的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            你是如何处理涂色成本计算中的两个最小值（min_idx 和 min_idx_）的？这种处理方法有什么特别的考量吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理涂色成本时，使用`min_idx`和`min_idx_`是为了优化时间复杂度并减少冗余计算。`min_idx`存储当前最小花费的颜色索引，而`min_idx_`存储次小花费的颜色索引。这样，在更新当前房子的颜色成本时，如果当前房子选择的是最小花费颜色，则可以使用次小花费来计算新的成本；如果不是，则使用最小花费。这种方法有效避免了在每次更新时重新计算所有颜色的最小和次小成本，提高了效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/paint-house-iii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/paint-house-iii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

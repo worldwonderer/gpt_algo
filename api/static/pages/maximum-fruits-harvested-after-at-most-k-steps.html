@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>摘水果</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>摘水果</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>在一个无限的 x 坐标轴上，有许多水果分布在其中某些位置。给你一个二维整数数组 <code>fruits</code> ，其中 <code>fruits[i] = [position<sub>i</sub>, amount<sub>i</sub>]</code> 表示共有 <code>amount<sub>i</sub></code> 个水果放置在 <code>position<sub>i</sub></code> 上。<code>fruits</code> 已经按 <code>position<sub>i</sub></code> <strong>升序排列</strong> ，每个 <code>position<sub>i</sub></code> <strong>互不相同</strong> 。</p>
+
+<p>另给你两个整数 <code>startPos</code> 和 <code>k</code> 。最初，你位于 <code>startPos</code> 。从任何位置，你可以选择 <strong>向左或者向右</strong> 走。在 x 轴上每移动 <strong>一个单位</strong> ，就记作 <strong>一步</strong> 。你总共可以走 <strong>最多</strong> <code>k</code> 步。你每达到一个位置，都会摘掉全部的水果，水果也将从该位置消失（不会再生）。</p>
+
+<p>返回你可以摘到水果的 <strong>最大总数</strong> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/11/21/1.png" style="width: 472px; height: 115px;">
+<pre><strong>输入：</strong>fruits = [[2,8],[6,3],[8,6]], startPos = 5, k = 4
+<strong>输出：</strong>9
+<strong>解释：</strong>
+最佳路线为：
+- 向右移动到位置 6 ，摘到 3 个水果
+- 向右移动到位置 8 ，摘到 6 个水果
+移动 3 步，共摘到 3 + 6 = 9 个水果
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/11/21/2.png" style="width: 512px; height: 129px;">
+<pre><strong>输入：</strong>fruits = [[0,9],[4,1],[5,7],[6,2],[7,4],[10,9]], startPos = 5, k = 4
+<strong>输出：</strong>14
+<strong>解释：</strong>
+可以移动最多 k = 4 步，所以无法到达位置 0 和位置 10 。
+最佳路线为：
+- 在初始位置 5 ，摘到 7 个水果
+- 向左移动到位置 4 ，摘到 1 个水果
+- 向右移动到位置 6 ，摘到 2 个水果
+- 向右移动到位置 7 ，摘到 4 个水果
+移动 1 + 3 = 4 步，共摘到 7 + 1 + 2 + 4 = 14 个水果
+</pre>
+
+<p><strong>示例 3：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2021/11/21/3.png" style="width: 476px; height: 100px;">
+<pre><strong>输入：</strong>fruits = [[0,3],[6,4],[8,5]], startPos = 3, k = 2
+<strong>输出：</strong>0
+<strong>解释：</strong>
+最多可以移动 k = 2 步，无法到达任一有水果的地方
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= fruits.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>fruits[i].length == 2</code></li>
+	<li><code>0 &lt;= startPos, position<sub>i</sub> &lt;= 2 * 10<sup>5</sup></code></li>
+	<li>对于任意 <code>i &gt; 0</code> ，<code>position<sub>i-1</sub> &lt; position<sub>i</sub></code> 均成立（下标从 <strong>0</strong> 开始计数）</li>
+	<li><code>1 &lt;= amount<sub>i</sub> &lt;= 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= k &lt;= 2 * 10<sup>5</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 124 ms</p>
+                    <p>内存: 49.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxTotalFruits(self, fruits: List[List[int]], startPos: int, k: int) -&gt; int:
+        left = bisect_left(fruits, [startPos-k])  #向左能走到的最远的地方
+        right = bisect_left(fruits, [startPos+1])  # 起始位置之后的有水果的位置
+        ans = s = sum(fruits[i][1] for i in range(left, right))
+        # 滑动窗口
+        n = len(fruits)
+        while right &lt; n and fruits[right][0] - startPos &lt;= k:
+            s += fruits[right][1]
+            # 注意这里有两种方式：先左后右和先右后左
+            while startPos + fruits[right][0] - 2 * fruits[left][0] &gt; k and \
+                2 * fruits[right][0] - startPos - fruits[left][0] &gt; k:
+                s -= fruits[left][1]
+                left += 1
+            ans = max(ans, s)
+            right += 1
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用滑动窗口与二分搜索的结合方法，以最大化在给定步数内摘到的水果总数。首先，使用两次二分搜索确定起始位置左右的水果范围，即可能达到的左边界和右边界。随后，通过滑动窗口遍历这个范围，尝试不同的路径组合（先左后右或者先右后左），计算在不超过k步的条件下可以摘到的最大水果数。每次移动窗口时，更新当前窗口内的水果总数，并与之前的最大值进行比较，以保留可能的最大收获。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># Solution class with maxTotalFruits method
+class Solution:
+    def maxTotalFruits(self, fruits: List[List[int]], startPos: int, k: int) -&gt; int:
+        # Use binary search to find the furthest position to the left
+        left = bisect_left(fruits, [startPos-k])
+        # Find the first fruit position right of the startPos
+        right = bisect_left(fruits, [startPos+1])
+        # Initialize the sum of fruits within the window
+        ans = s = sum(fruits[i][1] for i in range(left, right))
+        # Total number of fruit positions
+        n = len(fruits)
+        # Expand the window towards the right within the allowed steps
+        while right &lt; n and fruits[right][0] - startPos &lt;= k:
+            s += fruits[right][1]
+            # Adjust the window by moving the left side, ensuring total steps do not exceed k
+            while startPos + fruits[right][0] - 2 * fruits[left][0] &gt; k and \
+                2 * fruits[right][0] - startPos - fruits[left][0] &gt; k:
+                s -= fruits[left][1]
+                left += 1
+            # Update the maximum fruits collected
+            ans = max(ans, s)
+            right += 1
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用二分搜索确定起始位置左右的水果范围时，你是如何确保这些范围内的水果都可以在k步内被摘到的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用二分搜索确定起始位置左右的水果范围时，并没有直接确保所有选定范围内的水果都可以在k步内被摘到。二分搜索是用来快速定位到与起始位置距离可能在k步以内的水果的大致区域。具体是否能摘到，还需要通过滑动窗口的调整和计算来验证。通过调整窗口的左右边界，确保窗口内的水果位置总和与起始位置的距离不超过k步。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            你提到在滑动窗口中尝试不同的路径组合（先左后右或者先右后左），但代码示例中似乎只展示了一种方向的处理，如何处理另一种方向？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实，示例代码中主要展示了从起始位置向右扩展窗口的情况。要处理另一种方向即先向左再向右，可以通过初始化窗口时向左扩展，然后逐渐减少左边界的水果，同时增加右边界的水果，保持总步数不超过k。这种情况可以通过镜像地应用相同的逻辑来实现，即先设定一个向左的窗口，然后在必要时向右扩展。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新滑动窗口时，你如何确保即使移动窗口左边界也不会错过可能的最大收获？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在移动窗口左边界时，每次移动前都会对当前窗口内的水果总数进行比较和记录，确保记录下最大值。只有在确认右移左边界后，即使总步数减少，也能使得窗口内新的水果组合（通过增加右边界）可能带来更大的收获时，才会进行移动。这通过不断更新最大水果数的方式确保不会错过可能的最大收获。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            代码中使用了`bisect_left(fruits, [startPos+1])`来找到右侧水果的起始位置，为什么选择`startPos+1`作为开始而不是`startPos`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中使用`startPos+1`来找到右侧水果的起始位置是为了确保从起始位置的右侧开始计数水果，而不包括位于`startPos`位置上的水果。这是因为算法可能需要分别计算从起始点向左和向右两个方向上的水果收获，故需要明确界定起始点右侧的第一个位置。如果使用`startPos`，则可能会重复计算起始点位置上的水果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-fruits-harvested-after-at-most-k-steps')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-fruits-harvested-after-at-most-k-steps/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

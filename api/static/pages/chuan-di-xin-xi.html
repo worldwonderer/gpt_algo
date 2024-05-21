@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>传递信息</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>传递信息</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>小朋友 A 在和 ta 的小伙伴们玩传信息游戏，游戏规则如下：</p>
+
+<ol>
+	<li>有 n 名玩家，所有玩家编号分别为 0 ～ n-1，其中小朋友 A 的编号为 0</li>
+	<li>每个玩家都有固定的若干个可传信息的其他玩家（也可能没有）。传信息的关系是单向的（比如 A 可以向 B 传信息，但 B 不能向 A 传信息）。</li>
+	<li>每轮信息必须需要传递给另一个人，且信息可重复经过同一个人</li>
+</ol>
+
+<p>给定总玩家数 <code>n</code>，以及按 <code>[玩家编号,对应可传递玩家编号]</code> 关系组成的二维数组 <code>relation</code>。返回信息从小 A (编号 0 ) 经过 <code>k</code> 轮传递到编号为 n-1 的小伙伴处的方案数；若不能到达，返回 0。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<blockquote>
+<p>输入：<code>n = 5, relation = [[0,2],[2,1],[3,4],[2,3],[1,4],[2,0],[0,4]], k = 3</code></p>
+
+<p>输出：<code>3</code></p>
+
+<p>解释：信息从小 A 编号 0 处开始，经 3 轮传递，到达编号 4。共有 3 种方案，分别是 0-&gt;2-&gt;0-&gt;4， 0-&gt;2-&gt;1-&gt;4， 0-&gt;2-&gt;3-&gt;4。</p>
+</blockquote>
+
+<p><strong>示例 2：</strong></p>
+
+<blockquote>
+<p>输入：<code>n = 3, relation = [[0,2],[2,1]], k = 2</code></p>
+
+<p>输出：<code>0</code></p>
+
+<p>解释：信息不能从小 A 处经过 2 轮传递到编号 2</p>
+</blockquote>
+
+<p><strong>限制：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 10</code></li>
+	<li><code>1 &lt;= k &lt;= 5</code></li>
+	<li><code>1 &lt;= relation.length &lt;= 90, 且 relation[i].length == 2</code></li>
+	<li><code>0 &lt;= relation[i][0],relation[i][1] &lt; n 且 relation[i][0] != relation[i][1]</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 22 ms</p>
+                    <p>内存: 16.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def numWays(self, n: int, relation: List[List[int]], k: int) -&gt; int:
+        dp = [[0]*(n+1) for _ in range(k+1)]
+        # dp[i][j]: 经过i轮传递到编号j的玩家的方案数
+        dp[0][0] = 1
+        for i in range(k):
+            for edge in relation:
+                dp[i+1][edge[1]] += dp[i][edge[0]]
+        return dp[k][n-1]
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用动态规划的方式来解决传递信息的问题。动态规划数组 dp[i][j] 代表经过 i 轮传递到编号 j 的玩家的方案数。首先初始化 dp[0][0] = 1，表示从玩家 0 开始传递信息。然后对每一轮传递 i 从 0 到 k-1 进行遍历，更新 dp[i+1][j] 的值，即在第 i+1 轮传递到编号 j 的方案数，根据关系数组 relation 更新。relation 中的每一对 [src, dst] 表示信息可以从 src 传递到 dst。对于每一对 [src, dst]，当前轮 i 的 dp[i][src] 的值会加到下一轮 dp[i+1][dst] 上，表示经过 src 到达 dst 的所有可能的方案数。最终，dp[k][n-1] 就是问题的答案，即在第 k 轮传递到编号 n-1 的方案数。</p>
+                                <p>时间复杂度: O(k * relation.length)</p>
+                                <p>空间复杂度: O(k * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def numWays(self, n: int, relation: List[List[int]], k: int) -&gt; int:
+        # 初始化 dp 数组，大小为 (k+1) x (n+1)，全部初始化为 0
+        dp = [[0]*(n+1) for _ in range(k+1)]
+        # 初始化，从玩家0开始，所以第0轮传递到0的方案数为1
+        dp[0][0] = 1
+        # 遍历每一轮传递
+        for i in range(k):
+            # 遍历每一个传递关系
+            for edge in relation:
+                # 更新下一轮的方案数
+                dp[i+1][edge[1]] += dp[i][edge[0]]
+        # 返回第k轮传递到玩家 n-1 的方案数
+        return dp[k][n-1]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在动态规划数组 dp 中使用 dp[i+1][edge[1]] += dp[i][edge[0]] 这种更新方式？这是基于什么原理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种更新方式基于状态转移的原理。在动态规划中，我们关注如何从已知的状态（即当前已经考虑的轮次和玩家）转移到下一个状态。这里 dp[i][src] 表示第 i 轮结束时，消息传递到玩家 src 的方案总数。当存在一条从 src 到 dst 的传递关系时，意味着在第 i+1 轮，玩家 src 可以将消息传递给玩家 dst。因此，我们将从 src 到 dst 的所有可能方案（即 dp[i][src]）累加到 dp[i+1][dst] 上，从而更新第 i+1 轮传递到 dst 的方案数。这种方法确保了所有通过不同路径到达 dst 的方案都被计算在内。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在初始化 dp 数组时，为什么只将 dp[0][0] 设为 1，而其他 dp[0][j] (j != 0) 的值为 0？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>初始化 dp[0][0] 为 1 是因为传递信息的游戏从玩家 0 开始，所以在游戏开始时只有玩家 0 有消息。此时，消息尚未传递给其他玩家，因此，对于所有 j != 0，dp[0][j] 的值为 0，表示在游戏开始时，除了玩家 0 外，没有其他玩家接收到消息。这种初始化设置反映了问题的初始条件和约束。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果 relation 数组为空，或者没有任何一条可以直接或间接从 0 到 n-1 的路径，这种情况下算法会如何处理？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果 relation 数组为空，或者不存在从玩家 0 到玩家 n-1 的路径，这意味着在 dp 数组的更新过程中，从 dp[0][0] 开始的值无法被传递到任何其他玩家，特别是最终的目标玩家 n-1。无论进行多少轮传递（即 k 轮），dp[k][n-1] 的值将保持为 0，因为没有任何有效的传递路径可以使消息到达玩家 n-1。这反映了算法在处理无法完成任务的情况时的行为：输出将为 0，表示没有可行的方案数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/chuan-di-xin-xi')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/chuan-di-xin-xi/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

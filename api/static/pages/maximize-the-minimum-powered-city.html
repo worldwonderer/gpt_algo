@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最大化城市的最小电量</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最大化城市的最小电量</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=queue" class="badge bg-secondary tag-link">队列</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong>&nbsp;开始长度为 <code>n</code>&nbsp;的整数数组&nbsp;<code>stations</code>&nbsp;，其中&nbsp;<code>stations[i]</code>&nbsp;表示第 <code>i</code>&nbsp;座城市的供电站数目。</p>
+
+<p>每个供电站可以在一定 <strong>范围</strong>&nbsp;内给所有城市提供电力。换句话说，如果给定的范围是&nbsp;<code>r</code>&nbsp;，在城市&nbsp;<code>i</code>&nbsp;处的供电站可以给所有满足&nbsp;<code>|i - j| &lt;= r</code> 且&nbsp;<code>0 &lt;= i, j &lt;= n - 1</code>&nbsp;的城市&nbsp;<code>j</code>&nbsp;供电。</p>
+
+<ul>
+	<li><code>|x|</code>&nbsp;表示 <code>x</code>&nbsp;的 <strong>绝对值</strong>&nbsp;。比方说，<code>|7 - 5| = 2</code>&nbsp;，<code>|3 - 10| = 7</code>&nbsp;。</li>
+</ul>
+
+<p>一座城市的 <strong>电量</strong>&nbsp;是所有能给它供电的供电站数目。</p>
+
+<p>政府批准了可以额外建造 <code>k</code>&nbsp;座供电站，你需要决定这些供电站分别应该建在哪里，这些供电站与已经存在的供电站有相同的供电范围。</p>
+
+<p>给你两个整数&nbsp;<code>r</code> 和&nbsp;<code>k</code>&nbsp;，如果以最优策略建造额外的发电站，返回所有城市中，最小电量的最大值是多少。</p>
+
+<p>这 <code>k</code>&nbsp;座供电站可以建在多个城市。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>stations = [1,2,4,5,0], r = 1, k = 2
+<b>输出：</b>5
+<b>解释：</b>
+最优方案之一是把 2 座供电站都建在城市 1 。
+每座城市的供电站数目分别为 [1,4,4,5,0] 。
+- 城市 0 的供电站数目为 1 + 4 = 5 。
+- 城市 1 的供电站数目为 1 + 4 + 4 = 9 。
+- 城市 2 的供电站数目为 4 + 4 + 5 = 13 。
+- 城市 3 的供电站数目为 5 + 4 = 9 。
+- 城市 4 的供电站数目为 5 + 0 = 5 。
+供电站数目最少是 5 。
+无法得到更优解，所以我们返回 5 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>stations = [4,4,4,4], r = 0, k = 3
+<b>输出：</b>4
+<b>解释：</b>
+无论如何安排，总有一座城市的供电站数目是 4 ，所以最优解是 4 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == stations.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= stations[i] &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= r&nbsp;&lt;= n - 1</code></li>
+	<li><code>0 &lt;= k&nbsp;&lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 864 ms</p>
+                    <p>内存: 29.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxPower(self, stations: List[int], r: int, k: int) -&gt; int:
+        # 二分答案 + check
+        n = len(stations)
+        pre = [0] * n
+        left = 0
+        sm = 0
+        if r &gt;= n - 1:
+            return k + sum(stations)
+        else:
+            for i in range(r):
+                sm += stations[i]
+            
+            for i in range(r, n):
+                if i - left &gt;  2 * r:
+                    sm -= stations[left]
+                    left += 1
+                sm += stations[i]
+                pre[i - r] = sm
+            for i in range(n, n + r):
+                if i - left &gt;  2 * r:
+                    sm -= stations[left]
+                    left += 1
+                pre[i - r] = sm
+        
+
+        print(pre)
+        def check(x :int) -&gt; bool:
+            # 查分数组
+            diff = [0] * n
+            cur = 0
+            cnt = 0
+            for i, el in enumerate(pre):
+                cur += diff[i]
+                if el + cur &lt; x:
+                    addi = (x - cur - el)
+                    cur += addi
+                    cnt += addi
+                    if cnt &gt; k:
+                        return False
+                    if 2 * r + 1 + i &lt; n:
+                        diff[2 * r + 1 + i] -= addi
+            return True
+
+
+
+        
+        l = 0
+        rr = k + sum(stations)
+        while l &lt; rr:
+            mid = l + (rr - l)//2
+            if check(mid):
+                l = mid + 1
+            else:
+                rr = mid -1
+        return l if check(l) else l - 1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了二分查找和差分数组的组合技术来解决问题。首先，根据电站的覆盖范围 r，初始化一个前缀和数组 pre，用于计算每个城市的初始供电情况。如果 r 覆盖整个数组，则简单地将 k 加到所有电站数之和上。否则，使用滑动窗口计算每个城市由覆盖范围内的电站提供的电力总和。接下来，使用二分搜索尝试找到可能的最小电量的最大值。对于二分搜索中的每个中间值 mid，使用差分数组来模拟在不同位置增加 k 个电站后的电力分布，以检查是否所有城市的电量都可以达到 mid。最终通过调整二分搜索的上下界，找到最大的可行电量。</p>
+                                <p>时间复杂度: O(n log(maxPower))</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxPower(self, stations: List[int], r: int, k: int) -&gt; int:
+        # 初始化
+        n = len(stations)
+        pre = [0] * n # 存储覆盖每个城市的电站总数
+        left = 0 # 滑动窗口的左边界
+        sm = 0 # 窗口内电站的累计数
+        if r &gt;= n - 1:
+            return k + sum(stations) # 如果覆盖范围超过城市总数，直接返回
+        else:
+            # 构建前缀和数组
+            for i in range(r):
+                sm += stations[i]
+            for i in range(r, n):
+                if i - left &gt;  2 * r:
+                    sm -= stations[left]
+                    left += 1
+                sm += stations[i]
+                pre[i - r] = sm
+            for i in range(n, n + r):
+                if i - left &gt;  2 * r:
+                    sm -= stations[left]
+                    left += 1
+                pre[i - r] = sm
+        
+        # 二分查找和检查函数
+        def check(x: int) -&gt; bool:
+            diff = [0] * n
+            cur = 0 # 当前增加的电站数
+            cnt = 0 # 总共增加的电站数
+            for i, el in enumerate(pre):
+                cur += diff[i]
+                if el + cur &lt; x: # 如果当前电量低于mid
+                    addi = (x - cur - el) # 需要增加的电站数
+                    cur += addi
+                    cnt += addi
+                    if cnt &gt; k:
+                        return False # 如果超过可用电站数，返回 False
+                    if 2 * r + 1 + i &lt; n:
+                        diff[2 * r + 1 + i] -= addi # 更新差分数组
+            return True
+        l = 0
+        rr = k + sum(stations) # 最大可能电量
+        while l &lt; rr:
+            mid = l + (rr - l) // 2
+            if check(mid):
+                l = mid + 1 # 尝试更大的 mid
+            else:
+                rr = mid -1 # 降低 mid
+        return l if check(l) else l - 1 # 最后检查 l 是否有效</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到使用二分搜索来确定最小电量的最大值，为何选择二分搜索作为这个问题的解决方案？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二分搜索被选择用于解决此问题，因为我们需要在可能的电量值范围内找到一个最大值，使得所有城市的电量都不低于这个值。这是一个典型的“决策问题”，我们需要判断一个电量值是否能满足条件。通过不断地调整电量值范围来逼近最大可能的电量值，二分搜索能有效地在有序的数据范围中快速缩小搜索区间，从而找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的差分数组部分，如何确保增加的电站数不会超过k，特别是在处理边界位置时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用差分数组进行模拟时，算法会逐一检查每个城市当前的电量是否低于目标中值（mid）。如果某个城市的电量不足，算法计算出必须增加的电站数，并累加到总增加的电站数（cnt）中。每当增加电站时，都会检查累加后的总电站数是否超过了k。如果超过k，则函数返回False，表示当前的中值不可行。这样，通过在增加电站数时持续监控总数，我们确保不会超出k的限制。同时，差分数组的更新确保了增加的电站影响可以正确地延伸到适当的范围内，而不会错误地扩展到数组外。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            详述如何使用差分数组模拟在不同位置增加电站后的电力分布？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>差分数组是一种用于表示数值序列中相邻元素差值的技术，可以高效地处理区间增减值的问题。在本题中，当发现某个城市的电量低于目标值时，我们不仅需要在当前位置增加必要的电站，还需要确保这种增加影响可以覆盖到电站的最大范围（即2r）。通过在当前位置增加电站数，并在超出电站范围的下一个位置减去相同的电站数，差分数组能够有效地模拟每个城市实际受到的电站影响。随后，通过累加差分数组来得到每个城市实际的电站数，这种方法使得多次更新操作的复杂度仍然保持在线性级别。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximize-the-minimum-powered-city')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximize-the-minimum-powered-city/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

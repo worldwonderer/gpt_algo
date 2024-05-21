@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>字符串分组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>字符串分组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从&nbsp;<strong>0&nbsp;</strong>开始的字符串数组&nbsp;<code>words</code>&nbsp;。每个字符串都只包含 <strong>小写英文字母</strong>&nbsp;。<code>words</code>&nbsp;中任意一个子串中，每个字母都至多只出现一次。</p>
+
+<p>如果通过以下操作之一，我们可以从 <code>s1</code>&nbsp;的字母集合得到 <code>s2</code>&nbsp;的字母集合，那么我们称这两个字符串为 <strong>关联的</strong>&nbsp;：</p>
+
+<ul>
+	<li>往&nbsp;<code>s1</code>&nbsp;的字母集合中添加一个字母。</li>
+	<li>从&nbsp;<code>s1</code>&nbsp;的字母集合中删去一个字母。</li>
+	<li>将 <code>s1</code>&nbsp;中的一个字母替换成另外任意一个字母（也可以替换为这个字母本身）。</li>
+</ul>
+
+<p>数组&nbsp;<code>words</code>&nbsp;可以分为一个或者多个无交集的 <strong>组</strong>&nbsp;。如果一个字符串与另一个字符串关联，那么它们应当属于同一个组。</p>
+
+<p>注意，你需要确保分好组后，一个组内的任一字符串与其他组的字符串都不关联。可以证明在这个条件下，分组方案是唯一的。</p>
+
+<p>请你返回一个长度为 <code>2</code>&nbsp;的数组&nbsp;<code>ans</code>&nbsp;：</p>
+
+<ul>
+	<li><code>ans[0]</code>&nbsp;是&nbsp;<code>words</code>&nbsp;分组后的&nbsp;<strong>总组数</strong>&nbsp;。</li>
+	<li><code>ans[1]</code>&nbsp;是字符串数目最多的组所包含的字符串数目。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["a","b","ab","cde"]
+<b>输出：</b>[2,3]
+<b>解释：</b>
+- words[0] 可以得到 words[1] （将 'a' 替换为 'b'）和 words[2] （添加 'b'）。所以 words[0] 与 words[1] 和 words[2] 关联。
+- words[1] 可以得到 words[0] （将 'b' 替换为 'a'）和 words[2] （添加 'a'）。所以 words[1] 与 words[0] 和 words[2] 关联。
+- words[2] 可以得到 words[0] （删去 'b'）和 words[1] （删去 'a'）。所以 words[2] 与 words[0] 和 words[1] 关联。
+- words[3] 与 words 中其他字符串都不关联。
+所以，words 可以分成 2 个组 ["a","b","ab"] 和 ["cde"] 。最大的组大小为 3 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>words = ["a","ab","abc"]
+<b>输出：</b>[1,3]
+<strong>解释：</strong>
+- words[0] 与 words[1] 关联。
+- words[1] 与 words[0] 和 words[2] 关联。
+- words[2] 与 words[1] 关联。
+由于所有字符串与其他字符串都关联，所以它们全部在同一个组内。
+所以最大的组大小为 3 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= words.length &lt;= 2 * 10<sup>4</sup></code></li>
+	<li><code>1 &lt;= words[i].length &lt;= 26</code></li>
+	<li><code>words[i]</code>&nbsp;只包含小写英文字母。</li>
+	<li><code>words[i]</code> 中每个字母最多只出现一次。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 649 ms</p>
+                    <p>内存: 47.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def groupStrings(self, words: List[str]) -&gt; List[int]:
+        n = len(words)
+        words.sort(key=lambda w:len(w))
+        fa = list(range(n))
+
+        def find(x):
+            if fa[x] != x:
+                fa[x] = find(fa[x])
+            return fa[x]
+
+        def union(x,y):
+            fx, fy = find(x), find(y)
+            fa[fx] = fy 
+
+        aord = ord(&#34;a&#34;)
+        visits = {}
+        for i, word in enumerate(words):
+            x = 0
+            for c in word:
+                x |= 1&lt;&lt;(ord(c) - aord)
+
+            if x in visits:
+                union(i, visits[x])
+            else:
+                visits[x] = i
+
+                for j in range(26):
+                    if x&gt;&gt;j &amp; 1:
+                        y = x ^ (1&lt;&lt;j)
+                        if y in visits:
+                            union(i,visits[y])
+                        else:
+                            visits[y] = i 
+
+        for i in range(n):
+            find(i)
+        
+        cnts = Counter(fa)
+        return len(cnts), max(cnts.values())
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了位掩码和并查集来将具有一定关联的字符串分组。首先，每个字符串被转换成一个整数位掩码，其中位掩码的第 i 位表示字符 &#39;a&#39;+i 是否出现在字符串中。这使得比较两个字符串是否只有一个字符的差异变得容易和快速。题解中先将字符串按长度排序，以便尽可能地减少比较次数。然后，使用一个字典来记录已经遇到的位掩码及其对应字符串的索引。对于每个位掩码，我们不仅记录它本身，还生成26个可能的通过增加或删除单个字母得到的位掩码，并尝试将当前字符串与这些位掩码所代表的字符串联合。这样可以确保所有只差一个字符的字符串都会被放入同一个组。最后，使用并查集来确定组成员，并统计最大组的大小。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def groupStrings(self, words: List[str]) -&gt; List[int]:
+        n = len(words) # 字符串的数量
+        words.sort(key=lambda w:len(w)) # 按字符串长度排序
+        fa = list(range(n)) # 初始化并查集数组
+
+        def find(x):
+            if fa[x] != x:
+                fa[x] = find(fa[x])
+            return fa[x] # 并查集查找
+
+        def union(x,y):
+            fx, fy = find(x), find(y)
+            fa[fx] = fy  # 并查集合并
+
+        aord = ord(&#39;a&#39;) # 字母&#39;a&#39;的ASCII码
+        visits = {} # 存储已遇到的位掩码及其索引
+        for i, word in enumerate(words):
+            x = 0
+            for c in word:
+                x |= 1&lt;&lt;(ord(c) - aord) # 计算位掩码
+
+            if x in visits:
+                union(i, visits[x]) # 如果已经存在，合并到相同的组
+            else:
+                visits[x] = i # 记录当前位掩码和索引
+
+                for j in range(26):
+                    if x&gt;&gt;j &amp; 1:
+                        y = x ^ (1&lt;&lt;j) # 生成可能的位掩码变化
+                        if y in visits:
+                            union(i, visits[y]) # 如果变化后的位掩码存在，合并
+                        else:
+                            visits[y] = i # 记录变化后的位掩码和索引
+
+        for i in range(n):
+            find(i) # 更新所有节点的根节点，以完成所有合并操作
+
+        cnts = Counter(fa) # 统计每个组的大小
+        return [len(cnts), max(cnts.values())] # 返回总组数和最大组的大小</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用位掩码表示字符串时，为什么只考虑字符是否出现，而不是字符出现的次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个题目中，我们的主要目的是判断字符串之间是否可以通过增加、删除或替换一个字符来互相转换，而不是完全一致的匹配。使用位掩码来表示每个字符是否出现（而非出现次数），可以快速比较两个字符串的组成差异。这种方法简化了逻辑，并有效地支持了只通过单一字符变化达到的分组需求，因为字符的具体出现次数在这种变化检测中不是必要的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如何确保通过增加、删除或替换一个字母得到的位掩码都能正确地反映两个字符串之间的关系？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中生成位掩码的变化主要通过位操作实现。对于每个字符的位，我们尝试将其翻转（即从1变为0或从0变为1），代表删除或添加一个字符。这样的位操作确保了可以覆盖所有可能通过单一字符变化形成的位掩码。通过这种方法，我们可以确保所有只差一个字符的变化都被检测到，并正确地将相关字符串进行分组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中提到按字符串长度排序可以减少比较次数，请问这是基于什么原理？会不会有例外情况导致效果不显著？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>按字符串长度排序的主要目的是尽量减少不必要的比较。理论上，长度差异较大的字符串不太可能通过单一字符的增加、删除或替换来匹配，因此先比较长度相近的字符串可以提高效率。然而，如果输入数据中大部分字符串长度接近，这种排序可能不会显著减少比较次数，因为几乎每个字符串都需要与其他字符串进行比较。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            并查集在此题解中如何处理字符串分组，特别是如何确保一个组内的任一字符串与其他组的字符串都不关联？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>并查集在这个题解中用于管理和追踪字符串分组。每次当两个字符串确定只通过一个字符的增加、删除或替换可以互相转换时，这两个字符串就通过并查集的union操作合并到同一个组。并查集通过维护每个节点的父节点来形成一个树状结构，从而确保一旦两个字符串被合并到同一个组，它们将始终保持在同一组内。通过对所有字符串执行find操作，我们可以更新它们的根节点，最终得到一个准确的分组结果，确保每个组内的字符串都是相互关联的，而与其他组的字符串无关。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/groups-of-strings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/groups-of-strings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>找到最大整数的索引</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>找到最大整数的索引</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=interactive" class="badge bg-secondary tag-link">交互</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 118 ms</p>
+                    <p>内存: 52.9 MB</p>
+                    <pre class="bg-light p-2 code-pre"># &#34;&#34;&#34;
+# This is ArrayReader&#39;s API interface.
+# You should not implement it, or speculate about its implementation
+# &#34;&#34;&#34;
+#class ArrayReader(object):
+#	 # Compares the sum of arr[l..r] with the sum of arr[x..y]
+#	 # return 1 if sum(arr[l..r]) &gt; sum(arr[x..y])
+#	 # return 0 if sum(arr[l..r]) == sum(arr[x..y])
+#	 # return -1 if sum(arr[l..r]) &lt; sum(arr[x..y])
+#    def compareSub(self, l: int, r: int, x: int, y: int) -&gt; int:
+#
+#	 # Returns the length of the array
+#    def length(self) -&gt; int:
+#
+
+
+class Solution:
+    def getIndex(self, reader: &#39;ArrayReader&#39;) -&gt; int:
+        len = reader.length()
+        left = 0
+        right = len - 1
+        half = 0
+        comp = 0
+        temp = 0
+        while len &gt; 0:
+            len = right - left + 1
+            half = len // 2
+            if len % 2 == 0:
+                comp = 1
+            else:
+                comp = 0
+            temp = reader.compareSub(left, left + half - comp, left + half, right)
+            if temp == 0:
+                return left + half - comp
+            elif temp == 1:
+                right = left + half - comp
+            elif temp == -1:
+                left = left + half
+        return 0
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解通过二分搜索法寻找最大整数的索引。利用题目提供的 `compareSub` API，可以比较两个子数组的和。算法从数组的两端开始，不断将数组一分为二，通过比较两部分的和确定最大元素所在的部分，并在该部分继续搜索。如果两部分和相等，则直接返回中间的索引。否则，根据比较结果调整搜索范围，继续在较大的一边进行搜索。这种方法逐步缩小搜索范围，直到找到最大元素的位置。</p>
+                                <p>时间复杂度: O(log n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 解决方案类
+
+class Solution:
+    def getIndex(self, reader: &#39;ArrayReader&#39;) -&gt; int:
+        len = reader.length() # 获取数组长度
+        left = 0 # 左索引初始化
+        right = len - 1 # 右索引初始化
+        half = 0 # 初始化中点偏移量
+        comp = 0 # 比较结果初始化
+        temp = 0 # 临时变量用于存储比较结果
+        while len &gt; 0:
+            len = right - left + 1 # 更新当前搜索范围的长度
+            half = len // 2 # 计算中点位置
+            if len % 2 == 0:
+                comp = 1 # 如果长度为偶数，调整半段长度以平衡两边的元素数量
+            else:
+                comp = 0 # 如果长度为奇数，不需要调整
+            temp = reader.compareSub(left, left + half - comp, left + half, right) # 比较两个子数组的和
+            if temp == 0:
+                return left + half - comp # 如果两个子数组的和相等，则返回中点索引
+            elif temp == 1:
+                right = left + half - comp # 如果左边数组的和较大，则在左侧部分继续搜索
+            elif temp == -1:
+                left = left + half # 如果右边数组的和较大，则在右侧部分继续搜索
+        return 0 # 如果上述循环无法找到最大元素，返回0（正常情况不会发生）</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在使用二分搜索法时，如何确保`compareSub` API的调用正确处理了数组的边界和中点计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分搜索法中，确保`compareSub` API正确处理数组边界和中点计算，主要依赖于准确地定义和更新左右索引`left`和`right`以及正确计算中点偏移量`half`。`left`和`right`在每次迭代中被更新，以指向当前考虑的子数组的边界。中点`half`是根据当前子数组的长度动态计算的，确保每次比较的两个子数组均分整个考虑的范围。特别是在偶数长度的数组中，通过适当的调整（使用`comp`变量），可以确保两个子数组包含相等数量的元素，从而避免任何一个子数组不被完全比较的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当`compareSub`返回0表示两个子数组和相等时，为什么选择返回`left + half - comp`作为索引，这是否意味着最大元素总是位于中间？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`compareSub`返回0，即两个子数组的和相等时，选择返回`left + half - comp`作为索引是因为在当前的实现中，这一位置代表了中点或中点附近的元素。此时假设最大值可能出现在中点附近，因此返回此索引。然而，这并不意味着最大元素总是位于中间，而是在这种特定的实现和假设下，选择中点作为最可能的候选。实际情况中，最大元素可能位于数组的任何位置，这只是一种简化操作，实际应用中可能需要更精确的逻辑来确定最大值的确切位置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果左右子数组和不相等，算法是如何决定继续在左侧还是右侧子数组中搜索？请解释`temp`变量的作用以及它如何影响搜索方向。 <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`temp`变量存储的是`compareSub`函数的返回值，它表示两个子数组和的比较结果。如果`temp`为1，则表示左侧子数组的和大于右侧子数组的和，因此搜索范围更新为左侧子数组；如果`temp`为-1，则表示右侧子数组的和大于左侧子数组的和，因此搜索范围更新为右侧子数组。这样，`temp`变量直接决定了搜索的方向，帮助算法在可能包含最大元素的子数组中继续进行搜索。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在二分搜索中，你提到了对偶数长度和奇数长度数组的不同处理（即`comp`的值），这种处理方式背后的逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分搜索中，`comp`变量用于处理数组长度为偶数时的情况。偶数长度意味着无法直接平均分为两个完全相等的子数组，因此通过调整`comp`的值（设为1），确保两个子数组中一个包含中点而另一个不包含，从而使两个子数组的元素数量尽可能接近。这种处理方式背后的逻辑是为了尽可能保持两个比较子数组的平衡，避免因为元素数量的差异导致比较结果的偏差。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-the-index-of-the-large-integer')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-the-index-of-the-large-integer/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

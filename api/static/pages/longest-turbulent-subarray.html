@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最长湍流子数组</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最长湍流子数组</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个整数数组 <code>arr</code>&nbsp;，返回 <code>arr</code>&nbsp;的&nbsp;<em>最大湍流子数组的<strong>长度</strong></em><strong>&nbsp;</strong>。</p>
+
+<p>如果比较符号在子数组中的每个相邻元素对之间翻转，则该子数组是&nbsp;<strong>湍流子数组</strong>&nbsp;。</p>
+
+<p>更正式地来说，当 <code>arr</code>&nbsp;的子数组&nbsp;<code>A[i], A[i+1], ..., A[j]</code>&nbsp;满足仅满足下列条件时，我们称其为<em>湍流子数组</em>：</p>
+
+<ul>
+	<li>若&nbsp;<code>i &lt;= k &lt; j</code>&nbsp;：
+
+	<ul>
+		<li>当 <code>k</code>&nbsp;为奇数时，&nbsp;<code>A[k] &gt; A[k+1]</code>，且</li>
+		<li>当 <code>k</code> 为偶数时，<code>A[k] &lt; A[k+1]</code>；</li>
+	</ul>
+	</li>
+	<li><strong>或 </strong>若&nbsp;<code>i &lt;= k &lt; j</code>&nbsp;：
+	<ul>
+		<li>当 <code>k</code> 为偶数时，<code>A[k] &gt; A[k+1]</code>&nbsp;，且</li>
+		<li>当 <code>k</code>&nbsp;为奇数时，&nbsp;<code>A[k] &lt; A[k+1]</code>。</li>
+	</ul>
+	</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [9,4,2,10,7,8,8,1,9]
+<strong>输出：</strong>5
+<strong>解释：</strong>arr[1] &gt; arr[2] &lt; arr[3] &gt; arr[4] &lt; arr[5]</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [4,8,12,16]
+<strong>输出：</strong>2
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>arr = [100]
+<strong>输出：</strong>1
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= arr.length &lt;= 4 * 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= arr[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 66 ms</p>
+                    <p>内存: 18.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxTurbulenceSize(self, arr: List[int]) -&gt; int:
+        n = len(arr)
+        dp = [1] * n
+        tail = arr[0]
+        sign = 0
+        for i in range(1, n):
+            if arr[i] != tail and sign == 0:
+                
+                sign = 1 if arr[i] &gt; tail else -1
+                tail = arr[i]
+                dp[i] = dp[i - 1] + 1
+            elif sign == 1 and arr[i] &lt; tail :
+                sign = -1
+                tail = arr[i]
+                dp[i] = dp[i - 1] + 1
+            elif sign == -1 and arr[i] &gt; tail:
+                sign = 1
+                tail = arr[i]
+                dp[i] = dp[i - 1] + 1
+            else:#sign 和 差值不匹配
+                if sign == -1 and arr[i] &lt; tail:
+                    sign = -1
+                    tail = arr[i]
+                    dp[i] = 2
+                elif sign == 1 and arr[i] &gt; tail:
+                    sign = 1
+                    tail = arr[i]
+                    dp[i] = 2
+                elif arr[i] == tail:
+                    #print(i, arr[i], tail)
+                    sign = 0
+                    tail = arr[i]
+                    dp[i] = 1
+        #print(dp)
+        return max(dp)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用动态规划方法求解最长湍流子数组的长度。定义dp[i]表示以arr[i]结尾的最长湍流子数组的长度。使用tail变量记录上一个元素的值，sign变量记录当前湍流子数组的比较符号，即在湍流子数组中，当前比较应该是大于还是小于。初始时，dp数组全部初始化为1（每个元素自身至少是长度为1的湍流子数组），tail初始化为arr[0]，sign初始化为0（表示还未确定比较方向）。遍历数组时，根据当前元素与tail的比较结果以及当前的sign状态，更新dp数组。如果当前元素与tail相等，湍流结束，dp[i]重置为1；如果符合当前的湍流模式（sign状态），则dp[i]等于dp[i-1]+1并更新sign；如果不符合当前模式，根据具体情况重置sign和dp[i]的值。最后返回dp数组中的最大值，即为最长的湍流子数组长度。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2"># class Solution:
+    def maxTurbulenceSize(self, arr: List[int]) -&gt; int:
+        n = len(arr)  # 数组长度
+        dp = [1] * n  # 初始化dp数组，每个位置最小湍流长度为1
+        tail = arr[0]  # 初始化tail为第一个元素
+        sign = 0  # 比较符号初始化
+        for i in range(1, n):  # 遍历数组
+            if arr[i] != tail and sign == 0:  # 如果当前元素与tail不同且未确定比较方向
+                sign = 1 if arr[i] &gt; tail else -1  # 确定比较方向
+                tail = arr[i]  # 更新tail
+                dp[i] = dp[i - 1] + 1  # 更新dp[i]
+            elif sign == 1 and arr[i] &lt; tail:  # 如果当前比较方向为大于且当前元素小于tail
+                sign = -1  # 改变比较方向
+                tail = arr[i]  # 更新tail
+                dp[i] = dp[i - 1] + 1  # 更新dp[i]
+            elif sign == -1 and arr[i] &gt; tail:  # 如果当前比较方向为小于且当前元素大于tail
+                sign = 1  # 改变比较方向
+                tail = arr[i]  # 更新tail
+                dp[i] = dp[i - 1] + 1  # 更新dp[i]
+            else:  # 如果当前元素与tail相等或其他不符合当前湍流模式的情况
+                if arr[i] == tail:  # 相等情况
+                    sign = 0  # 重置比较方向
+                    tail = arr[i]  # 更新tail
+                    dp[i] = 1  # 重置dp[i]
+                else:  # 不符合当前湍流模式
+                    sign = 1 if arr[i] &gt; tail else -1  # 重新确定比较方向
+                    tail = arr[i]  # 更新tail
+                    dp[i] = 2  # 重置dp[i]开始新的湍流
+        return max(dp)  # 返回dp中的最大值，即最长湍流子数组的长度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，为什么在遇到当前元素与tail相等时，需要将dp[i]重置为1？这对于识别湍流子数组的边界有何作用？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在湍流子数组中，要求每个元素与前一个元素不相等，并且与前一个元素的大小关系要连续交替。当当前元素与tail（即前一个元素）相等时，这种大小关系被打破，因此无法形成湍流子数组。将dp[i]重置为1是因为任何单个元素可以被视为长度为1的湍流子数组。这种处理有助于在数组中明确标识湍流子数组的起始点，即每次遇到相等的元素，湍流子数组就在此处结束，新的可能的湍流子数组从下一个不同的元素开始。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到当当前元素不符合湍流模式时，dp[i]会被设置为2，这里的逻辑是基于什么考虑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果当前元素不符合预期的湍流模式（即大于或小于之间的交替关系被破坏），但同时与前一个元素不相等，意味着这个元素可以与前一个元素组成一个新的长度为2的湍流子数组。此时，虽然不能延续之前的湍流子数组，但可以开始一个新的湍流子数组，因此dp[i]被设置为2。这反映了题解中尝试从每个可能的点重新开始计算湍流子数组的长度的策略。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的sign变量在确定比较方向时有三种状态（0，1，-1），每种状态具体代表什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，sign变量用于表示当前湍流子数组中元素的比较方向。其中，0表示比较方向尚未确定，通常是在子数组开始的位置或者当前元素与前一个元素相等时使用。1表示当前元素应该大于前一个元素，即预期下一个元素应该小于当前元素，形成一个&#39;大于&#39;的比较。-1表示当前元素应该小于前一个元素，即预期下一个元素应该大于当前元素，形成一个&#39;小于&#39;的比较。这种方法有助于追踪和维持湍流子数组的交替大小关系。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            为什么题解中在遍历数组时需要从索引1开始，而不是从头开始遍历？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中从索引1开始遍历数组是因为需要将数组中的每个元素与其前一个元素进行比较。如果从索引0开始，则没有前一个元素可以用于比较，无法决定该元素与前一个元素的大小关系，因此无法判断是否符合湍流条件。从索引1开始，可以确保每次迭代都能访问到当前元素的前一个元素，从而正确地应用湍流子数组的定义和逻辑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/maximum-subarray" class="list-group-item list-group-item-action">
+                                最大子数组和
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/longest-turbulent-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/longest-turbulent-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

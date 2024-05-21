@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>分割回文串 III</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>分割回文串 III</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由小写字母组成的字符串&nbsp;<code>s</code>，和一个整数&nbsp;<code>k</code>。</p>
+
+<p>请你按下面的要求分割字符串：</p>
+
+<ul>
+	<li>首先，你可以将&nbsp;<code>s</code>&nbsp;中的部分字符修改为其他的小写英文字母。</li>
+	<li>接着，你需要把&nbsp;<code>s</code>&nbsp;分割成&nbsp;<code>k</code>&nbsp;个非空且不相交的子串，并且每个子串都是回文串。</li>
+</ul>
+
+<p>请返回以这种方式分割字符串所需修改的最少字符数。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>s = &quot;abc&quot;, k = 2
+<strong>输出：</strong>1
+<strong>解释：</strong>你可以把字符串分割成 &quot;ab&quot; 和 &quot;c&quot;，并修改 &quot;ab&quot; 中的 1 个字符，将它变成回文串。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>s = &quot;aabbc&quot;, k = 3
+<strong>输出：</strong>0
+<strong>解释：</strong>你可以把字符串分割成 &quot;aa&quot;、&quot;bb&quot; 和 &quot;c&quot;，它们都是回文串。</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>s = &quot;leetcode&quot;, k = 8
+<strong>输出：</strong>0
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= k &lt;= s.length &lt;= 100</code></li>
+	<li><code>s</code>&nbsp;中只含有小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 48 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def palindromePartition(self, s: str, k: int) -&gt; int:
+        
+        # 把一个字符串划分成 k 个部分，要求将划分出来的子串修改成回文串所需要的最少操作次数
+        # 划分型DP
+
+        # 定义 f[i][j] 为将前j个元素划分成i组 需要修改的最少字符数
+        # cost 里面指的是索引 [L, j)
+        # 那么状态转移方程就是 f[i][j] = min(f[i-1][L] + cost(L, j) for L in range(i-1, j))
+
+        # 那么我们只要能用 O(1) 的时间得到 处理出每个区间段操作成回文串的次数就行了
+        # 预处理每个区间的回文串情况
+
+        
+        n = len(s)
+        ss = [[0] * n for _ in range(n)]
+        for i in range(2, n + 1):
+            for j in range(n - i + 1):
+                ss[j][j+i-1] = ss[j + 1][j+i-2] + (0 if s[j] == s[j+i-1] else 1)
+
+
+        f = [[inf] * (n+1) for _ in range(k+1)]
+        # 初始状态的定义
+        f[0][0] = 0
+
+        for i in range(1, k + 1):
+            for j in range(i, n+1-(k-i)):
+                if i == 1:
+                    f[i][j] = ss[0][j-1]
+                else:
+                    for l in range(i-1, j):
+                        f[i][j] = min(f[i-1][l] + ss[l][j-1], f[i][j])
+        return f[k][n]
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用动态规划的方法来解决问题。首先预处理出任意区间[i, j]转变成回文串所需的最小修改次数，存储在二维数组ss中。接着定义状态f[i][j]表示将字符串的前j个字符分割成i个回文子串所需的最小修改次数。状态转移方程是通过枚举上一个回文子串的结尾位置l来更新，即f[i][j] = min(f[i-1][l] + ss[l][j-1])，其中l从i-1到j-1遍历。最终答案为f[k][n]，即整个字符串分割成k个回文子串的最小修改次数。</p>
+                                <p>时间复杂度: O(n^3 + k*n^2)</p>
+                                <p>空间复杂度: O(n^2 + k*n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def palindromePartition(self, s: str, k: int) -&gt; int:
+        n = len(s)
+        # 预处理数组，计算任意子串成为回文串的最小修改次数
+        ss = [[0] * n for _ in range(n)]
+        for i in range(2, n + 1):
+            for j in range(n - i + 1):
+                ss[j][j+i-1] = ss[j + 1][j+i-2] + (0 if s[j] == s[j+i-1] else 1)
+
+        # 动态规划数组，记录分割成i个回文子串的最小修改次数
+        f = [[float(&#39;inf&#39;)] * (n+1) for _ in range(k+1)]
+        f[0][0] = 0 # 初始化状态
+
+        for i in range(1, k + 1):
+            for j in range(i, n+1-(k-i)):
+                if i == 1:
+                    f[i][j] = ss[0][j-1] # 只有一个分组时直接取整个字符串为一组的情况
+                else:
+                    for l in range(i-1, j):
+                        f[i][j] = min(f[i-1][l] + ss[l][j-1], f[i][j])
+        return f[k][n]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到的二维数组ss的确切作用是什么？它如何帮助动态规划解决此问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二维数组ss是用来存储任意子串[i, j]转变成回文串所需的最小修改次数。这个预处理步骤是为了支持动态规划中的状态转移。在动态规划过程中，每次计算分割出新的回文子串的代价时，可以直接使用ss数组得到任意子串成为回文串的修改次数，而不需要重新计算。这样大大减少了问题解决的时间复杂性，因为直接查表比重新计算每个子串是否为回文串要快得多。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在状态转移方程中，为什么选择遍历上一个回文子串的结尾位置l从i-1到j-1？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，状态f[i][j]表示将字符串的前j个字符分割成i个回文子串的最小修改次数。遍历上一个回文子串的结尾位置l从i-1到j-1是因为，至少需要前i-1个字符来构成前i-1个回文子串。因此，l的最小值是i-1，确保每一个子串都至少有一个字符。l的最大值是j-1，意味着当前正在考虑的子串至少包含一个字符。这样的遍历范围确保了所有可能的子串划分都被考虑到，从而可以找到真正的最小修改次数来满足题目要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在动态规划数组f的初始化中，为什么f[0][0]初始化为0，而其他f[i][0]的值是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划数组f中，f[0][0]初始化为0是因为将长度为0的字符串分割成0个回文子串的修改次数自然是0（没有字符，也不需要分割）。对于其他的f[i][0]，这些表示试图将长度为0的字符串分割成多于0个回文子串，这在逻辑上是不可能的，因此应该初始化为无穷大（float(&#39;inf&#39;)），表示这种情况不可能发生。这样的初始化确保了动态规划在进行状态转移时，不会错误地考虑这些不合逻辑的情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/palindrome-partitioning-iii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/palindrome-partitioning-iii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

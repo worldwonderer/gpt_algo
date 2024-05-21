@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>区域和检索 - 数组不可变</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>区域和检索 - 数组不可变</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=design" class="badge bg-secondary tag-link">设计</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个整数数组 &nbsp;<code>nums</code>，处理以下类型的多个查询:</p>
+
+<ol>
+	<li>计算索引&nbsp;<code>left</code>&nbsp;和&nbsp;<code>right</code>&nbsp;（包含 <code>left</code> 和 <code>right</code>）之间的 <code>nums</code> 元素的 <strong>和</strong> ，其中&nbsp;<code>left &lt;= right</code></li>
+</ol>
+
+<p>实现 <code>NumArray</code> 类：</p>
+
+<ul>
+	<li><code>NumArray(int[] nums)</code> 使用数组 <code>nums</code> 初始化对象</li>
+	<li><code>int sumRange(int i, int j)</code> 返回数组 <code>nums</code>&nbsp;中索引&nbsp;<code>left</code>&nbsp;和&nbsp;<code>right</code>&nbsp;之间的元素的 <strong>总和</strong> ，包含&nbsp;<code>left</code>&nbsp;和&nbsp;<code>right</code>&nbsp;两点（也就是&nbsp;<code>nums[left] + nums[left + 1] + ... + nums[right]</code>&nbsp;)</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>
+["NumArray", "sumRange", "sumRange", "sumRange"]
+[[[-2, 0, 3, -5, 2, -1]], [0, 2], [2, 5], [0, 5]]
+<strong>输出：
+</strong>[null, 1, -1, -3]
+
+<strong>解释：</strong>
+NumArray numArray = new NumArray([-2, 0, 3, -5, 2, -1]);
+numArray.sumRange(0, 2); // return 1 ((-2) + 0 + 3)
+numArray.sumRange(2, 5); // return -1 (3 + (-5) + 2 + (-1)) 
+numArray.sumRange(0, 5); // return -3 ((-2) + 0 + 3 + (-5) + 2 + (-1))
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= nums.length &lt;= 10<sup>4</sup></code></li>
+	<li><code>-10<sup>5</sup>&nbsp;&lt;= nums[i] &lt;=&nbsp;10<sup>5</sup></code></li>
+	<li><code>0 &lt;= i &lt;= j &lt; nums.length</code></li>
+	<li>最多调用 <code>10<sup>4</sup></code> 次 <code>sumRange</code><strong> </strong>方法</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 60 ms</p>
+                    <p>内存: 20.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class NumArray:
+
+    def __init__(self, nums: List[int]):
+        n = len(nums)
+        # 前缀和数组
+        self.presum = [0]*(n+1)
+        # 计算 nums 的累加和
+        for i in range(1,n+1):
+            self.presum[i] = self.presum[i-1] + nums[i-1]
+
+    def sumRange(self, left: int, right: int) -&gt; int:
+        # 查询闭区间 [left, right] 的累加和
+        sumlr = self.presum[right+1] - self.presum[left]
+        return sumlr
+
+
+
+
+# Your NumArray object will be instantiated and called as such:
+# obj = NumArray(nums)
+# param_1 = obj.sumRange(left,right)</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了前缀和的思想。在构造函数中，先预处理计算出数组 nums 的前缀和数组 presum，其中 presum[i] 表示 nums[0] 到 nums[i-1] 的累加和。在 sumRange 查询函数中，利用前缀和数组快速计算出区间 [left, right] 的累加和，只需要用 presum[right+1] 减去 presum[left] 即可得到结果。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class NumArray:
+
+    def __init__(self, nums: List[int]):
+        n = len(nums)
+        # 创建前缀和数组，长度为 n+1，方便处理边界情况
+        self.presum = [0]*(n+1) 
+        # 计算 nums 的前缀和
+        for i in range(1, n+1):
+            self.presum[i] = self.presum[i-1] + nums[i-1]
+
+    def sumRange(self, left: int, right: int) -&gt; int:
+        # 查询闭区间 [left, right] 的累加和
+        # 利用前缀和数组，只需计算 presum[right+1] - presum[left]
+        sumlr = self.presum[right+1] - self.presum[left]
+        return sumlr
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在前缀和数组`presum`中，索引0的值被初始化为0，这样的设计有什么特别的用处吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在前缀和数组`presum`中，索引0的值被初始化为0，这主要是为了方便计算从数组开头到某一位置的累加和。具体来说，当需要计算从`nums[0]`到`nums[right]`的累加和时，直接使用`presum[right+1]`即可得到结果。这种设计避免了在计算区间和时需要进行特殊判断或额外的计算来处理从数组开头开始的累加情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在构造`NumArray`类时，计算前缀和数组`presum`的循环中，`presum[i] = presum[i-1] + nums[i-1]`这一步是如何确保数组索引不会越界的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构造`NumArray`类时，创建的前缀和数组`presum`长度为`n+1`，其中`n`是输入数组`nums`的长度。因此在循环计算前缀和时，`presum[i]`的索引从1开始，最大到`n`，对应的`nums[i-1]`的索引从0开始，最大到`n-1`。这样设计保证了访问`nums[i-1]`时，索引始终在有效范围内，不会越界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在方法`sumRange`中，直接使用`presum[right+1] - presum[left]`来获取区间和的原理是什么？能否详细解释这种计算方式的数学依据？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>方法`sumRange`使用`presum[right+1] - presum[left]`来计算区间[left, right]的和的原理基于前缀和的定义。`presum[i]`表示从`nums[0]`到`nums[i-1]`的累加和。因此，`presum[right+1]`表示从`nums[0]`到`nums[right]`的累加和，而`presum[left]`表示从`nums[0]`到`nums[left-1]`的累加和。从`presum[right+1]`中减去`presum[left]`，就剔除了`nums[0]`到`nums[left-1]`的部分，恰好得到从`nums[left]`到`nums[right]`的累加和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果输入的索引`left`或`right`不在数组`nums`的有效范围内，`sumRange`方法会如何处理？是否有错误处理机制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>题解中的`sumRange`方法并没有直接提到对索引`left`或`right`超出数组有效范围的处理机制。在实际应用中，应当在方法调用前或方法内部添加索引合法性的检查，例如确保`0 &lt;= left &lt;= right &lt; nums.length`。如果不进行这样的检查，试图访问超出范围的前缀和数组`presum`的元素可能导致运行时错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/range-sum-query-2d-immutable" class="list-group-item list-group-item-action">
+                                二维区域和检索 - 矩阵不可变
+                            </a>
+                        
+                            <a href="/problem/range-sum-query-mutable" class="list-group-item list-group-item-action">
+                                区域和检索 - 数组可修改
+                            </a>
+                        
+                            <a href="/problem/maximum-size-subarray-sum-equals-k" class="list-group-item list-group-item-action">
+                                和等于 k 的最长子数组长度
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/range-sum-query-immutable')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/range-sum-query-immutable/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

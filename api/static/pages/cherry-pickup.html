@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>摘樱桃</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>摘樱桃</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>n x n</code> 的网格 <code>grid</code> ，代表一块樱桃地，每个格子由以下三种数字的一种来表示：</p>
+
+<ul>
+	<li><code>0</code> 表示这个格子是空的，所以你可以穿过它。</li>
+	<li><code>1</code> 表示这个格子里装着一个樱桃，你可以摘到樱桃然后穿过它。</li>
+	<li><code>-1</code> 表示这个格子里有荆棘，挡着你的路。</li>
+</ul>
+
+<p>请你统计并返回：在遵守下列规则的情况下，能摘到的最多樱桃数：</p>
+
+<ul>
+	<li>从位置&nbsp;<code>(0, 0)</code> 出发，最后到达 <code>(n - 1, n - 1)</code> ，只能向下或向右走，并且只能穿越有效的格子（即只可以穿过值为 <code>0</code> 或者 <code>1</code> 的格子）；</li>
+	<li>当到达 <code>(n - 1, n&nbsp;- 1)</code> 后，你要继续走，直到返回到 <code>(0, 0) </code>，只能向上或向左走，并且只能穿越有效的格子；</li>
+	<li>当你经过一个格子且这个格子包含一个樱桃时，你将摘到樱桃并且这个格子会变成空的（值变为 <code>0</code> ）；</li>
+	<li>如果在 <code>(0, 0)</code> 和 <code>(n - 1, n - 1)</code> 之间不存在一条可经过的路径，则无法摘到任何一个樱桃。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode.com/uploads/2020/12/14/grid.jpg" />
+<pre>
+<b>输入：</b>grid = [[0,1,-1],[1,0,-1],[1,1,1]]
+<b>输出：</b>5
+<b>解释：</b>玩家从 (0, 0) 出发：向下、向下、向右、向右移动至 (2, 2) 。
+在这一次行程中捡到 4 个樱桃，矩阵变成 [[0,1,-1],[0,0,-1],[0,0,0]] 。
+然后，玩家向左、向上、向上、向左返回起点，再捡到 1 个樱桃。
+总共捡到 5 个樱桃，这是最大可能值。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>grid = [[1,1,-1],[1,-1,1],[-1,1,1]]
+<b>输出：</b>0
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == grid.length</code></li>
+	<li><code>n == grid[i].length</code></li>
+	<li><code>1 &lt;= n &lt;= 50</code></li>
+	<li><code>grid[i][j]</code>&nbsp;为&nbsp;<code>-1</code>、<code>0</code>&nbsp;或&nbsp;<code>1</code></li>
+	<li><code>grid[0][0] != -1</code></li>
+	<li><code>grid[n - 1][n - 1] != -1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 204 ms</p>
+                    <p>内存: 16.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">from typing import List
+
+class Solution: # 3 维 DP
+    def cherryPickup(self, grid: List[List[int]]) -&gt; int:
+        if grid[0][0] == -1:
+            return 0
+        n = len(grid)
+        k = 2*n-1
+        dp = [[[0 for i in range(n)] for j in range(n)] for k in range(2)] # 三维 DP
+        dp[0][0][0] = grid[0][0]
+        for sum in range(1, k): # TO MODIFY
+            flag = False
+            now  = sum % 2
+            last = (sum-1) % 2
+            for x1 in range(n):
+                if x1 &gt; sum: # 越界
+                    break
+                y1 = sum - x1
+                if y1 &gt;= n:
+                    continue
+                
+                if grid[x1][y1] == -1: # 如果当前点不能走
+                    dp[sum%2][x1] = [-1]*n
+                    # print(f&#34;dp[{sum}][{x1}] = {dp[now][x1]}&#34;)
+                    continue
+                top  = grid[x1-1][y1] if x1&gt;0 else -1
+                left = grid[x1][y1-1] if y1&gt;0 else -1
+                if top == left == -1: # 走到当前点的两个 point 都是不能走的，那么也没法走到当前点
+                    dp[now][x1] = [-1]*n
+                    # print(f&#34;dp[{sum}][{x1}] = {dp[now][x1]}&#34;)
+                    continue
+                # 否则遍历
+                for x2 in range(n):
+                    if x2 &gt; sum:
+                        break
+                    y2 = sum - x2
+                    if y2 &gt;= n:
+                        continue
+                    if grid[x2][y2] == -1: # 当前点不能走
+                        dp[now][x1][x2] = -1
+                        continue
+                    top2  = grid[x2-1][y2] if x2&gt;0 else -1
+                    left2 = grid[x2][y2-1] if y2&gt;0 else -1
+                    if top2 == left2 == -1:
+                        dp[now][x1][x2] = -1
+                        grid[x2][y2] = -1
+                        continue
+                    top1  = dp[last][x1-1][x2]   if (x1&gt;0 and y2&gt;0) else 0
+                    left1 = dp[last][x1-1][x2-1] if (x1&gt;0 and x2&gt;0) else 0
+                    top2  = dp[last][x1][x2-1]   if (y1&gt;0 and x2&gt;0) else 0
+                    left2 = dp[last][x1][x2]     if (y1&gt;0 and y2&gt;0) else 0
+                    dp[now][x1][x2] = max(left1, left2, top1, top2) + grid[x1][y1] + grid[x2][y2]
+                    if x1 == x2:
+                        dp[now][x1][x2] -= grid[x1][y1]
+                flag = True # 能运行到这一步，说明存在点都可以走
+            if not flag:
+                return 0
+        return dp[0][n-1][n-1] if dp[0][n-1][n-1]!=-1 else 0</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解使用三维动态规划（DP）的方式解决问题。解决的主要策略是同时考虑从(0,0)到(n-1,n-1)的前进路径和从(n-1,n-1)返回到(0,0)的返回路径。这里的关键在于，任何时间点上的两条路径所在的网格之和应该相等。我们使用dp数组，其中dp[t][x1][x2]表示在时间步t，第一条路径在点(x1, t-x1)和第二条路径在点(x2, t-x2)时可以摘到的最大樱桃数。动态规划的转移方程考虑了从左边或上边转移到当前点的所有可能性，同时考虑两个路径可能在同一个点重合的情况。如果两条路径在同一点相遇，则该点的樱桃只计算一次。如果某一步没有有效的移动方式，则直接返回0，表示无法完成任务。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n^2)</p>
+                                <pre class="bg-light p-2">from typing import List
+
+class Solution:
+    def cherryPickup(self, grid: List[List[int]]) -&gt; int:
+        if grid[0][0] == -1:
+            return 0
+        n = len(grid)
+        k = 2*n-1
+        dp = [[[0 for i in range(n)] for j in range(n)] for k in range(2)] # 三维 DP, 滚动数组
+        dp[0][0][0] = grid[0][0]
+        for sum in range(1, k):
+            flag = False
+            now  = sum % 2
+            last = (sum-1) % 2
+            for x1 in range(min(sum+1, n)):
+                y1 = sum - x1
+                if y1 &gt;= n or grid[x1][y1] == -1:
+                    continue
+                for x2 in range(min(sum+1, n)):
+                    y2 = sum - x2
+                    if y2 &gt;= n or grid[x2][y2] == -1:
+                        continue
+                    choices = [
+                        dp[last][x1-1][x2] if x1&gt;0 else -1,
+                        dp[last][x1][x2-1] if x2&gt;0 else -1,
+                        dp[last][x1-1][x2-1] if x1&gt;0 and x2&gt;0 else -1,
+                        dp[last][x1][x2] if x1&gt;0 and x2&gt;0 else -1
+                    ]
+                    best_prev = max([x for x in choices if x != -1], default=-1)
+                    if best_prev == -1:
+                        continue
+                    cherries = grid[x1][y1] + (grid[x2][y2] if x1 != x2 else 0)
+                    dp[now][x1][x2] = best_prev + cherries
+            if not any(any(dp[now][x][y] != -1 for y in range(n)) for x in range(n)):
+                return 0
+        return max(dp[now][n-1][n-1], 0) # 确保返回非负值</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解决这个问题时选择使用三维动态规划而不是其他算法？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个问题涉及两条路径同时在一个网格中行走并尽可能多地摘樱桃。使用三维动态规划可以有效处理这种情况，因为它能同时跟踪两条路径的状态并计算最大樱桃数。三维DP通过时间步`t`和两条路径的位置`x1`和`x2`来表示状态，能够考虑两条路径的相互作用，如重合和同时选择最优路径。其他算法，如贪心或二维DP，无法有效处理两条路径可能的交互和重叠，可能导致无法找到全局最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在动态规划转移方程中，为什么要特别处理两条路径在同一点相遇的情况，只计算一次樱桃数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果两条路径在同一点相遇而计算两次樱桃数，则会导致樱桃的重复计算，这不符合题目要求的实际情况。实际上，当两个人同时到达同一个格子时，只能摘取一次樱桃。因此，在DP转移方程中，如果`x1`与`x2`相等（即两路径在同一个点），则这个点的樱桃数只加一次，否则分别为两条路径添加各自位置的樱桃数。这样可以确保每个樱桃只被计算一次。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如何处理边界条件，例如当`x1`或`x2`为0时，以及如何确保不会引用到无效的数组索引？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法实现中，对边界条件进行了特别处理。例如，当`x1`或`x2`为0时，我们只从可能的方向（即上方或左方）进行状态转移，而不是从不存在的格子转移，这通过条件判断如`if x1&gt;0`来实现。同时，确保`y1`和`y2`（计算为`sum - x1`和`sum - x2`）不超过网格的边界，即不大于`n-1`。这些条件判断确保了引用的数组索引总是有效和存在的，从而避免了数组越界错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            动态规划数组`dp`中的初始值是如何设置的，为什么只将`dp[0][0][0]`设为`grid[0][0]`？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，初始化是非常重要的步骤，它定义了递推的起点。对于这个问题，`dp[0][0][0]`代表两条路径都从网格的左上角(0,0)开始，因此初始樱桃数为`grid[0][0]`。这是因为在开始时，两条路径都在起点只有一个可能的位置，且这是计算的起始状态。其他的`dp`值不需要初始化为具体的樱桃数，因为它们会在接下来的状态转移中被覆盖。仅初始化`dp[0][0][0]`是因为这是唯一已知的初始条件，其他状态依赖于从起点出发的状态转移。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/minimum-path-sum" class="list-group-item list-group-item-action">
+                                最小路径和
+                            </a>
+                        
+                            <a href="/problem/dungeon-game" class="list-group-item list-group-item-action">
+                                地下城游戏
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/cherry-pickup')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/cherry-pickup/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

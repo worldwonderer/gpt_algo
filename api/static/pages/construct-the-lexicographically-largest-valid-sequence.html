@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>构建字典序最大的可行序列</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>构建字典序最大的可行序列</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数 <code>n</code> ，请你找到满足下面条件的一个序列：</p>
+
+<ul>
+	<li>整数 <code>1</code> 在序列中只出现一次。</li>
+	<li><code>2</code> 到 <code>n</code> 之间每个整数都恰好出现两次。</li>
+	<li>对于每个 <code>2</code> 到 <code>n</code> 之间的整数 <code>i</code> ，两个 <code>i</code> 之间出现的距离恰好为 <code>i</code> 。</li>
+</ul>
+
+<p>序列里面两个数 <code>a[i]</code> 和 <code>a[j]</code> 之间的 <strong>距离</strong> ，我们定义为它们下标绝对值之差 <code>|j - i|</code> 。</p>
+
+<p>请你返回满足上述条件中 <strong>字典序最大</strong> 的序列。题目保证在给定限制条件下，一定存在解。</p>
+
+<p>一个序列 <code>a</code> 被认为比序列 <code>b</code> （两者长度相同）字典序更大的条件是： <code>a</code> 和 <code>b</code> 中第一个不一样的数字处，<code>a</code> 序列的数字比 <code>b</code> 序列的数字大。比方说，<code>[0,1,9,0]</code> 比 <code>[0,1,5,6]</code> 字典序更大，因为第一个不同的位置是第三个数字，且 <code>9</code> 比 <code>5</code> 大。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><b>输入：</b>n = 3
+<b>输出：</b>[3,1,2,3,2]
+<b>解释：</b>[2,3,2,1,3] 也是一个可行的序列，但是 [3,1,2,3,2] 是字典序最大的序列。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>n = 5
+<b>输出：</b>[5,3,1,4,3,5,2,4,2]
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 20</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 28 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def constructDistancedSequence(self, n: int) -&gt; List[int]:
+        res = [None] * ((n &lt;&lt; 1) - 1)
+        # info = { 1 : 1}
+        # for i in range(2, n + 1):
+        #     info[i] = 2
+        visited = set()
+        self.recurse(res, n, 0, 1, visited)
+        return res
+    
+    def recurse(self, res, n, idx, t, visited):
+        # if t == n:
+        #     return True
+
+        # visited = set()
+        next_idx = None
+        for i in range(n, 0, -1):
+            if i in visited:
+                continue
+            
+            if i &gt; 1 and idx + i &gt;= len(res):
+                continue
+            
+            if i &gt; 1 and res[idx + i] is not None:
+                continue
+            
+            visited.add(i)
+            res[idx] = i 
+            if i &gt; 1:
+                res[idx + i] = i 
+            
+            if t == n:
+                return True
+            
+            next_idx = idx + 1
+            while res[next_idx] is not None:
+                next_idx += 1
+            
+            if self.recurse(res, n, next_idx, t + 1, visited):
+                return True
+            
+            if i &gt; 1:
+                res[idx + i] = None
+            res[idx] = None
+            visited.remove(i)
+
+            
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解基于回溯算法。首先，初始化一个长度为2n-1的数组res，用于存放最终的序列。数组中的每个位置初始值为None，表示尚未放置任何数字。使用一个集合visited来记录当前已经被放置在序列中的数字。回溯函数recurse通过递归的方式尝试在序列res中放置数字，从n开始尝试到1，以确保字典序最大。对于每个数字i，如果i未被访问过，并且位置上的放置是可行的（对于大于1的i，需要确保res[idx + i]也未被占用），则将i放入当前位置和对应的间隔位置（如果i大于1）。然后，继续递归尝试填充下一个位置。如果递归成功，返回True；否则，撤销当前放置，尝试下一个数字。通过这种方式，算法尝试构建字典序最大的序列。</p>
+                                <p>时间复杂度: O(n!)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def constructDistancedSequence(self, n: int) -&gt; List[int]:
+        res = [None] * ((n &lt;&lt; 1) - 1) # 初始化结果数组，长度为2n-1
+        visited = set() # 访问标记集合
+        self.recurse(res, n, 0, 1, visited)
+        return res
+    
+    def recurse(self, res, n, idx, t, visited):
+        for i in range(n, 0, -1): # 从大到小尝试放置数字以保证字典序最大
+            if i in visited: # 如果数字已被使用则跳过
+                continue
+            if i &gt; 1 and idx + i &gt;= len(res): # 确保不会越界
+                continue
+            if i &gt; 1 and res[idx + i] is not None: # 确保间隔位置未被占用
+                continue
+            visited.add(i) # 标记数字为已使用
+            res[idx] = i # 放置数字
+            if i &gt; 1:
+                res[idx + i] = i # 放置间隔数字
+            if t == n: # 如果所有数字都已放置
+                return True
+            next_idx = idx + 1
+            while res[next_idx] is not None: # 寻找下一个空位置
+                next_idx += 1
+            if self.recurse(res, n, next_idx, t + 1, visited): # 递归放置下一个数字
+                return True
+            if i &gt; 1:
+                res[idx + i] = None # 撤销间隔位置的放置
+            res[idx] = None # 撤销当前位置的放置
+            visited.remove(i) # 取消标记</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在递归函数中从数字n开始递减尝试放置，而不是从1开始放置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数中从数字n开始递减尝试放置而不是从1开始，是因为我们需要构建一个字典序最大的序列。字典序比较是从左到右比较数字的大小，因此首先尝试放置较大的数可以更有可能在序列的前面放置大数字，从而确保生成的序列在字典序上尽可能大。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在回溯算法中，如果放置了数字i但未能成功构建整个序列，为什么需要撤销当前位置和间隔位置的放置？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回溯算法中，如果试图放置数字i后未能成功构建整个序列，需要撤销当前位置和间隔位置的放置是因为这样的放置可能阻碍了其他可能的数字放置，导致无法找到一个成功的完整序列。撤销放置允许算法回退到前一个状态，尝试其他数字的放置，从而找到正确的序列配置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在寻找下一个空位置时，是否存在更高效的方法来确定下一个未被占用的位置，而不是通过逐个检查？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实存在更高效的方法来确定下一个未被占用的位置，比如使用一个辅助数据结构（如队列或链表）来跟踪还未被填充的位置。每次填充位置后，可以从这个数据结构中移除相应的位置，从而快速获取下一个空位置。这种方法可以减少不必要的遍历，提高算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解中没有详细解释如何确保构建的是字典序最大的序列，能否进一步解释这一点？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>构建字典序最大的序列的关键在于优先放置较大的数字，并尽可能地将这些数字放在序列的前面位置。算法从n开始递减尝试放置数字，确保一旦较大的数字可以放置，它们会立即被放置在可用的最前端位置。这样，较大的数字较早出现在序列中，从而确保整个序列的字典序尽可能大。此外，通过正确管理数字的放置和撤销（回溯），算法能够探索所有可能的配置，从而找到字典序最大的序列。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/construct-the-lexicographically-largest-valid-sequence')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/construct-the-lexicographically-largest-valid-sequence/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

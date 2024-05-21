@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>力扣泡泡龙</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>力扣泡泡龙</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        欢迎各位勇者来到力扣城，本次试炼主题为「力扣泡泡龙」。
+
+游戏初始状态的泡泡形如二叉树 `root`，每个节点值对应了该泡泡的分值。勇者最多可以击破一个节点泡泡，要求满足：
+- 被击破的节点泡泡 **至多** 只有一个子节点泡泡
+- 当被击破的节点泡泡有子节点泡泡时，则子节点泡泡将取代被击破泡泡的位置
+    > 注：即整棵子树泡泡上移
+
+请问在击破一个节点泡泡操作或无击破操作后，二叉泡泡树的最大「层和」是多少。
+
+**注意：**
+- 「层和」为同一高度的所有节点的分值之和
+
+**示例 1：**
+> 输入：`root = [6,0,3,null,8]`
+>
+> 输出：`11`
+>
+> 解释：勇者的最佳方案如图所示
+>![image.png](https://pic.leetcode-cn.com/1648180809-XSWPLu-image.png){:height="100px"}
+
+
+
+**示例 2：**
+> 输入：`root = [5,6,2,4,null,null,1,3,5]`
+>
+> 输出：`9`
+>
+> 解释：勇者击破 6 节点，此时「层和」最大为 3+5+1 = 9
+>![image.png](https://pic.leetcode-cn.com/1648180769-TLpYop-image.png){:height="200px"}
+
+
+
+**示例 3：**
+> 输入：`root = [-5,1,7]`
+>
+> 输出：`8`
+>
+> 解释：勇者不击破节点，「层和」最大为 1+7 = 8
+
+
+**提示**：
+- `2 <= 树中节点个数 <= 10^5`
+- `-10000 <= 树中节点的值 <= 10000`
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 919 ms</p>
+                    <p>内存: 64.0 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def getMaxLayerSum(self, root: Optional[TreeNode]) -&gt; int:
+
+
+
+        # public solution ... 
+        
+        def dfs(node):
+            if node.left is None and node.right is None:
+                return [node.val], [node.val], 0, True
+            elif node.left is None or node.right is None:
+                child = node.left or node.right
+                nohit, hit, move_up_range, last_null = dfs(child)
+                nohit.append(node.val)
+                hit.append(node.val)
+                for i in range(-1, -1 - move_up_range, -1):
+                    hit[i] = max(hit[i], nohit[i - 1])
+                if len(hit) - 1 - move_up_range &gt; 0:
+                    hit[len(hit) - 1 - move_up_range] = max(hit[len(hit) - 1 - move_up_range], nohit[len(hit) - 2 - move_up_range])
+                #print(&#34;dfs1&#34;, node.val, nohit, hit)
+                return nohit, hit, 0, True
+            else:
+                left_result = dfs(node.left)
+                right_result = dfs(node.right)
+                if len(left_result[0]) &lt; len(right_result[0]):
+                    left_result, right_result = right_result, left_result
+                nohit_left, hit_left, move_up_range_left, last_null_left = left_result
+                nohit_right, hit_right, _, last_null_right = right_result
+                for i in range(len(hit_right)):
+                    hr = hit_right[i]
+                    if i == 0 and last_null_right:
+                        hr = max(hr, 0)
+                    j = len(hit_left) - len(hit_right) + i
+                    hl = hit_left[j]
+                    if j == 0 and last_null_left:
+                        hl = max(hl, 0)
+                    hit_left[j] = max(hl + nohit_right[i], nohit_left[j] + hr)
+                for i in range(len(nohit_right)):
+                    j = len(hit_left) - len(hit_right) + i
+                    nohit_left[j] += nohit_right[i]
+                last_null = (len(hit_left) &gt; len(hit_right)) and last_null_left
+                nohit_left.append(node.val)
+                hit_left.append(node.val)
+                move_up_range = max(move_up_range_left, len(nohit_right)) + 1
+                #print(&#34;dfs2&#34;, node.val, nohit_left, hit_left, move_up_range, last_null)
+                return nohit_left, hit_left, move_up_range, last_null
+
+        _, hit, _, _ = dfs(root)
+        return max(hit)
+        
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用深度优先搜索（DFS）的方式遍历二叉树。对于每个节点，计算在不击破该节点和击破该节点两种情况下，以该节点为根的子树的每一层的最大层和。在遍历过程中，需要考虑几种情况：
+1. 如果当前节点是叶子节点，则直接返回该节点的值作为层和。
+2. 如果当前节点只有一个子节点，则将当前节点的值加到子节点的层和上，同时在击破的情况下，需要将子节点的层和向上移动一层。
+3. 如果当前节点有两个子节点，则分别计算左右子树的层和，然后合并两个子树的层和。在合并过程中，需要考虑击破节点的情况，将左右子树的层和进行适当的组合。
+最后，返回根节点的击破和不击破两种情况下的最大层和中的较大值。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def getMaxLayerSum(self, root: Optional[TreeNode]) -&gt; int:
+        def dfs(node):
+            if node.left is None and node.right is None:
+                # 如果当前节点是叶子节点，直接返回节点值作为层和
+                return [node.val], [node.val], 0, True
+            elif node.left is None or node.right is None:
+                # 如果当前节点只有一个子节点
+                child = node.left or node.right
+                nohit, hit, move_up_range, last_null = dfs(child)
+                # 将当前节点的值加到子节点的层和上
+                nohit.append(node.val) 
+                hit.append(node.val)
+                # 在击破的情况下，将子节点的层和向上移动
+                for i in range(-1, -1 - move_up_range, -1):
+                    hit[i] = max(hit[i], nohit[i - 1])
+                if len(hit) - 1 - move_up_range &gt; 0:
+                    hit[len(hit) - 1 - move_up_range] = max(hit[len(hit) - 1 - move_up_range], nohit[len(hit) - 2 - move_up_range])
+                return nohit, hit, 0, True
+            else:
+                # 如果当前节点有两个子节点
+                left_result = dfs(node.left)
+                right_result = dfs(node.right)
+                # 确保left_result的深度不小于right_result
+                if len(left_result[0]) &lt; len(right_result[0]):
+                    left_result, right_result = right_result, left_result
+                nohit_left, hit_left, move_up_range_left, last_null_left = left_result
+                nohit_right, hit_right, _, last_null_right = right_result
+                # 合并左右子树的击破层和
+                for i in range(len(hit_right)):
+                    hr = hit_right[i]
+                    if i == 0 and last_null_right:
+                        hr = max(hr, 0)
+                    j = len(hit_left) - len(hit_right) + i
+                    hl = hit_left[j]
+                    if j == 0 and last_null_left:
+                        hl = max(hl, 0)
+                    hit_left[j] = max(hl + nohit_right[i], nohit_left[j] + hr)
+                # 合并左右子树的不击破层和
+                for i in range(len(nohit_right)):
+                    j = len(hit_left) - len(hit_right) + i
+                    nohit_left[j] += nohit_right[i]
+                last_null = (len(hit_left) &gt; len(hit_right)) and last_null_left
+                nohit_left.append(node.val)
+                hit_left.append(node.val)
+                move_up_range = max(move_up_range_left, len(nohit_right)) + 1
+                return nohit_left, hit_left, move_up_range, last_null
+        
+        # 从根节点开始DFS遍历         
+        _, hit, _, _ = dfs(root)
+        # 返回击破和不击破两种情况下的最大层和的较大值
+        return max(hit)
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理只有一个子节点的情况时，你是如何决定将子节点的层和向上移动的层数的？具体的逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当一个节点只有一个子节点时，&#39;击破&#39;操作意味着将子节点的层和向上移动一层，以使当前节点的层和能够通过消除子节点的层来获得优化。具体的逻辑包括：1. 将当前节点的值加到子节点的每一层层和中。2. 为处理击破情况，我们考虑将子节点的每一层层和向上移动一层，这样做是为了在最后的层和中考虑可能的最优结构。这种移动实际上是通过计算一个新的层和数组，其中每个元素是当前层和与上一层层和的最大值实现的。这样的处理可以帮助我们在父节点中获得更高的层和值，特别是在父节点本身也可能被击破的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当当前节点有两个子节点时，为什么需要确保`left_result`的深度不小于`right_result`，这样的排序有什么特定的目的或效果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理有两个子节点的节点时，确保`left_result`的层和数组深度不小于`right_result`的层和数组深度是为了简化合并过程。这种排序允许我们遍历右子树的结果并将其相应层的值合并到左子树的相应层。如果`left_result`的深度小于`right_result`，则在合并过程中我们需要额外的步骤来处理数组长度不匹配的情况，这可能会增加算法的复杂性和执行时间。通过保持`left_result`总是较深的数组，我们可以直接在一个循环中完成合并，同时保留左子树的深度信息，使得整体处理更为高效和直接。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在合并左右子树的层和时，你是如何处理可能存在的空层（例如，一个子节点可能没有对应深度的层）的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在合并左右子树的层和时，处理不同深度的层和（即所谓的空层）主要通过填充较短的数组以匹配较长数组的长度来实现。具体地，如果右子树较短，我们会在其层和数组末尾假设额外的层和值为0。这样，当我们合并层和时，对于右子树不存在的层，其层和值默认为0，从而不会影响左子树相应层的层和值。此外，若一个子节点在某一深度没有层和，则在合并时我们只需考虑另一子节点在该深度的层和值。这种方法确保了合并过程的正确性并避免了错误的层和累加。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/WInSav')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/WInSav/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

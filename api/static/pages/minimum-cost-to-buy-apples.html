@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>购买苹果的最低成本</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>购买苹果的最低成本</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 31 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minCost(self, n: int, roads: List[List[int]], appleCost: List[int], k: int) -&gt; List[int]:
+        k, conn, res, heap = k+1, [[] for _ in range(n+1)], [0]*(n+1), [(apple, i) for i,apple in enumerate(appleCost,1)]
+        for u,v,cost in roads:
+            conn[u].append((v,cost))
+            conn[v].append((u,cost))
+        heapify(heap)
+        while heap and n:
+            cur, node = heappop(heap)
+            if res[node]:   continue
+            res[node], n = cur, n-1
+            for nxt, cost in conn[node]:
+                if not res[nxt]:
+                    heappush(heap, (cur+cost*k, nxt))
+        return res[1:]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了优先队列（最小堆）结合图的遍历来寻找购买苹果的最低成本。首先，题解中扩展了每条边的成本，将其变成原始成本乘以一个因子k+1。这是因为题目可能包含某种与k相关的特殊计算规则，比如运输成本或额外税费，但题目描述中未明确。接着使用了一个最小堆来保持当前苹果成本最低的节点。算法从成本最低的苹果开始，并通过遍历所有连接的节点来更新它们到达的成本，如果找到更小的成本则更新。重复这个过程直到所有节点都被访问过。最终，返回每个节点的最小成本。</p>
+                                <p>时间复杂度: O((n + e) log n)</p>
+                                <p>空间复杂度: O(n + e)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minCost(self, n: int, roads: List[List[int]], appleCost: List[int], k: int) -&gt; List[int]:
+        k, conn, res, heap = k+1, [[] for _ in range(n+1)], [0]*(n+1), [(apple, i) for i,apple in enumerate(appleCost,1)]
+        # 构建无向图的邻接表
+        for u,v,cost in roads:
+            conn[u].append((v,cost))
+            conn[v].append((u,cost))
+        # 初始化堆
+        heapify(heap)
+        # 使用优先队列处理最小成本计算
+        while heap and n:
+            cur, node = heappop(heap)
+            # 如果节点已经处理过，跳过
+            if res[node]:   continue
+            # 设置当前节点的最低成本
+            res[node], n = cur, n-1
+            # 更新连接节点的成本
+            for nxt, cost in conn[node]:
+                if not res[nxt]:
+                    heappush(heap, (cur+cost*k, nxt))
+        # 返回除0号节点外的所有节点成本
+        return res[1:]</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，为何将每条边的成本乘以因子k+1？这种处理方式是否与题目中的某个特定需求有关？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，每条边的成本乘以因子k+1是为了模拟额外的成本因素，可能是因为题目涉及到的特殊运输成本或其他费用，这个因子k+1有助于模拟这种额外开销。这种处理方式确实与题目中的特定需求相关，可能题目描述中有提及特定的成本计算规则，但在题目摘要中未详细说明。这个因子使得算法可以灵活调整各条边的权重，以适应题目的特殊要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理优先队列时，跳过了已经设置成本的节点？这种策略会不会导致某些情况下无法得到真正的最小成本？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理优先队列时，跳过已经设置成本的节点是因为使用了贪心策略，即已经从堆中提取出的节点被认为其成本已经是最小的。如果一个节点的成本已经确定，再次考虑它将是多余的，因为其它路径到达该节点的成本一定不会更低。这种策略通常不会导致错过真正的最小成本，因为每个节点的成本一旦被设置，就意味着我们已找到从起点到该节点的最低成本路径。然而，如果算法实现中有错误，比如更新邻接节点成本的逻辑不正确，可能会导致不准确的结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            你在算法中使用了最小堆来处理节点成本，这种数据结构在这种情况下相比于其他数据结构（如数组或二叉搜索树）有何优势？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这种情况下，使用最小堆（优先队列）可以更有效地管理和更新节点的成本。最小堆能够保证每次从堆中提取的都是当前成本最低的节点，这对于实现像 Dijkstra 算法这样的最短路径算法非常关键。相比之下，如果使用数组，每次查找最小成本节点都需要遍历整个数组，效率较低；而如果使用二叉搜索树，虽然可以提供较快的插入和删除操作，但在维护平衡和更新操作方面比最小堆复杂。因此，最小堆在处理此类问题时，提供了既高效又简单的解决方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-cost-to-buy-apples')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-cost-to-buy-apples/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

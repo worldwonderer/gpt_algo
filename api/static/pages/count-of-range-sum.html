@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>区间和的个数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>区间和的个数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=divide-and-conquer" class="badge bg-secondary tag-link">分治</a>
+                    
+                        <a href="/problems?tag=ordered-set" class="badge bg-secondary tag-link">有序集合</a>
+                    
+                        <a href="/problems?tag=merge-sort" class="badge bg-secondary tag-link">归并排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数数组 <code>nums</code> 以及两个整数 <code>lower</code> 和 <code>upper</code> 。求数组中，值位于范围 <code>[lower, upper]</code> （包含 <code>lower</code> 和 <code>upper</code>）之内的 <strong>区间和的个数</strong> 。</p>
+
+<p><strong>区间和</strong> <code>S(i, j)</code> 表示在 <code>nums</code> 中，位置从 <code>i</code> 到 <code>j</code> 的元素之和，包含 <code>i</code> 和 <code>j</code> (<code>i</code> ≤ <code>j</code>)。</p>
+
+<p> </p>
+<strong>示例 1：</strong>
+
+<pre>
+<strong>输入：</strong>nums = [-2,5,-1], lower = -2, upper = 2
+<strong>输出：</strong>3
+<strong>解释：</strong>存在三个区间：[0,0]、[2,2] 和 [0,2] ，对应的区间和分别是：-2 、-1 、2 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [0], lower = 0, upper = 0
+<strong>输出：</strong>1
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= nums.length <= 10<sup>5</sup></code></li>
+	<li><code>-2<sup>31</sup> <= nums[i] <= 2<sup>31</sup> - 1</code></li>
+	<li><code>-10<sup>5</sup> <= lower <= upper <= 10<sup>5</sup></code></li>
+	<li>题目数据保证答案是一个 <strong>32 位</strong> 的整数</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 704 ms</p>
+                    <p>内存: 32.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+
+    def countRangeSum(self, nums, lower, upper):
+        arr_sum = [0] * len(nums)  # 前缀和数组
+        arr_sum[0] = nums[0]
+        for i in range(1, len(nums)):
+            arr_sum[i] = arr_sum[i - 1] + nums[i]
+
+        return self.process5(arr_sum, 0, len(arr_sum) - 1, lower, upper)
+
+    def process5(self, arr, left, right, lower, upper):
+        if left == right:
+            return 1 if lower &lt;= arr[left] &lt;= upper else 0
+
+        mid = (left + right) // 2
+
+        return sum([self.process5(arr, left, mid, lower, upper), self.process5(arr, mid + 1, right, lower, upper),
+                    self.merge5(arr, left, mid, right, lower, upper)])
+
+    def merge5(self, arr, left, mid, right, lower, upper):
+        ans = 0
+        help_arr = [0] * (right - left + 1)  # 辅助数组，就两个数组合并，最后再赋值给arr[left:right+1]
+        i = 0
+        p1 = left
+        p2 = mid + 1
+
+        # [window_l, window_r) 是囊括的答案数
+        window_l = left
+        window_r = left
+
+        for v in arr[mid + 1: right + 1]:
+            value_min = v - upper
+            value_max = v - lower
+
+            while window_l &lt;= mid and arr[window_l] &lt; value_min:  # l 最大能到达 m+1
+                window_l += 1
+            while window_r &lt;= mid and arr[window_r] &lt;= value_max:  # r 最大能到达 m+1
+                window_r += 1
+
+            ans += window_r - window_l
+
+        while (p1 &lt;= mid) and (p2 &lt;= right):
+            if arr[p1] &lt;= arr[p2]:  #
+                help_arr[i] = arr[p1]
+                p1 += 1
+            else:  # 等于的时候优先让右边进辅助数组
+                help_arr[i] = arr[p2]
+                p2 += 1
+
+            i += 1
+
+        help_arr[i:] = arr[p1:mid + 1] if p1 &lt;= mid else arr[p2:right + 1]  # 等价于上面两个while
+
+        arr[left: right + 1] = help_arr
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用分治法与归并排序的思想来解决问题。首先，我们计算了数组的前缀和，然后通过递归分治方法处理每个子数组，并在合并的过程中统计符合条件的区间和的个数。具体步骤如下：
+1. 计算数组的前缀和，以便快速计算任意子数组的和。
+2. 使用递归分治的方法来处理和合并子数组。对于每个子问题，如果它只包含一个元素，直接判断这个单独元素形成的区间和是否在指定范围内。
+3. 在合并两个已经排序的子数组的过程中，使用双指针技术统计当前右侧元素与左侧元素组合形成的区间和落在[lower, upper]范围内的个数。
+4. 合并完成后，还需要将左右两部分归并排序，以便后续操作可以继续利用已排序的性质加速区间和的计算。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+
+    def countRangeSum(self, nums, lower, upper):
+        arr_sum = [0] * len(nums)  # 计算前缀和数组
+        arr_sum[0] = nums[0]
+        for i in range(1, len(nums)):
+            arr_sum[i] = arr_sum[i - 1] + nums[i]
+
+        return self.process5(arr_sum, 0, len(arr_sum) - 1, lower, upper)
+
+    def process5(self, arr, left, right, lower, upper):
+        if left == right:
+            return 1 if lower &lt;= arr[left] &lt;= upper else 0
+
+        mid = (left + right) // 2
+
+        return sum([self.process5(arr, left, mid, lower, upper), self.process5(arr, mid + 1, right, lower, upper),
+                    self.merge5(arr, left, mid, right, lower, upper)])
+
+    def merge5(self, arr, left, mid, right, lower, upper):
+        ans = 0
+        help_arr = [0] * (right - left + 1)  # 辅助数组，用于合并两个子数组
+        i = 0
+        p1 = left
+        p2 = mid + 1
+
+        window_l = left
+        window_r = left
+
+        for v in arr[mid + 1: right + 1]:
+            value_min = v - upper
+            value_max = v - lower
+
+            while window_l &lt;= mid and arr[window_l] &lt; value_min:
+                window_l += 1
+            while window_r &lt;= mid and arr[window_r] &lt;= value_max:
+                window_r += 1
+
+            ans += window_r - window_l
+
+        while (p1 &lt;= mid) and (p2 &lt;= right):
+            if arr[p1] &lt;= arr[p2]:
+                help_arr[i] = arr[p1]
+                p1 += 1
+            else:
+                help_arr[i] = arr[p2]
+                p2 += 1
+
+            i += 1
+
+        help_arr[i:] = arr[p1:mid + 1] if p1 &lt;= mid else arr[p2:right + 1]  # 处理剩余元素
+
+        arr[left: right + 1] = help_arr  # 将排序后的数组写回原数组
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在计算区间和的个数时选择使用前缀和而不是直接遍历所有可能的区间组合？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用前缀和可以将计算任意子数组的和的时间复杂度从线性时间降低到常数时间。如果直接遍历所有区间组合来计算区间和，则对于长度为 n 的数组，可能的区间组合数为 n*(n+1)/2，这将导致时间复杂度为 O(n^2)，这在 n 较大时效率非常低。通过计算前缀和数组，我们只需 O(n) 时间就可以得到整个数组的前缀和，之后计算任何一个区间和都可以在 O(1) 时间内完成，从而大大提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            分治法在这个问题中具体是如何实现的？能否详细解释其在合并步骤中的作用和机制？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，分治法通过递归地将数组分成更小的子数组，直到子数组只包含一个元素，然后在合并过程中计算跨越两个子数组的区间和是否在给定的范围内。具体来说，我们首先计算左半部分和右半部分内部各自满足条件的区间和的数量，然后计算跨越左右子数组的区间和的数量。在合并步骤中，我们使用双指针技术：一个指针遍历右子数组，另外两个指针在左子数组中移动，定位符合条件的区间和范围。这种方法利用了区间和的性质，即如果我们知道右子数组的某个前缀和，可以快速通过左子数组的前缀和确定哪些和落在指定范围内。这种分治加合并的策略有效地减少了重复计算，从而提高了算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在合并过程中使用双指针统计符合条件的区间和的数量，这种方法的时间复杂度是多少？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在合并过程中，使用双指针来统计符合条件的区间和的数量主要涉及遍历右子数组的每个元素，并对每个元素使用两个指针在左子数组中寻找符合条件的前缀和范围。这个过程的时间复杂度是 O(n)，因为虽然对每个右子数组元素都可能进行一系列比较，但是两个指针（window_l 和 window_r）都是单向移动，即每个指针在整个合并过程中最多移动 n 步。因此，这一步的总体操作数是线性的，即 O(n)。这比直接计算每个可能的区间和要高效得多。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/count-of-smaller-numbers-after-self" class="list-group-item list-group-item-action">
+                                计算右侧小于当前元素的个数
+                            </a>
+                        
+                            <a href="/problem/reverse-pairs" class="list-group-item list-group-item-action">
+                                翻转对
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-of-range-sum')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-of-range-sum/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

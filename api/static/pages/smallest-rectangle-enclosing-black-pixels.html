@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>包含全部黑色像素的最小矩形</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>包含全部黑色像素的最小矩形</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 36 ms</p>
+                    <p>内存: 17.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minArea(self, image: List[List[str]], x: int, y: int) -&gt; int:
+        # using BS
+        m, n = len(image), len(image[0])
+        # search for rows
+        def searchRows(i, j, check):
+            upper, lower = i, j
+            while upper &lt; lower:
+                mid = upper + (lower - upper) // 2
+                c = sum([image[mid][k] == &#39;1&#39; for k in range(n)])
+                if (c &gt; 0) == check:
+                    lower = mid
+                else:
+                    upper = mid + 1
+            return upper
+        def searchCols(i, j, check):
+            left, right = i, j
+            while left &lt; right:
+                mid = left + (right - left) // 2
+                c = sum([image[k][mid] == &#39;1&#39; for k in range(m)])
+                if (c &gt; 0) == check:
+                    right = mid
+                else:
+                    left = mid + 1
+            return left 
+        
+        l, r = searchCols(0, y, True), searchCols(y+1, n, False)
+        u, b = searchRows(0, x, True), searchRows(x + 1, m, False)
+        # print(l, r, u, b)
+        return (b - u) * (r - l)
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题目要求找到包含所有&#39;1&#39;（黑色像素）的最小矩形区域。题解使用了二分查找方法来确定这个矩形的上下左右边界。具体地，先通过两个辅助函数 searchCols 和 searchRows 来确定四个边界。searchCols 函数用来确定左右边界，searchRows 函数用来确定上下边界。对于每个方向的边界查找，当在中间行或列找到至少一个&#39;1&#39;时，这个位置是有效的，反之无效，据此调整二分查找的范围。最终计算出的上下左右四个边界构成的矩形即为结果。</p>
+                                <p>时间复杂度: O((m+n) log(m+n))</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minArea(self, image: List[List[str]], x: int, y: int) -&gt; int:
+        # Initialize the dimensions of the image
+        m, n = len(image), len(image[0])
+        # Define function to search for horizontal boundaries
+        def searchRows(i, j, check):
+            upper, lower = i, j
+            while upper &lt; lower:
+                mid = upper + (lower - upper) // 2
+                # Check if current row has at least one &#39;1&#39;
+                c = sum([image[mid][k] == &#39;1&#39; for k in range(n)])
+                if (c &gt; 0) == check:
+                    lower = mid
+                else:
+                    upper = mid + 1
+            return upper
+        # Define function to search for vertical boundaries
+        def searchCols(i, j, check):
+            left, right = i, j
+            while left &lt; right:
+                mid = left + (right - left) // 2
+                # Check if current column has at least one &#39;1&#39;
+                c = sum([image[k][mid] == &#39;1&#39; for k in range(m)])
+                if (c &gt; 0) == check:
+                    right = mid
+                else:
+                    left = mid + 1
+            return left 
+        # Compute the boundaries using the helper functions
+        l, r = searchCols(0, y, True), searchCols(y+1, n, False)
+        u, b = searchRows(0, x, True), searchRows(x + 1, m, False)
+        # Return the area of the rectangle defined by the boundaries
+        return (b - u) * (r - l)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在二分查找中，为什么需要通过检查某一行或列中是否至少有一个&#39;1&#39;来判断中点是否有效？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，我们需要确定包含所有&#39;1&#39;的最小矩形边界。为了找到有效的边界，我们必须确认某一行或列是否有贡献（即至少包含一个&#39;1&#39;）。如果一行或列至少包含一个&#39;1&#39;，这意味着该行或列至少是部分边界。通过这种方式，我们可以使用二分查找方法有效地确定边界位置，从而缩小搜索范围，提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在searchCols和searchRows函数中，为什么在找到&#39;1&#39;时对应的行动是缩小范围而不是扩大？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法中，目标是寻找到包含所有&#39;1&#39;的最小矩形边界。当我们在某个中点发现&#39;1&#39;时，这表示当前中点向边界方向的搜索是有效的，因此我们应该向这个方向继续缩小搜索范围，以便更精确地锁定边界。如果扩大范围，我们可能会包含更多不必要的区域，不符合最小化矩形的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            searchCols函数中，当从左边界开始时为什么使用y作为起始的右边界，而从右边界开始时使用y+1作为起始的左边界？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在searchCols函数中，我们从一个已知包含&#39;1&#39;的点(y)开始寻找边界。使用y作为左边界查找的结束（右边界）是基于这样一个假设：y列本身可能是需要的最左边界或更左。而使用y+1作为右边界查找的开始是基于假设：y列已经包含在内，我们需要从下一列开始确定不包含&#39;1&#39;的列，从而确定最右边界。这样的分界确保了查找范围的正确性和算法的高效性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            如果输入的图像中没有任何&#39;1&#39;（全部为&#39;0&#39;），此算法是否还会正确运行？如果不会，应该如何修改算法来处理这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果输入的图像中全部为&#39;0&#39;，当前算法可能不会正确运行，因为它依赖于找到至少一列或一行包含&#39;1&#39;来确定边界。在这种情况下，二分查找的check部分永远不会为true，可能导致无限循环或错误的边界返回。为了处理这种情况，我们可以在算法开始前添加一个预检查步骤，即遍历整个图像查看是否至少存在一个&#39;1&#39;。如果不存在&#39;1&#39;，则直接返回面积为0或相应的错误/空矩形提示。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/smallest-rectangle-enclosing-black-pixels')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/smallest-rectangle-enclosing-black-pixels/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

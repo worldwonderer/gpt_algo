@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>模式匹配</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>模式匹配</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你有两个字符串，即<code>pattern</code>和<code>value</code>。 <code>pattern</code>字符串由字母<code>&quot;a&quot;</code>和<code>&quot;b&quot;</code>组成，用于描述字符串中的模式。例如，字符串<code>&quot;catcatgocatgo&quot;</code>匹配模式<code>&quot;aabab&quot;</code>（其中<code>&quot;cat&quot;</code>是<code>&quot;a&quot;</code>，<code>&quot;go&quot;</code>是<code>&quot;b&quot;</code>），该字符串也匹配像<code>&quot;a&quot;</code>、<code>&quot;ab&quot;</code>和<code>&quot;b&quot;</code>这样的模式。但需注意<code>&quot;a&quot;</code>和<code>&quot;b&quot;</code>不能同时表示相同的字符串。编写一个方法判断<code>value</code>字符串是否匹配<code>pattern</code>字符串。</p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong> pattern = &quot;abba&quot;, value = &quot;dogcatcatdog&quot;
+<strong>输出：</strong> true
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong> pattern = &quot;abba&quot;, value = &quot;dogcatcatfish&quot;
+<strong>输出：</strong> false
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong> pattern = &quot;aaaa&quot;, value = &quot;dogcatcatdog&quot;
+<strong>输出：</strong> false
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong> pattern = &quot;abba&quot;, value = &quot;dogdogdogdog&quot;
+<strong>输出：</strong> true
+<strong>解释：</strong> &quot;a&quot;=&quot;dogdog&quot;,b=&quot;&quot;，反之也符合规则
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= len(pattern) &lt;= 1000</code></li>
+	<li><code>0 &lt;= len(value) &lt;= 1000</code></li>
+	<li>你可以假设<code>pattern</code>只包含字母<code>&quot;a&quot;</code>和<code>&quot;b&quot;</code>，<code>value</code>仅包含小写字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 29 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def patternMatching(self, pattern: str, value: str) -&gt; bool:
+        cnta = pattern.count(&#39;a&#39;)
+        cntb = len(pattern) - cnta
+        if not value:
+            return not (cnta and cntb)
+        if cnta == 1 or cntb == 1:
+            return True
+        n = len(value)
+        if not (cnta and cntb):
+            c = cnta or cntb
+            if n % c:
+                return False
+            s = value[:n // c]
+            return bool(re.match(f&#39;{s}{{{c}}}&#39;, value))
+
+        for len_a in range(n):
+            total_a = len_a * cnta
+            rest = n - total_a
+            len_b, t = divmod(rest, cntb)
+            if t:
+                continue
+            d = {&#39;a&#39;:[None, len_a], &#39;b&#39;:[None, len_b]}
+            i = 0
+            for c in pattern:
+                if d[c][0] is None:
+                    d[c][0] = value[i:i + d[c][1]]
+                    if d[&#39;a&#39;][0] == d[&#39;b&#39;][0]:
+                        break
+                elif value[i:i + d[c][1]] != d[c][0]:
+                    break
+                i += d[c][1]
+            else:
+                return True
+        return False
+
+
+
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用模拟和试探的方法来决定两种模式 &#39;a&#39; 和 &#39;b&#39; 可能对应的字符串长度，通过穷举所有可能的长度组合。首先计算 pattern 中 &#39;a&#39; 和 &#39;b&#39; 的出现次数。如果 value 为空字符串，只有在 pattern 也不含 &#39;a&#39; 或 &#39;b&#39; 时才返回真。特殊情况处理，若 &#39;a&#39; 或 &#39;b&#39; 出现次数为1，那么总可以将 value 分配给那个模式字符。接下来，尝试每一个可能的 &#39;a&#39; 的长度 (len_a)，计算相应的 &#39;b&#39; 的长度。通过字典 d 存储 &#39;a&#39; 和 &#39;b&#39; 对应的字符串和长度。遍历 pattern，检查对应段的字符串是否匹配，如果遇到不匹配的情况则结束当前循环。如果整个 pattern 遍历完成也没有中断，说明找到了一种匹配方式。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def patternMatching(self, pattern: str, value: str) -&gt; bool:
+        cnta = pattern.count(&#39;a&#39;)  # 统计 &#39;a&#39; 的数量
+        cntb = len(pattern) - cnta  # 统计 &#39;b&#39; 的数量
+        if not value:  # 如果 value 为空
+            return not (cnta and cntb)  # 只有 &#39;a&#39; 或 &#39;b&#39; 其中一个为0时返回 True
+        if cnta == 1 or cntb == 1:  # 如果 &#39;a&#39; 或 &#39;b&#39; 的数量为1
+            return True  # 直接返回 True
+        n = len(value)  # value 的长度
+        if not (cnta and cntb):  # 如果 &#39;a&#39; 或 &#39;b&#39; 其中一个为0
+            c = cnta or cntb  # 获取非零的数量
+            if n % c:  # 如果不能整除则返回 False
+                return False
+            s = value[:n // c]  # 取得对应的子串
+            return bool(re.match(f&#39;{s}{{{c}}}&#39;, value))  # 检查模式是否匹配
+        for len_a in range(n):  # 尝试每一个可能的 &#39;a&#39; 的长度
+            total_a = len_a * cnta  # 计算 &#39;a&#39; 对应的总长度
+            rest = n - total_a  # 剩余长度
+            len_b, t = divmod(rest, cntb)  # 计算 &#39;b&#39; 的长度和剩余部分
+            if t:  # 如果剩余部分不为0，继续下一轮
+                continue
+            d = {&#39;a&#39;:[None, len_a], &#39;b&#39;:[None, len_b]}  # 存储 &#39;a&#39; 和 &#39;b&#39; 的字符串和长度
+            i = 0
+            for c in pattern:  # 遍历 pattern
+                if d[c][0] is None:  # 如果还没有确定对应的字符串
+                    d[c][0] = value[i:i + d[c][1]]  # 确定对应的字符串
+                    if d[&#39;a&#39;][0] == d[&#39;b&#39;][0]:  # 如果 &#39;a&#39; 和 &#39;b&#39; 对应相同的字符串
+                        break
+                elif value[i:i + d[c][1]] != d[c][0]:  # 如果当前段不匹配
+                    break
+                i += d[c][1]  # 更新下一段的起始索引
+            else:  # 如果遍历完 pattern 没有中断
+                return True  # 返回 True
+        return False  # 如果尝试所有可能都失败，返回 False
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理模式匹配时，如何决定枚举&#39;a&#39;和&#39;b&#39;的长度范围？为什么选择最大长度为value的长度？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在枚举&#39;a&#39;和&#39;b&#39;的长度时，选择&#39;a&#39;的长度从0到value的长度是因为&#39;a&#39;的最大可能长度不会超过value的总长度。若&#39;a&#39;的长度超过了value的长度，那么&#39;a&#39;对应的字符串将无法从value中提取，因此&#39;a&#39;的长度范围设定为0到value长度。同样的逻辑也适用于&#39;b&#39;。这样的范围设定确保了所有可能的长度组合都被考虑到，同时避免了无意义的枚举，提高了算法的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            如果&#39;a&#39;和&#39;b&#39;在pattern中的数量完全不同，算法是如何处理这种不平衡？是否会影响长度的计算和最终匹配结果？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当&#39;a&#39;和&#39;b&#39;在pattern中的数量不同，算法通过调整&#39;a&#39;和&#39;b&#39;对应字符串的长度来处理这种不平衡。通过枚举可能的&#39;a&#39;长度，并计算对应的&#39;b&#39;长度（通过剩余长度除以&#39;b&#39;的数量得到）。这个长度计算方法确保了不同数量的&#39;a&#39;和&#39;b&#39;能够被适当地映射到value的不同部分。这种处理方式虽然复杂，但能够有效地处理不同数量对应关系，不会影响最终的匹配结果，只要存在一种有效的长度组合能够满足模式匹配。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为何在确定&#39;a&#39;或&#39;b&#39;的字符串时，算法采用了断言&#39;a&#39;和&#39;b&#39;不指向相同的字符串？这种假设是否有可能限制某些边界情况下的正确匹配？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法中断言&#39;a&#39;和&#39;b&#39;不指向相同的字符串是为了确保模式中的不同元素对应到value中的不同部分，这样才能实现真正的模式匹配。如果&#39;a&#39;和&#39;b&#39;指向相同的字符串，那么模式中&#39;a&#39;和&#39;b&#39;的区分将失去意义，无法完成正确的匹配。这种假设确实可能在某些极端情况下限制匹配，例如当模式和字符串都允许&#39;a&#39;和&#39;b&#39;对应相同的字符串时，但这种情况在实际应用中较为罕见，通常认为&#39;a&#39;和&#39;b&#39;应该映射到不同的字符串才符合模式匹配的初衷。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/pattern-matching-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/pattern-matching-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

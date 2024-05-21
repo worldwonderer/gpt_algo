@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>随机翻转矩阵</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>随机翻转矩阵</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=reservoir-sampling" class="badge bg-secondary tag-link">水塘抽样</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=randomized" class="badge bg-secondary tag-link">随机化</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>m x n</code> 的二元矩阵 <code>matrix</code> ，且所有值被初始化为 <code>0</code> 。请你设计一个算法，随机选取一个满足&nbsp;<code>matrix[i][j] == 0</code> 的下标&nbsp;<code>(i, j)</code> ，并将它的值变为 <code>1</code> 。所有满足 <code>matrix[i][j] == 0</code> 的下标 <code>(i, j)</code> 被选取的概率应当均等。</p>
+
+<p>尽量最少调用内置的随机函数，并且优化时间和空间复杂度。</p>
+
+<p>实现 <code>Solution</code> 类：</p>
+
+<ul>
+	<li><code>Solution(int m, int n)</code> 使用二元矩阵的大小 <code>m</code> 和 <code>n</code> 初始化该对象</li>
+	<li><code>int[] flip()</code> 返回一个满足&nbsp;<code>matrix[i][j] == 0</code> 的随机下标 <code>[i, j]</code> ，并将其对应格子中的值变为 <code>1</code></li>
+	<li><code>void reset()</code> 将矩阵中所有的值重置为 <code>0</code></li>
+</ul>
+
+
+
+<p><strong>示例：</strong></p>
+
+<pre>
+<strong>输入</strong>
+["Solution", "flip", "flip", "flip", "reset", "flip"]
+[[3, 1], [], [], [], [], []]
+<strong>输出</strong>
+[null, [1, 0], [2, 0], [0, 0], null, [2, 0]]
+
+<strong>解释</strong>
+Solution solution = new Solution(3, 1);
+solution.flip();  // 返回 [1, 0]，此时返回 [0,0]、[1,0] 和 [2,0] 的概率应当相同
+solution.flip();  // 返回 [2, 0]，因为 [1,0] 已经返回过了，此时返回 [2,0] 和 [0,0] 的概率应当相同
+solution.flip();  // 返回 [0, 0]，根据前面已经返回过的下标，此时只能返回 [0,0]
+solution.reset(); // 所有值都重置为 0 ，并可以再次选择下标返回
+solution.flip();  // 返回 [2, 0]，此时返回 [0,0]、[1,0] 和 [2,0] 的概率应当相同</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= m, n &lt;= 10<sup>4</sup></code></li>
+	<li>每次调用<code>flip</code> 时，矩阵中至少存在一个值为 0 的格子。</li>
+	<li>最多调用 <code>1000</code> 次 <code>flip</code> 和 <code>reset</code> 方法。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 34 ms</p>
+                    <p>内存: 16.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def __init__(self, m: int, n: int):
+        self.m, self.n = m, n
+        self.total = m * n - 1
+        self.record = dict()
+
+    def flip(self) -&gt; List[int]:
+        r = random.randint(0, self.total)
+        idx = self.record.get(r, r)
+        # 相当于total的值没被用，将那个值填入idx位置；
+        # 被用了的话，将它那里填入的没被用的值填入
+        self.record[r] = self.record.get(self.total, self.total)
+        self.total -= 1
+        ans = [idx // self.n, idx % self.n]
+        return ans
+
+    def reset(self) -&gt; None:
+        self.total = self.m * self.n - 1
+        self.record = dict()
+
+# Your Solution object will be instantiated and called as such:
+# obj = Solution(m, n)
+# param_1 = obj.flip()
+# obj.reset()
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个解决方案使用了一个映射表（哈希表）来记录已被随机选取的索引。每当调用flip函数时，它将从未被选择的索引中随机选取一个。使用一个整数total来跟踪还没有被选择的索引数量。如果一个索引已经被选取，它会被哈希表中映射到一个新的未被选取的索引。这样可以避免使用一个完整的矩阵来存储状态，从而节省空间并优化性能。</p>
+                                <p>时间复杂度: O(1)</p>
+                                <p>空间复杂度: O(min(m*n, 1000))</p>
+                                <pre class="bg-light p-2">class Solution:
+    def __init__(self, m: int, n: int):
+        self.m, self.n = m, n
+        self.total = m * n - 1
+        self.record = dict()
+
+    def flip(self) -&gt; List[int]:
+        r = random.randint(0, self.total)  # 随机选择一个未被选过的索引
+        idx = self.record.get(r, r)  # 获取实际应该返回的索引，如果没有被映射则返回自身
+        # 更新映射表，将选中的索引映射到当前的最后一个索引，或已经映射的最后一个索引
+        self.record[r] = self.record.get(self.total, self.total)
+        self.total -= 1  # 减少可选的索引数量
+        ans = [idx // self.n, idx % self.n]  # 计算行列位置
+        return ans
+
+    def reset(self) -&gt; None:
+        self.total = self.m * self.n - 1  # 重置可选索引数量
+        self.record = dict()  # 清空映射表</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确保flip函数返回的每个索引`(i, j)`被选中的概率是均等的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在flip函数中，每次选择一个随机索引`r`时，都是从当前未被选中的索引范围`[0, self.total]`中随机选取的。由于每次选择后，`self.total`都会减少1，并且通过哈希表的映射机制确保任何已经被选择的索引都映射到一个未被选择的新索引上，这样每个索引在每次调用`flip`时被选中的机会都是均等的，保证了每个索引被选中的概率是相同的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在哈希表中，如果一个索引已经被选取并映射到一个新的未被选取的索引，那么这种映射方法是否会导致某些索引被选中的概率变高？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>不会。映射方法的设计是为了确保每个索引被选中的概率保持一致。当一个索引`r`被选中后，通过映射将其指向另一个尚未被选中的索引（通常是当前的`self.total`索引）。这种映射确保了即使`r`已经被使用，后续选择时它仍指向一个有效的未使用索引。因此，每个索引被选中的次数在长期运行中将均等分布，不会因映射机制而有所偏差。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            reset函数是否能够完全重置`Solution`类的状态，使其与初始化后的状态完全相同？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，reset函数将`self.total`重置为`m * n - 1`，并且清空了哈希表`self.record`。这确保了类的状态完全回到了初始状态，如同新创建一个实例一样，所有的索引都重新变为可选，并且没有任何映射记录。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在flip操作中，使用`self.record.get(r, r)`和`self.record.get(self.total, self.total)`进行索引映射的具体逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`self.record.get(r, r)`表示尝试从哈希表`self.record`中获取键`r`的值，如果`r`不存在，则返回`r`自身。这确保了即使某个索引尚未映射，它也能正确返回自身作为结果。`self.record.get(self.total, self.total)`用于更新映射表，表示如果`self.total`已经有映射，则使用其映射值，否则使用`self.total`自身。这种方法在每次flip调用时，都将已选索引`r`映射到当前最末尾的索引`self.total`，保持映射的连续性和有效性，从而确保所有索引能均等地被随机选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/random-flip-matrix')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/random-flip-matrix/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

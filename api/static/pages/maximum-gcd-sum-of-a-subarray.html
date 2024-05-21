@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子数组的最大 GCD-Sum</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子数组的最大 GCD-Sum</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=number-theory" class="badge bg-secondary tag-link">数论</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 1219 ms</p>
+                    <p>内存: 25.6 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxGcdSum(self, nums: List[int], k: int) -&gt; int:
+        l = {}
+        ans = max(nums) ** 2 if k == 1 else 0
+        for i, x in enumerate(nums):
+            r = {x: (x, 1)}
+            for key, (sum_, length) in l.items():
+                g = gcd(key, x)
+                if g not in r:
+                    r[g] = (sum_ + x, length + 1)
+                else:
+                    if (sum_ + x) &gt; r[g][0]:
+                        r[g] = (sum_ + x, length + 1)
+                    elif (sum_ + x) == r[g][0]:
+                        r[g] = (sum_ + x, max(length + 1, r[g][1]))
+                if r[g][1] &gt;= k:
+                    ans = max(ans, r[g][0] * g)
+            l = r
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了动态规划和哈希表的混合策略来解决问题。基本思路是通过遍历数组，持续更新以每个元素为结尾的子数组的最大GCD和其对应的和与长度。使用哈希表来存储当前所有可能的GCD值及其对应的最大和与子数组长度。对于每个新的元素x，更新哈希表，检查与之前每个子数组的最大公约数，并更新这些公约数的最大和与长度。如果达到子数组长度k，计算可能的答案。这种方法确保了我们能够找到长度至少为k的子数组的最大GCD-Sum。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxGcdSum(self, nums: List[int], k: int) -&gt; int:
+        l = {}  # 存储当前所有可能的GCD及其对应的最大和与子数组长度
+        # 特殊情况处理，当k为1时，返回最大元素的平方
+        ans = max(nums) ** 2 if k == 1 else 0
+        for i, x in enumerate(nums):  # 遍历数组中的每个元素
+            r = {x: (x, 1)}  # 初始化当前元素的GCD为其本身
+            for key, (sum_, length) in l.items():  # 遍历之前的哈希表
+                g = gcd(key, x)  # 计算当前元素与之前GCD的最大公约数
+                if g not in r:  # 如果新的GCD不在哈希表中，初始化
+                    r[g] = (sum_ + x, length + 1)
+                else:  # 如果已存在，尝试更新最大和与最大长度
+                    if (sum_ + x) &gt; r[g][0]:
+                        r[g] = (sum_ + x, length + 1)
+                    elif (sum_ + x) == r[g][0]:
+                        r[g] = (sum_ + x, max(length + 1, r[g][1]))
+                if r[g][1] &gt;= k:  # 如果子数组长度达到k，更新答案
+                    ans = max(ans, r[g][0] * g)
+            l = r  # 更新哈希表
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在算法中，为什么要单独处理`k为1`的情况，直接返回最大元素的平方？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当`k`为1时，每个单独的元素都可以视为一个符合条件的子数组，因此我们只需要找到数组中的最大元素。因为题目要求计算最大GCD和的平方，而单个元素的GCD是其本身，所以最大元素的GCD和就是最大元素本身，其平方即为答案。这种情况下不需要进行更复杂的动态规划计算，直接返回最大元素的平方可以大大简化问题并提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            算法中使用的`gcd`函数是如何确保在更新哈希表时保持计算效率的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，`gcd`函数用于计算两个数的最大公约数。计算最大公约数的经典算法是欧几里得算法，其时间复杂度非常低，平均情况下是O(log(min(a, b)))。在更新哈希表时，我们需要对每个新元素和已有的每个GCD进行计算，使用高效的`gcd`函数可以确保即使这一步骤在每次迭代中重复多次，总体的计算效率仍然是可接受的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在更新哈希表时，如何决定是否创建新的GCD键或更新现有键的值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表中的键是子数组的GCD值。在更新哈希表时，首先计算当前元素与已存在GCD的最大公约数。如果这个GCD值不在哈希表中，我们将创建一个新的键，并初始化其对应的和与子数组长度。如果这个GCD值已存在于哈希表中，我们将比较现有的和与新计算的和，选择较大的和来更新，同时更新对应的子数组长度。这种方法确保了哈希表始终存储了对应GCD的最大和与最大长度，从而在后续步骤中可以更有效地找到可能的最大GCD和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            对于每个GCD键的值，您选择存储最大和与子数组长度，这种选择的优点是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>存储每个GCD对应的最大和与子数组长度的策略，可以在遍历数组时持续追踪和更新每种GCD条件下可能的最优解。这允许算法在后续的遍历中快速比较和选择不同GCD下的最优子数组情况，特别是当需要判断子数组长度是否满足题目条件（例如长度至少为k）时。此外，这种存储方式还可以在达到所需子数组长度时，立即计算出当前GCD与其和的乘积，从而实时更新可能的最大GCD-Sum答案。这有助于降低整体的时间复杂度并提高算法效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-gcd-sum-of-a-subarray')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-gcd-sum-of-a-subarray/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

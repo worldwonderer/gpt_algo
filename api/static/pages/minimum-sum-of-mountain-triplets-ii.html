@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>元素和最小的山形三元组 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>元素和最小的山形三元组 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code> 。</p>
+
+<p>如果下标三元组 <code>(i, j, k)</code> 满足下述全部条件，则认为它是一个 <strong>山形三元组</strong> ：</p>
+
+<ul>
+	<li><code>i &lt; j &lt; k</code></li>
+	<li><code>nums[i] &lt; nums[j]</code> 且 <code>nums[k] &lt; nums[j]</code></li>
+</ul>
+
+<p>请你找出 <code>nums</code> 中 <strong>元素和最小</strong> 的山形三元组，并返回其 <strong>元素和</strong> 。如果不存在满足条件的三元组，返回 <code>-1</code> 。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [8,6,1,5,3]
+<strong>输出：</strong>9
+<strong>解释：</strong>三元组 (2, 3, 4) 是一个元素和等于 9 的山形三元组，因为： 
+- 2 &lt; 3 &lt; 4
+- nums[2] &lt; nums[3] 且 nums[4] &lt; nums[3]
+这个三元组的元素和等于 nums[2] + nums[3] + nums[4] = 9 。可以证明不存在元素和小于 9 的山形三元组。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [5,4,8,7,10,2]
+<strong>输出：</strong>13
+<strong>解释：</strong>三元组 (1, 3, 5) 是一个元素和等于 13 的山形三元组，因为： 
+- 1 &lt; 3 &lt; 5 
+- nums[1] &lt; nums[3] 且 nums[5] &lt; nums[3]
+这个三元组的元素和等于 nums[1] + nums[3] + nums[5] = 13 。可以证明不存在元素和小于 13 的山形三元组。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [6,5,4,3,4,5]
+<strong>输出：</strong>-1
+<strong>解释：</strong>可以证明 nums 中不存在山形三元组。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= nums.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>8</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 111 ms</p>
+                    <p>内存: 30.7 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minimumSum(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        left, right = 0, 1
+        ans = float(&#39;inf&#39;)
+        for i in range(1, n-1):
+            if nums[left] &gt;= nums[i]:
+                left = i
+                continue
+            if right &lt;= i:
+                right = n-1
+                minRight = right
+                while right &gt; i:
+                    if nums[minRight] &gt; nums[right]:
+                        minRight = right
+                    right -= 1
+                right = minRight
+            if nums[right] &gt;= nums[i]:
+                continue
+            ans = min(ans, nums[i]+nums[left]+nums[right])
+        return ans if ans != float(&#39;inf&#39;) else -1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了一种改进的暴力搜索方法，用以寻找元素和最小的山形三元组。算法通过单次遍历，同时维护三个指针 left, i, right 分别代表三元组中的三个元素的位置。left 指针始终指向遍历到当前位置 i 前的最小值，而 right 指针则尝试在位置 i 后找到一个小于 nums[i] 的最小元素。每次循环，首先检查 left 指针是否应该更新（即，如果 nums[i] 更小，则更新 left 为当前 i）。然后检查和更新 right 指针，确保 right 指向 i 右侧的最小值，这需要在每次 i 改变时从新从数组尾部向 i 扫描。如果在 i 处的 nums[left] 和 nums[right] 与 nums[i] 形成山形结构，更新最小和 ans。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minimumSum(self, nums: List[int]) -&gt; int:
+        n = len(nums)
+        left, right = 0, 1
+        ans = float(&#39;inf&#39;)
+        for i in range(1, n-1):
+            # 更新左侧最小值
+            if nums[left] &gt;= nums[i]:
+                left = i
+                continue
+            # 确保 right 总是在 i 的右侧
+            if right &lt;= i:
+                right = n-1
+                minRight = right
+                # 从右向左查找最小值
+                while right &gt; i:
+                    if nums[minRight] &gt; nums[right]:
+                        minRight = right
+                    right -= 1
+                right = minRight
+            # 判断当前三元组是否为山形
+            if nums[right] &gt;= nums[i]:
+                continue
+            # 更新最小和
+            ans = min(ans, nums[i]+nums[left]+nums[right])
+        return ans if ans != float(&#39;inf&#39;) else -1
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在更新&#39;left&#39;指针的条件是&#39;nums[left] &gt;= nums[i]&#39;，而不是简单地选择&#39;i&#39;之前的最小值？有什么特别的考虑吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这里的关键是保持左指针left始终指向当前遍历到的元素之前的最小值。当遍历到新的元素nums[i]时，如果该元素比nums[left]小或等，这意味着我们找到了一个更小的元素，因此更新left指针为当前索引i。这样做是为了确保当我们在考虑任何中心点i时，left指针指向的是i左侧的最小值，从而使得三元组形成山形结构的可能性增大。如果简单地选择i之前的最小值而不更新left，可能会错过更新的机会，导致不是最优的三元组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在查找&#39;right&#39;指针的最小值时，为什么选择从数组的尾部向&#39;i&#39;扫描而不是使用其他更有效的方法如二分查找或维护一个有序结构？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个算法实现中，选择从数组尾部向i扫描主要是因为它简单且在遍历过程中易于维护。使用二分查找或有序结构虽然可以提高查找效率，但这样做通常需要额外的数据结构（如平衡树或堆），这会增加实现的复杂性和空间复杂度。此外，每次迭代i时，nums[i]右侧的数组部分都在变化，这使得维护一个动态更新的有序结构变得更加复杂。从尾部向前扫描是一个时间复杂度为O(n)的操作，虽然不是最优，但在整体上保持了算法的简洁性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果&#39;nums&#39;数组中存在多个相同的最小值，这种方法是否还能正确地返回元素和最小的山形三元组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果数组中存在多个相同的最小值，该方法依然可以正确地返回元素和最小的山形三元组。在这种情况下，left指针会在遇到第一个最小值时停止更新。即使后续存在相同的最小值，left指针的位置已经足够保证它是最小的，并且可以与后续的i和right形成有效的山形三元组。算法的核心在于保证left和right正确地指向了能形成山形三元组的元素，而不受具体数值是否相同的影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在实际操作中，如果&#39;right&#39;指针始终没有更新（即始终不满足&#39;nums[right] &lt; nums[i]&#39;的条件），算法是如何处理这种情况的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在算法中，如果right指针始终没有更新，即在i的右侧没有找到比nums[i]小的元素，这意味着不能形成山形结构，因此这种情况下不会更新最小和ans。算法会继续遍历其它的i值，直到找到一个合适的right使得nums[right] &lt; nums[i]。如果整个遍历过程中始终找不到符合条件的三元组，算法将返回初始设置的&#39;inf&#39;值，表示不存在有效的山形三元组。这通常会在最后的返回语句中被处理，如果ans仍为&#39;inf&#39;，则返回-1，表示无解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-sum-of-mountain-triplets-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-sum-of-mountain-triplets-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>不同的循环子字符串</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>不同的循环子字符串</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=hash-function" class="badge bg-secondary tag-link">哈希函数</a>
+                    
+                        <a href="/problems?tag=rolling-hash" class="badge bg-secondary tag-link">滚动哈希</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个字符串&nbsp;<code>text</code> ，请你返回满足下述条件的&nbsp;<strong>不同</strong> 非空子字符串的数目：</p>
+
+<ul>
+	<li>可以写成某个字符串与其自身相连接的形式（即，可以写为 <code>a&nbsp;+ a</code>，其中 <code>a</code> 是某个字符串）。</li>
+</ul>
+
+<p>例如，<code>abcabc</code>&nbsp;就是&nbsp;<code>abc</code>&nbsp;和它自身连接形成的。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;abcabcabc&quot;
+<strong>输出：</strong>3
+<strong>解释：</strong>3 个子字符串分别为 &quot;abcabc&quot;，&quot;bcabca&quot; 和 &quot;cabcab&quot; 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>text = &quot;leetcodeleetcode&quot;
+<strong>输出：</strong>2
+<strong>解释：</strong>2 个子字符串为 &quot;ee&quot; 和 &quot;leetcodeleetcode&quot; 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= text.length &lt;= 2000</code></li>
+	<li><code>text</code>&nbsp;只包含小写英文字母。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 538 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def distinctEchoSubstrings(self, text: str) -&gt; int:
+        res = defaultdict(list)
+        ans = set()
+        for i, t in enumerate(text):
+            for index in res[t]:
+                if index + 1 &gt;= i - index:
+                    if text[index - i + index + 1: index + 1] == text[index + 1: i + 1]:
+                        ans.add(text[index + 1: i + 1])
+            res[t].append(i)
+        return len(ans)
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解的核心思路是利用哈希表来记录每个字符出现的所有位置，然后依此判断是否存在形如a+a的子字符串。具体实现中，遍历字符串的每个字符，利用一个字典res存储每个字符和其出现位置的列表。对于当前字符t和位置i，检查之前所有t出现的位置，判断在这些位置之间的字符串是否可以形成a+a。这是通过比较两个相邻位置间的字符串是否相同来完成的。如果相同，则将该字符串加入到结果集合ans中。最终，返回集合ans的大小，即不同的符合条件的子字符串数目。</p>
+                                <p>时间复杂度: O(n^3)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def distinctEchoSubstrings(self, text: str) -&gt; int:
+        res = defaultdict(list)  # 存储每个字符出现的位置
+        ans = set()  # 存储符合条件的子字符串，自动去重
+        for i, t in enumerate(text):  # 遍历每个字符及其索引
+            for index in res[t]:  # 对当前字符的每个先前出现位置进行检查
+                if index + 1 &gt;= i - index:  # 确保不越界
+                    if text[index - i + index + 1: index + 1] == text[index + 1: i + 1]:  # 比较两段是否相同
+                        ans.add(text[index + 1: i + 1])  # 若相同，则添加到结果集
+            res[t].append(i)  # 更新当前字符的位置列表
+        return len(ans)  # 返回不同子字符串的数量</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么可以通过比较两个相邻位置间的字符串来确定是否形成a+a的子字符串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在给定的算法中，我们寻找形式为a+a的字符串，这意味着字符串由两个相同的部分a组成。通过记录每个字符出现的所有位置，我们可以找到所有可能的相同字符对的位置组合。对于字符t的任意两个相邻出现位置index和i（index &lt; i），如果在index和i之间的字符串长度与从index到i的长度相等且内容相同，那么这部分字符串就是形式为a+a。因此，通过比较这两个相邻位置间的字符串是否相同，可以有效地判断是否形成了所需的子字符串结构。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在实现中，为何使用集合(set)来存储符合条件的子字符串？是否有其他数据结构能达到同样的目的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>使用集合(set)来存储符合条件的子字符串的主要目的是利用集合的自动去重特性，这可以有效地防止同一个子字符串被多次计数。集合在这种情况下提供了简单且高效的去重方法。尽管其他数据结构例如列表(list)也可以用来存储这些子字符串，但它们则需要额外的操作来保证元素的唯一性，如使用循环来检查重复或者在添加前进行查找，这会增加时间复杂性。另一种选择是哈希表（如Python中的字典），它同样可以达到去重的目的，但对于本问题而言，集合更为直接和高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            代码中的`if index + 1 &gt;= i - index`条件是为了什么？这个条件帮助解决了什么潜在问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件确保了在比较两个相邻位置间的字符串内容前，后一个位置i与前一个位置index之间有足够的字符来构成一个可能的a+a结构。具体来说，`i - index`是两个相邻位置之间的距离，而`index + 1 &gt;= i - index`确保了从index开始的字符串长度至少与index到i之间的距离相等，这是形成a+a结构的基本要求。如果没有这个条件，可能会导致字符串比较时越界，或者比较不等长的字符串，从而造成逻辑错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            哈希表res存储每个字符出现的所有位置，这种方法在什么情况下效率最高，什么情况下可能效率较低？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>哈希表res存储每个字符出现的所有位置，在字符分布较均匀或字符串较短时效率较高，因为这样可以较快地访问和更新每个字符的位置列表。当字符串较长且某些字符非常频繁地出现时，效率可能较低。在这种情况下，每个字符的位置列表可能变得非常长，导致每次更新位置列表和检查可能的a+a结构时耗时增加。此外，如果字符很少重复，那么哈希表的优势不明显，因为大部分位置列表都非常短。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/distinct-echo-substrings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/distinct-echo-substrings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

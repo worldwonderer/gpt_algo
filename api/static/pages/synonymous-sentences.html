@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>近义词句子</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>近义词句子</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 32 ms</p>
+                    <p>内存: 0.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">from copy import deepcopy
+class Solution:
+    def generateSentences(self, synonyms: List[List[str]], text: str) -&gt; List[str]:
+        similarWords = {}
+        self.output = []
+        for pair in synonyms:
+            first = pair[0]
+            second = pair[1]
+            if first in similarWords and second in similarWords:
+                continue
+            if first not in similarWords and second not in similarWords:
+                similarWords[first] = set([second])
+                similarWords[second] = set([first])
+                continue
+                
+            existed, notExisted = first, second
+            if existed not in similarWords:
+                existed, notExisted = second, first
+            
+            
+            similarWords[notExisted] = set()
+            
+            
+            for word in similarWords[existed]:
+                similarWords[word].add(notExisted)
+                similarWords[notExisted].add(word)
+            
+            similarWords[notExisted].add(existed)
+            similarWords[existed].add(notExisted)
+            
+            
+        self.backtracker(0, text.split(&#39; &#39;), similarWords)
+                
+        return sorted(self.output)
+    
+    
+    def backtracker(self, curIndex, wordsList, similarWords):
+
+        if curIndex == len(wordsList):
+            self.output.append(&#39; &#39;.join(wordsList))
+            return
+        self.backtracker(curIndex + 1, wordsList, similarWords)
+        
+        if wordsList[curIndex] in similarWords:
+            for synonym in similarWords[wordsList[curIndex]]:
+                wordsList[curIndex] = synonym
+                self.backtracker(curIndex + 1, wordsList, similarWords)
+    </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用了回溯算法来生成所有可能的句子。首先，通过建立一个映射表 `similarWords` 来记录每个单词可以互为近义词的所有单词。然后使用 `backtracker` 函数递归地探索每个单词的所有可能的近义词替换，生成所有可能的句子组合。最后，将结果排序后返回。</p>
+                                <p>时间复杂度: O((m+1)^n)</p>
+                                <p>空间复杂度: O(n + k)</p>
+                                <pre class="bg-light p-2">from copy import deepcopy
+
+class Solution:
+    def generateSentences(self, synonyms: List[List[str]], text: str) -&gt; List[str]:
+        similarWords = {}
+        self.output = []
+        for pair in synonyms:
+            first, second = pair
+            if first in similarWords and second in similarWords:
+                continue
+            if first not in similarWords and second not in similarWords:
+                similarWords[first] = set([second])
+                similarWords[second] = set([first])
+                continue
+                
+            existed, notExisted = (first, second) if first in similarWords else (second, first)
+
+            similarWords[notExisted] = set()
+
+            for word in similarWords[existed]:
+                similarWords[word].add(notExisted)
+                similarWords[notExisted].add(word)
+            
+            similarWords[notExisted].add(existed)
+            similarWords[existed].add(notExisted)
+
+        self.backtracker(0, text.split(&#39; &#39;), similarWords)
+        
+        return sorted(self.output)
+    
+    def backtracker(self, curIndex, wordsList, similarWords):
+        if curIndex == len(wordsList):
+            self.output.append(&#39; &#39;.join(wordsList))
+            return
+        self.backtracker(curIndex + 1, wordsList, similarWords)
+        if wordsList[curIndex] in similarWords:
+            originalWord = wordsList[curIndex]
+            for synonym in similarWords[wordsList[curIndex]]:
+                wordsList[curIndex] = synonym
+                self.backtracker(curIndex + 1, wordsList, similarWords)
+            wordsList[curIndex] = originalWord # Restore the original word after recursion
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在构建`similarWords`映射表时，如果两个单词均未出现过，为什么只建立它们之间的双向映射而不是将它们与其他已有单词的关系也考虑进去？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在构建`similarWords`映射表时，如果两个单词均未出现过，意味着这两个单词之间的相似关系是独立于其他单词的关系。此时，没有足够的信息将这两个单词与其他已有单词关联起来。因此，只建立这两个单词之间的双向映射是为了避免错误地假设未验证的近义词关系，从而确保映射表的准确性和一致性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在处理已有单词与未出现过的单词建立映射时，为什么只将新单词与已有单词的近义词建立关系，而不是直接加入到已有单词的近义词集合中？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当处理已有单词与未出现过的单词建立映射时，将新单词添加到已有单词的近义词集合中，同时也需要将新单词与已有单词的所有近义词建立连接，这是为了保持近义词网络的完整性。如果仅将新单词加入到已有单词的近义词集合，但不更新其他相关的近义词关系，将导致近义词网络不连贯，从而可能影响后续生成句子的正确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在`backtracker`函数中，每次递归调用都先尝试不替换当前单词，这种策略对结果有何影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在`backtracker`函数中，首先尝试不替换当前单词是为了保留原始句子结构的一个选择。这种策略确保了生成的句子列表中包含了从完全不替换任何单词到替换所有可能单词的所有组合。这样做不仅保证了解集的完整性，还有助于确保递归过程中能够探索到所有有效的句子构造方式。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            当使用`backtracker`函数进行递归时，为什么需要在每次递归结束后恢复原来的单词（`wordsList[curIndex] = originalWord`）？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在使用`backtracker`函数进行递归时，需要在每次递归结束后恢复原来的单词以保持原始单词列表的状态不变。这是因为在递归过程中修改了单词列表的内容，如果不恢复原来的单词，那么这些修改会影响到后续递归调用的上下文，导致生成错误的句子。通过恢复原来的单词，可以确保每次递归调用都是从相同的状态开始，从而正确地探索所有可能的句子组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/synonymous-sentences')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/synonymous-sentences/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

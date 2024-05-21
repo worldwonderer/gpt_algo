@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>缀点成线</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>缀点成线</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=geometry" class="badge bg-secondary tag-link">几何</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Easy</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个数组&nbsp;<code>coordinates</code>&nbsp;，其中&nbsp;<code>coordinates[i] = [x, y]</code>&nbsp;，<meta charset="UTF-8" />&nbsp;<code>[x, y]</code>&nbsp;表示横坐标为 <code>x</code>、纵坐标为 <code>y</code>&nbsp;的点。请你来判断，这些点是否在该坐标系中属于同一条直线上。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/10/19/untitled-diagram-2.jpg" /></p>
+
+<pre>
+<strong>输入：</strong>coordinates = [[1,2],[2,3],[3,4],[4,5],[5,6],[6,7]]
+<strong>输出：</strong>true
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<p><strong><img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/10/19/untitled-diagram-1.jpg" /></strong></p>
+
+<pre>
+<strong>输入：</strong>coordinates = [[1,1],[2,2],[3,4],[4,5],[5,6],[7,7]]
+<strong>输出：</strong>false
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;=&nbsp;coordinates.length &lt;= 1000</code></li>
+	<li><code>coordinates[i].length == 2</code></li>
+	<li><code>-10^4 &lt;=&nbsp;coordinates[i][0],&nbsp;coordinates[i][1] &lt;= 10^4</code></li>
+	<li><code>coordinates</code>&nbsp;中不含重复的点</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 18 ms</p>
+                    <p>内存: 16.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def checkStraightLine(self, coordinates: List[List[int]]) -&gt; bool:
+        dy = coordinates[1][1] - coordinates[0][1]
+        dx = coordinates[1][0] - coordinates[0][0]
+        if dx == 0:
+            dy_dx_original = &#39;Inf&#39;
+        else:
+            dy_dx_original = dy/dx
+
+        current_coor = coordinates[1]
+        for coor in coordinates[2:]:
+            dy = coor[1] - current_coor[1]
+            dx = coor[0] - current_coor[0]
+            if dx == 0:
+                dy_dx = &#39;Inf&#39;
+            else:
+                dy_dx = dy/dx
+            if dy_dx != dy_dx_original:
+                return False
+            current_coor = coor
+        
+        return True
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了直线斜率的性质来判断多个点是否在同一直线上。首先，计算出第一个点和第二个点之间的斜率作为参考斜率。然后，依次计算后续每个点与其前一个点之间的斜率，并与参考斜率比较。如果所有点与其前一个点的斜率都相等，则这些点共线；否则，不共线。为避免除零错误，当两点水平相同时，斜率被定义为&#39;Inf&#39;（无穷大）。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 定义Solution类
+
+class Solution:
+    def checkStraightLine(self, coordinates: List[List[int]]) -&gt; bool:
+        # 计算初始两点间的y差和x差
+        dy = coordinates[1][1] - coordinates[0][1]
+        dx = coordinates[1][0] - coordinates[0][0]
+        # 处理x差为0的情况，即垂直线
+        if dx == 0:
+            dy_dx_original = &#39;Inf&#39;
+        else:
+            # 计算斜率
+            dy_dx_original = dy / dx
+
+        # 从第二个点开始检查每一个点
+        current_coor = coordinates[1]
+        for coor in coordinates[2:]:
+            dy = coor[1] - current_coor[1]
+            dx = coor[0] - current_coor[0]
+            # 处理x差为0的情况，即垂直线
+            if dx == 0:
+                dy_dx = &#39;Inf&#39;
+            else:
+                # 计算当前点的斜率
+                dy_dx = dy / dx
+            # 如果当前斜率与参考斜率不同，则不在同一直线上
+            if dy_dx != dy_dx_original:
+                return False
+            # 更新当前点为下一个点的前一个点
+            current_coor = coor
+        
+        # 所有斜率相同，返回True
+        return True
+    </pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在处理斜率为无穷大的情况时，你是如何确保所有垂直的点确实都在同一直线上的？是否只是检查x坐标是否相同是否足够？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理斜率为无穷大的情况，即两点垂直的情况下，确保所有点在同一直线上的关键是检查这些点的 x 坐标是否完全相同。如果所有具有相同斜率（无穷大）的点的 x 坐标相同，这些点确实都在同一垂直线上。因此，检查 x 坐标的相等性是确保垂直共线性的足够且必要的条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在计算斜率时，为什么选择使用浮点数除法而不是保持整数形式，比如使用比例的形式（dy, dx）来避免浮点数精度的问题？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在计算斜率时使用浮点数除法是为了简化比较过程，使代码更直接和易于理解。然而，这确实引入了浮点数精度的问题。使用整数形式的比例（dy, dx）作为斜率的表示可以避免这类精度问题，同时还可以通过简化比例（例如使用最大公约数）来确保斜率的一致性。这种方法可以更精确地处理斜率比较，尤其是在涉及大量或极端坐标值时更为稳定。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果输入的坐标数组中只有一个点或两个点，该算法是否还适用，如果适用，其输出是否准确？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>根据常规定义，单个点不能形成线，而两个点总是共线的。因此，如果输入数组中只有一个点，应特别处理这种情况，可能返回一个错误或者特定值。在算法当前实现下，两个点会被正确判断为共线，因为它们之间的斜率是唯一确定的。如果要全面处理，可以在算法开头添加对点数量的检查，以处理不同情况。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            算法中在比较斜率是否相等时使用了不等式，这是否可能由于浮点精度问题引起错误的判断？该如何改进？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>由于浮点数的精度问题，直接比较两个浮点数是否相等确实可能引入错误。改进的方法是不直接计算斜率，而是比较两个点间的纵横坐标差的比例。可以通过计算交叉乘积（例如，对于点A和点B的斜率与点B和点C的斜率比较，使用 (y2-y1)*(x3-x2) 是否等于 (y3-y2)*(x2-x1)）来避免直接使用浮点数。这种方法只涉及整数运算，避免了浮点数的不精确性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/check-if-it-is-a-straight-line')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/check-if-it-is-a-straight-line/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

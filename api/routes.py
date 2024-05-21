@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort, jsonify
+from flask import Blueprint, render_template, request, abort, jsonify, current_app, send_from_directory
 
 from .models import Problem
 from .config import tags
@@ -47,10 +47,12 @@ def problems():
 
 @bp.route('/problem/<title_slug>')
 def problem_detail(title_slug):
+    static_file_dir = current_app.config['STATIC_PAGES_DIR']
+    static_file_name = f'{title_slug}.html'
+
     try:
-        problem = Problem.objects.get(title_slug=title_slug)
-        return render_template('detail.html', problem=problem)
-    except Problem.DoesNotExist:
+        return send_from_directory(static_file_dir, static_file_name)
+    except FileNotFoundError:
         abort(404)
 
 

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>水果成篮</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>水果成篮</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你正在探访一家农场，农场从左到右种植了一排果树。这些树用一个整数数组 <code>fruits</code> 表示，其中 <code>fruits[i]</code> 是第 <code>i</code> 棵树上的水果 <strong>种类</strong> 。</p>
+
+<p>你想要尽可能多地收集水果。然而，农场的主人设定了一些严格的规矩，你必须按照要求采摘水果：</p>
+
+<ul>
+	<li>你只有 <strong>两个</strong> 篮子，并且每个篮子只能装 <strong>单一类型</strong> 的水果。每个篮子能够装的水果总量没有限制。</li>
+	<li>你可以选择任意一棵树开始采摘，你必须从 <strong>每棵</strong> 树（包括开始采摘的树）上 <strong>恰好摘一个水果</strong> 。采摘的水果应当符合篮子中的水果类型。每采摘一次，你将会向右移动到下一棵树，并继续采摘。</li>
+	<li>一旦你走到某棵树前，但水果不符合篮子的水果类型，那么就必须停止采摘。</li>
+</ul>
+
+<p>给你一个整数数组 <code>fruits</code> ，返回你可以收集的水果的 <strong>最大</strong> 数目。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>fruits = [<em><strong>1,2,1</strong></em>]
+<strong>输出：</strong>3
+<strong>解释：</strong>可以采摘全部 3 棵树。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>fruits = [0,<em><strong>1,2,2</strong></em>]
+<strong>输出：</strong>3
+<strong>解释：</strong>可以采摘 [1,2,2] 这三棵树。
+如果从第一棵树开始采摘，则只能采摘 [0,1] 这两棵树。
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>fruits = [1,<em><strong>2,3,2,2</strong></em>]
+<strong>输出：</strong>4
+<strong>解释：</strong>可以采摘 [2,3,2,2] 这四棵树。
+如果从第一棵树开始采摘，则只能采摘 [1,2] 这两棵树。
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre>
+<strong>输入：</strong>fruits = [3,3,3,<em><strong>1,2,1,1,2</strong></em>,3,3,4]
+<strong>输出：</strong>5
+<strong>解释：</strong>可以采摘 [1,2,1,1,2] 这五棵树。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= fruits.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= fruits[i] &lt; fruits.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 74 ms</p>
+                    <p>内存: 21.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def totalFruit(self, fruits: List[int]) -&gt; int:
+        slowIndex1, slowIndex2 = 0, 0
+        fruit1, fruit2 = fruits[0], fruits[0]
+        fruitNum = 0 #当前区间的数量
+        result = 0
+        for i in range(len(fruits)):
+            if fruits[i] != fruit1:
+                fruit2 = fruits[i]
+                slowIndex2 = i
+                fruitNum = i + 1
+                break
+        if fruit1 == fruit2:
+            return len(fruits)
+        for fastIndex in range(slowIndex2 + 1, len(fruits)):
+            if fruits[fastIndex] == fruit1:
+                fruit1, fruit2 = fruit2, fruit1
+                slowIndex2 = fastIndex
+                fruitNum += 1
+            elif fruits[fastIndex] == fruit2:
+                fruitNum += 1
+            else:
+                if result &lt; fruitNum:
+                    result = fruitNum
+                slowIndex1 = slowIndex2
+                slowIndex2 = fastIndex
+                fruit1, fruit2 = fruit2, fruits[slowIndex2]
+                fruitNum = fastIndex - slowIndex1 + 1
+        if result &lt; fruitNum:
+            result = fruitNum
+        return result</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用滑动窗口的方法来解决问题。首先，初始化两个篮子fruit1和fruit2以及它们的起始位置slowIndex1和slowIndex2。遍历数组，确保篮子始终包含最近访问的两种水果。如果遇到第三种水果，则需要更新篮子的内容，将当前窗口的起始位置移动到前一个水果的最后出现位置，从而保持窗口内只有两种水果。整个过程中，记录下遇到的最大水果数量。如果整个数组中只有一种水果，则直接返回数组的长度。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def totalFruit(self, fruits: List[int]) -&gt; int:
+        slowIndex1, slowIndex2 = 0, 0 # 初始化两个篮子的起始索引
+        fruit1, fruit2 = fruits[0], fruits[0] # 初始化两个篮子装的水果种类
+        fruitNum = 0 # 当前区间的水果数量
+        result = 0 # 记录最大数量
+        for i in range(len(fruits)):
+            if fruits[i] != fruit1:
+                fruit2 = fruits[i]
+                slowIndex2 = i
+                fruitNum = i + 1
+                break
+        if fruit1 == fruit2: # 如果整个数组中只有一种水果
+            return len(fruits)
+        for fastIndex in range(slowIndex2 + 1, len(fruits)):
+            if fruits[fastIndex] == fruit1:
+                fruit1, fruit2 = fruit2, fruit1 # 交换篮子，保持fruit2是最新访问的水果
+                slowIndex2 = fastIndex
+                fruitNum += 1
+            elif fruits[fastIndex] == fruit2:
+                fruitNum += 1
+            else:
+                if result &lt; fruitNum:
+                    result = fruitNum # 更新最大数量
+                slowIndex1 = slowIndex2 # 更新窗口的起始位置
+                slowIndex2 = fastIndex
+                fruit1, fruit2 = fruit2, fruits[slowIndex2] # 更新篮子内容
+                fruitNum = fastIndex - slowIndex1 + 1 # 更新当前水果数量
+        if result &lt; fruitNum:
+            result = fruitNum # 最后一次检查可能的最大值
+        return result</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            j <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>The character &#39;j&#39; likely refers to JSON, which is the format in which the output and explanations are structured. JSON (JavaScript Object Notation) is a lightweight data-interchange format that is easy for humans to read and write and easy for machines to parse and generate.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            s <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>The character &#39;s&#39; could be referring to the &#39;Solution&#39; class in the provided code. The Solution class contains the method &#39;totalFruit&#39; which implements the algorithm to solve the problem of collecting the maximum number of fruits into two baskets.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            o <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>The letter &#39;o&#39; in this context might be referring to the &#39;output&#39; of the algorithm. In the provided code, the output is the result of the &#39;totalFruit&#39; function, which calculates the maximum number of fruits that can be collected in two baskets under the given constraints.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            n <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>The letter &#39;n&#39; could refer to &#39;n&#39;, a common variable used to represent the size of the input, such as the number of items in an array or list. In the context of the provided algorithm, &#39;n&#39; would represent the length of the &#39;fruits&#39; array, which is iterated over to compute the result.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/fruit-into-baskets')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/fruit-into-baskets/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

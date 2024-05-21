@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>最近的公平整数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>最近的公平整数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=math" class="badge bg-secondary tag-link">数学</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 30 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def closestFair(self, n: int) -&gt; int:
+        ret = self.helper(n, 0)
+        if ret != -1:
+            return ret
+        count = 0
+        while n &gt;= 0:
+            ret = self.helper(n + 1, count)
+            if ret != -1:
+                return ret;
+            ret = self.helper(n + 2, count)
+            if ret != -1:
+                return ret
+            n = n // 10
+            count += 1
+        return -1
+
+    def helper(self, m, count):
+        t = m
+        odd = 0
+        even = 0
+        while t &gt; 0:
+            if t % 2 == 0:
+                even += 1
+            else:
+                odd += 1
+            t = t // 10
+        diff = odd - even
+        # print(diff)
+        # print(m)
+
+        if (count + diff) % 2 != 0:
+            return -1
+
+        if (count - diff) % 2 != 0:
+            return -1
+
+        a = (count + diff) // 2
+        b = (count - diff) // 2
+        if a &lt; 0 or b &lt; 0:
+            return -1
+        for i in range(a):
+            m = m * 10 + 0
+        for i in range(b):
+            m = m * 10 + 1
+        # print(m)
+        return m
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解中的方法是寻找离给定数字n最近的“公平整数”。这里的“公平整数”定义似乎是关于数字中偶数和奇数的位数平衡的。代码首先尝试通过递归调用helper方法来找到从n开始的公平数。如果直接调用失败，则开始递增地搜索更大的数。在循环中，如果从n开始没有找到合适的结果，那么代码会尝试n+1和n+2，并逐步减小n的位数，继续搜索，直到n降为0。helper函数负责统计给定数m的奇数位和偶数位数量，并根据它们的差异和已经考察的额外数字（由变量count表示）来判断能否形成一个公平数。如果可以形成，它还将根据需要添加0或1来构造最终的公平数。</p>
+                                <p>时间复杂度: O(d^2)</p>
+                                <p>空间复杂度: O(d)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def closestFair(self, n: int) -&gt; int:
+        # 尝试从n开始找到一个公平整数
+        ret = self.helper(n, 0)
+        if ret != -1:
+            return ret
+        count = 0
+        while n &gt;= 0:
+            # 分别尝试n+1和n+2
+            ret = self.helper(n + 1, count)
+            if ret != -1:
+                return ret;
+            ret = self.helper(n + 2, count)
+            if ret != -1:
+                return ret
+            # 减少n的位数并增加计数
+            n = n // 10
+            count += 1
+        return -1
+
+    def helper(self, m, count):
+        t = m
+        odd = 0
+        even = 0
+        # 计算m的奇数位和偶数位
+        while t &gt; 0:
+            if t % 2 == 0:
+                even += 1
+            else:
+                odd += 1
+            t = t // 10
+        diff = odd - even
+        # 判断是否可能形成公平数
+        if (count + diff) % 2 != 0:
+            return -1
+
+        if (count - diff) % 2 != 0:
+            return -1
+
+        a = (count + diff) // 2
+        b = (count - diff) // 2
+        # 检查构成条件
+        if a &lt; 0 or b &lt; 0:
+            return -1
+        for i in range(a):
+            m = m * 10 + 0
+        for i in range(b):
+            m = m * 10 + 1
+        return m</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确保递归方法`helper`在处理较大的数值时不会导致性能问题，特别是在考虑到Python的整数不受固定大小限制的情况下？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>为了确保`helper`方法在处理较大数值时不导致性能问题，应该关注减少递归调用的次数和避免在每次调用时进行重复计算。在实现中可以采用记忆化技术（缓存之前的计算结果），以避免重复计算相同数值的公平性检查。此外，由于每次递归都减少数字的位数，这自然限制了递归的深度。例如，对于一个10位数的整数，最多只需要10次递归即可将数字减至0。这种设计有效地控制了递归的深度和执行次数，从而避免了性能问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在减少n的位数的过程中，为什么选择通过`n = n // 10`的方式逐步减少，这种方法在什么情况下可能不会导致找到一个公平整数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>通过`n = n // 10`减少数字位数的主要目的是为了逐渐减少搜索空间，同时也是一种回退策略，当找不到更大的公平数时尝试更小的数位组合。这种方法可能在所有更大的数字都不是公平数，而通过逐步减少位数也不能构成公平数的情况下失败。例如，如果最初的数已经非常接近于一个较大范围内的最小公平数，减少位数可能会跳过潜在的公平数，导致无法找到答案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法中对`count`变量的使用有何意义，它是如何帮助确定是否可以构造一个公平数的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>`count`变量在算法中用于跟踪减少数字位数的次数，这影响了需要添加的额外数字（0或1）来构成公平数。每当数字n通过`n = n // 10`减少一位时，`count`增加1，表示额外需要一个数字来平衡奇数和偶数的数量。通过计算`(count + diff) // 2`和`(count - diff) // 2`来确定需要添加多少个0和1，这样就可以判断出能否通过添加特定数量的0和1来构成一个公平数。如果计算结果表明需要添加的0或1的数量为负，则当前的n和count组合无法构成公平数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/closest-fair-integer')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/closest-fair-integer/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

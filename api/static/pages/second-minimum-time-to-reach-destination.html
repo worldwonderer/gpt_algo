@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>到达目的地的第二短时间</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>到达目的地的第二短时间</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>城市用一个 <strong>双向连通</strong> 图表示，图中有 <code>n</code> 个节点，从 <code>1</code> 到 <code>n</code> 编号（包含 <code>1</code> 和 <code>n</code>）。图中的边用一个二维整数数组 <code>edges</code> 表示，其中每个 <code>edges[i] = [u<sub>i</sub>, v<sub>i</sub>]</code>&nbsp;表示一条节点&nbsp;<code>u<sub>i</sub></code> 和节点&nbsp;<code>v<sub>i</sub></code> 之间的双向连通边。每组节点对由 <strong>最多一条</strong> 边连通，顶点不存在连接到自身的边。穿过任意一条边的时间是 <code>time</code>&nbsp;分钟。</p>
+
+<p>每个节点都有一个交通信号灯，每 <code>change</code> 分钟改变一次，从绿色变成红色，再由红色变成绿色，循环往复。所有信号灯都&nbsp;<strong>同时</strong> 改变。你可以在 <strong>任何时候</strong> 进入某个节点，但是 <strong>只能</strong> 在节点&nbsp;<strong>信号灯是绿色时</strong> 才能离开。如果信号灯是&nbsp; <strong>绿色</strong> ，你 <strong>不能</strong> 在节点等待，必须离开。</p>
+
+<p><strong>第二小的值</strong> 是&nbsp;<strong>严格大于</strong> 最小值的所有值中最小的值。</p>
+
+<ul>
+	<li>例如，<code>[2, 3, 4]</code> 中第二小的值是 <code>3</code> ，而 <code>[2, 2, 4]</code> 中第二小的值是 <code>4</code> 。</li>
+</ul>
+
+<p>给你 <code>n</code>、<code>edges</code>、<code>time</code> 和 <code>change</code> ，返回从节点 <code>1</code> 到节点 <code>n</code> 需要的 <strong>第二短时间</strong> 。</p>
+
+<p><strong>注意：</strong></p>
+
+<ul>
+	<li>你可以 <strong>任意次</strong> 穿过任意顶点，<strong>包括</strong> <code>1</code> 和 <code>n</code> 。</li>
+	<li>你可以假设在 <strong>启程时</strong> ，所有信号灯刚刚变成 <strong>绿色</strong> 。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/09/29/e1.png" style="width: 200px; height: 250px;" />        <img alt="" src="https://assets.leetcode.com/uploads/2021/09/29/e2.png" style="width: 200px; height: 250px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 5, edges = [[1,2],[1,3],[1,4],[3,4],[4,5]], time = 3, change = 5
+<strong>输出：</strong>13
+<strong>解释：</strong>
+上面的左图展现了给出的城市交通图。
+右图中的蓝色路径是最短时间路径。
+花费的时间是：
+- 从节点 1 开始，总花费时间=0
+- 1 -&gt; 4：3 分钟，总花费时间=3
+- 4 -&gt; 5：3 分钟，总花费时间=6
+因此需要的最小时间是 6 分钟。
+
+右图中的红色路径是第二短时间路径。
+- 从节点 1 开始，总花费时间=0
+- 1 -&gt; 3：3 分钟，总花费时间=3
+- 3 -&gt; 4：3 分钟，总花费时间=6
+- 在节点 4 等待 4 分钟，总花费时间=10
+- 4 -&gt; 5：3 分钟，总花费时间=13
+因此第二短时间是 13 分钟。      
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2021/09/29/eg2.png" style="width: 225px; height: 50px;" /></p>
+
+<pre>
+<strong>输入：</strong>n = 2, edges = [[1,2]], time = 3, change = 2
+<strong>输出：</strong>11
+<strong>解释：</strong>
+最短时间路径是 1 -&gt; 2 ，总花费时间 = 3 分钟
+第二短时间路径是 1 -&gt; 2 -&gt; 1 -&gt; 2 ，总花费时间 = 11 分钟</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 &lt;= n &lt;= 10<sup>4</sup></code></li>
+	<li><code>n - 1 &lt;= edges.length &lt;= min(2 * 10<sup>4</sup>, n * (n - 1) / 2)</code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>1 &lt;= u<sub>i</sub>, v<sub>i</sub> &lt;= n</code></li>
+	<li><code>u<sub>i</sub> != v<sub>i</sub></code></li>
+	<li>不含重复边</li>
+	<li>每个节点都可以从其他节点直接或者间接到达</li>
+	<li><code>1 &lt;= time, change &lt;= 10<sup>3</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 238 ms</p>
+                    <p>内存: 22.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def secondMinimum(self, n: int, edges: List[List[int]], time: int, change: int) -&gt; int:
+        G = [[] for _ in range(n+1)]
+        for u,v in edges:
+            G[u].append(v)
+            G[v].append(u)
+        vis = [-1] * (n+1)
+        q = deque([(1, 0)])
+        vis[1] = 0
+        while q:
+            i, t = q.popleft()
+            if t % (2 * change) &lt; change:
+                t1 = t + time
+            else:
+                t1 = (t // change + 1) * change + time
+            for j in G[i]:
+                if t1 &gt; vis[j]:
+                    vis[j] = t1 if vis[j] == -1 else math.inf
+                    q.append((j, t1))
+                    if j == n and vis[j] == math.inf:
+                        return t1</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用广度优先搜索 (BFS) 算法来寻找从节点 1 到节点 n 的第二短路径时间。算法首先构建了一个邻接表 G 来表示图中的节点和边。然后，使用一个队列 q 来进行 BFS，其中队列中的每个元素是一个元组，包含当前节点编号和到达该节点的时间。时间 t1 根据当前时间和信号灯周期 change 计算，以决定是否需要等待红灯。如果当前时间 t 处于绿灯阶段，则直接加上通过时间 time；如果处于红灯阶段，则需等待至下一个绿灯开始，再加上通过时间。每遍历到一个新节点，如果该节点未被访问过，或者可以在更短的时间内到达，则更新到达时间并将其加入队列。算法的目标是找到第二短的到达时间，因此在到达节点 n 时，需要检查是否已有更短的路径存在，如果已经是第二次到达，则返回该时间作为结果。</p>
+                                <p>时间复杂度: O(V + E)</p>
+                                <p>空间复杂度: O(V + E)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def secondMinimum(self, n: int, edges: List[List[int]], time: int, change: int) -&gt; int:
+        # 创建邻接表
+        G = [[] for _ in range(n+1)]
+        for u, v in edges:
+            G[u].append(v)
+            G[v].append(u)
+        # 初始化访问时间数组
+        vis = [-1] * (n+1)
+        q = deque([(1, 0)])
+        # 初始节点1的访问时间
+        vis[1] = 0
+        while q:
+            i, t = q.popleft()
+            # 计算下一个信号灯是绿色的时间点
+            if t % (2 * change) &lt; change:
+                t1 = t + time
+            else:
+                t1 = (t // change + 1) * change + time
+            # 遍历当前节点所有邻接节点
+            for j in G[i]:
+                if t1 &gt; vis[j]:
+                    vis[j] = t1 if vis[j] == -1 else math.inf
+                    q.append((j, t1))
+                    # 如果到达终点，并且是第二次到达，返回时间
+                    if j == n and vis[j] == math.inf:
+                        return t1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解题中你是如何考虑图中可能存在的环或重复路径对计算第二最短路径的影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题的算法设计中，通过设置访问时间数组 vis 来管理每个节点的访问状态，确保可以正确处理环和重复路径的情况。在第一次到达任何节点时，我们记录其到达时间。如果后续有其他路径再次到达该节点，而且到达时间晚于第一次，我们会继续考虑这个时间点，因为它可能代表着一个有效的第二短路径。这样即便图中存在环或节点被多次访问，算法也能正确地考虑这些路径对第二短路径的潜在贡献。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            BFS算法在处理节点访问时，通常不会重新访问已检查的节点。在这个解法中，你如何确保可以找到第二短路径而不是仅仅停留在最短路径的计算？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个特定的解法中，我们对传统的 BFS 进行了修改，允许节点在特定条件下被重新访问。具体地，我们使用 vis 数组记录到达每个节点的最短时间。当我们通过不同的路径到达同一个节点并且提供了一个更晚的到达时间时，我们会考虑这个新的到达时间，并将其加入队列中以供进一步的路径探索。这种方法允许我们捕捉到第二短路径，因为即使一个节点已被访问，只要有可能找到更长的路径（作为第二短路径的候选），我们就继续探索这个路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/second-minimum-time-to-reach-destination')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/second-minimum-time-to-reach-destination/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

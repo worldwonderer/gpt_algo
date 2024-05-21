@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>同源字符串检测</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>同源字符串检测</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>原字符串由小写字母组成，可以按下述步骤编码：</p>
+
+<ul>
+	<li>任意将其 <strong>分割</strong> 为由若干 <strong>非空</strong> 子字符串组成的一个 <strong>序列</strong> 。</li>
+	<li>任意选择序列中的一些元素（也可能不选择），然后将这些元素替换为元素各自的长度（作为一个数字型的字符串）。</li>
+	<li>重新 <strong>顺次连接</strong> 序列，得到编码后的字符串。</li>
+</ul>
+
+<p>例如，编码 <code>"abcdefghijklmnop"</code> 的一种方法可以描述为：</p>
+
+<ul>
+	<li>将原字符串分割得到一个序列：<code>["ab", "cdefghijklmn", "o", "p"]</code> 。</li>
+	<li>选出其中第二个和第三个元素并分别替换为它们自身的长度。序列变为 <code>["ab", "12", "1", "p"]</code> 。</li>
+	<li>重新顺次连接序列中的元素，得到编码后的字符串：<code>"ab121p"</code> 。</li>
+</ul>
+
+<p>给你两个编码后的字符串 <code>s1</code> 和 <code>s2</code> ，由小写英文字母和数字 <code>1-9</code> 组成。如果存在能够同时编码得到 <code>s1</code> 和 <code>s2</code> 原字符串，返回 <code>true</code> ；否则，返回 <code>false</code>。</p>
+
+<p><strong>注意：</strong>生成的测试用例满足 <code>s1</code> 和 <code>s2</code> 中连续数字数不超过 <code>3</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>s1 = "internationalization", s2 = "i18n"
+<strong>输出：</strong>true
+<strong>解释：</strong>"internationalization" 可以作为原字符串
+- "internationalization" 
+  -&gt; 分割：      ["internationalization"]
+  -&gt; 不替换任何元素
+  -&gt; 连接：      "internationalization"，得到 s1
+- "internationalization"
+  -&gt; 分割：      ["i", "nternationalizatio", "n"]
+  -&gt; 替换：      ["i", "18",                 "n"]
+  -&gt; 连接：      "i18n"，得到 s2
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>s1 = "l123e", s2 = "44"
+<strong>输出：</strong>true
+<strong>解释：</strong>"leetcode" 可以作为原字符串
+- "leetcode" 
+  -&gt; 分割：       ["l", "e", "et", "cod", "e"]
+  -&gt; 替换：       ["l", "1", "2",  "3",   "e"]
+  -&gt; 连接：       "l123e"，得到 s1
+- "leetcode" 
+  -&gt; 分割：       ["leet", "code"]
+  -&gt; 替换：       ["4",    "4"]
+  -&gt; 连接：       "44"，得到 s2
+</pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre><strong>输入：</strong>s1 = "a5b", s2 = "c5b"
+<strong>输出：</strong>false
+<strong>解释：</strong>不存在这样的原字符串
+- 编码为 s1 的字符串必须以字母 'a' 开头
+- 编码为 s2 的字符串必须以字母 'c' 开头
+</pre>
+
+<p><strong>示例 4：</strong></p>
+
+<pre><strong>输入：</strong>s1 = "112s", s2 = "g841"
+<strong>输出：</strong>true
+<strong>解释：</strong>"gaaaaaaaaaaaas" 可以作为原字符串
+- "gaaaaaaaaaaaas"
+  -&gt; 分割：       ["g", "aaaaaaaaaaaa", "s"]
+  -&gt; 替换：       ["1", "12",           "s"]
+  -&gt; 连接：       "112s"，得到 s1
+- "gaaaaaaaaaaaas"
+  -&gt; 分割：       ["g", "aaaaaaaa", "aaaa", "s"]
+  -&gt; 替换：       ["g", "8",        "4",    "1"]
+  -&gt; 连接         "g841"，得到 s2
+</pre>
+
+<p><strong>示例 5：</strong></p>
+
+<pre><strong>输入：</strong>s1 = "ab", s2 = "a2"
+<strong>输出：</strong>false
+<strong>解释：</strong>不存在这样的原字符串
+- 编码为 s1 的字符串由两个字母组成
+- 编码为 s2 的字符串由三个字母组成
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s1.length, s2.length &lt;= 40</code></li>
+	<li><code>s1</code> 和 <code>s2</code> 仅由数字 <code>1-9</code> 和小写英文字母组成</li>
+	<li><code>s1</code> 和 <code>s2</code> 中连续数字数不超过 <code>3</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 603 ms</p>
+                    <p>内存: 114.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def possiblyEquals(self, s1: str, s2: str) -&gt; bool:
+        m = len(s1)  # s1的长度
+        n = len(s2)  # s2的长度
+        memo = dict()  # 用于记忆化递归的字典
+
+        # diff:跟踪两个字符串 s1和s2之间的潜在字符差异。
+        # 具体来说，它表示在某个点上s1相对于s2的额外或缺少的字符数量。
+        def helper(i, j, diff):
+            # 如果两个字符串都遍历完成，并且差异为0，则返回True
+            if i == m and j == n:
+                return diff == 0
+            # 如果当前状态已经计算过，则直接返回之前的结果
+            if (i, j, diff) in memo:
+                return memo[(i, j, diff)]
+
+            # 如果s1的当前字符是数字
+            if i &lt; m and s1[i].isdigit():
+                num = 0  # 用于记录数字的变量
+                k = i
+                # 计算数字的值
+                while k &lt; m and s1[k].isdigit():
+                    num = num * 10 + int(s1[k])
+                    k += 1
+                    # 递归检查在考虑这个数字代表的重复次数后，两个字符串是否可能等价
+                    if helper(k, j, diff + num):
+                        return True
+            # 如果s2的当前字符是数字:
+            # why elif? especially in a scenario where multiple conditions are being checked sequentially.
+            # It ensures that only one branch of the logic is executed for each iteration or recursion
+            elif j &lt; n and s2[j].isdigit():
+                num = 0
+                k = j
+                # 计算数字的值
+                while k &lt; n and s2[k].isdigit():
+                    num = num * 10 + int(s2[k])
+                    k += 1
+                    # 递归检查在考虑这个数字代表的重复次数后，两个字符串是否可能等价
+                    if helper(i, k, diff- num):
+                        return True
+            # 如果当前没有字符重复的差异
+            elif diff == 0:
+                # 如果当前字符相同，则继续递归比较下一个字符
+                if i &lt; m and j &lt; n and s1[i] == s2[j]:
+                    if helper(i+1, j+1, diff):
+                        return True
+            # 如果s1需要更多字符来匹配s2
+            elif diff &gt; 0:
+                if j &lt; n:
+                    if helper(i, j+1, diff - 1):
+                        return True
+            # 如果s2需要更多字符来匹配s1
+            elif diff &lt; 0:
+                if i &lt; m:
+                    if helper(i+1, j, diff + 1):
+                        return True
+
+            # 如果当前状态不能使两个字符串等价，记录这个结果并返回False
+            memo[(i, j, diff)] = False
+            return False
+
+        # 从两个字符串的起始位置开始递归检查
+        return helper(0, 0, 0)
+# s1 = &#34;L3E&#34;，
+# s2 = &#34;L1E2&#34;
+# 初始状态：diff = 0，因为两个字符串初始同步开始。
+
+# 在s1中，数字是3，意味着有3个字符。
+# 在s2中，紧接&#34;L&#34;的数字是1，意味着有1个字符，然后是&#34;E&#34;，然后是另外2个字符。
+# 更新diff = 3 - 1 = 2。
+
+# 由于s2中&#34;E&#34;之后还有2个字符，而在s1中，&#34;E&#34;之后没有更多的字符，这与我们之前计算的diff = 2相匹配，
+# 表明在&#34;E&#34;之后，s1和s2可能有相同数量的额外字符。
+# 根据diff的最终值和对字符串的分析，我们可以推断s1和s2可能表示同一个原始字符串，即&#34;LXXXE&#34;，
+# 其中&#34;X&#34;表示任意字符。</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用递归回溯的方式配合记忆化搜索解决问题。核心思想是通过递归函数探索两个编码字符串s1和s2是否可能由同一原字符串通过不同的编码方式得到。在递归函数中，使用三个主要参数i, j, diff分别表示当前在s1和s2中的位置以及两者之间的潜在字符差异（diff表示s1相对于s2可能多出或少的字符数）。当遇到数字时，递归探索该数字可能表示的字符数，同时更新diff值。当字符直接相同时，直接比较下一位置。最终，若两字符串能够同时遍历完毕且diff为0，则表示可能由同一原字符串编码得到。</p>
+                                <p>时间复杂度: O(m * n * diff_range)</p>
+                                <p>空间复杂度: O(m * n * diff_range)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def possiblyEquals(self, s1: str, s2: str) -&gt; bool:
+        m = len(s1)
+        n = len(s2)
+        memo = dict()
+
+        def helper(i, j, diff):
+            if i == m and j == n:
+                return diff == 0
+            if (i, j, diff) in memo:
+                return memo[(i, j, diff)]
+
+            if i &lt; m and s1[i].isdigit():
+                num = 0
+                k = i
+                while k &lt; m and s1[k].isdigit():
+                    num = num * 10 + int(s1[k])
+                    k += 1
+                    if helper(k, j, diff + num):
+                        return True
+            elif j &lt; n and s2[j].isdigit():
+                num = 0
+                k = j
+                while k &lt; n and s2[k].isdigit():
+                    num = num * 10 + int(s2[k])
+                    k += 1
+                    if helper(i, k, diff - num):
+                        return True
+            elif diff == 0:
+                if i &lt; m and j &lt; n and s1[i] == s2[j]:
+                    if helper(i+1, j+1, diff):
+                        return True
+            elif diff &gt; 0:
+                if j &lt; n:
+                    if helper(i, j+1, diff - 1):
+                        return True
+            elif diff &lt; 0:
+                if i &lt; m:
+                    if helper(i+1, j, diff + 1):
+                        return True
+
+            memo[(i, j, diff)] = False
+            return False
+
+        return helper(0, 0, 0)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在递归函数中，`diff`参数具体是如何计算并影响递归过程的？例如，当diff为正或负时，递归逻辑是如何调整的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在递归函数中，`diff` 参数表示两个字符串 s1 和 s2 在当前位置的潜在字符数差异。如果 `diff` 为正，表示 s1 比 s2 长，即 s1 有更多未匹配的字符；如果 `diff` 为负，表示 s2 比 s1 长，即 s2 有更多未匹配的字符。当 `diff` 为正时，递归逻辑会尝试通过增加 s2 的位置索引 `j`（即调用 `helper(i, j+1, diff-1)`）来平衡差异，消耗 s2 的字符以匹配 s1 的额外字符。当 `diff` 为负时，递归逻辑会尝试通过增加 s1 的位置索引 `i`（即调用 `helper(i+1, j, diff+1)`）来平衡差异，消耗 s1 的字符以匹配 s2 的额外字符。这种方法确保了无论字符数差异如何，都可以通过适当调整两个字符串的索引来尝试匹配两者。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到当遇到数字时会探索该数字可能表示的字符数，这种探索的具体实现方式是什么？如何确保这种探索能够覆盖所有可能的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当遇到数字时，算法通过解析数字并将其视为可能的字符长度来探索不同的匹配情况。具体实现为，如果在 s1 或 s2 中的当前位置发现数字，会从该位置开始解析出完整的数字（可能是多位数），然后递归探索将该数字视为字符串长度的所有情况。例如，如果 `s1[i]` 是数字，会计算从 `i` 开始的全数字，然后尝试不同的长度从 1 到该数字值，逐一调用递归函数 `helper(k, j, diff + num)`，其中 `k` 是数字后的下一个位置，`num` 是当前探索的长度。这样可以确保覆盖从该位置开始所有可能的字符长度。通过递归地探索每一种可能的长度，可以确保所有情况都被考虑到。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在字符直接相同时，可以直接比较下一位置，这种假设在什么情况下可能不成立？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在字符直接相同时，可以直接比较下一位置的原因是，如果两个字符相同，则它们可能来自同一个原字符，因此无需进一步的解码或调整，直接移动到下一个字符继续比较即可。这种假设通常在没有涉及数字编码变化或其他复杂编码情况时成立。然而，这种假设可能不成立的情况包括数字解析后的长度可能与实际字符匹配不一致。例如，如果一个字符串在一个数字后直接跟随相同字符，而另一个字符串中该数字表示不同的字符数，即使当前字符相同，后续的字符和长度处理可能导致不匹配。因此，在处理含有数字的字符串时，需要小心处理每个数字可能引入的复杂性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/check-if-an-original-string-exists-given-two-encoded-strings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/check-if-an-original-string-exists-given-two-encoded-strings/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

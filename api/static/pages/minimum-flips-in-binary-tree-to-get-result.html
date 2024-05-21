@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>二叉树中得到结果所需的最少翻转次数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>二叉树中得到结果所需的最少翻转次数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=binary-tree" class="badge bg-secondary tag-link">二叉树</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 542 ms</p>
+                    <p>内存: 61.2 MB</p>
+                    <pre class="bg-light p-2 code-pre"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def minimumFlips(self, root: Optional[TreeNode], result: bool) -&gt; int:
+        MAPPING = {0: False, 1: True, 2: or_, 3: and_, 4: xor, 5: not_}
+        def dfs(root: Optional[&#39;TreeNode&#39;]) -&gt; List[int]:
+            &#34;&#34;&#34;返回(变为FALSE的最小操作次数,变为TRUE的最小操作次数)&#34;&#34;&#34;
+            if not root:
+                return [inf, inf]
+            if root.val in (0, 1):
+                return [int(root.val == 1), int(root.val == 0)]
+            if root.val == 5:
+                return dfs(root.left)[::-1] if root.left else dfs(root.right)[::-1]
+
+            res, leftRes, rightRes = [inf, inf], dfs(root.left), dfs(root.right)
+            for left, leftFlip in enumerate(leftRes):
+                for right, rigthFlip in enumerate(rightRes):
+                    value = MAPPING[root.val](left, right)
+                    res[value] = min(res[value], leftFlip + rigthFlip)
+
+            return res
+
+        return dfs(root)[result &amp; 1]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用深度优先搜索（DFS）策略来计算二叉树中达到指定布尔结果（True或False）所需的最小翻转次数。树中的每个节点可能代表一个布尔值（0为False，1为True）或一个逻辑运算符（例如AND, OR, XOR, NOT）。解题思路是自底向上地计算每个节点达到True或False状态所需的最小翻转次数。对于逻辑运算符，会考虑其左右子树的状态，并计算出所有可能状态的翻转次数，保留最小值。最终，根据根节点的运算结果，返回达到目标结果&#39;True&#39;或&#39;False&#39;的最小翻转次数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n) in the worst case</p>
+                                <pre class="bg-light p-2"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def minimumFlips(self, root: Optional[TreeNode], result: bool) -&gt; int:
+        MAPPING = {0: False, 1: True, 2: or_, 3: and_, 4: xor, 5: not_}
+        def dfs(root: Optional[&#39;TreeNode&#39;]) -&gt; List[int]:
+            &#34;&#34;&#34;返回(变为FALSE的最小操作次数,变为TRUE的最小操作次数)&#34;&#34;&#34;
+            if not root:
+                return [inf, inf]
+            if root.val in (0, 1):
+                return [int(root.val == 1), int(root.val == 0)]
+            if root.val == 5:
+                # 如果是NOT运算符，翻转左或右子树的结果
+                return dfs(root.left)[::-1] if root.left else dfs(root.right)[::-1]
+
+            res, leftRes, rightRes = [inf, inf], dfs(root.left), dfs(root.right)
+            for left, leftFlip in enumerate(leftRes):
+                for right, rigthFlip in enumerate(rightRes):
+                    value = MAPPING[root.val](left, right)
+                    res[value] = min(res[value], leftFlip + rigthFlip)
+
+            return res
+
+        return dfs(root)[result &amp; 1]
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            题解中提到的映射`MAPPING = {0: False, 1: True, 2: or_, 3: and_, 4: xor, 5: not_}`是否意味着二叉树的节点值直接代表了特定的布尔操作？如何处理节点值为2, 3, 4, 5的详细逻辑？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，`MAPPING`映射意味着二叉树中的节点值直接对应于特定的布尔值或布尔运算。对于节点值为2, 3, 4, 5：
+- `2: or_` 表示当前节点执行逻辑或操作。该节点的最终值由其左右子节点的布尔值通过逻辑或运算确定。
+- `3: and_` 表示执行逻辑与操作，节点值由左右子节点通过逻辑与运算确定。
+- `4: xor_` 表示执行逻辑异或操作，节点值由左右子节点通过逻辑异或运算确定。
+- `5: not_` 表示逻辑非操作，但通常应用于单个子节点（左子节点或右子节点）。这在树的表示中应被明确，即非运算符节点将只有一个子节点。在处理这些运算时，我们基于子节点的逻辑状态计算达到目标状态（True或False）的最小翻转次数。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在题解的`dfs`函数中，当遇到`NOT`运算符时，为什么只考虑左子树的结果？如果存在右子树但没有左子树，这种情况下的处理是否正确？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种方法假设`NOT`运算符节点总是只有一个子节点。在常规的逻辑运算树表示中，非运算通常只对一个操作数（即一个子节点）应用。因此，代码中考虑左子节点或右子节点的存在性是为了处理某些特殊情况。如果存在右子树而没有左子树，代码通过`if root.left else dfs(root.right)`确保正确地处理了这一情况，即如果左子树不存在，则会使用右子树的结果进行运算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在处理逻辑运算符节点时，需要考虑所有可能的左右子树状态组合？这种方法是否最优，存在没有考虑的更有效的策略吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理逻辑运算符节点时，考虑所有可能的左右子树状态组合是因为每种组合可能导致不同的翻转需求，从而影响达到目标状态（True或False）的最小翻转次数。这种方法确保了无论子树的当前状态如何，都能找到达到期望结果的最优解。尽管这种方法在某些情况下可能看起来效率不高，但它确保了全面性和正确性，特别是在树的结构和节点值的变化复杂时。对于优化，可以考虑使用动态规划或者备忘录技术来缓存已计算的结果，避免重复的计算，从而提高效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/minimum-flips-in-binary-tree-to-get-result')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/minimum-flips-in-binary-tree-to-get-result/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

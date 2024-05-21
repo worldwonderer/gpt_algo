@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>树中可以形成回文的路径数</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>树中可以形成回文的路径数</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=tree" class="badge bg-secondary tag-link">树</a>
+                    
+                        <a href="/problems?tag=depth-first-search" class="badge bg-secondary tag-link">深度优先搜索</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                        <a href="/problems?tag=bitmask" class="badge bg-secondary tag-link">状态压缩</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一棵 <strong>树</strong>（即，一个连通、无向且无环的图），<strong>根</strong> 节点为 <code>0</code> ，由编号从 <code>0</code> 到 <code>n - 1</code> 的 <code>n</code> 个节点组成。这棵树用一个长度为 <code>n</code> 、下标从 <strong>0</strong> 开始的数组 <code>parent</code> 表示，其中 <code>parent[i]</code> 为节点 <code>i</code> 的父节点，由于节点 <code>0</code> 为根节点，所以 <code>parent[0] == -1</code> 。</p>
+
+<p>另给你一个长度为 <code>n</code> 的字符串 <code>s</code> ，其中 <code>s[i]</code> 是分配给 <code>i</code> 和 <code>parent[i]</code> 之间的边的字符。<code>s[0]</code> 可以忽略。</p>
+
+<p>找出满足 <code>u &lt; v</code> ，且从 <code>u</code> 到 <code>v</code> 的路径上分配的字符可以 <strong>重新排列</strong> 形成 <strong>回文</strong> 的所有节点对&nbsp;<code>(u, v)</code> ，并返回节点对的数目。</p>
+
+<p>如果一个字符串正着读和反着读都相同，那么这个字符串就是一个 <strong>回文</strong> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/07/15/treedrawio-8drawio.png" style="width: 281px; height: 181px;" /></p>
+
+<pre>
+<strong>输入：</strong>parent = [-1,0,0,1,1,2], s = "acaabc"
+<strong>输出：</strong>8
+<strong>解释：</strong>符合题目要求的节点对分别是：
+- (0,1)、(0,2)、(1,3)、(1,4) 和 (2,5) ，路径上只有一个字符，满足回文定义。
+- (2,3)，路径上字符形成的字符串是 "aca" ，满足回文定义。
+- (1,5)，路径上字符形成的字符串是 "cac" ，满足回文定义。
+- (3,5)，路径上字符形成的字符串是 "acac" ，可以重排形成回文 "acca" 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>parent = [-1,0,0,0,0], s = "aaaaa"
+<strong>输出：</strong>10
+<strong>解释：</strong>任何满足 u &lt; v 的节点对 (u,v) 都符合题目要求。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == parent.length == s.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li>对于所有 <code>i &gt;= 1</code> ，<code>0 &lt;= parent[i] &lt;= n - 1</code> 均成立</li>
+	<li><code>parent[0] == -1</code></li>
+	<li><code>parent</code> 表示一棵有效的树</li>
+	<li><code>s</code> 仅由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 372 ms</p>
+                    <p>内存: 45.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import defaultdict
+
+
+class Solution:
+    def countPalindromePaths(self, parent: List[int], s: str) -&gt; int:
+        count = defaultdict(int)
+        N = len(parent)
+        bitset = [None] * N
+        ans = 0
+        def get_bitset(i):
+            if bitset[i] is not None:
+                return bitset[i]
+            p = parent[i]
+            if p == -1:
+                b = 0
+            else:
+                ci = ord(s[i]) - ord(&#39;a&#39;)
+                b = get_bitset(p) ^ (1 &lt;&lt; ci)
+            bitset[i] = b
+            count[b] += 1
+            return b
+
+        for i in range(len(parent)):
+            get_bitset(i)
+        for k, v in count.items():
+            ans += v * (v - 1) // 2
+            x = k
+            while x:
+                lowbit = (x &amp; (-x))
+                ans += v * count.get(k ^ lowbit, 0)
+                x -= lowbit
+        return ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用了位运算与哈希表来高效处理问题。首先，通过DFS遍历树的每个节点，利用位运算来记录从根节点到当前节点的路径上字符出现的奇偶性。具体地，为每个字符分配一个位（例如字符&#39;a&#39;对应第0位），若该字符在路径上出现奇数次则对应位为1，偶数次则为0。这样，每个节点的路径可以通过一个整数（位集合）来唯一表示。使用哈希表来统计每种位集合的出现次数。在统计完所有节点后，再次遍历哈希表来计算可能的回文路径数。如果两个节点的路径位集合异或结果为0或者只有一个位为1（即只有一个字符出现奇数次），那么这两个节点之间的路径可以重排成回文。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">from collections import defaultdict
+
+
+class Solution:
+    def countPalindromePaths(self, parent: List[int], s: str) -&gt; int:
+        count = defaultdict(int)
+        N = len(parent)
+        bitset = [None] * N
+        ans = 0
+        def get_bitset(i):
+            if bitset[i] is not None:
+                return bitset[i]
+            p = parent[i]
+            if p == -1:
+                b = 0
+            else:
+                ci = ord(s[i]) - ord(&#39;a&#39;)
+                b = get_bitset(p) ^ (1 &lt;&lt; ci)
+            bitset[i] = b
+            count[b] += 1
+            return b
+
+        for i in range(len(parent)):
+            get_bitset(i)
+        for k, v in count.items():
+            ans += v * (v - 1) // 2
+            x = k
+            while x:
+                lowbit = (x &amp; (-x))
+                ans += v * count.get(k ^ lowbit, 0)
+                x -= lowbit
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在DFS过程中，如何确保每个节点的位运算正确反映了从根节点到该节点的路径上字符出现的奇偶性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在DFS过程中，每次访问一个节点时，都会通过该节点的父节点的位集合来更新当前节点的位集合。具体操作是，将父节点的位集合与当前节点字符对应的位进行异或操作。异或操作的特性是，如果某一位是0，则输出与另一个操作数相同的值；如果是1，则输出另一个操作数的相反值。这意味着，如果当前字符在路径上已经出现奇数次（对应位为1），再次出现就会转变为偶数次（1异或1），反之亦然。这样一来，每次迭代都正确地反映了从根节点到当前节点的字符的奇偶次数变化。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            位集合使用整数表示时，为什么选择异或操作来记录字符的奇偶次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>异或操作具有几个有用的特性，特别适合于跟踪字符出现次数的奇偶性：1) 自反性，即`x XOR x = 0`，这意味着同一个字符出现两次（偶数次）会抵消自己，导致位回归到0。2) 恒等性，即`x XOR 0 = x`，这意味着字符首次出现时，其对应的位会从0变为1。这两个特性使得异或操作成为更新和记录字符出现奇偶次数的理想选择。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            算法如何处理重复计算节点对的问题，特别是在计算可能的回文路径数时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>算法通过哈希表统计每种位集合的出现次数，而不是直接记录节点对。在计算可能的回文路径数时，对于每种位集合，都计算选择两个节点（两者位集合相同）的组合数，即`v * (v - 1) / 2`，其中`v`是该位集合的出现次数。通过这种方式，避免了直接对节点对进行双重循环，从而有效减少了重复计算的问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在回文路径判断中，为什么只需检查异或结果为0或只有一个位为1的场景？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二进制表示中，位集合异或结果为0意味着两个节点的路径上所有字符出现偶数次，可以自由重排成回文。如果异或结果中只有一个位为1，这意味着只有一个字符出现了奇数次，这在回文中也是可接受的（中间字符）。这两种情况都符合回文的条件，因此这种检查方法足以确定两个路径是否可以组成回文。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/count-paths-that-can-form-a-palindrome-in-a-tree')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/count-paths-that-can-form-a-palindrome-in-a-tree/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

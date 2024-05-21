@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>子数组最大平均数 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>子数组最大平均数 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 127 ms</p>
+                    <p>内存: 17.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">from collections import deque
+
+class Solution:
+    def findMaxAverage(self, nums: List[int], k: int) -&gt; float:
+        # (count, sum)
+        stack = deque()
+        st = 0
+        N = len(nums)
+        for i in range(0, k):
+            st += nums[i]
+        ans = st / k
+        ct = k
+        for i in range(1, N - k + 1):
+            st += nums[i + k - 1]
+            ct += 1
+            s1 = nums[i - 1]
+            c1 = 1
+            # S0 / C0 &gt;= S1 / C1
+            while stack and stack[-1][1] * c1 &gt;= s1 * stack[-1][0]:
+                c0, s0 = stack.pop()
+                c1 += c0
+                s1 += s0
+            stack.append((c1, s1))
+            # S0 / C0 &lt;= st / ct
+            while stack and stack[0][1] * ct &lt;= st * stack[0][0]:
+                c0, s0 = stack.popleft()
+                ct -= c0
+                st -= s0
+            ans = max(ans, st / ct)
+        return ans
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用滑动窗口加上双端队列（deque）的方式来求解问题。首先，通过滑动窗口计算初始大小为k的子数组的平均值。随后，继续滑动窗口并在每一步尝试调整子数组的开始和结束位置，以便找到可能的最大平均值。这一过程中使用了双端队列来维护当前窗口的子数组信息。每次移动时，从前面移除元素并可能从队尾合并较小的平均值子数组，从而不断更新当前的最大平均值。通过队列操作，我们能够有效地计算每一个新窗口的平均值，并比较它与已知的最大平均值。</p>
+                                <p>时间复杂度: O(N)</p>
+                                <p>空间复杂度: O(N)</p>
+                                <pre class="bg-light p-2">from collections import deque
+
+class Solution:
+    def findMaxAverage(self, nums: List[int], k: int) -&gt; float:
+        # 初始化双端队列，用于存储子数组的大小和总和
+        stack = deque()
+        # 初始子数组的总和
+        st = 0
+        # 数组的长度
+        N = len(nums)
+        # 计算第一个窗口的总和
+        for i in range(0, k):
+            st += nums[i]
+        # 初始的最大平均值
+        ans = st / k
+        # 窗口的初始大小
+        ct = k
+        # 从第二个元素开始滑动窗口
+        for i in range(1, N - k + 1):
+            # 向窗口添加新元素，窗口扩展
+            st += nums[i + k - 1]
+            ct += 1
+            s1 = nums[i - 1]
+            c1 = 1
+            # 合并小的子数组，保证队尾的平均值最大
+            while stack and stack[-1][1] * c1 &gt;= s1 * stack[-1][0]:
+                c0, s0 = stack.pop()
+                c1 += c0
+                s1 += s0
+            stack.append((c1, s1))
+            # 调整窗口大小，尝试找到更大的平均值
+            while stack and stack[0][1] * ct &lt;= st * stack[0][0]:
+                c0, s0 = stack.popleft()
+                ct -= c0
+                st -= s0
+            ans = max(ans, st / ct)
+        return ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定滑动窗口的起始大小k，并且这个大小对算法的效果有什么影响？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>滑动窗口的起始大小k通常是根据题目要求或数据特性确定的。在本题中，k可能是一个给定的初始值，表示要求计算的最小子数组的长度。选择合适的k对算法的效果有显著影响：较小的k可能让算法更频繁地更新最大平均值，而较大的k则可能减少更新次数但增大了每次计算的数据量。初始窗口大小k是平衡算法效率和精度的一个关键因素。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            双端队列中元素合并的条件`stack[-1][1] * c1 &gt;= s1 * stack[-1][0]`是如何确保队尾的平均值最大的？能否提供一个具体的例子说明这种合并的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>此条件确保在队列中，较新添加的子数组（平均值较小）与前一个子数组合并时，不会导致平均值下降。具体例子：假设队列末尾有一个子数组平均值为3（总和为6，元素个数为2），即`(2, 6)`。现在新加入的元素为1，形成新子数组`(1, 1)`。按照合并条件`6 * 1 &gt;= 1 * 2`，即`6 &gt;= 2`，条件满足，所以这两个子数组应合并为`(3, 7)`，新的平均值为`7 / 3`，仍然保持了队列中平均值不减的原则。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在调整窗口大小的循环中`while stack and stack[0][1] * ct &lt;= st * stack[0][0]`，这个条件是如何帮助找到更大平均值的？具体是通过什么逻辑实现的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件检查当前窗口的总平均值是否大于队列首部的子数组平均值。如果是，移除队首的子数组能提高整体窗口的平均值。例如，如果整体窗口平均值（`st / ct`）高于队首子数组的平均值，通过移除这部分较低平均的子数组，剩余部分的平均值可能增加，从而尝试找到一个更大的平均值。这是通过不断调整窗口大小来优化当前窗口的平均值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            您提到每个元素最多被操作两次，这是否意味着在某些特定情况下，元素的操作次数可以少于两次？如果是，这种情况通常在何时发生？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，元素的操作次数可能少于两次。这通常发生在元素在被加入到窗口后很快就被移除，而没有经过队列中的合并过程。例如，如果一个元素被添加到窗口后，随即因为不满足窗口的平均值提高条件而被移除，那么该元素只被操作了一次。这种情况较少见，通常发生在窗口平均值与新加入元素差异较大时。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/maximum-average-subarray-i" class="list-group-item list-group-item-action">
+                                子数组最大平均数 I
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-average-subarray-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-average-subarray-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

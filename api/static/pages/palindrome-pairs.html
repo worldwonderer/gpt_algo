@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>回文对</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>回文对</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个由唯一字符串构成的 <strong>0 索引&nbsp;</strong>数组 <code>words</code>&nbsp;。</p>
+
+<p><strong>回文对</strong> 是一对整数 <code>(i, j)</code> ，满足以下条件：</p>
+
+<ul>
+	<li><code>0 &lt;= i, j &lt; words.length</code>，</li>
+	<li><code>i != j</code> ，并且</li>
+	<li><code>words[i] + words[j]</code>（两个字符串的连接）是一个<span data-keyword="palindrome-string">回文串</span>。</li>
+</ul>
+
+<p>返回一个数组，它包含&nbsp;<code>words</code> 中所有满足 <strong>回文对</strong> 条件的字符串。</p>
+
+<p>你必须设计一个时间复杂度为 <code>O(sum of words[i].length)</code> 的算法。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["abcd","dcba","lls","s","sssll"]
+<strong>输出：</strong>[[0,1],[1,0],[3,2],[2,4]] 
+<strong>解释：</strong>可拼接成的回文串为 <code>["dcbaabcd","abcddcba","slls","llssssll"]</code>
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["bat","tab","cat"]
+<strong>输出：</strong>[[0,1],[1,0]] 
+<strong>解释：</strong>可拼接成的回文串为 <code>["battab","tabbat"]</code></pre>
+
+<p><strong>示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["a",""]
+<strong>输出：</strong>[[0,1],[1,0]]
+</pre>
+&nbsp;
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= words.length &lt;= 5000</code></li>
+	<li><code>0 &lt;= words[i].length &lt;= 300</code></li>
+	<li><code>words[i]</code> 由小写英文字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 891 ms</p>
+                    <p>内存: 26.5 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+     def palindromePairs(self, words: List[str]) -&gt; List[List[int]]:
+         backward, res = {}, []
+         for i, word in enumerate(words):
+             backward[word[::-1]] = i
+
+         for i, word in enumerate(words):
+             
+             if word in backward and backward[word] != i:
+                 res.append([i, backward[word]])
+                 
+             if word != &#34;&#34; and &#34;&#34; in backward and word == word[::-1]:
+                 res.append([i, backward[&#34;&#34;]])
+                 res.append([backward[&#34;&#34;], i])
+                 
+             for j in range(len(word)):
+                 if word[j:] in backward and word[:j] == word[j-1::-1]:
+                     res.append([backward[word[j:]], i])
+                 if word[:j] in backward and word[j:] == word[:j-1:-1]:
+                     res.append([i, backward[word[:j]]])
+                     
+         return res
+solution = Solution()
+assert solution.palindromePairs(words = [&#34;abcd&#34;,&#34;dcba&#34;,&#34;lls&#34;,&#34;s&#34;,&#34;sssll&#34;]) == [[0,1],[1,0],[3,2],[2,4]]
+assert solution.palindromePairs(words = [&#34;bat&#34;,&#34;tab&#34;,&#34;cat&#34;]) == [[0,1],[1,0]]
+assert solution.palindromePairs(words = [&#34;a&#34;,&#34;&#34;]) == [[0,1],[1,0]]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了字典 backward 来存储单词的逆序作为键，原单词的索引作为值。然后遍历每个单词，判断以下情况：
+1. 如果当前单词的逆序在字典中，且不是当前单词自身，则可以组成回文对。
+2. 如果当前单词是回文串，且空串在字典中，则可以组成两个回文对。
+3. 将当前单词划分为左右两部分，如果左边部分的逆序在字典中，且右边部分是回文串，则可以组成回文对。
+4. 将当前单词划分为左右两部分，如果右边部分的逆序在字典中，且左边部分是回文串，则可以组成回文对。
+最后返回所有找到的回文对。</p>
+                                <p>时间复杂度: O(n*k)，其中 n 为单词数组的长度，k 为单词的平均长度。</p>
+                                <p>空间复杂度: O(n^2)，其中 n 为单词数组的长度。</p>
+                                <pre class="bg-light p-2">```python
+class Solution:
+    def palindromePairs(self, words: List[str]) -&gt; List[List[int]]:
+        backward, res = {}, []
+        
+        # 创建单词逆序到索引的字典
+        for i, word in enumerate(words):
+            backward[word[::-1]] = i
+        
+        # 遍历每个单词
+        for i, word in enumerate(words):
+            # 情况1：当前单词的逆序在字典中，且不是当前单词自身
+            if word in backward and backward[word] != i:
+                res.append([i, backward[word]])
+            
+            # 情况2：当前单词是回文串，且空串在字典中
+            if word != &#34;&#34; and &#34;&#34; in backward and word == word[::-1]:
+                res.append([i, backward[&#34;&#34;]])
+                res.append([backward[&#34;&#34;], i])
+            
+            # 情况3和情况4：将当前单词划分为左右两部分
+            for j in range(len(word)):
+                # 情况3：左边部分的逆序在字典中，且右边部分是回文串
+                if word[j:] in backward and word[:j] == word[j-1::-1]:
+                    res.append([backward[word[j:]], i])
+                # 情况4：右边部分的逆序在字典中，且左边部分是回文串
+                if word[:j] in backward and word[j:] == word[:j-1:-1]:
+                    res.append([i, backward[word[:j]]])
+        
+        return res
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解的情况2中，为什么提到&#39;当前单词是回文串，且空串在字典中，则可以组成两个回文对&#39;？空串应该如何处理才能确保算法的正确性和效率？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在情况2中，如果一个单词本身是回文串（例如&#39;aba&#39;），并且空串也存在于字典中，这个单词可以与空串形成回文对。空串作为前缀或后缀添加到回文串上仍保持整体是回文的。因此，可以形成两个回文对，一个是空串在前（例如，[&#39;&#39;, &#39;aba&#39;]），另一个是空串在后（例如，[&#39;aba&#39;, &#39;&#39;]）。为了确保算法的正确性和效率，可以在创建字典时检查并添加空串，确保处理空串的逻辑清晰且不会因为频繁检查空串而降低效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            对于情况3和情况4，题解说明了将单词划分为两部分，但是如何确保这种划分和逆序的查找能够有效发现所有可能的回文对？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>情况3和情况4通过将单词拆分为两部分，检查其中一部分的逆序是否存在于字典中，而另一部分若是回文，则可以与逆序存在的单词形成回文对。这种方法有效地利用了字典的快速查找性能来确认单词的部分是否能形成有效的回文对。通过从第一个字符到最后一个字符逐步划分单词，这种策略确保了所有可能的拆分都被考虑到，从而找出所有可能的回文对组合。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的算法实现似乎没有显式地处理单词数组中存在重复单词的情况，给定题目条件是唯一字符串，但如果条件改变，该如何调整算法以处理重复字符串？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果单词数组中存在重复单词，字典结构需要调整以允许每个逆序单词键关联多个索引。这可以通过将字典的值从单个索引更改为索引列表来实现。在查找时，需要遍历这些索引并对每个索引执行相应的逻辑检查，确保不与当前遍历到的单词索引相同。这样可以处理重复单词的情况，并确保算法的正确性和完整性。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解提到的情况2中，如果空字符串不在字典中，但是存在一个是回文串的单词，这种情况下的处理逻辑是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果空字符串不在字典中，情况2中描述的添加空串形成回文对的情况就不会发生。在这种情况下，单独的回文串不会与空串形成对，因此不需要特别处理。只有当空串确实存在于字典中时，才能根据情况2的逻辑形成回文对。这确保了算法处理的一致性和预期行为。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+                <aside class="related-problems-section">
+                    <h2>Related Problems</h2>
+                    <div class="list-group">
+                        
+                            <a href="/problem/longest-palindromic-substring" class="list-group-item list-group-item-action">
+                                最长回文子串
+                            </a>
+                        
+                            <a href="/problem/shortest-palindrome" class="list-group-item list-group-item-action">
+                                最短回文串
+                            </a>
+                        
+                    </div>
+                </aside>
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/palindrome-pairs')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/palindrome-pairs/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

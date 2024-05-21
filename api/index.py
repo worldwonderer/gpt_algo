@@ -3,12 +3,12 @@ from flask_mongoengine import MongoEngine
 
 from .routes import bp
 from .filters import difficulty_filter, remove_empty_paragraphs, format_code
-from .config import MONGODB_SETTINGS
+from .config import Config
 
 app = Flask(__name__)
 
 # 配置 MongoDB
-app.config['MONGODB_SETTINGS'] = MONGODB_SETTINGS
+app.config.from_object(Config)
 
 # 配置 jinja2 过滤器
 app.jinja_env.filters['difficulty'] = difficulty_filter

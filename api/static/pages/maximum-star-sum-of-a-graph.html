@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>图中最大星和</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>图中最大星和</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=greedy" class="badge bg-secondary tag-link">贪心</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个&nbsp;<code>n</code>&nbsp;个点的无向图，节点从&nbsp;<code>0</code>&nbsp;到&nbsp;<code>n - 1</code>&nbsp;编号。给你一个长度为 <code>n</code>&nbsp;下标从&nbsp;<strong>0</strong>&nbsp;开始的整数数组&nbsp;<code>vals</code>&nbsp;，其中&nbsp;<code>vals[i]</code>&nbsp;表示第&nbsp;<code>i</code>&nbsp;个节点的值。</p>
+
+<p>同时给你一个二维整数数组&nbsp;<code>edges</code>&nbsp;，其中&nbsp;<code>edges[i] = [a<sub>i</sub>, b<sub>i</sub>]</code>&nbsp;表示节点&nbsp;<code>a<sub>i</sub></code> 和&nbsp;<code>b<sub>i</sub></code>&nbsp;之间有一条双向边。</p>
+
+<p><strong>星图</strong>&nbsp;是给定图中的一个子图，它包含一个中心节点和&nbsp;<code>0</code>&nbsp;个或更多个邻居。换言之，星图是给定图中一个边的子集，且这些边都有一个公共节点。</p>
+
+<p>下图分别展示了有 <code>3</code>&nbsp;个和 <code>4</code>&nbsp;个邻居的星图，蓝色节点为中心节点。</p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/11/07/max-star-sum-descdrawio.png" style="width: 400px; height: 179px;"></p>
+
+<p><strong>星和</strong> 定义为星图中所有节点值的和。</p>
+
+<p>给你一个整数&nbsp;<code>k</code>&nbsp;，请你返回 <strong>至多</strong>&nbsp;包含 <code>k</code>&nbsp;条边的星图中的 <strong>最大星和</strong>&nbsp;。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2022/11/07/max-star-sum-example1drawio.png" style="width: 300px; height: 291px;"></p>
+
+<pre><b>输入：</b>vals = [1,2,3,4,10,-10,-20], edges = [[0,1],[1,2],[1,3],[3,4],[3,5],[3,6]], k = 2
+<b>输出：</b>16
+<b>解释：</b>上图展示了输入示例。
+最大星和对应的星图在上图中用蓝色标出。中心节点是 3 ，星图中还包含邻居 1 和 4 。
+无法得到一个和大于 16 且边数不超过 2 的星图。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><b>输入：</b>vals = [-5], edges = [], k = 0
+<b>输出：</b>-5
+<b>解释：</b>只有一个星图，就是节点 0 自己。
+所以我们返回 -5 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>n == vals.length</code></li>
+	<li><code>1 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>-10<sup>4</sup> &lt;= vals[i] &lt;= 10<sup>4</sup></code></li>
+	<li><code>0 &lt;= edges.length &lt;= min(n * (n - 1) / 2</code><code>, 10<sup>5</sup>)</code></li>
+	<li><code>edges[i].length == 2</code></li>
+	<li><code>0 &lt;= a<sub>i</sub>, b<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>a<sub>i</sub> != b<sub>i</sub></code></li>
+	<li><code>0 &lt;= k &lt;= n - 1</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 180 ms</p>
+                    <p>内存: 50.8 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def maxStarSum(self, vals: List[int], edges: List[List[int]], k: int) -&gt; int:
+        g = [[] for _ in vals]
+        for a, b in edges:
+            if vals[b] &gt; 0:
+                heapq.heappush(g[a], vals[b])
+                if len(g[a]) &gt; k:
+                    heapq.heappop(g[a])
+            if vals[a] &gt; 0:
+                heapq.heappush(g[b], vals[a])
+                if len(g[b]) &gt; k:
+                    heapq.heappop(g[b])
+        return max(v + sum(g[i]) for i, v in enumerate(vals))
+            </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解主要采用了贪心策略和优先队列（最小堆）来解决问题。首先，为每个节点维护一个优先队列（最小堆），用来存储该节点的所有邻居节点的值，但只保留值最大的k个邻居。这是因为我们想要最大化星和，所以只保留最大的k个邻居值。当遍历每条边时，我们将节点值为正的邻居节点的值添加到对应的优先队列中。如果队列的长度超过k，则移除最小的元素，确保队列中只保留k个最大的值。在构建完所有节点的优先队列后，我们计算每个节点作为中心，其星和的最大值，即节点本身的值加上其优先队列中所有值的和，最后返回所有节点的最大星和。</p>
+                                <p>时间复杂度: O(m * log k + n * k)</p>
+                                <p>空间复杂度: O(n * k)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def maxStarSum(self, vals: List[int], edges: List[List[int]], k: int) -&gt; int:
+        g = [[] for _ in vals]  # 为每个节点初始化一个最小堆
+        for a, b in edges:  # 遍历每条边
+            if vals[b] &gt; 0:  # 仅当邻居节点的值大于0时考虑
+                heapq.heappush(g[a], vals[b])  # 将节点b的值加入到节点a的堆中
+                if len(g[a]) &gt; k:  # 如果堆的大小超过k，则弹出最小元素
+                    heapq.heappop(g[a])
+            if vals[a] &gt; 0:  # 同上，处理节点a对节点b的贡献
+                heapq.heappush(g[b], vals[a])
+                if len(g[b]) &gt; k:
+                    heapq.heappop(g[b])
+        return max(v + sum(g[i]) for i, v in enumerate(vals))  # 计算每个节点作为中心的最大星和，并返回最大值</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在确定使用优先队列（最小堆）来维持每个节点的k个最大邻居值时，如何处理邻居节点值为0或负数的情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此题解中，对于邻居节点值为0或负数的情况，我们选择不将这些值加入优先队列（最小堆）。这是因为我们的目标是最大化每个节点的星和，而星和的计算只考虑正值对总和的贡献。将值为0或负数的邻居加入堆中不仅无助于提升星和，反而可能占据堆中的有限空间（k个位置），导致不能保留更多的正值邻居，从而降低可能的最大星和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在处理每个节点的星和时，只考虑邻居节点的值而忽略邻居节点的邻居情况？这是否会影响结果的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这种处理方式基于题目定义的星和的计算方法，即一个节点的星和是该节点值和其最大的k个邻居值的总和。这里的关键是只考虑直接邻居的值对星和的贡献，而非邻居的邻居。这种定义下的计算方法是准确的，不会影响结果的正确性。忽略邻居的邻居情况是因为题目仅要求计算直接邻居的影响。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在计算最大星和时，如果某个节点的邻居数量少于k个，这种情况下是如何处理的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果某个节点的邻居数量少于k个，我们仍然会把这些邻居（只要它们的值为正）的值添加到该节点的优先队列中，但这个队列中的元素数量将少于k个。在计算该节点的星和时，我们只将队列中存在的邻居值求和，加上节点本身的值。这意味着，即使邻居数量不足k个，我们也能正确处理并计算出该节点的星和。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            题解提到的贪心策略在选择保留k个最大邻居时是否有可能忽略某些重要的算法优化，例如在特定条件下提前确定星和的最大值？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>贪心策略在选择保留k个最大邻居时主要目的是简化问题并尽可能地寻找局部最优解。这种策略可能确实忽略了一些可能的全局优化，比如考虑特定的图结构或特殊情况下的优化策略。然而，对于大多数情况，贪心策略提供了一个效率高且实现简单的解决方案。对于能否在特定条件下提前确定星和的最大值，这取决于具体问题的限制和附加条件，可能需要更复杂的算法或数据结构来实现更优的解决方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-star-sum-of-a-graph')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-star-sum-of-a-graph/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

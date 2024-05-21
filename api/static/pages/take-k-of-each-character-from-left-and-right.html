@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>每种字符至少取 K 个</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>每种字符至少取 K 个</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                        <a href="/problems?tag=sliding-window" class="badge bg-secondary tag-link">滑动窗口</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个由字符 <code>'a'</code>、<code>'b'</code>、<code>'c'</code> 组成的字符串 <code>s</code> 和一个非负整数 <code>k</code> 。每分钟，你可以选择取走 <code>s</code> <strong>最左侧</strong> 还是 <strong>最右侧</strong> 的那个字符。</p>
+
+<p>你必须取走每种字符 <strong>至少</strong> <code>k</code> 个，返回需要的 <strong>最少</strong> 分钟数；如果无法取到，则返回<em> </em><code>-1</code> 。</p>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "aabaaaacaabc", k = 2
+<strong>输出：</strong>8
+<strong>解释：</strong>
+从 s 的左侧取三个字符，现在共取到两个字符 'a' 、一个字符 'b' 。
+从 s 的右侧取五个字符，现在共取到四个字符 'a' 、两个字符 'b' 和两个字符 'c' 。
+共需要 3 + 5 = 8 分钟。
+可以证明需要的最少分钟数是 8 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>s = "a", k = 1
+<strong>输出：</strong>-1
+<strong>解释：</strong>无法取到一个字符 'b' 或者 'c'，所以返回 -1 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= s.length &lt;= 10<sup>5</sup></code></li>
+	<li><code>s</code> 仅由字母 <code>'a'</code>、<code>'b'</code>、<code>'c'</code> 组成</li>
+	<li><code>0 &lt;= k &lt;= s.length</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 152 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def takeCharacters(self, s: str, k: int) -&gt; int:
+        a = s.count(&#39;a&#39;)-k
+        b = s.count(&#39;b&#39;)-k
+        c = s.count(&#39;c&#39;)-k
+        if a &lt; 0 or b &lt; 0 or c &lt; 0:
+            return -1
+        
+        c1 = c2 = c3 = 0
+
+   
+        
+        i = 0
+        ans = 0
+        for j in range(len(s)):
+            if s[j] == &#39;a&#39;:
+                c1 += 1
+            elif s[j] == &#39;b&#39;:
+                c2 += 1
+            else:
+                c3 += 1
+
+            while c1 &gt; a or c2 &gt; b or c3 &gt; c:
+                if s[i] == &#39;a&#39;:
+                    c1 -= 1
+                elif s[i] == &#39;b&#39;:
+                    c2 -= 1
+                else:
+                    c3 -= 1
+                i += 1
+            ans = max(ans, j-i+1)
+        return len(s)-ans</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>题解采用滑动窗口的方法来找出最短的子数组，使得移除这个子数组后剩余的字符串中每个字符的数量都至少为k。首先计算字符串中每个字符&#39;a&#39;、&#39;b&#39;、&#39;c&#39;的总数减去k，得到a、b、c。如果任何一个字符的总数不足k，则直接返回-1，因为无法满足条件。接着使用一个滑动窗口（通过两个指针i和j定义），遍历字符串，统计窗口中各个字符的数量。如果窗口中某个字符的数量超过了所需的最小数量（比如&#39;a&#39;超过a），则尝试缩小窗口（移动左指针i）以找到最小的满足条件的窗口。最后，计算除去这个窗口外的剩余部分的长度，即为所需的最少分钟数。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># 解决方案类
+
+class Solution:
+    def takeCharacters(self, s: str, k: int) -&gt; int:
+        # 计算每个字符超过k的数量
+        a = s.count(&#39;a&#39;)-k
+        b = s.count(&#39;b&#39;)-k
+        c = s.count(&#39;c&#39;)-k
+        # 如果任何字符数量不足k，直接返回-1
+        if a &lt; 0 or b &lt; 0 or c &lt; 0:
+            return -1
+        # 初始化窗口内的字符计数器
+        c1 = c2 = c3 = 0
+        # 初始化滑动窗口的左指针
+        i = 0
+        # 初始化答案为0
+        ans = 0
+        # 遍历字符串，j为滑动窗口的右指针
+        for j in range(len(s)):
+            # 根据字符类型增加计数器
+            if s[j] == &#39;a&#39;:
+                c1 += 1
+            elif s[j] == &#39;b&#39;:
+                c2 += 1
+            else:
+                c3 += 1
+            # 当窗口内字符数量超过所需时，移动左指针缩小窗口
+            while c1 &gt; a or c2 &gt; b or c3 &gt; c:
+                if s[i] == &#39;a&#39;:
+                    c1 -= 1
+                elif s[i] == &#39;b&#39;:
+                    c2 -= 1
+                else:
+                    c3 -= 1
+                i += 1
+            # 更新答案为最小的窗口大小
+            ans = max(ans, j-i+1)
+        # 返回除去窗口外的其他部分的长度
+        return len(s)-ans</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何确定滑动窗口中每个字符的最小数量阈值，即变量a、b、c是如何计算得出的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，变量a、b、c代表除去至少k个各字符后，剩余可以用于构成滑动窗口的字符数量。具体地，对于每种字符（&#39;a&#39;、&#39;b&#39;、&#39;c&#39;），我们先计算该字符在整个字符串中的总数，然后减去k。这样，得到的结果就是滑动窗口在理想情况下可以容纳的该字符的最大数量。如果某字符的总数小于k，那么将这个值设为负数，表示不可能构成有效的滑动窗口，因为不能满足每种字符至少有k个的条件。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到如果某个字符的总数不足k，则返回-1。这个判断是否在整个字符串被遍历前就可以确定？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，这个判断可以在遍历字符串之前就确定。在开始滑动窗口算法之前，我们首先计算字符串中每种字符的总数量，并检查每种字符的数量是否至少为k。如果发现任何一个字符的总数少于k，则可以立即返回-1，因为无论如何也无法通过移除部分字符来满足每种字符至少有k个的条件。这个判断是预处理步骤，有助于提前结束算法，避免不必要的计算。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中使用的滑动窗口策略是尝试找到最小的窗口使得移除这个窗口后剩余部分的每种字符都至少有k个。请问为什么不直接从字符串的两端开始移除字符来尝试满足条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>从字符串的两端开始移除字符虽然直观，但可能不会得到最优解。这种方法可能会移除过多的符合条件的字符，特别是当符合条件的字符集中在字符串的中部时。相比之下，滑动窗口方法能够更灵活地调整窗口的大小和位置，寻找到确切的最小的可移除窗口，从而使剩余的字符串部分满足每种字符至少有k个的条件。这种方法更为有效，因为它考虑了字符在整个字符串中的分布，而不仅仅是从两端考虑。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            在滑动窗口中，为什么在确定窗口内某个字符的数量超过所需时，就缩小窗口而不是继续拓展窗口？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在滑动窗口算法中，目标是找到最小的窗口，使得移除这个窗口后剩余的字符串部分的每种字符数量都至少为k。当窗口内某个字符的数量超过所需的最小数量时，继续增大窗口不会帮助改进结果，反而可能包含更多不需要移除的字符，导致不满足条件或不是最优解。因此，我们尝试缩小窗口，以确保窗口是最小的，并且剩余的每种字符的数量仍满足条件。这样的策略有助于精确控制窗口大小，确保找到最优解。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/take-k-of-each-character-from-left-and-right')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/take-k-of-each-character-from-left-and-right/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

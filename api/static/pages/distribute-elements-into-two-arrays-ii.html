@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>将元素分配到两个数组中 II</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>将元素分配到两个数组中 II</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=binary-indexed-tree" class="badge bg-secondary tag-link">树状数组</a>
+                    
+                        <a href="/problems?tag=segment-tree" class="badge bg-secondary tag-link">线段树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=simulation" class="badge bg-secondary tag-link">模拟</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个下标从 <strong>1</strong> 开始、长度为 <code>n</code> 的整数数组 <code>nums</code> 。</p>
+
+<p>现定义函数 <code>greaterCount</code> ，使得 <code>greaterCount(arr, val)</code> 返回数组 <code>arr</code> 中<strong> 严格大于</strong> <code>val</code> 的元素数量。</p>
+
+<p>你需要使用 <code>n</code> 次操作，将 <code>nums</code> 的所有元素分配到两个数组 <code>arr1</code> 和 <code>arr2</code> 中。在第一次操作中，将 <code>nums[1]</code> 追加到 <code>arr1</code> 。在第二次操作中，将 <code>nums[2]</code> 追加到 <code>arr2</code> 。之后，在第 <code>i</code> 次操作中：</p>
+
+<ul>
+	<li>如果 <code>greaterCount(arr1, nums[i]) &gt; greaterCount(arr2, nums[i])</code> ，将 <code>nums[i]</code> 追加到 <code>arr1</code> 。</li>
+	<li>如果 <code>greaterCount(arr1, nums[i]) &lt; greaterCount(arr2, nums[i])</code> ，将 <code>nums[i]</code> 追加到 <code>arr2</code> 。</li>
+	<li>如果 <code>greaterCount(arr1, nums[i]) == greaterCount(arr2, nums[i])</code> ，将 <code>nums[i]</code> 追加到元素数量较少的数组中。</li>
+	<li>如果仍然相等，那么将 <code>nums[i]</code> 追加到 <code>arr1</code> 。</li>
+</ul>
+
+<p>连接数组 <code>arr1</code> 和 <code>arr2</code> 形成数组 <code>result</code> 。例如，如果 <code>arr1 == [1,2,3]</code> 且 <code>arr2 == [4,5,6]</code> ，那么 <code>result = [1,2,3,4,5,6]</code> 。</p>
+
+<p>返回整数数组 <code>result</code> 。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [2,1,3,3]
+<strong>输出：</strong>[2,3,1,3]
+<strong>解释：</strong>在前两次操作后，arr1 = [2] ，arr2 = [1] 。
+在第 3 次操作中，两个数组中大于 3 的元素数量都是零，并且长度相等，因此，将 nums[3] 追加到 arr1 。
+在第 4 次操作中，两个数组中大于 3 的元素数量都是零，但 arr2 的长度较小，因此，将 nums[4] 追加到 arr2 。
+在 4 次操作后，arr1 = [2,3] ，arr2 = [1,3] 。
+因此，连接形成的数组 result 是 [2,3,1,3] 。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [5,14,3,1,2]
+<strong>输出：</strong>[5,3,1,2,14]
+<strong>解释：</strong>在前两次操作后，arr1 = [5] ，arr2 = [14] 。
+在第 3 次操作中，两个数组中大于 3 的元素数量都是一，并且长度相等，因此，将 nums[3] 追加到 arr1 。
+在第 4 次操作中，arr1 中大于 1 的元素数量大于 arr2 中的数量（2 &gt; 1），因此，将 nums[4] 追加到 arr1 。
+在第 5 次操作中，arr1 中大于 2 的元素数量大于 arr2 中的数量（2 &gt; 1），因此，将 nums[5] 追加到 arr1 。
+在 5 次操作后，arr1 = [5,3,1,2] ，arr2 = [14] 。
+因此，连接形成的数组 result 是 [5,3,1,2,14] 。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<strong>输入：</strong>nums = [3,3,3,3]
+<strong>输出：</strong>[3,3,3,3]
+<strong>解释：</strong>在 4 次操作后，arr1 = [3,3] ，arr2 = [3,3] 。
+因此，连接形成的数组 result 是 [3,3,3,3] 。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>3 &lt;= n &lt;= 10<sup>5</sup></code></li>
+	<li><code>1 &lt;= nums[i] &lt;= 10<sup>9</sup></code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 633 ms</p>
+                    <p>内存: 41.9 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def resultArray(self, nums: List[int]) -&gt; List[int]:
+        
+        v2i = {v: i for i, v in enumerate(sorted(set(nums)), 1)}
+        m = len(v2i)
+        a, b = list(), list()
+        t = [0] * (m + 1)
+        
+        for idx, x in enumerate(nums):
+            i = v2i[x]
+            tmp, i0 = 0, i
+            while i0:
+                tmp += t[i0]
+                i0 &amp;= i0 - 1
+            diff = len(a) - len(b) - tmp
+            if (idx == 0 or idx != 1) and (diff &gt; 0 or diff == 0 and len(a) &lt;= len(b)):
+                a.append(x)
+                while i &lt;= m:
+                    t[i] += 1
+                    i += i &amp; -i
+            else:
+                b.append(x)
+                while i &lt;= m:
+                    t[i] -= 1
+                    i += i &amp; -i
+        return a + b
+        </pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了二进制索引树（Binary Indexed Tree，BIT）来高效地维护和查询数组中特定值的计数信息。首先，创建一个值到索引的映射（v2i），将数组中的元素映射到一个连续的索引范围内，并按值排序。这个映射用于在BIT中更新和查询位置。对于数组中的每个元素，基于其在BIT中的计数值以及当前两个数组（arr1和arr2）的长度，决定将元素添加到哪一个数组。使用BIT可以快速计算出任意元素值大于当前元素值的元素数量。这种方法允许我们在对数时间内处理每个元素的插入操作，从而有效地解决问题。</p>
+                                <p>时间复杂度: O(n log m)</p>
+                                <p>空间复杂度: O(m + n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def resultArray(self, nums: List[int]) -&gt; List[int]:
+        # 创建值到索引的映射
+        v2i = {v: i for i, v in enumerate(sorted(set(nums)), 1)}
+        m = len(v2i)
+        a, b = list(), list()
+        t = [0] * (m + 1)
+        
+        for idx, x in enumerate(nums):
+            i = v2i[x]
+            # 查询BIT得到大于当前元素的数量
+            tmp, i0 = 0, i
+            while i0:
+                tmp += t[i0]
+                i0 &amp;= i0 - 1
+            diff = len(a) - len(b) - tmp
+            # 根据条件判断将元素加入arr1或arr2
+            if (idx == 0 or idx != 1) and (diff &gt; 0 or diff == 0 and len(a) &lt;= len(b)):
+                a.append(x)
+                # 更新BIT
+                while i &lt;= m:
+                    t[i] += 1
+                    i += i &amp; -i
+            else:
+                b.append(x)
+                while i &lt;= m:
+                    t[i] -= 1
+                    i += i &amp; -i
+        # 返回结果数组
+        return a + b</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在解决方法中提到使用了二进制索引树（BIT），这种数据结构具体是如何帮助解决这个问题的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>二进制索引树（Binary Indexed Tree，BIT），也被称为树状数组，主要用于高效地处理数组的前缀和查询和更新操作。在本题中，BIT 被用于维护和查询数组元素的计数信息。通过BIT，可以快速计算出任意给定元素值大于当前元素值的元素数量，这是通过在每次添加元素到数组时更新BIT，并在需要时查询所有大于当前元素的索引的计数总和来实现的。这样，每次元素插入的处理时间能够保持在对数级别（O(log n)），从而使整体解决方案更加高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解中提到的`值到索引的映射（v2i）`是如何构建的，为什么需要将数组中的元素映射到一个连续的索引范围内？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>值到索引的映射（v2i）是通过将数组中的所有不同元素进行排序和去重后，再给每一个唯一元素分配一个连续的整数索引来构建的。这种映射是必要的，因为BIT操作需要使用连续的索引范围来有效地更新和查询。如果直接使用元素的原始值作为索引，可能会导致索引过大（尤其是在元素值范围广泛时），从而增加空间复杂度。通过将元素映射到一个较小的、连续的索引范围内，我们可以使空间使用更加高效，并确保BIT的操作能够正确执行。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            题解中的`diff = len(a) - len(b) - tmp`这一行代码的逻辑是如何决定元素应该添加到arr1还是arr2的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这行代码中，`diff`计算的是数组`a`和`b`的长度差减去当前元素之后所有元素的数量（即`tmp`，通过BIT计算得到）。`diff`的值用于决定新元素应该添加到哪一个数组中。如果`diff`大于0，或者`diff`等于0且`a`的长度不大于`b`的长度，新元素会被添加到数组`a`中；否则，添加到数组`b`中。这种方法的目的是尽可能平衡两个数组的长度，同时考虑到元素的相对大小顺序，以达到题目的要求。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/distribute-elements-into-two-arrays-ii')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/distribute-elements-into-two-arrays-ii/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

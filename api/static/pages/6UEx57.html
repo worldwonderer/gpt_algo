@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>信物传送</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>信物传送</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=breadth-first-search" class="badge bg-secondary tag-link">广度优先搜索</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        欢迎各位勇者来到力扣城，本次试炼主题为「信物传送」。
+
+本次试炼场地设有若干传送带，`matrix[i][j]` 表示第 `i` 行 `j` 列的传送带运作方向，`"^","v","<",">"` 这四种符号分别表示 **上、下、左、右** 四个方向。信物会随传送带的方向移动。勇者**每一次**施法操作，可**临时**变更一处传送带的方向，在物品经过后传送带恢复原方向。
+![lcp (2).gif](https://pic.leetcode-cn.com/1649835246-vfupSL-lcp%20\(2\).gif){:width=300px}
+
+通关信物初始位于坐标 `start`处，勇者需要将其移动到坐标 `end` 处，请返回勇者施法操作的最少次数。
+
+
+
+**注意：**
+- `start` 和 `end` 的格式均为 `[i,j]`
+
+**示例 1:**
+> 输入：`matrix = [">>v","v^<","<><"], start = [0,1], end = [2,0]`
+>
+> 输出：`1`
+>
+> 解释：
+> 如上图所示
+> 当信物移动到 `[1,1]` 时，勇者施法一次将 `[1,1]` 的传送方向 `^` 从变更为 `<`
+> 从而信物移动到 `[1,0]`，后续到达 `end` 位置
+> 因此勇者最少需要施法操作 1 次
+
+**示例 2:**
+> 输入：`matrix = [">>v",">>v","^<<"], start = [0,0], end = [1,1]`
+>
+> 输出：`0`
+>
+> 解释：勇者无需施法，信物将自动传送至 `end` 位置
+
+**示例 3:**
+> 输入：`matrix = [">^^>","<^v>","^v^<"], start = [0,0], end = [1,3]`
+>
+> 输出：`3`
+
+**提示：**
+- `matrix` 中仅包含 `'^'、'v'、'<'、'>'`
+- `0 < matrix.length <= 100`
+- `0 < matrix[i].length <= 100`
+- `0 <= start[0],end[0] < matrix.length`
+- `0 <= start[1],end[1] < matrix[i].length`
+
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 41 ms</p>
+                    <p>内存: 16.3 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def conveyorBelt(self, mat: List[str], start: List[int], end: List[int]) -&gt; int:
+        m, n = len(mat), len(mat[0])
+        vst = [[0] * n for _ in range(m)]
+
+        def move(i, j):
+            if mat[i][j] == &#39;&gt;&#39;:
+                return i, min(j + 1, n - 1)
+            elif mat[i][j] == &#39;v&#39;:
+                return min(i + 1, m - 1), j
+            elif mat[i][j] == &#39;&lt;&#39;:
+                return i, max(0, j - 1)
+            else:
+                return max(0, i - 1), j
+
+        c = 0
+        l = [start]
+        vst[start[0]][start[1]] = 1
+        while True:
+            for i, j in l:
+                if i == end[0] and j == end[1]:
+                    return c
+                ii, jj = move(i, j)
+                if not vst[ii][jj]:
+                    vst[ii][jj] = 1
+                    l.append([ii, jj])
+
+            c += 1
+            l_n = []
+            for i, j in l:
+                if i and not vst[i - 1][j]:
+                    vst[i - 1][j] = 1
+                    l_n.append([i - 1, j])
+                if i &lt; m - 1 and not vst[i + 1][j]:
+                    vst[i + 1][j] = 1
+                    l_n.append([i + 1, j])
+                if j and not vst[i][j - 1]:
+                    vst[i][j - 1] = 1
+                    l_n.append([i, j - 1])
+                if j &lt; n - 1 and not vst[i][j + 1]:
+                    vst[i][j + 1] = 1
+                    l_n.append([i, j + 1]) 
+            l = l_n
+        return -1
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解采用了广度优先搜索（BFS）的思路。首先，创建一个与矩阵相同大小的访问数组 vst，用于记录每个位置是否被访问过。然后，从起点 start 开始，按照传送带的方向移动，并将到达的新位置加入到队列中。每次移动后，检查是否到达终点 end，如果到达，则返回当前的施法次数 c。如果没有到达，则对当前位置的四个方向进行探索，如果相邻的位置没有被访问过，则将其加入到下一轮的队列中，并更新访问数组。每一轮探索结束后，施法次数 c 加一。如果最终无法到达终点，则返回 -1。</p>
+                                <p>时间复杂度: O(m * n)</p>
+                                <p>空间复杂度: O(m * n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def conveyorBelt(self, mat: List[str], start: List[int], end: List[int]) -&gt; int:
+        m, n = len(mat), len(mat[0])  # 获取矩阵的行数和列数
+        vst = [[0] * n for _ in range(m)]  # 初始化访问数组
+
+        def move(i, j):  # 根据传送带的方向移动
+            if mat[i][j] == &#39;&gt;&#39;:
+                return i, min(j + 1, n - 1)
+            elif mat[i][j] == &#39;v&#39;:
+                return min(i + 1, m - 1), j
+            elif mat[i][j] == &#39;&lt;&#39;:
+                return i, max(0, j - 1)
+            else:
+                return max(0, i - 1), j
+
+        c = 0  # 初始化施法次数
+        l = [start]  # 初始化队列
+        vst[start[0]][start[1]] = 1  # 标记起点为已访问
+        while True:
+            for i, j in l:
+                if i == end[0] and j == end[1]:
+                    return c  # 如果到达终点，返回施法次数
+                ii, jj = move(i, j)  # 按传送带方向移动
+                if not vst[ii][jj]:
+                    vst[ii][jj] = 1  # 标记为已访问
+                    l.append([ii, jj])  # 将新位置加入队列
+
+            c += 1  # 施法次数加一
+            l_n = []  # 初始化下一轮的队列
+            for i, j in l:
+                if i and not vst[i - 1][j]:
+                    vst[i - 1][j] = 1
+                    l_n.append([i - 1, j])
+                if i &lt; m - 1 and not vst[i + 1][j]:
+                    vst[i + 1][j] = 1
+                    l_n.append([i + 1, j])
+                if j and not vst[i][j - 1]:
+                    vst[i][j - 1] = 1
+                    l_n.append([i, j - 1])
+                if j &lt; n - 1 and not vst[i][j + 1]:
+                    vst[i][j + 1] = 1
+                    l_n.append([i, j + 1])  # 探索四个方向，并更新队列
+            l = l_n  # 更新队列为下一轮的队列
+        return -1  # 如果无法到达终点，返回 -1</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            如何处理在边界位置时传送带方向可能会指向矩阵外的情况？例如，如果在矩阵的最右侧一列，传送带方向向右，该如何确保不会引发索引错误？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在代码中，处理边界情况主要通过使用min和max函数确保坐标不会越界。例如，当传送带方向向右且处于最右侧一列时，使用表达式`min(j + 1, n - 1)`来确保列索引j不会超过矩阵的最大列索引n-1。类似地，向左移动时使用`max(0, j - 1)`确保不会小于0。这样处理可以保证即使传送带指示向外，代码也不会尝试访问矩阵边界之外的元素，从而避免索引错误。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在该题解中，对每个位置的四个方向进行探索时，所使用的条件`if i and not vst[i - 1][j]`似乎没有完全考虑边界条件，是否应该更明确地检查边界？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>确实，条件`if i and not vst[i - 1][j]`只检查了i不为0（即不在第一行），但没有明确地检查是否在矩阵的有效行范围内。理想情况下，应该使用更严格的边界检查，如`if i &gt; 0 and not vst[i - 1][j]`来确保进行访问的索引是有效的。这样的检查可以更清晰地表明只在i大于0时才向上探索，从而避免任何可能的边界问题。对于其他方向也应执行类似的边界检查。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            为什么在到达终点后就直接返回当前的施法次数，而不考虑当前队列中可能还存在其他未探索的路径可能需要更少的施法次数？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在广度优先搜索（BFS）中，一旦找到终点，该路径保证是施法次数最少的路径。BFS按层级探索，意味着它首先探索所有距起点1步的所有位置，然后是2步的位置，依此类推。所以，当我们在某一施法次数层级首次到达终点时，可以确信没有其他更短的路径存在于此前或同一层级的其他节点中。因此，一旦到达终点，立即返回当前施法次数是合理的，无需考虑队列中的其他路径。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/6UEx57')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/6UEx57/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

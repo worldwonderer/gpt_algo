@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>检查边长度限制的路径是否存在</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>检查边长度限制的路径是否存在</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=union-find" class="badge bg-secondary tag-link">并查集</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=two-pointers" class="badge bg-secondary tag-link">双指针</a>
+                    
+                        <a href="/problems?tag=sorting" class="badge bg-secondary tag-link">排序</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个 <code>n</code> 个点组成的无向图边集 <code>edgeList</code> ，其中 <code>edgeList[i] = [u<sub>i</sub>, v<sub>i</sub>, dis<sub>i</sub>]</code> 表示点 <code>u<sub>i</sub></code> 和点 <code>v<sub>i</sub></code> 之间有一条长度为 <code>dis<sub>i</sub></code> 的边。请注意，两个点之间可能有 <strong>超过一条边 </strong>。</p>
+
+<p>给你一个查询数组<code>queries</code> ，其中 <code>queries[j] = [p<sub>j</sub>, q<sub>j</sub>, limit<sub>j</sub>]</code> ，你的任务是对于每个查询 <code>queries[j]</code> ，判断是否存在从 <code>p<sub>j</sub></code> 到 <code>q<sub>j</sub></code><sub> </sub>的路径，且这条路径上的每一条边都 <strong>严格小于</strong> <code>limit<sub>j</sub></code> 。</p>
+
+<p>请你返回一个 <b>布尔数组</b><em> </em><code>answer</code><em> </em>，其中<em> </em><code>answer.length == queries.length</code> ，当 <code>queries[j]</code> 的查询结果为 <code>true</code> 时， <code>answer</code> 第<em> </em><code>j</code> 个值为<em> </em><code>true</code><em> </em>，否则为 <code>false</code> 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/12/19/h.png" style="width: 267px; height: 262px;" />
+<pre>
+<b>输入：</b>n = 3, edgeList = [[0,1,2],[1,2,4],[2,0,8],[1,0,16]], queries = [[0,1,2],[0,2,5]]
+<b>输出：</b>[false,true]
+<b>解释：</b>上图为给定的输入数据。注意到 0 和 1 之间有两条重边，分别为 2 和 16 。
+对于第一个查询，0 和 1 之间没有小于 2 的边，所以我们返回 false 。
+对于第二个查询，有一条路径（0 -> 1 -> 2）两条边都小于 5 ，所以这个查询我们返回 true 。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+<img alt="" src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/12/19/q.png" style="width: 390px; height: 358px;" />
+<pre>
+<b>输入：</b>n = 5, edgeList = [[0,1,10],[1,2,5],[2,3,9],[3,4,13]], queries = [[0,4,14],[1,4,13]]
+<b>输出：</b>[true,false]
+<b>解释：</b>上图为给定数据。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>2 <= n <= 10<sup>5</sup></code></li>
+	<li><code>1 <= edgeList.length, queries.length <= 10<sup>5</sup></code></li>
+	<li><code>edgeList[i].length == 3</code></li>
+	<li><code>queries[j].length == 3</code></li>
+	<li><code>0 <= u<sub>i</sub>, v<sub>i</sub>, p<sub>j</sub>, q<sub>j</sub> <= n - 1</code></li>
+	<li><code>u<sub>i</sub> != v<sub>i</sub></code></li>
+	<li><code>p<sub>j</sub> != q<sub>j</sub></code></li>
+	<li><code>1 <= dis<sub>i</sub>, limit<sub>j</sub> <= 10<sup>9</sup></code></li>
+	<li>两个点之间可能有 <strong>多条</strong> 边。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 296 ms</p>
+                    <p>内存: 56.0 MB</p>
+                    <pre class="bg-light p-2 code-pre">class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+    
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+    
+    def union(self, x, y):
+        rootX, rootY = self.find(x), self.find(y)
+        if rootX == rootY:
+            return
+        
+        if self.rank[rootX] &lt; self.rank[rootY]:
+            self.parent[rootX] = rootY
+        elif self.rank[rootX] &gt; self.rank[rootY]:
+            self.parent[rootY] = rootX
+        else:
+            self.parent[rootY] = rootX
+            self.rank[rootX] += 1
+
+def sort_edges(edge):
+    return edge[2]
+
+def sort_queries(query):
+    return query[2]
+
+class Solution:
+    def distanceLimitedPathsExist(self, n: int, edgeList: List[List[int]], queries: List[List[int]]) -&gt; List[bool]:
+        # Sort edges and queries by weight/limit in ascending order
+        edgeList.sort(key=sort_edges)
+        queries = sorted([(i, q) for i, q in enumerate(queries)], key=lambda x: x[1][2])
+        
+        # Initialize the union-find data structure
+        uf = UnionFind(n)
+        
+        # Index to keep track of the current edge being processed
+        edge_idx = 0
+        
+        # Array to store the results for each query
+        results = [False] * len(queries)
+        
+        # Process queries in ascending order of limits
+        for i, (query_idx, (p, q, limit)) in enumerate(queries):
+            # Add edges with weights less than the current limit
+            while edge_idx &lt; len(edgeList) and edgeList[edge_idx][2] &lt; limit:
+                u, v, _ = edgeList[edge_idx]
+                uf.union(u, v)
+                edge_idx += 1
+            
+            # Check if p and q are connected in the union-find data structure
+            if uf.find(p) == uf.find(q):
+                results[query_idx] = True
+        
+        return results
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>本题解采用了排序与并查集（Union-Find）的组合策略。首先，根据边的长度和查询限制进行排序。对边按长度升序排序，对查询按限制升序排序，并在查询时附上原始索引以便最终能按顺序返回结果。使用并查集来动态维护节点间的连通性。对于每个查询，依次添加所有长度小于当前查询限制的边到并查集中，然后检查查询中的两个节点是否属于同一连通分量。如果是，则认为该查询的答案为true，否则为false。</p>
+                                <p>时间复杂度: O(E log E + Q log Q)</p>
+                                <p>空间复杂度: O(N + E)</p>
+                                <pre class="bg-light p-2">class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+    
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+    
+    def union(self, x, y):
+        rootX, rootY = self.find(x), self.find(y)
+        if rootX == rootY:
+            return
+        if self.rank[rootX] &lt; self.rank[rootY]:
+            self.parent[rootX] = rootY
+        elif self.rank[rootX] &gt; self.rank[rootY]:
+            self.parent[rootY] = rootX
+        else:
+            self.parent[rootY] = rootX
+            self.rank[rootX] += 1
+def sort_edges(edge):
+    return edge[2]
+def sort_queries(query):
+    return query[2]
+class Solution:
+    def distanceLimitedPathsExist(self, n: int, edgeList: List[List[int]], queries: List[List[int]]) -&gt; List[bool]:
+        edgeList.sort(key=sort_edges)  # 根据边的长度排序
+        queries = sorted([(i, q) for i, q in enumerate(queries)], key=lambda x: x[1][2])  # 根据查询的限制排序并保持原索引
+        uf = UnionFind(n)  # 初始化并查集
+        edge_idx = 0  # 当前处理的边的索引
+        results = [False] * len(queries)  # 结果数组
+        for i, (query_idx, (p, q, limit)) in enumerate(queries):
+            while edge_idx &lt; len(edgeList) and edgeList[edge_idx][2] &lt; limit:
+                u, v, _ = edgeList[edge_idx]
+                uf.union(u, v)
+                edge_idx += 1
+            if uf.find(p) == uf.find(q):
+                results[query_idx] = True
+        return results</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在并查集中使用路径压缩和秩合并的具体优势是什么，尤其是在处理大量节点和边时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在并查集中，路径压缩和秩合并是两种优化技术，主要用来提高查找和合并操作的效率。路径压缩通过在执行查找操作时减少树的高度，使后续的查找操作更快。具体来说，它使得每个节点在查找过程中直接指向其根节点。秩合并则是在执行合并操作时，总是将较低秩的树根指向较高秩的树根，如果秩相同，则选择其中一个树根作为代表，秩增加1。这样可以避免形成高度很大的树，从而保持树的平衡，减少查找路径的长度。在处理大量节点和边的场景下，这两种技术极大地提高了并查集的性能，使得几乎所有操作都能在几乎常数的时间内完成，从而有效处理大规模数据。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么选择在处理查询之前对边按长度进行升序排序？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>边按长度进行升序排序是为了便于按照查询的限制逐步添加边到并查集中。通过排序，可以确保在处理每个查询时，只考虑长度小于当前查询限制的边。这样做不仅可以按需构建并查集，还可以避免重复检查不符合条件的边，提高算法的效率。此外，这种排序还使得并查集在每次查询时都是最小的必要连通状态，避免了不必要的合并操作，从而优化了性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果两个节点之间存在多条边，这种情况如何处理，是否有可能影响并查集的效率或结果的正确性？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在本题解中，如果两个节点之间存在多条边，这并不会影响并查集的效率或结果的正确性。在实现中，我们只关注是否能够在给定的限制下连接两个节点，而并查集的合并操作是幂等的，即重复合并两个已经在同一连通分量中的节点不会改变并查集的状态。此外，由于边已经按长度排序，只有最短的边会被首先考虑，满足效率的需求。因此，即使存在多条边连接同一对节点，也只有最短的那些在限制内的边会被处理，不会导致重复工作或错误结果。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            查询限制升序排序后，为什么可以断言在处理当前查询时，之前考虑的边都满足限制条件？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>查询限制升序排序的目的是确保在处理每个查询时，可以逐步增加考虑的边的范围。当处理某个查询时，由于该查询的限制是当前已考虑的所有查询中最大的，因此之前处理的所有边的长度都小于或等于当前查询的限制。这意味着在处理当前查询时，不需要重新评估之前已经添加到并查集中的边，可以保证算法的正确性和效率。这种方法避免了对每个查询重复检查所有边，而是使得边的添加过程与查询的处理同步进行，提高了整体的效率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/checking-existence-of-edge-length-limited-paths')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/checking-existence-of-edge-length-limited-paths/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

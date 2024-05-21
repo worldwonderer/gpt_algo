@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>黄金矿工</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>黄金矿工</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=backtracking" class="badge bg-secondary tag-link">回溯</a>
+                    
+                        <a href="/problems?tag=matrix" class="badge bg-secondary tag-link">矩阵</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>你要开发一座金矿，地质勘测学家已经探明了这座金矿中的资源分布，并用大小为&nbsp;<code>m * n</code> 的网格 <code>grid</code> 进行了标注。每个单元格中的整数就表示这一单元格中的黄金数量；如果该单元格是空的，那么就是 <code>0</code>。</p>
+
+<p>为了使收益最大化，矿工需要按以下规则来开采黄金：</p>
+
+<ul>
+	<li>每当矿工进入一个单元，就会收集该单元格中的所有黄金。</li>
+	<li>矿工每次可以从当前位置向上下左右四个方向走。</li>
+	<li>每个单元格只能被开采（进入）一次。</li>
+	<li><strong>不得开采</strong>（进入）黄金数目为 <code>0</code> 的单元格。</li>
+	<li>矿工可以从网格中 <strong>任意一个</strong> 有黄金的单元格出发或者是停止。</li>
+</ul>
+
+
+
+<p><strong>示例 1：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[0,6,0],[5,8,7],[0,9,0]]
+<strong>输出：</strong>24
+<strong>解释：</strong>
+[[0,6,0],
+ [5,8,7],
+ [0,9,0]]
+一种收集最多黄金的路线是：9 -&gt; 8 -&gt; 7。
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre><strong>输入：</strong>grid = [[1,0,7],[2,0,6],[3,4,5],[0,3,0],[9,0,20]]
+<strong>输出：</strong>28
+<strong>解释：</strong>
+[[1,0,7],
+ [2,0,6],
+ [3,4,5],
+ [0,3,0],
+ [9,0,20]]
+一种收集最多黄金的路线是：1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; 6 -&gt; 7。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= grid.length,&nbsp;grid[i].length &lt;= 15</code></li>
+	<li><code>0 &lt;= grid[i][j] &lt;= 100</code></li>
+	<li>最多 <strong>25 </strong>个单元格中有黄金。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 441 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def getMaximumGold(self, grid: List[List[int]]) -&gt; int:
+        res = 0
+        b = set()
+        g_x, g_y = len(grid[0]), len(grid)
+
+        def backtrack(x, y, count, vis_local):
+            nonlocal res
+            if count &gt; res:
+                res = count
+            for i, j in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                n_x, n_y = x + i, y + j
+                if 0 &lt;= n_x &lt; g_x and 0 &lt;= n_y &lt; g_y and vis_local[n_y][n_x] and grid[n_y][n_x]:
+                    vis_local[n_y][n_x] = 0
+                    backtrack(n_x, n_y, count + grid[n_y][n_x], vis_local)
+                    vis_local[n_y][n_x] = 1
+
+        def find_corner(i, j):
+            count = 0
+            for x, y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                n_x, n_y = x + i, y + j
+                if 0 &lt;= n_x &lt; g_x and 0 &lt;= n_y &lt; g_y and grid[n_y][n_x]:
+                    count += 1
+            return count &lt;= 2
+
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] and find_corner(j, i):
+                    print(i, j)
+                    vis_local = [[1] * g_x for _ in range(g_y)]
+                    vis_local[i][j] = 0
+                    backtrack(j, i, grid[i][j], vis_local)
+        return res
+
+
+# 作者：时雨
+# 链接：https://leetcode.cn/problems/path-with-maximum-gold/solutions/1243095/ji-bai-100-python-hui-su-you-hua-by-driz-lpfv/
+# 来源：力扣（LeetCode）
+# 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>该题解使用了回溯法来解决问题。首先，它定义了一个递归函数backtrack来尝试所有可能的路径，并使用一个局部变量vis_local来记录已经访问过的单元格，以避免重复访问。函数backtrack接受当前位置(x, y)和当前收集到的黄金总量count作为参数，它会尝试向四个方向探索，并在探索后回溯。此外，题解中还使用了一个函数find_corner来优化搜索过程，该函数用于判断一个单元格是否是一个&#39;角落&#39;，即最多只与两个有黄金的单元格相邻。如果一个单元格是角落，则可以从该单元格开始搜索，这样可以减少不必要的搜索次数。</p>
+                                <p>时间复杂度: O(4^(mn))</p>
+                                <p>空间复杂度: O(mn)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def getMaximumGold(self, grid: List[List[int]]) -&gt; int:
+        res = 0
+        b = set()
+        g_x, g_y = len(grid[0]), len(grid)
+
+        def backtrack(x, y, count, vis_local):
+            nonlocal res
+            if count &gt; res:
+                res = count
+            for i, j in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                n_x, n_y = x + i, y + j
+                if 0 &lt;= n_x &lt; g_x and 0 &lt;= n_y &lt; g_y and vis_local[n_y][n_x] and grid[n_y][n_x]:
+                    vis_local[n_y][n_x] = 0
+                    backtrack(n_x, n_y, count + grid[n_y][n_x], vis_local)
+                    vis_local[n_y][n_x] = 1
+
+        def find_corner(i, j):
+            count = 0
+            for x, y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                n_x, n_y = x + i, y + j
+                if 0 &lt;= n_x &lt; g_x and 0 &lt;= n_y &lt; g_y and grid[n_y][n_x]:
+                    count += 1
+            return count &lt;= 2
+
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] and find_corner(j, i):
+                    vis_local = [[1] * g_x for _ in range(g_y)]
+                    vis_local[i][j] = 0
+                    backtrack(j, i, grid[i][j], vis_local)
+        return res
+
+# 作者：时雨
+# 链接：https://leetcode.cn/problems/path-with-maximum-gold/solutions/1243095/ji-bai-100-python-hui-su-you-hua-by-driz-lpfv/
+# 来源：力扣（LeetCode）
+# 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在回溯算法中使用一个局部变量vis_local来记录访问状态，而不是修改原始的grid数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在回溯算法中使用一个局部变量vis_local而不直接修改grid数组的主要原因是为了保护原始数据。使用vis_local可以帮助我们跟踪在特定递归路径中哪些单元格已经被访问过，而不改变grid本身，这样在回溯到上一层的时候可以很容易地通过修改vis_local的状态来&#39;撤销&#39;访问，恢复到上一状态。如果直接修改grid，那么每次访问后都需要恢复原始值，这不仅增加了操作的复杂度，还可能引入错误，特别是在多线程或需要频繁读取原始数据的情况下。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在find_corner函数中，判断一个单元格是否为角落的逻辑是否充分？是否有可能误判导致一些优秀的起点被忽略？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>find_corner函数通过检查一个单元格最多只与两个有黄金的单元格相邻来判断它是否是角落。这个逻辑虽然可以帮助减少搜索次数和避免从中间位置非必要的搜索，但它确实可能导致一些潜在的良好起点被忽略，特别是那些虽然不是传统意义上的&#39;角落&#39;但起始位置可能导致高收益的单元格。因此，这种优化虽然可以提高效率，但可能牺牲了一定的全局最优解的搜索潜力。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在backtrack函数中，如何保证在探索完四个方向后正确地回溯，恢复vis_local的状态？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在backtrack函数中，每次向一个方向探索前，都会先将当前单元格的访问状态在vis_local中设置为0（标记为已访问），然后递归调用探索该方向。探索完毕后，无论是找到了新的黄金还是没有更进一步的路径可走，都将当前单元格的vis_local状态重新设置为1（标记为未访问）。这种方法确保了每次探索完一个方向后都能够恢复到探索前的状态，使得算法能够正确地回溯到上一步，继续尝试其他可能的探索方向。这是回溯算法中常见的处理方式，有效地利用了递归栈的特性来管理状态的存储和恢复。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/path-with-maximum-gold')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/path-with-maximum-gold/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

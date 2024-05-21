@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>关闭分部的可行集合数目</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>关闭分部的可行集合数目</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=graph" class="badge bg-secondary tag-link">图</a>
+                    
+                        <a href="/problems?tag=enumeration" class="badge bg-secondary tag-link">枚举</a>
+                    
+                        <a href="/problems?tag=shortest-path" class="badge bg-secondary tag-link">最短路</a>
+                    
+                        <a href="/problems?tag=heap-priority-queue" class="badge bg-secondary tag-link">堆（优先队列）</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Hard</span></p>
+                
+                    <div class="problem-description">
+                        <p>一个公司在全国有 <code>n</code>&nbsp;个分部，它们之间有的有道路连接。一开始，所有分部通过这些道路两两之间互相可以到达。</p>
+
+<p>公司意识到在分部之间旅行花费了太多时间，所以它们决定关闭一些分部（<b>也可能不关闭任何分部</b>），同时保证剩下的分部之间两两互相可以到达且最远距离不超过&nbsp;<code>maxDistance</code>&nbsp;。</p>
+
+<p>两个分部之间的 <strong>距离</strong> 是通过道路长度之和的 <strong>最小值</strong>&nbsp;。</p>
+
+<p>给你整数&nbsp;<code>n</code>&nbsp;，<code>maxDistance</code>&nbsp;和下标从 <strong>0</strong>&nbsp;开始的二维整数数组&nbsp;<code>roads</code>&nbsp;，其中&nbsp;<code>roads[i] = [u<sub>i</sub>, v<sub>i</sub>, w<sub>i</sub>]</code>&nbsp;表示一条从&nbsp;<code>u<sub>i</sub></code>&nbsp;到&nbsp;<code>v<sub>i</sub></code>&nbsp;长度为&nbsp;<code>w<sub>i</sub></code>的&nbsp;<strong>无向</strong>&nbsp;道路。</p>
+
+<p>请你返回关闭分部的可行方案数目，满足每个方案里剩余分部之间的最远距离不超过<em>&nbsp;</em><code>maxDistance</code>。</p>
+
+<p><strong>注意</strong>，关闭一个分部后，与之相连的所有道路不可通行。</p>
+
+<p><b>注意</b>，两个分部之间可能会有多条道路。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/11/08/example11.png" style="width: 221px; height: 191px;" /></p>
+
+<pre>
+<b>输入：</b>n = 3, maxDistance = 5, roads = [[0,1,2],[1,2,10],[0,2,10]]
+<b>输出：</b>5
+<b>解释：</b>可行的关闭分部方案有：
+- 关闭分部集合 [2] ，剩余分部为 [0,1] ，它们之间的距离为 2 。
+- 关闭分部集合 [0,1] ，剩余分部为 [2] 。
+- 关闭分部集合 [1,2] ，剩余分部为 [0] 。
+- 关闭分部集合 [0,2] ，剩余分部为 [1] 。
+- 关闭分部集合 [0,1,2] ，关闭后没有剩余分部。
+总共有 5 种可行的关闭方案。
+</pre>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<p><img alt="" src="https://assets.leetcode.com/uploads/2023/11/08/example22.png" style="width: 221px; height: 241px;" /></p>
+
+<pre>
+<b>输入：</b>n = 3, maxDistance = 5, roads = [[0,1,20],[0,1,10],[1,2,2],[0,2,2]]
+<b>输出：</b>7
+<b>解释：</b>可行的关闭分部方案有：
+- 关闭分部集合 [] ，剩余分部为 [0,1,2] ，它们之间的最远距离为 4 。
+- 关闭分部集合 [0] ，剩余分部为 [1,2] ，它们之间的距离为 2 。
+- 关闭分部集合 [1] ，剩余分部为 [0,2] ，它们之间的距离为 2 。
+- 关闭分部集合 [0,1] ，剩余分部为 [2] 。
+- 关闭分部集合 [1,2] ，剩余分部为 [0] 。
+- 关闭分部集合 [0,2] ，剩余分部为 [1] 。
+- 关闭分部集合 [0,1,2] ，关闭后没有剩余分部。
+总共有 7 种可行的关闭方案。
+</pre>
+
+<p><strong class="example">示例 3：</strong></p>
+
+<pre>
+<b>输入：</b>n = 1, maxDistance = 10, roads = []
+<b>输出：</b>2
+<b>解释：</b>可行的关闭分部方案有：
+- 关闭分部集合 [] ，剩余分部为 [0] 。
+- 关闭分部集合 [0] ，关闭后没有剩余分部。
+总共有 2 种可行的关闭方案。
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= n &lt;= 10</code></li>
+	<li><code>1 &lt;= maxDistance &lt;= 10<sup>5</sup></code></li>
+	<li><code>0 &lt;= roads.length &lt;= 1000</code></li>
+	<li><code>roads[i].length == 3</code></li>
+	<li><code>0 &lt;= u<sub>i</sub>, v<sub>i</sub> &lt;= n - 1</code></li>
+	<li><code>u<sub>i</sub> != v<sub>i</sub></code></li>
+	<li><code>1 &lt;= w<sub>i</sub> &lt;= 1000</code></li>
+	<li>一开始所有分部之间通过道路互相可以到达。</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 172 ms</p>
+                    <p>内存: 16.8 MB</p>
+                    <pre class="bg-light p-2 code-pre"># dijkstra算法
+class Solution:
+    def numberOfSets(self, n: int, maxDistance: int, roads: List[List[int]]) -&gt; int:
+        road = [ defaultdict(lambda: int(1e9)) for _ in range(n) ]
+        for x,y,w in roads:
+            road[x][y] = min(road[x][y],w)
+            road[y][x] = min(road[y][x],w)
+        
+        dt = [0] * (n)
+        def dijkstra(start,opn):
+            # dijk 最小堆优化
+            heap = [(0,start)]
+                    
+            # 到所有点的最小距离
+            dist = [int(1e9)] * n
+            visit = [0] * n
+            total = 0
+            
+            while heap:
+                t,node = heappop(heap)
+                
+                if visit[node]:
+                    continue
+                
+                visit[node] = 1
+                total += 1
+                if t &gt; maxDistance:
+                    return False
+                
+                for nxt,nw in road[node].items():
+                    # 关闭了
+                    if not dt[nxt]:
+                        continue
+                        
+                    if dist[nxt] &gt; t + nw:
+                        dist[nxt] = t + nw
+                        heappush(heap,(t+nw,nxt))
+            
+            # 联通点数要等于opn，即保证所有点联通
+            return total == opn
+                    
+        # 枚举子集
+        # node 当前节点
+        # opn 未关闭的节点数
+        def dfs(node,opn):
+            if node == n:
+                # 遍历所有起始点
+                for start in range(n):
+                    if not dt[start]:
+                        continue
+                    # 判断该起始点到其它点的距离符不符合要求
+                    if not dijkstra(start,opn):
+                        return 0
+                
+                return 1
+                        
+            
+            # 选
+            dt[node] = 1
+            res = dfs(node+1,opn+1)
+            dt[node] = 0
+            
+            # 不选
+            res += dfs(node+1,opn)
+            return res
+        
+        return dfs(0,0)
+
+# # Floyd算法
+# class Solution:
+#     def numberOfSets(self, n: int, maxDistance: int, roads: List[List[int]]) -&gt; int:
+#         g = [[inf] * n for _ in range(n)]
+#         for i in range(n):
+#             g[i][i] = 0
+#         for x, y, wt in roads:
+#             g[x][y] = min(g[x][y], wt)
+#             g[y][x] = min(g[y][x], wt)
+#         print(g)
+#         f = [None] * n
+#         def check(s: int) -&gt; int:
+#             for i, row in enumerate(g):
+#                 if s &gt;&gt; i &amp; 1:
+#                     f[i] = row[:]
+
+#             # Floyd
+#             for k in range(n):
+#                 if (s &gt;&gt; k &amp; 1) == 0: continue
+#                 for i in range(n):
+#                     if (s &gt;&gt; i &amp; 1) == 0: continue
+#                     for j in range(n):
+#                         f[i][j] = min(f[i][j], f[i][k] + f[k][j])
+
+#             for i, di in enumerate(f):
+#                 if (s &gt;&gt; i &amp; 1) == 0: continue
+#                 for j, dij in enumerate(di):
+#                     if s &gt;&gt; j &amp; 1 and dij &gt; maxDistance:
+#                         return 0
+#             return 1
+#         return sum(check(s) for s in range(1 &lt;&lt; n))  # 枚举子集</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解使用了深度优先搜索(DFS)和Dijkstra算法来找出所有可能的关闭分部的方案，满足剩余分部之间的最远距离不超过maxDistance。首先，构建了一个邻接表来表示所有分部之间的最短道路。然后，使用DFS枚举所有可能的关闭分部的子集。对于每个子集，使用Dijkstra算法检查从任一未关闭分部出发，是否所有未关闭分部都能在maxDistance的限制下互达。如果可以，这个子集是一个合法方案。</p>
+                                <p>时间复杂度: O(2^n * n * E log V)</p>
+                                <p>空间复杂度: O(V + E + n)</p>
+                                <pre class="bg-light p-2"># dijkstra算法
+class Solution:
+    def numberOfSets(self, n: int, maxDistance: int, roads: List[List[int]]) -&gt; int:
+        # 初始化道路信息，使用邻接表存储最短距离
+        road = [ defaultdict(lambda: int(1e9)) for _ in range(n) ]
+        for x,y,w in roads:
+            road[x][y] = min(road[x][y],w)
+            road[y][x] = min(road[y][x],w)
+        
+        # dt数组表示分部是否关闭，0表示关闭，1表示未关闭
+        dt = [0] * (n)
+        # dijkstra算法实现，使用最小堆优化
+        def dijkstra(start,opn):
+            heap = [(0,start)]
+            dist = [int(1e9)] * n
+            visit = [0] * n
+            total = 0
+            while heap:
+                t,node = heappop(heap)
+                if visit[node]:
+                    continue
+                visit[node] = 1
+                total += 1
+                if t &gt; maxDistance:
+                    return False
+                for nxt,nw in road[node].items():
+                    if not dt[nxt]:
+                        continue
+                    if dist[nxt] &gt; t + nw:
+                        dist[nxt] = t + nw
+                        heappush(heap,(t+nw,nxt))
+            return total == opn
+        # DFS遍历所有关闭分部的子集
+        def dfs(node,opn):
+            if node == n:
+                for start in range(n):
+                    if not dt[start]:
+                        continue
+                    if not dijkstra(start,opn):
+                        return 0
+                return 1
+            dt[node] = 1
+            res = dfs(node+1,opn+1)
+            dt[node] = 0
+            res += dfs(node+1,opn)
+            return res
+        return dfs(0,0)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在题解中，DFS和Dijkstra算法是如何结合使用的，能否详细解释其各自在问题中扮演的角色？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在此题解中，DFS和Dijkstra算法被用于解决分部关闭问题，确保剩余分部间的最大距离不超过maxDistance。DFS（深度优先搜索）用于枚举所有可能的分部关闭子集。对每一种可能的关闭方案，DFS会遍历所有分部，决定哪些分部关闭（dt数组设为0）和哪些保持开启（dt数组设为1）。Dijkstra算法则用于验证对于每个分部关闭方案，开启的分部是否在maxDistance的限制下可以互相到达。具体地，对于每个开启的分部作为起点，使用Dijkstra算法计算其到其他所有开启分部的最短距离，并检查是否所有这些距离都不超过maxDistance。如果某一方案中所有开启的分部都是互连的，那么该方案是有效的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            题解提到使用邻接表表示所有分部之间的最短道路，为什么选择邻接表而不是邻接矩阵，特别是在处理最短路径问题时？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在处理最短路径问题时，尤其是当图中的节点数量较大或者边的数量远少于节点对的数量时，邻接表比邻接矩阵更为高效。邻接表可以更有效地管理稀疏图，因为它只存储存在的边，而不是所有可能的节点对。这降低了内存使用，并可以减少算法在无边节点间的无效操作。在使用Dijkstra算法时，使用邻接表可以直接访问到与某个节点相连的所有节点，这使得处理动态更新距离和使用优先队列（如最小堆）检查未访问节点更为高效。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在使用Dijkstra算法检查分部间互达性时，若某一分部已经关闭（dt[nxt]为0），为什么还需要继续检查从这一分部出发的路径？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在题解中，Dijkstra算法实现确实忽略了已关闭的分部（dt[nxt]为0），不会从这些分部出发计算路径。此逻辑体现在代码中，通过`if not dt[nxt]: continue`这一行实现。这确保了算法只考虑那些保持开启的分部之间的路径。如果某一分部已经关闭，则从这一分部出发的路径不会被包括在内，因为关闭的分部不应该被计入互达性的检验中。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            DFS遍历所有关闭分部的子集时，如何确保不遗漏任何一种可能的关闭方案？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>DFS通过递归的方式确保了每个分部都有两种可能的状态：关闭或开启。对每个分部，算法都递归地考虑了关闭它和不关闭它的情况。这种二元决策过程保证了从第一个分部到最后一个分部，所有的关闭组合都被考虑到了。具体实现中，`dfs`函数首先尝试将当前节点设为开启然后递归调用自己处理下一个分部，接着将当前节点设为关闭后再次递归调用自己。这样的递归结构保证了每一种可能的分部关闭组合都会被遍历到，从而不遗漏任何一种可能的关闭方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/number-of-possible-sets-of-closing-branches')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/number-of-possible-sets-of-closing-branches/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

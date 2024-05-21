@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>填充书架</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>填充书架</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个数组 <code>books</code> ，其中&nbsp;<code>books[i] = [thickness<sub>i</sub>, height<sub>i</sub>]</code>&nbsp;表示第 <code>i</code> 本书的厚度和高度。你也会得到一个整数 <code>shelfWidth</code> 。</p>
+
+<p><strong>按顺序</strong>&nbsp;将这些书摆放到总宽度为 <code>shelfWidth</code> 的书架上。</p>
+
+<p>先选几本书放在书架上（它们的厚度之和小于等于书架的宽度 <code>shelfWidth</code> ），然后再建一层书架。重复这个过程，直到把所有的书都放在书架上。</p>
+
+<p>需要注意的是，在上述过程的每个步骤中，<strong>摆放书的顺序与给定图书数组 </strong><code>books</code><strong> 顺序相同</strong>。</p>
+
+<ul>
+	<li>例如，如果这里有 5 本书，那么可能的一种摆放情况是：第一和第二本书放在第一层书架上，第三本书放在第二层书架上，第四和第五本书放在最后一层书架上。</li>
+</ul>
+
+<p>每一层所摆放的书的最大高度就是这一层书架的层高，书架整体的高度为各层高之和。</p>
+
+<p>以这种方式布置书架，返回书架整体可能的最小高度。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<p><img src="https://assets.leetcode.com/uploads/2019/06/24/shelves.png" style="width: 337px; height: 500px;" /></p>
+
+<pre>
+<strong>输入：</strong>books = [[1,1],[2,3],[2,3],[1,1],[1,1],[1,1],[1,2]], shelfWidth = 4
+<strong>输出：</strong>6
+<strong>解释：</strong>
+3 层书架的高度和为 1 + 3 + 2 = 6 。
+第 2 本书不必放在第一层书架上。
+</pre>
+
+<p><strong class="example">示例 2:</strong></p>
+
+<pre>
+<strong>输入:</strong> books = [[1,3],[2,4],[3,2]], shelfWidth = 6
+<strong>输出:</strong> 4
+</pre>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= books.length &lt;= 1000</code></li>
+	<li><code>1 &lt;= thickness<sub>i</sub>&nbsp;&lt;= shelfWidth &lt;= 1000</code></li>
+	<li><code>1 &lt;= height<sub>i</sub>&nbsp;&lt;= 1000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 23 ms</p>
+                    <p>内存: 16.2 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def minHeightShelves(self, books: List[List[int]], shelfWidth: int) -&gt; int:
+        n=len(books)
+        f=[inf]*(n+1)
+        f[0]=0
+        for i in range(1,n+1):
+            mx,wid=0,0
+            for j in range(i,0,-1):
+                if books[j-1][1]&gt;mx: mx=books[j-1][1]
+                wid+=books[j-1][0]
+                if wid&lt;=shelfWidth:
+                    if f[j-1]+mx&lt;f[i]: f[i]=f[j-1]+mx
+                else:
+                    break
+        return f[n]</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解使用动态规划解决问题。定义dp数组f，其中f[i]表示放置前i本书的最小总高度。初始化f[0]为0，表示没有书时高度为0。对于每本书i，从i开始向前检查以当前书为结束的所有可能的书层配置。对每种配置，计算该层的最大高度和当前层的宽度总和。如果宽度总和没有超过书架宽度，更新f[i]为当前最优解。这样，最终f[n]中存储的就是放置所有书的最小高度。</p>
+                                <p>时间复杂度: O(n^2)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def minHeightShelves(self, books: List[List[int]], shelfWidth: int) -&gt; int:
+        n = len(books)
+        f = [float(&#39;inf&#39;)] * (n + 1)
+        f[0] = 0
+        for i in range(1, n + 1):
+            mx, wid = 0, 0
+            for j in range(i, 0, -1):
+                if books[j - 1][1] &gt; mx: mx = books[j - 1][1]  # 更新当前层的最大高度
+                wid += books[j - 1][0]  # 累加当前层的宽度
+                if wid &lt;= shelfWidth:
+                    if f[j - 1] + mx &lt; f[i]: f[i] = f[j - 1] + mx  # 如果当前层宽度有效，则尝试更新最小高度
+                else:
+                    break
+        return f[n]  # 返回放置所有书的最小总高度</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在你的动态规划解决方案中，如何处理书的顺序？是否考虑了题目要求的‘按顺序’摆放书籍的规则？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在我的动态规划解决方案中，通过从前向后遍历书籍列表并逐一决定每本书的放置，来保证书籍是按照给定的顺序摆放的。内部循环从当前书籍索引i开始，并向前检查，这样可以确保书籍的顺序从1到i是连续的，符合题目要求的&#39;按顺序&#39;摆放规则。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            动态规划数组f[i]的初始化为什么选择float(&#39;inf&#39;)，除了f[0]外，这样的初始化对算法的影响是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在动态规划中，f[i]数组的初始化为float(&#39;inf&#39;)（意味着无穷大）用于确保在开始算法时，任何非初始状态（即f[0]除外）都不会被错误地认为是一个可行的最小值。这种初始化方式允许我们在更新每个f[i]时，只考虑那些实际上通过比较得到的更小的值。这样可以保证，每次更新f[i]都是基于有效的、可能的最小高度，而不是一个未初始化或错误初始化的值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在内层循环中，当书的宽度累加超过书架宽度时就会停止循环。这是否意味着我们总是在宽度超出前就不能再添加新的书？这种方式是否最优？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，内层循环中当书的宽度累加超过书架宽度时停止循环，确保不会添加超过书架宽度的书籍。这种设计是为了遵守书架宽度的限制，并尝试找出在不超过宽度限制的情况下的可能的最佳高度配置。虽然这种方法可能不会在每次都找到全局最优解，但它是一个有效的启发式方法，通常可以在合理的时间内找到非常接近最优的解决方案。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            你的算法中提到更新最小高度时使用了条件判断`if f[j - 1] + mx &lt; f[i]`。这里的逻辑是否保证了每次都能获得局部最优解，进而实现全局最优解？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>这个条件判断确保我们在每个步骤中都寻求局部最优解，即在给定当前书的配置下，尝试找到最小的可能高度。通过动态规划的特性，这种局部最优的决策能够累积起来，努力朝向全局最优解。虽然动态规划通常能提供全局最优解，但这也取决于问题的具体构造和状态转移的定义。在大多数情况下，本算法能有效地找到整体的最小高度。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/filling-bookcase-shelves')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/filling-bookcase-shelves/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

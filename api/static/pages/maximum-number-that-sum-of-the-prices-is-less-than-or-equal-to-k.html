@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>价值和小于等于 K 的最大数字</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>价值和小于等于 K 的最大数字</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=bit-manipulation" class="badge bg-secondary tag-link">位运算</a>
+                    
+                        <a href="/problems?tag=binary-search" class="badge bg-secondary tag-link">二分查找</a>
+                    
+                        <a href="/problems?tag=dynamic-programming" class="badge bg-secondary tag-link">动态规划</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给你一个整数&nbsp;<code>k</code>&nbsp;和一个整数&nbsp;<code>x</code>&nbsp;。整数&nbsp;<code>num</code>&nbsp;的价值是由它的二进制表示中，从最低有效位开始，<code>x</code>，<code>2x</code>，<code>3x</code>，以此类推，这些位置上&nbsp;<strong>设置位</strong>&nbsp;的数目来计算。下面的表格包含了如何计算价值的例子。</p>
+
+<table border="1">
+	<tbody>
+		<tr>
+			<th>x</th>
+			<th>num</th>
+			<th>Binary Representation</th>
+			<th>Price</th>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>13</td>
+			<td><u>0</u><u>0</u><u>0</u><u>0</u><u>0</u><strong><u>1</u></strong><strong><u>1</u></strong><u>0</u><strong><u>1</u></strong></td>
+			<td>3</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>13</td>
+			<td>0<u>0</u>0<u>0</u>0<strong><u>1</u></strong>1<u>0</u>1</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>233</td>
+			<td>0<strong><u>1</u></strong>1<strong><u>1</u></strong>0<strong><u>1</u></strong>0<u>0</u>1</td>
+			<td>3</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td>13</td>
+			<td><u>0</u>00<u>0</u>01<strong><u>1</u></strong>01</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td>362</td>
+			<td><strong><u>1</u></strong>01<strong><u>1</u></strong>01<u>0</u>10</td>
+			<td>2</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+<p><code>num</code>&nbsp;的 <strong>累加价值</strong> 是从&nbsp;<code>1</code>&nbsp;到&nbsp;<code>num</code>&nbsp;的数字的 <strong>总</strong> 价值。如果&nbsp;<code>num</code>&nbsp;的累加价值小于或等于&nbsp;<code>k</code>&nbsp;则被认为是 <strong>廉价</strong> 的。</p>
+
+<p>请你返回<strong>&nbsp;最大</strong>&nbsp;的廉价数字。</p>
+
+
+
+<p><strong class="example">示例 1：</strong></p>
+
+<pre>
+<b>输入：</b>k = 9, x = 1
+<b>输出：</b>6
+<b>解释：</b>由下表所示，6 是最大的廉价数字。
+</pre>
+
+<table border="1">
+	<tbody>
+		<tr>
+			<th>x</th>
+			<th>num</th>
+			<th>Binary Representation</th>
+			<th>Price</th>
+			<th>Accumulated Price</th>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>1</td>
+			<td><u>0</u><u>0</u><strong><u>1</u></strong></td>
+			<td>1</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>2</td>
+			<td><u>0</u><strong><u>1</u></strong><u>0</u></td>
+			<td>1</td>
+			<td>2</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>3</td>
+			<td><u>0</u><strong><u>1</u></strong><strong><u>1</u></strong></td>
+			<td>2</td>
+			<td>4</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>4</td>
+			<td><strong><u>1</u></strong><u>0</u><u>0</u></td>
+			<td>1</td>
+			<td>5</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>5</td>
+			<td><strong><u>1</u></strong><u>0</u><strong><u>1</u></strong></td>
+			<td>2</td>
+			<td>7</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>6</td>
+			<td><strong><u>1</u></strong><strong><u>1</u></strong><u>0</u></td>
+			<td>2</td>
+			<td>9</td>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>7</td>
+			<td><strong><u>1</u></strong><strong><u>1</u></strong><strong><u>1</u></strong></td>
+			<td>3</td>
+			<td>12</td>
+		</tr>
+	</tbody>
+</table>
+
+<p><strong class="example">示例 2：</strong></p>
+
+<pre>
+<b>输入：</b>k = 7, x = 2
+<b>输出：</b>9
+<b>解释：</b>由下表所示，9 是最大的廉价数字。
+</pre>
+
+<table border="1">
+	<tbody>
+		<tr>
+			<th>x</th>
+			<th>num</th>
+			<th>Binary Representation</th>
+			<th>Price</th>
+			<th>Accumulated Price</th>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>1</td>
+			<td><u>0</u>0<u>0</u>1</td>
+			<td>0</td>
+			<td>0</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>2</td>
+			<td><u>0</u>0<strong><u>1</u></strong>0</td>
+			<td>1</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>3</td>
+			<td><u>0</u>0<strong><u>1</u></strong>1</td>
+			<td>1</td>
+			<td>2</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>4</td>
+			<td><u>0</u>1<u>0</u>0</td>
+			<td>0</td>
+			<td>2</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>5</td>
+			<td><u>0</u>1<u>0</u>1</td>
+			<td>0</td>
+			<td>2</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>6</td>
+			<td><u>0</u>1<strong><u>1</u></strong>0</td>
+			<td>1</td>
+			<td>3</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>7</td>
+			<td><u>0</u>1<strong><u>1</u></strong>1</td>
+			<td>1</td>
+			<td>4</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>8</td>
+			<td><strong><u>1</u></strong>0<u>0</u>0</td>
+			<td>1</td>
+			<td>5</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>9</td>
+			<td><strong><u>1</u></strong>0<u>0</u>1</td>
+			<td>1</td>
+			<td>6</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>10</td>
+			<td><strong><u>1</u></strong>0<strong><u>1</u></strong>0</td>
+			<td>2</td>
+			<td>8</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 &lt;= k &lt;= 10<sup>15</sup></code></li>
+	<li><code>1 &lt;= x &lt;= 8</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 138 ms</p>
+                    <p>内存: 16.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findMaximumNumber(self, k: int, x: int) -&gt; int:
+        def f(t):
+            return sum((t + 1 &gt;&gt; i &lt;&lt; i - 1) + max(0, ((t + 1) &amp; ((1 &lt;&lt; i) - 1)) - (1 &lt;&lt; i - 1)) for i in range(x, t.bit_length() + 1, x))
+        t = 1
+        while f(t) &lt;= k:
+            t &lt;&lt;= 1
+        a, b = t &gt;&gt; x, t - 1
+        while a &lt; b:
+            t = a + b + 1 &gt;&gt; 1
+            if f(t) &gt; k:
+                b = t - 1
+            else:
+                a = t
+        return a</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用二分搜索的方法来查找最大的廉价数字。首先，定义了一个辅助函数 f(t)，计算从1到t的所有数字的累积价值。函数 f(t) 利用位操作计算特定位上的值。初始时，将 t 设为1并不断左移，以快速逼近可能的上界，直至累积价值超过 k。接着，使用二分搜索方法在已知的上界和下界之间搜索，以确定累积价值不超过 k 的最大 t 值。</p>
+                                <p>时间复杂度: O(log n * (log n) / x)</p>
+                                <p>空间复杂度: O(1)</p>
+                                <pre class="bg-light p-2"># Solution class definition
+class Solution:
+    # Function to find the maximum cheap number
+    def findMaximumNumber(self, k: int, x: int) -&gt; int:
+        # Helper function to compute the accumulated price for numbers from 1 to t
+        def f(t):
+            return sum((t + 1 &gt;&gt; i &lt;&lt; i - 1) + max(0, ((t + 1) &amp; ((1 &lt;&lt; i) - 1)) - (1 &lt;&lt; i - 1)) for i in range(x, t.bit_length() + 1, x))
+        t = 1
+        # Find upper boundary where accumulated price exceeds k
+        while f(t) &lt;= k:
+            t &lt;&lt;= 1
+        a, b = t &gt;&gt; x, t - 1
+        # Binary search within the determined range
+        while a &lt; b:
+            t = a + b + 1 &gt;&gt; 1
+            if f(t) &gt; k:
+                b = t - 1
+            else:
+                a = t
+        return a</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            在函数 f(t) 中，表达式 `(t + 1 &gt;&gt; i &lt;&lt; i - 1)` 和 `max(0, ((t + 1) &amp; ((1 &lt;&lt; i) - 1)) - (1 &lt;&lt; i - 1))` 具体是如何计算的？这两部分各代表什么意义？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在函数 `f(t)` 中，表达式 `(t + 1 &gt;&gt; i &lt;&lt; i - 1)` 和 `max(0, ((t + 1) &amp; ((1 &lt;&lt; i) - 1)) - (1 &lt;&lt; i - 1))` 用于计算从1到t的所有数字在第i位上的贡献。表达式 `(t + 1 &gt;&gt; i &lt;&lt; i - 1)` 计算的是总共有多少个完整的i位的周期，每个周期内有 `2^(i-1)` 个数字的第i位为1。第二个表达式 `max(0, ((t + 1) &amp; ((1 &lt;&lt; i) - 1)) - (1 &lt;&lt; i - 1))` 计算的是在最后一个不完整的周期中超出 `2^(i-1)` 的部分，即最后一个周期中1的个数。这两者相加即得第i位对总价值的贡献。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            为什么在寻找上界时，变量 t 的值是通过左移操作来逼近的？这种方法如何保证找到足够大的 t 使得累积价值超过 k？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在寻找上界时，变量t的值通过左移操作逼近的原因是为了以指数方式快速增加t的值，从而迅速找到一个使得累积价值超过k的t值。这种方法通过不断翻倍t的值（每次左移相当于乘以2），可以在对数时间内找到足够大的t。一旦找到f(t)大于k的情况，即确定了足够大的上界。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在二分查找的终止条件中，当 `a &lt; b` 不成立时，最终返回的是 `a`，这是否意味着在所有情况下 a 和 b 最终会相等？如果是，为什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>是的，在所有情况下a和b最终会相等。这是因为二分搜索的性质，每次迭代会将搜索范围缩小一半，不断地调整a或b的值直至它们相邻或者相等。当a和b相等时，`a &lt; b` 的条件不再成立，此时的a（或b，因为此时a等于b）就是二分搜索的结果，即满足条件的最大t值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            二分搜索中，更新下界 a 的条件是 `f(t) &lt;= k`，为什么不是 `f(t) &lt; k`？使用小于等于条件对算法的影响是什么？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在二分搜索中使用 `f(t) &lt;= k` 作为更新下界a的条件是为了确保找到的是 **不超过** k的最大t值。如果使用 `f(t) &lt; k`，则可能会错过正好使得 `f(t) = k` 的t值，这样就不能保证得到的是最大的t。使用小于等于条件保证了我们不会错过任何一个可能的解，因此可以找到确切的最大值。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/maximum-number-that-sum-of-the-prices-is-less-than-or-equal-to-k')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/maximum-number-that-sum-of-the-prices-is-less-than-or-equal-to-k/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

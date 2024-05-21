@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>单词的压缩编码</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1>单词的压缩编码</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=trie" class="badge bg-secondary tag-link">字典树</a>
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=string" class="badge bg-secondary tag-link">字符串</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>单词数组 <code>words</code> 的 <strong>有效编码</strong> 由任意助记字符串 <code>s</code> 和下标数组 <code>indices</code> 组成，且满足：</p>
+
+<ul>
+	<li><code>words.length == indices.length</code></li>
+	<li>助记字符串 <code>s</code> 以 <code>'#'</code> 字符结尾</li>
+	<li>对于每个下标 <code>indices[i]</code> ，<code>s</code> 的一个从 <code>indices[i]</code> 开始、到下一个 <code>'#'</code> 字符结束（但不包括 <code>'#'</code>）的 <strong>子字符串</strong> 恰好与 <code>words[i]</code> 相等</li>
+</ul>
+
+<p>给你一个单词数组 <code>words</code> ，返回成功对 <code>words</code> 进行编码的最小助记字符串 <code>s</code> 的长度 。</p>
+
+<p> </p>
+
+<p><strong>示例 1：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["time", "me", "bell"]
+<strong>输出：</strong>10
+<strong>解释：</strong>一组有效编码为 s = <code>"time#bell#" 和 indices = [0, 2, 5</code>] 。
+words[0] = "time" ，s 开始于 indices[0] = 0 到下一个 '#' 结束的子字符串，如加粗部分所示 "<strong>time</strong>#bell#"
+words[1] = "me" ，s 开始于 indices[1] = 2 到下一个 '#' 结束的子字符串，如加粗部分所示 "ti<strong>me</strong>#bell#"
+words[2] = "bell" ，s 开始于 indices[2] = 5 到下一个 '#' 结束的子字符串，如加粗部分所示 "time#<strong>bell</strong>#"
+</pre>
+
+<p><strong>示例 2：</strong></p>
+
+<pre>
+<strong>输入：</strong>words = ["t"]
+<strong>输出：</strong>2
+<strong>解释：</strong>一组有效编码为 s = "t#" 和 indices = [0] 。
+</pre>
+
+<p> </p>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>1 <= words.length <= 2000</code></li>
+	<li><code>1 <= words[i].length <= 7</code></li>
+	<li><code>words[i]</code> 仅由小写字母组成</li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 45 ms</p>
+                    <p>内存: 16.4 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution(object):
+    def minimumLengthEncoding(self, words):
+        &#34;&#34;&#34;
+        :type words: List[str]
+        :rtype: int
+        &#34;&#34;&#34;
+        words.sort(key = lambda x: x[::-1])
+        ret = 0
+        for i in range(len(words)-1):
+            if not words[i+1].endswith(words[i]):
+                ret+=len(words[i])+1
+        ret+=len(words[-1])+1
+        return ret</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>这个题解的思路是利用字符串排序和后缀匹配来解决问题。首先将所有单词按照反转后的字典序排序，这样可以保证如果一个单词是另一个单词的后缀，那么它一定会出现在那个单词的后面。然后遍历排序后的单词列表，如果当前单词不是下一个单词的后缀，说明当前单词需要被编码，将其长度加1（表示单词结尾的&#39;#&#39;）累加到结果中。最后将最后一个单词的长度加1也累加到结果中，因为最后一个单词一定需要被编码。</p>
+                                <p>时间复杂度: O(n log n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution(object):
+    def minimumLengthEncoding(self, words):
+        &#34;&#34;&#34;
+        :type words: List[str]
+        :rtype: int
+        &#34;&#34;&#34;
+        # 将所有单词按照反转后的字典序排序
+        words.sort(key = lambda x: x[::-1]) 
+        ret = 0
+        for i in range(len(words)-1):
+            # 如果当前单词不是下一个单词的后缀
+            if not words[i+1].endswith(words[i]):
+                # 当前单词需要被编码，将其长度加1（表示单词结尾的&#39;#&#39;）累加到结果中
+                ret+=len(words[i])+1 
+        # 将最后一个单词的长度加1也累加到结果中，因为最后一个单词一定需要被编码
+        ret+=len(words[-1])+1 
+        return ret</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在解题中选择将单词进行反转后再排序，这种排序方式对解题有什么帮助？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>将单词进行反转再排序的主要目的是将单词的结尾字符放在比较的最前面，这样可以更容易地判断一个单词是否是另一个单词的后缀。在反转后的字典序排序中，如果一个单词是另一个单词的后缀，那么这个单词在排序后的列表中会紧跟在它的超集单词之后。例如，对于单词&#39;apple&#39;和&#39;ple&#39;，反转后分别是&#39;elppa&#39;和&#39;elp&#39;，在字典序中&#39;elp&#39;会排在&#39;elppa&#39;之前。这样排序后只需比较相邻的单词即可确定编码的必要性，简化了后续的处理过程。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            当判断一个单词是否为另一个单词的后缀时，为什么只检查当前单词与下一个单词而不是所有其他单词？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>由于单词已经按照反转后的字典序进行了排序，如果一个单词是另一个单词的后缀，它必然直接位于那个单词之后。这意味着在检查时只需考虑连续的两个单词。如果检查所有其他单词，不仅增加了不必要的计算复杂度，而且因为排序已经确保了必要的相邻关系，这种全面检查是多余的。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            如果有多个单词相同，这种方法处理时会有什么特殊考虑吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>如果有多个单词完全相同，排序过程中这些单词会紧挨在一起。在编码长度计算时，除了最后一次出现的单词需要计入结果（因为它没有后续单词或是其后续单词不是它的后缀），其他相同的单词不会被重复计算，因为它们都会被判定为后续单词的后缀。这样确保了编码的最小长度，避免了重复的单词导致的冗余。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader4">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse4" aria-expanded="false" aria-controls="exploreCollapse4">
+                                            解题思路中提到的`如果当前单词不是下一个单词的后缀`，能否给出一个具体的例子说明这种情况？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse4" class="collapse" aria-labelledby="exploreHeader4" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>考虑单词列表[&#39;time&#39;, &#39;me&#39;, &#39;bell&#39;]。经过反转和排序后，列表变为[&#39;em&#39;, &#39;emit&#39;, &#39;lleb&#39;]。在这个列表中，&#39;em&#39;（对应原单词&#39;me&#39;）不是&#39;emit&#39;（对应原单词&#39;time&#39;）的后缀，因此我们需要单独对&#39;me&#39;进行编码，将其长度加上1（为&#39;#&#39;符号）累加到结果中。这个例子说明了即使单词在原始列表中是另一个单词的后缀，在排序和反转后也可能不再满足这种关系，需要单独编码。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/short-encoding-of-words')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/short-encoding-of-words/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

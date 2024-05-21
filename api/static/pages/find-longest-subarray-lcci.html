@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title> 字母与数字</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/detail.css">
+</head>
+<body>
+    <div class="container mt-3">
+        <header class="problem-header">
+            <h1> 字母与数字</h1>
+        </header>
+        <main>
+            <article class="problem-content">
+                <p>标签:
+                    
+                        <a href="/problems?tag=array" class="badge bg-secondary tag-link">数组</a>
+                    
+                        <a href="/problems?tag=hash-table" class="badge bg-secondary tag-link">哈希表</a>
+                    
+                        <a href="/problems?tag=prefix-sum" class="badge bg-secondary tag-link">前缀和</a>
+                    
+                </p>
+                <p>难度: <span class="badge bg-secondary">Medium</span></p>
+                
+                    <div class="problem-description">
+                        <p>给定一个放有字母和数字的数组，找到最长的子数组，且包含的字母和数字的个数相同。</p>
+
+<p>返回该子数组，若存在多个最长子数组，返回左端点下标值最小的子数组。若不存在这样的数组，返回一个空数组。</p>
+
+<p><strong>示例 1:</strong></p>
+
+<pre>
+<strong>输入: </strong>["A","1","B","C","D","2","3","4","E","5","F","G","6","7","H","I","J","K","L","M"]
+
+<strong>输出: </strong>["A","1","B","C","D","2","3","4","E","5","F","G","6","7"]
+</pre>
+
+<p><strong>示例 2:</strong></p>
+
+<pre>
+<strong>输入: </strong>["A","A"]
+
+<strong>输出: </strong>[]
+</pre>
+
+<p><strong>提示：</strong></p>
+
+<ul>
+	<li><code>array.length <= 100000</code></li>
+</ul>
+
+                    </div>
+                
+            </article>
+
+            <section>
+                <h2>Submission</h2>
+                <div class="code-block">
+                    <p>运行时间: 82 ms</p>
+                    <p>内存: 33.1 MB</p>
+                    <pre class="bg-light p-2 code-pre">class Solution:
+    def findLongestSubarray(self, array: List[str]) -&gt; List[str]:
+        prefix_index_dict = {0: -1}
+        start = -1
+        max_len = 0
+        int_str_list = [str(i) for i in range(10)]
+        prefix_sum = 0
+        for i in range(len(array)):
+            if array[i].isdigit():
+                prefix_sum += 1
+            else:
+                prefix_sum -= 1
+            if prefix_sum not in prefix_index_dict:
+                prefix_index_dict[prefix_sum] = i
+            else:
+                last_index = prefix_index_dict[prefix_sum]
+                if i - last_index &gt; max_len:
+                    max_len = i - last_index
+                    start = last_index + 1
+        
+        if max_len == 0:
+            return []
+        return array[start: start + max_len]
+</pre>
+                    <button class="btn btn-secondary copy-btn" onclick="copyCode(this)">复制代码</button>
+                </div>
+            </section>
+
+            <section class="vote-buttons">
+                <button id="like-button" class="btn btn-outline-success"><i class="fas fa-thumbs-up"></i><span id="like-count" class="vote-count">0</span></button>
+                <button id="dislike-button" class="btn btn-outline-danger"><i class="fas fa-thumbs-down"></i><span id="dislike-count" class="vote-count">0</span></button>
+            </section>
+
+            
+                <section class="explain-section">
+                    <h2>Explain</h2>
+                    <div class="card">
+                        <div class="card-header" id="explainHeader">
+                            <span class="mb-0">
+                                <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explainCollapse" aria-expanded="false" aria-controls="explainCollapse">
+                                     <i class="fas fa-chevron-down float-end"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="explainCollapse" class="collapse" aria-labelledby="explainHeader">
+                            <div class="card-body">
+                                <p>此题解采用前缀和和哈希表的方法来找到包含相同数量字母和数字的最长子数组。首先，定义一个变量prefix_sum作为前缀和，当遇到数字时增加1，遇到字母时减少1。这样，每个位置的prefix_sum值反映了从数组开始到该位置数字和字母的数量差。使用哈希表prefix_index_dict来存储每个前缀和第一次出现的位置。遍历数组，对于每个元素，如果当前前缀和已经在哈希表中存在，则说明从上一次该前缀和出现的位置到当前位置的子数组中字母和数字的数量相等。通过比较并更新最长长度max_len，记录下最长子数组的开始位置。如果最终max_len为0，说明没有找到符合条件的子数组，返回空数组；否则根据记录的开始位置和长度返回子数组。</p>
+                                <p>时间复杂度: O(n)</p>
+                                <p>空间复杂度: O(n)</p>
+                                <pre class="bg-light p-2">class Solution:
+    def findLongestSubarray(self, array: List[str]) -&gt; List[str]:
+        prefix_index_dict = {0: -1} # 存储每个前缀和第一次出现的位置，初始为0的前缀和位置为-1
+        start = -1 # 最长子数组的起始索引
+        max_len = 0 # 最长子数组的长度
+        int_str_list = [str(i) for i in range(10)] # 生成数字字符列表，用于检查元素是否为数字
+        prefix_sum = 0 # 前缀和初始化
+        for i in range(len(array)):
+            if array[i].isdigit():
+                prefix_sum += 1 # 遇到数字，前缀和加1
+            else:
+                prefix_sum -= 1 # 遇到字母，前缀和减1
+            if prefix_sum not in prefix_index_dict:
+                prefix_index_dict[prefix_sum] = i # 存储新的前缀和及其位置
+            else:
+                last_index = prefix_index_dict[prefix_sum] # 获取相同前缀和的上一个位置
+                if i - last_index &gt; max_len:
+                    max_len = i - last_index # 更新最长长度
+                    start = last_index + 1 # 更新起始索引
+        if max_len == 0:
+            return [] # 如果没有找到有效的子数组，返回空数组
+        return array[start: start + max_len] # 返回最长的符合条件的子数组</pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+
+            
+                <section class="explore-section">
+                    <h2>Explore</h2>
+                    <div class="accordion" id="exploreAccordion">
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader1">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse1" aria-expanded="false" aria-controls="exploreCollapse1">
+                                            为什么在处理前缀和时数字增加1而字母减少1？这样的设计有什么特别的原因吗？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse1" class="collapse" aria-labelledby="exploreHeader1" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>在这个问题中，我们需要找到一个字母和数字数量相等的子数组。为了追踪字母和数字的数量差异，我们使用前缀和的方法。通过将数字视为+1，字母视为-1，前缀和就可以表示从数组开始到当前位置为止数字和字母的数量差。如果在某个位置前缀和为0，这意味着从开始到这个位置的子数组中字母和数字的数量完全相等。因此，通过这种设计，我们可以方便地通过前缀和的变化来追踪和定位数量相等的子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader2">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse2" aria-expanded="false" aria-controls="exploreCollapse2">
+                                            在哈希表中记录前缀和第一次出现的位置的目的是什么？如何通过这个信息找到满足条件的最长子数组？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse2" class="collapse" aria-labelledby="exploreHeader2" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>记录前缀和第一次出现的位置的目的是为了在之后遇到相同的前缀和时，能够迅速找到最早出现这个前缀和的位置。如果在数组的某个后续位置我们再次遇到相同的前缀和，这意味着从最初记录的位置到这个后续位置之间的子数组中，字母和数字的增减抵消了，即这部分子数组中字母和数字的数量相等。通过这种方式，我们可以用当前的索引减去哈希表中记录的索引来计算出这个子数组的长度，并持续更新我们找到的最长的满足条件的子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="card">
+                                <div class="card-header" id="exploreHeader3">
+                                    <span class="mb-0">
+                                        <button class="btn btn-link btn-block text-start collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#exploreCollapse3" aria-expanded="false" aria-controls="exploreCollapse3">
+                                            在题解中提到，如果前缀和在哈希表中已存在，则可以确定一个字母和数字数量相等的子数组。这种方法是如何确保子数组的字母和数字数量确实相等的？ <i class="fas fa-chevron-down float-end"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div id="exploreCollapse3" class="collapse" aria-labelledby="exploreHeader3" data-bs-parent="#exploreAccordion">
+                                    <div class="card-body">
+                                        <p>当我们在遍历数组时，每次通过增加1或减少1来更新前缀和，这反映了从数组开始到当前元素为止，数字和字母的总数量差。当我们在哈希表中找到一个已经存在的前缀和时，这意味着从哈希表中记录的位置到当前位置的前缀和增减彼此抵消了。换句话说，这两个位置之间的子数组中，字母和数字的增减数相等，因此它们的数量也必然相等。这就是为什么当我们发现相同的前缀和时可以确定找到了一个数量相等的子数组。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </section>
+            
+
+            
+        </main>
+
+        <footer class="mt-4 mb-3">
+            <div class="d-flex justify-content-between">
+                <a href="/problems" class="btn btn-secondary">返回题目列表</a>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchInitialCounts();
+            setupEventListeners();
+        });
+
+        function fetchInitialCounts() {
+            fetch('/api/vote_count/find-longest-subarray-lcci')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likes;
+                    document.getElementById('dislike-count').textContent = data.dislikes;
+                })
+                .catch(error => console.error('Error loading initial counts:', error));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('like-button').addEventListener('click', function() {
+                updateVoteCounts('like');
+            });
+
+            document.getElementById('dislike-button').addEventListener('click', function() {
+                updateVoteCounts('dislike');
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    copyCode(this);
+                });
+            });
+        }
+
+        function updateVoteCounts(voteType) {
+            const baseUrl = "/api/vote/find-longest-subarray-lcci/PLACEHOLDER";
+            const url = baseUrl.replace('PLACEHOLDER', voteType);
+
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes;
+                    }
+                    if (data.dislikes !== undefined) {
+                        document.getElementById('dislike-count').textContent = data.dislikes;
+                    }
+                })
+                .catch(error => console.error('Error updating counts:', error));
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = '已复制';
+                setTimeout(function() {
+                    button.textContent = '复制代码';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制代码: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
