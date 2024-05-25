@@ -56,3 +56,72 @@ class Problem(Document):
     explore = ListField(EmbeddedDocumentField(Explore))
 
     meta = {'collection': 'leetcode'}
+
+
+class SystemDesign(Document):
+    _id = StringField(required=True, primary_key=True)
+    description = StringField(required=True)
+    difficulty = StringField(required=True)
+    problem_path_name = StringField(db_field='problemPathName', required=True)
+    title = StringField(required=True)
+    description_zh = StringField()
+    title_zh = StringField()
+
+    meta = {
+        'collection': 'system_design'
+    }
+
+
+class Diagram(EmbeddedDocument):
+    value = StringField()
+
+    meta = {
+        'strict': False
+    }
+
+
+class DiagramCode(EmbeddedDocument):
+    highlevel = EmbeddedDocumentField(Diagram)
+    er = EmbeddedDocumentField(Diagram)
+    sequence = EmbeddedDocumentField(Diagram)
+    class_diagram = EmbeddedDocumentField(Diagram, db_field='classDiagram')
+    state = EmbeddedDocumentField(Diagram)
+
+    meta = {
+        'strict': False
+    }
+
+
+class SolutionSection(EmbeddedDocument):
+    name = StringField()
+    title = StringField()
+    placeholder = StringField()
+    content = StringField()
+
+    meta = {
+        'strict': False
+    }
+
+
+class Solution(EmbeddedDocument):
+    diagram_code = EmbeddedDocumentField(DiagramCode, db_field='diagramCode')
+    sections = ListField(EmbeddedDocumentField(SolutionSection))
+    sections_zh = ListField(EmbeddedDocumentField(SolutionSection), db_field='sections_zh')
+
+    meta = {
+        'strict': False
+    }
+
+
+class SystemDesignSolution(Document):
+    _id = StringField(required=True, primary_key=True)
+    created_at = StringField(db_field='createdAt', required=True)
+    id_path = StringField(db_field='idPath', required=True)
+    score = IntField(required=True)
+    solution = EmbeddedDocumentField(Solution)
+    problem_path_name = StringField(db_field='problemPathName', required=True)
+
+    meta = {
+        'collection': 'system_design_solution',
+        'strict': False
+    }

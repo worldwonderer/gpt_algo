@@ -42,7 +42,7 @@ def problems():
 
     return render_template('index.html', problems=problem_list, tags=tags,
                            search_query=search_query, selected_tag=selected_tag,
-                           page=page, total_pages=total_pages)
+                           page=page, total_pages=total_pages, rt=f'{bp.name}.{problems.__name__}')
 
 
 @bp.route('/problem/<title_slug>')

@@ -2,7 +2,7 @@ import os
 
 from flask import render_template
 
-from api.index import app
+from api.app import app
 from api.models import Problem
 
 
