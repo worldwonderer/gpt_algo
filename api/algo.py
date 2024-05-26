@@ -25,7 +25,7 @@ def problems():
 
     # 分页和查询问题列表
     # 计算跳过的文档数量
-    per_page = 15
+    per_page = 12
     skip = (page - 1) * per_page
 
     # 查询并分页问题列表
