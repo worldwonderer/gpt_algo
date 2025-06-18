@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, abort, jsonify, current_app, send_from_directory
+import json
+import os
+from flask import Blueprint, render_template, request, abort, jsonify, current_app, send_from_directory, redirect, url_for
 
-from .models import Problem
 from .config import tags
 from .vote import get_likes_count, get_dislikes_count, incr_likes_count, incr_dislikes_count
 
@@ -9,6 +10,22 @@ from wrap import fuzzy_search
 
 bp = Blueprint('main', __name__)
 
+_all_problems = None
+
+
+def get_all_problems():
+    global _all_problems
+    if _all_problems is None:
+        file_path = os.path.join(os.path.dirname(__file__), 'static', 'all_problems.json')
+        with open(file_path, 'r', encoding='utf-8') as f:
+            _all_problems = json.load(f)
+    return _all_problems
+
+
+@bp.route('/')
+def index():
+    return redirect(url_for('main.problems'))
+
 
 @bp.route('/problems')
 def problems():
@@ -16,31 +33,31 @@ def problems():
     search_query = request.args.get('search', '')
     selected_tag = request.args.get('tag', '')
 
-    # 构建查询条件
-    query = {}
-    if search_query:
-        query['title_cn__icontains'] = search_query
-    if selected_tag:
-        query['tags_q__in'] = [selected_tag]
+    all_problems_data = get_all_problems()
 
-    # 分页和查询问题列表
-    # 计算跳过的文档数量
-    per_page = 12
-    skip = (page - 1) * per_page
+    # 过滤问题
+    filtered_problems = []
+    if search_query or selected_tag:
+        for problem in all_problems_data:
+            match = True
+            if selected_tag and selected_tag not in problem.get('tags_q', []):
+                match = False
+            if search_query and search_query.lower() not in (problem.get('title_cn') or '').lower():
+                match = False
+            if match:
+                filtered_problems.append(problem)
+    else:
+        filtered_problems = all_problems_data
 
-    # 查询并分页问题列表
-    problem_list = Problem.objects(**query).skip(skip).limit(per_page)
-    total_count = problem_list.count()
-
-    if total_count == 0 and len(search_query) > 2:  # 在未命中任何题目，且有足够的信息时，进行模糊搜索
-        title_slug = fuzzy_search(search_query)
-        problem_list = Problem.objects(_id=title_slug)
-        total_count = problem_list.count()
-
-    # 计算总页数
+    # 分页
+    per_page = 14
+    total_count = len(filtered_problems)
     total_pages = (total_count + per_page - 1) // per_page
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_problems = filtered_problems[start:end]
 
-    return render_template('index.html', problems=problem_list, tags=tags,
+    return render_template('index.html', problems=paginated_problems, tags=tags,
                            search_query=search_query, selected_tag=selected_tag,
                            page=page, total_pages=total_pages, rt=f'{bp.name}.{problems.__name__}')
 

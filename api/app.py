@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_mongoengine import MongoEngine
 
-from .algo import bp
+from .algo import bp, get_all_problems
 from .system_design import sd_bp
 from .filters import difficulty_filter, remove_empty_paragraphs, format_code, clean_remote_html
 from .config import Config
@@ -23,3 +23,7 @@ db = MongoEngine(app)
 # 注册蓝图
 app.register_blueprint(bp)
 app.register_blueprint(sd_bp)
+
+# 在应用启动时预加载问题数据
+with app.app_context():
+    get_all_problems()
