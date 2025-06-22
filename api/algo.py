@@ -38,12 +38,33 @@ def problems():
     # 过滤问题
     filtered_problems = []
     if search_query or selected_tag:
+        # 处理多关键词搜索
+        search_keywords = []
+        if search_query:
+            # 按空格分割搜索关键词，并去除空字符串
+            search_keywords = [keyword.strip().lower() for keyword in search_query.split() if keyword.strip()]
+
         for problem in all_problems_data:
             match = True
+
+            # 标签过滤
             if selected_tag and selected_tag not in problem.get('tags_q', []):
                 match = False
-            if search_query and search_query.lower() not in (problem.get('title_cn') or '').lower():
-                match = False
+
+            # 多关键词搜索过滤
+            if search_keywords and match:
+                # 构建搜索文本：包括题目标题和标签
+                search_text = (problem.get('title_cn') or '').lower()
+                # 将标签也加入搜索范围
+                tags_text = ' '.join(problem.get('tags_q', [])).lower()
+                full_search_text = f"{search_text} {tags_text}"
+
+                # 检查所有关键词是否都存在（AND逻辑）
+                for keyword in search_keywords:
+                    if keyword not in full_search_text:
+                        match = False
+                        break
+
             if match:
                 filtered_problems.append(problem)
     else:
